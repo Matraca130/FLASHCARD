@@ -5,10 +5,10 @@ Compatible con frontend existente - CRÍTICO para conexión frontend-backend
 
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from app.models import User, Deck, Flashcard, StudySession, CardReview
-from app.services import StudyService
-from app.utils import calculate_fsrs, calculate_sm2, get_next_review_date
-from app.extensions import db
+from backend_app.models import User, Deck, Flashcard, StudySession, CardReview
+from backend_app.services import StudyService
+from backend_app.utils import calculate_fsrs, calculate_sm2, get_next_review_date
+from backend_app.extensions import db
 from datetime import datetime
 import logging
 

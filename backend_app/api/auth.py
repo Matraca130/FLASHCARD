@@ -5,9 +5,9 @@ Compatible con frontend existente
 
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, create_access_token, get_jwt_identity
-from app.models import User
-from app.services import UserService
-from app.extensions import db
+from backend_app.models import User
+from backend_app.services import UserService
+from backend_app.extensions import db
 import logging
 
 logger = logging.getLogger(__name__)

@@ -3,7 +3,7 @@ Modelos optimizados con índices, constraints y mejoras de rendimiento
 """
 
 from datetime import datetime, timedelta
-from app.extensions import db, bcrypt
+from backend_app.extensions import db, bcrypt
 from sqlalchemy import Index, CheckConstraint, text, event
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import validates

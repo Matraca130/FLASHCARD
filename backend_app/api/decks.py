@@ -5,9 +5,9 @@ Compatible con frontend existente
 
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from app.models import User, Deck, Flashcard
-from app.services import DeckService
-from app.extensions import db
+from backend_app.models import User, Deck, Flashcard
+from backend_app.services import DeckService
+from backend_app.extensions import db
 from datetime import datetime
 import logging
 

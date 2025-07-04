@@ -5,9 +5,9 @@ APIs optimizadas para consumo desde aplicaciones web
 
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from app.extensions import db
-from app.models import User, Deck, Flashcard, StudySession, CardReview
-from app.utils import get_current_user_id
+from backend_app.extensions import db
+from backend_app.models import User, Deck, Flashcard, StudySession, CardReview
+from backend_app.utils import get_current_user_id
 from datetime import datetime, timedelta
 import logging
 
@@ -219,7 +219,7 @@ def review_card_frontend(session_id):
             return jsonify({'error': 'Carta no encontrada'}), 404
         
         # Aplicar algoritmo de revisión espaciada
-        from app.algorithms import calculate_fsrs
+        from backend_app.algorithms import calculate_fsrs
         
         result = calculate_fsrs(
             difficulty=card.difficulty,

@@ -1,43 +1,23 @@
 #!/usr/bin/env python3
 """
-Punto de entrada SIMPLE para Gunicorn en Render
-Compatible con 'gunicorn app:app'
+Punto de entrada para Gunicorn en Render
+Integra el backend completo modularizado
 """
 
-from flask import Flask
+import os
+import sys
 
-# Crear aplicación Flask simple
-app = Flask(__name__)
+# Agregar el directorio actual al path para imports
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-# Configuración básica
-app.config['SECRET_KEY'] = 'dev-secret-key'
+# Importar la factory function del backend completo
+from backend_app import create_app
 
-@app.route('/')
-def home():
-    return {
-        "message": "StudyingFlash Backend funcionando!",
-        "status": "success",
-        "version": "1.0.0"
-    }
-
-@app.route('/health')
-def health():
-    return {"status": "healthy"}
-
-@app.route('/api/')
-def api_info():
-    return {
-        "api": "StudyingFlash Backend",
-        "version": "1.0.0",
-        "endpoints": [
-            "/",
-            "/health", 
-            "/api/"
-        ]
-    }
+# Crear la aplicación Flask con todas las funcionalidades
+app = create_app()
 
 if __name__ == '__main__':
-    import os
     port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port, debug=False)
+    debug = os.environ.get('FLASK_ENV') == 'development'
+    app.run(host='0.0.0.0', port=port, debug=debug)
 

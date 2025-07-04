@@ -2,10 +2,10 @@
 Sistema de servicios completo con patrones de diseño y optimizaciones
 """
 
-from app.extensions import db
-from app.models import User, Deck, Flashcard, StudySession, CardReview
-from app.utils.algorithms import calculate_fsrs, calculate_sm2
-from app.utils.cache import CacheManager
+from backend_app.extensions import db
+from backend_app.models import User, Deck, Flashcard, StudySession, CardReview
+from backend_app.utils.algorithms import calculate_fsrs, calculate_sm2
+from backend_app.utils.cache import CacheManager
 from flask_jwt_extended import create_access_token
 from datetime import datetime, timedelta
 from sqlalchemy import and_, or_, func, desc

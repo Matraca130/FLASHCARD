@@ -5,8 +5,8 @@ Aplicación Flask modularizada para sistema de flashcards con repetición espaci
 
 from flask import Flask
 from flask_cors import CORS
-from app.extensions import db, jwt, bcrypt, limiter
-from app.config import get_config
+from backend_app.extensions import db, jwt, bcrypt, limiter
+from backend_app.config import get_config
 import logging
 import os
 
@@ -51,13 +51,13 @@ def create_app(config_class=None):
         app.logger.info('StudyingFlash backend startup')
     
     # Registrar blueprints
-    from app.api.routes import api_bp
-    from app.api.auth import auth_bp
-    from app.api.study import study_bp
-    from app.api.dashboard import dashboard_bp
-    from app.api.decks import decks_bp
-    from app.api.flashcards import flashcards_bp
-    from app.api.stats import stats_bp
+    from backend_app.api.routes import api_bp
+    from backend_app.api.auth import auth_bp
+    from backend_app.api.study import study_bp
+    from backend_app.api.dashboard import dashboard_bp
+    from backend_app.api.decks import decks_bp
+    from backend_app.api.flashcards import flashcards_bp
+    from backend_app.api.stats import stats_bp
     
     app.register_blueprint(api_bp)
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
