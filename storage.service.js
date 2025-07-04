@@ -53,7 +53,7 @@ const StorageService = {
     getDeck: function(deckId) {
         const decks = this.getDecks();
         const deck = decks.find(d => d.id === deckId);
-        console.log('📖 Deck encontrado:', deck ? deck.nombre : 'No encontrado');
+        console.log('📖 Deck encontrado:', deck ? deck.name : 'No encontrado');
         return deck;
     },
 
@@ -65,7 +65,7 @@ const StorageService = {
             const newDeck = {
                 id: 'deck_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
                 name: deckData.name || 'Nuevo Deck',
-                descripcion: deckData.descripcion || '',
+                description: deckData.description || "",
                 categoria: deckData.categoria || 'general',
                 dificultad: deckData.dificultad || 'medio',
                 public: deckData.public || false,
@@ -83,7 +83,7 @@ const StorageService = {
             decks.push(newDeck);
             this.save('decks', decks);
             
-            console.log('✅ Deck creado:', newDeck.nombre);
+            console.log("✅ Deck creado:", newDeck.name);
             return newDeck;
         } catch (error) {
             console.error('❌ Error al crear deck:', error);
