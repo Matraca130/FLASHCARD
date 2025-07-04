@@ -1,229 +1,179 @@
-// charts.js - Enhanced chart initialization functions
-
-let progressChart = null;
-let accuracyChart = null;
-
+// charts.js - Configuración de gráficas para el dashboard
 export function initializeCharts() {
-  if (typeof Chart === 'undefined') {
-    console.warn('Chart.js not loaded');
-    return;
-  }
+  console.log('Initializing charts...');
   
-  initializeProgressChart();
-  initializeAccuracyChart();
+  try {
+    // Verificar si Chart.js está disponible
+    if (typeof Chart === 'undefined') {
+      console.warn('Chart.js no está disponible. Las gráficas no se mostrarán.');
+      return;
+    }
+
+    // Configurar gráfica de progreso semanal
+    initializeWeeklyProgressChart();
+    
+    // Configurar gráfica de distribución de categorías
+    initializeCategoryDistributionChart();
+    
+    // Configurar gráfica de rendimiento
+    initializePerformanceChart();
+    
+    console.log('Charts initialized successfully');
+  } catch (error) {
+    console.error('Error initializing charts:', error);
+  }
 }
 
-/**
- * Initialize the weekly progress chart
- */
-function initializeProgressChart() {
-  const progressCtx = document.getElementById('progressChart');
-  if (!progressCtx) return;
-  
-  // Destroy existing chart if it exists
-  if (progressChart) {
-    progressChart.destroy();
-  }
-  
-  progressChart = new Chart(progressCtx, {
+function initializeWeeklyProgressChart() {
+  const ctx = document.getElementById('weeklyProgressChart');
+  if (!ctx) return;
+
+  const data = {
+    labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
+    datasets: [{
+      label: 'Tarjetas Estudiadas',
+      data: [12, 19, 3, 5, 2, 3, 9],
+      borderColor: 'rgb(75, 192, 192)',
+      backgroundColor: 'rgba(75, 192, 192, 0.2)',
+      tension: 0.1
+    }]
+  };
+
+  new Chart(ctx, {
     type: 'line',
-    data: {
-      labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
-      datasets: [{
-        label: 'Cartas Estudiadas',
-        data: [12, 19, 15, 25, 22, 18, 30],
-        borderColor: 'rgba(102, 126, 234, 1)',
-        backgroundColor: 'rgba(102, 126, 234, 0.1)',
-        tension: 0.4,
-        fill: true,
-        pointBackgroundColor: 'rgba(102, 126, 234, 1)',
-        pointBorderColor: '#ffffff',
-        pointBorderWidth: 2,
-        pointRadius: 4,
-        pointHoverRadius: 6
-      }]
-    },
+    data: data,
     options: {
       responsive: true,
-      maintainAspectRatio: false,
       plugins: {
-        legend: { display: false },
-        tooltip: {
-          backgroundColor: 'rgba(0, 0, 0, 0.8)',
-          titleColor: '#ffffff',
-          bodyColor: '#ffffff',
-          borderColor: 'rgba(102, 126, 234, 1)',
-          borderWidth: 1
+        title: {
+          display: true,
+          text: 'Progreso Semanal'
         }
       },
       scales: {
         y: {
-          beginAtZero: true,
-          grid: { 
-            color: 'rgba(255, 255, 255, 0.1)',
-            drawBorder: false
-          },
-          ticks: { 
-            color: 'rgba(255, 255, 255, 0.8)',
-            font: { size: 12 }
-          }
-        },
-        x: {
-          grid: { 
-            color: 'rgba(255, 255, 255, 0.1)',
-            drawBorder: false
-          },
-          ticks: { 
-            color: 'rgba(255, 255, 255, 0.8)',
-            font: { size: 12 }
-          }
+          beginAtZero: true
         }
-      },
-      interaction: {
-        intersect: false,
-        mode: 'index'
       }
     }
   });
 }
 
-/**
- * Initialize the accuracy doughnut chart
- */
-function initializeAccuracyChart() {
-  const accuracyCtx = document.getElementById('accuracyChart');
-  if (!accuracyCtx) return;
-  
-  // Destroy existing chart if it exists
-  if (accuracyChart) {
-    accuracyChart.destroy();
-  }
-  
-  accuracyChart = new Chart(accuracyCtx, {
+function initializeCategoryDistributionChart() {
+  const ctx = document.getElementById('categoryChart');
+  if (!ctx) return;
+
+  const data = {
+    labels: ['Matemáticas', 'Historia', 'Ciencias', 'Idiomas', 'Otros'],
+    datasets: [{
+      data: [30, 25, 20, 15, 10],
+      backgroundColor: [
+        '#FF6384',
+        '#36A2EB',
+        '#FFCE56',
+        '#4BC0C0',
+        '#9966FF'
+      ]
+    }]
+  };
+
+  new Chart(ctx, {
     type: 'doughnut',
-    data: {
-      labels: ['Correctas', 'Incorrectas'],
-      datasets: [{
-        data: [75, 25],
-        backgroundColor: [
-          'rgba(34, 197, 94, 0.8)',
-          'rgba(239, 68, 68, 0.8)'
-        ],
-        borderColor: [
-          'rgba(34, 197, 94, 1)',
-          'rgba(239, 68, 68, 1)'
-        ],
-        borderWidth: 2,
-        hoverBackgroundColor: [
-          'rgba(34, 197, 94, 0.9)',
-          'rgba(239, 68, 68, 0.9)'
-        ]
-      }]
-    },
+    data: data,
     options: {
       responsive: true,
-      maintainAspectRatio: false,
       plugins: {
-        legend: {
-          position: 'bottom',
-          labels: {
-            color: 'rgba(255, 255, 255, 0.8)',
-            font: { size: 12 },
-            padding: 20,
-            usePointStyle: true
-          }
+        title: {
+          display: true,
+          text: 'Distribución por Categorías'
         },
-        tooltip: {
-          backgroundColor: 'rgba(0, 0, 0, 0.8)',
-          titleColor: '#ffffff',
-          bodyColor: '#ffffff',
-          callbacks: {
-            label: function(context) {
-              const label = context.label || '';
-              const value = context.parsed;
-              const total = context.dataset.data.reduce((a, b) => a + b, 0);
-              const percentage = Math.round((value / total) * 100);
-              return `${label}: ${value} (${percentage}%)`;
-            }
-          }
+        legend: {
+          position: 'bottom'
         }
-      },
-      cutout: '60%'
+      }
     }
   });
 }
 
-/**
- * Update progress chart with new data
- * @param {Array} data - Array of numbers for each day
- * @param {Array} labels - Array of labels for each day
- */
-export function updateProgressChart(data, labels = null) {
-  if (!progressChart) return;
-  
-  if (labels) {
-    progressChart.data.labels = labels;
-  }
-  progressChart.data.datasets[0].data = data;
-  progressChart.update('active');
+function initializePerformanceChart() {
+  const ctx = document.getElementById('performanceChart');
+  if (!ctx) return;
+
+  const data = {
+    labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
+    datasets: [{
+      label: 'Precisión (%)',
+      data: [65, 70, 75, 80, 85, 88],
+      borderColor: 'rgb(255, 99, 132)',
+      backgroundColor: 'rgba(255, 99, 132, 0.2)',
+      tension: 0.1
+    }, {
+      label: 'Velocidad (seg)',
+      data: [15, 12, 10, 8, 7, 6],
+      borderColor: 'rgb(54, 162, 235)',
+      backgroundColor: 'rgba(54, 162, 235, 0.2)',
+      tension: 0.1,
+      yAxisID: 'y1'
+    }]
+  };
+
+  new Chart(ctx, {
+    type: 'line',
+    data: data,
+    options: {
+      responsive: true,
+      plugins: {
+        title: {
+          display: true,
+          text: 'Rendimiento en el Tiempo'
+        }
+      },
+      scales: {
+        y: {
+          type: 'linear',
+          display: true,
+          position: 'left',
+          title: {
+            display: true,
+            text: 'Precisión (%)'
+          }
+        },
+        y1: {
+          type: 'linear',
+          display: true,
+          position: 'right',
+          title: {
+            display: true,
+            text: 'Tiempo (segundos)'
+          },
+          grid: {
+            drawOnChartArea: false,
+          },
+        }
+      }
+    }
+  });
 }
 
-/**
- * Update accuracy chart with new data
- * @param {number} correct - Number of correct answers
- * @param {number} incorrect - Number of incorrect answers
- */
-export function updateAccuracyChart(correct, incorrect) {
-  if (!accuracyChart) return;
-  
-  accuracyChart.data.datasets[0].data = [correct, incorrect];
-  accuracyChart.update('active');
+// Función para actualizar datos de las gráficas
+export function updateChartData(chartType, newData) {
+  console.log(`Updating ${chartType} chart with new data:`, newData);
+  // Implementar actualización de datos según sea necesario
 }
 
-/**
- * Update chart theme for different time periods
- * @param {string} period - '7D', '30D', or '90D'
- */
-export function updateChartPeriod(period) {
-  let labels, data;
-  
-  switch (period) {
-    case '7D':
-      labels = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
-      data = [12, 19, 15, 25, 22, 18, 30];
-      break;
-    case '30D':
-      labels = Array.from({length: 30}, (_, i) => `${i + 1}`);
-      data = Array.from({length: 30}, () => Math.floor(Math.random() * 40) + 5);
-      break;
-    case '90D':
-      labels = Array.from({length: 12}, (_, i) => `Sem ${i + 1}`);
-      data = Array.from({length: 12}, () => Math.floor(Math.random() * 200) + 50);
-      break;
-    default:
-      return;
-  }
-  
-  updateProgressChart(data, labels);
-}
-
-/**
- * Destroy all charts (useful for cleanup)
- */
-export function destroyCharts() {
-  if (progressChart) {
-    progressChart.destroy();
-    progressChart = null;
-  }
-  if (accuracyChart) {
-    accuracyChart.destroy();
-    accuracyChart = null;
+// Función para redimensionar gráficas
+export function resizeCharts() {
+  if (typeof Chart !== 'undefined') {
+    Chart.instances.forEach(chart => {
+      chart.resize();
+    });
   }
 }
 
-// Expose to legacy code
-window.initializeCharts = initializeCharts;
-window.updateProgressChart = updateProgressChart;
-window.updateAccuracyChart = updateAccuracyChart;
-window.updateChartPeriod = updateChartPeriod;
+// Exportar funciones principales
+export default {
+  initializeCharts,
+  updateChartData,
+  resizeCharts
+};
 
