@@ -20,11 +20,14 @@ document.addEventListener('click', async (e) => {
       await logout();
       break;
     case 'create-deck': {
-      const form = document.getElementById('create-deck-form');
-      if (!form) return;
-      const name = form.querySelector('input[name="name"]').value;
-      const description = form.querySelector('textarea[name="description"]').value;
-      await createDeck({ name, description });
+      const name = document.getElementById('deck-name').value.trim();
+      const description = document.getElementById('deck-description').value.trim();
+      const isPublic = document.getElementById('deck-public').checked;
+      await createDeck({ name, description, isPublic });
+      break;
+    }
+    case 'create-flashcard': {
+      await createFlashcard();
       break;
     }
     case 'start-study':
