@@ -2,16 +2,16 @@
 
 /* CSS Custom Properties - Instagram Gray System */
 :root {
-  /* Instagram Inspired Gray Colors */
-  --ig-gray-background: #FAFAFA;        /* Fondo principal de Instagram */
-  --ig-gray-light: #F5F5F5;            /* Gris muy claro */
-  --ig-gray-medium-light: #EFEFEF;     /* Gris claro medio */
-  --ig-gray-medium: #DBDBDB;           /* Gris medio */
-  --ig-gray-dark-medium: #C7C7C7;      /* Gris medio oscuro */
-  --ig-gray-dark: #8E8E8E;             /* Gris oscuro */
-  --ig-gray-text: #262626;             /* Texto principal */
-  --ig-gray-text-secondary: #8E8E8E;   /* Texto secundario */
-  --ig-gray-border: #DBDBDB;           /* Bordes */
+  /* Instagram Inspired Gray Colors - Ajustados */
+  --ig-gray-background: #F8F8F8;        /* Fondo principal más suave */
+  --ig-gray-light: #F3F3F3;            /* Gris muy claro ajustado */
+  --ig-gray-medium-light: #EBEBEB;     /* Gris claro medio más suave */
+  --ig-gray-medium: #D0D0D0;           /* Gris medio más visible */
+  --ig-gray-dark-medium: #BDBDBD;      /* Gris medio oscuro ajustado */
+  --ig-gray-dark: #757575;             /* Gris oscuro más legible */
+  --ig-gray-text: #212121;             /* Texto principal más oscuro */
+  --ig-gray-text-secondary: #757575;   /* Texto secundario ajustado */
+  --ig-gray-border: #E0E0E0;           /* Bordes más suaves */
   --ig-white: #FFFFFF;                 /* Blanco puro */
   
   /* Instagram Accent Colors (sutiles) */

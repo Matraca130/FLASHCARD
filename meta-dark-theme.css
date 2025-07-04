@@ -1,0 +1,578 @@
+/* ===== META DARK THEME: Basado en los colores de Meta/Instagram ===== */
+
+/* CSS Custom Properties - Meta Dark System */
+:root {
+  /* Meta Dark Colors - Basados en la imagen */
+  --meta-black: #000000;                /* Negro puro */
+  --meta-dark-bg: #0A0A0A;             /* Fondo principal muy oscuro */
+  --meta-dark-secondary: #1C1E21;       /* Fondo secundario */
+  --meta-dark-card: #242526;           /* Cards y elementos */
+  --meta-dark-hover: #3A3B3C;         /* Hover states */
+  --meta-dark-border: #3E4042;        /* Bordes */
+  --meta-gray-light: #B0B3B8;         /* Texto secundario */
+  --meta-white: #FFFFFF;               /* Texto principal */
+  --meta-white-secondary: #E4E6EA;    /* Texto secundario claro */
+  
+  /* Meta Accent Colors */
+  --meta-blue: #1877F2;               /* Azul Meta */
+  --meta-blue-hover: #166FE5;         /* Azul hover */
+  --meta-green: #42B883;              /* Verde */
+  --meta-red: #F02849;                /* Rojo */
+  --meta-orange: #FF6B35;             /* Naranja */
+  
+  /* Gradientes Meta */
+  --gradient-meta-main: linear-gradient(135deg, #0A0A0A 0%, #1C1E21 100%);
+  --gradient-meta-card: linear-gradient(135deg, #242526 0%, #1C1E21 100%);
+  --gradient-meta-button: linear-gradient(135deg, #1877F2 0%, #166FE5 100%);
+  
+  /* Sombras Meta */
+  --shadow-meta-subtle: 0 2px 4px rgba(0, 0, 0, 0.3);
+  --shadow-meta-medium: 0 4px 8px rgba(0, 0, 0, 0.4);
+  --shadow-meta-elevated: 0 8px 16px rgba(0, 0, 0, 0.5);
+  --shadow-meta-focus: 0 0 0 2px rgba(24, 119, 242, 0.3);
+  
+  /* Typography */
+  --font-meta: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  
+  /* Transitions */
+  --transition-meta: all 0.2s ease-out;
+  --transition-meta-smooth: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* ===== GLOBAL META DARK OVERRIDES ===== */
+
+/* Body and Background */
+body {
+  background: var(--meta-dark-bg) !important;
+  color: var(--meta-white) !important;
+  font-family: var(--font-meta) !important;
+  line-height: 1.5 !important;
+}
+
+/* Main container background */
+.main-content {
+  background: var(--meta-dark-bg) !important;
+}
+
+/* ===== NAVIGATION META DARK STYLING ===== */
+
+.navbar {
+  background: var(--meta-dark-secondary) !important;
+  backdrop-filter: blur(20px) !important;
+  border-bottom: 1px solid var(--meta-dark-border) !important;
+  box-shadow: var(--shadow-meta-subtle) !important;
+}
+
+.nav-link {
+  color: var(--meta-gray-light) !important;
+  font-weight: 400 !important;
+  transition: var(--transition-meta) !important;
+  padding: 0.75rem 1rem !important;
+  border-radius: 8px !important;
+}
+
+.nav-link:hover {
+  color: var(--meta-white) !important;
+  background: var(--meta-dark-hover) !important;
+}
+
+.nav-link.active {
+  color: var(--meta-white) !important;
+  background: var(--meta-dark-card) !important;
+  font-weight: 600 !important;
+}
+
+.nav-link.active .icon {
+  color: var(--meta-blue) !important;
+}
+
+/* ===== SECTIONS META DARK STYLING ===== */
+
+.section {
+  background: var(--meta-dark-bg) !important;
+  padding: 2rem !important;
+}
+
+/* Dashboard Hero */
+.dashboard-hero {
+  background: var(--meta-dark-card) !important;
+  border-radius: 12px !important;
+  padding: 3rem 2rem !important;
+  margin-bottom: 2rem !important;
+  box-shadow: var(--shadow-meta-subtle) !important;
+  border: 1px solid var(--meta-dark-border) !important;
+}
+
+.hero-title {
+  color: var(--meta-white) !important;
+  font-weight: 700 !important;
+  font-size: 2.5rem !important;
+  margin-bottom: 1rem !important;
+  letter-spacing: -0.02em !important;
+}
+
+.hero-subtitle {
+  color: var(--meta-gray-light) !important;
+  font-weight: 400 !important;
+  font-size: 1.1rem !important;
+  line-height: 1.5 !important;
+}
+
+/* ===== CARDS META DARK STYLING ===== */
+
+.chart-container,
+.deck-card,
+.card,
+.modal-content {
+  background: var(--meta-dark-card) !important;
+  border: 1px solid var(--meta-dark-border) !important;
+  border-radius: 12px !important;
+  box-shadow: var(--shadow-meta-subtle) !important;
+  transition: var(--transition-meta-smooth) !important;
+}
+
+.chart-container:hover,
+.deck-card:hover,
+.card:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: var(--shadow-meta-medium) !important;
+  border-color: var(--meta-dark-hover) !important;
+  background: var(--meta-dark-hover) !important;
+}
+
+/* Chart Headers */
+.chart-title {
+  color: var(--meta-white) !important;
+  font-weight: 600 !important;
+  font-size: 1.1rem !important;
+}
+
+/* ===== BUTTONS META DARK STYLING ===== */
+
+.btn-primary {
+  background: var(--gradient-meta-button) !important;
+  border: none !important;
+  color: white !important;
+  font-weight: 600 !important;
+  border-radius: 8px !important;
+  padding: 0.75rem 1.5rem !important;
+  transition: var(--transition-meta) !important;
+  box-shadow: var(--shadow-meta-subtle) !important;
+}
+
+.btn-primary:hover {
+  background: var(--meta-blue-hover) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: var(--shadow-meta-medium) !important;
+}
+
+.btn-secondary {
+  background: var(--meta-dark-card) !important;
+  border: 1px solid var(--meta-dark-border) !important;
+  color: var(--meta-white) !important;
+  font-weight: 600 !important;
+  border-radius: 8px !important;
+  transition: var(--transition-meta) !important;
+}
+
+.btn-secondary:hover {
+  background: var(--meta-dark-hover) !important;
+  border-color: var(--meta-gray-light) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: var(--shadow-meta-subtle) !important;
+}
+
+/* ===== FORMS META DARK STYLING ===== */
+
+.form-input,
+.form-textarea,
+.form-select {
+  background: var(--meta-dark-card) !important;
+  border: 1px solid var(--meta-dark-border) !important;
+  border-radius: 6px !important;
+  padding: 1rem 1.25rem !important;
+  color: var(--meta-white) !important;
+  font-family: var(--font-meta) !important;
+  transition: var(--transition-meta) !important;
+  font-size: 0.95rem !important;
+}
+
+.form-input::placeholder,
+.form-textarea::placeholder {
+  color: var(--meta-gray-light) !important;
+}
+
+.form-input:focus,
+.form-textarea:focus,
+.form-select:focus {
+  outline: none !important;
+  border-color: var(--meta-blue) !important;
+  box-shadow: var(--shadow-meta-focus) !important;
+  background: var(--meta-dark-hover) !important;
+}
+
+.form-input:hover,
+.form-textarea:hover,
+.form-select:hover {
+  border-color: var(--meta-gray-light) !important;
+}
+
+.form-group label {
+  color: var(--meta-white) !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  margin-bottom: 0.5rem !important;
+}
+
+/* ===== MODALS META DARK STYLING ===== */
+
+.modal-overlay {
+  background: rgba(0, 0, 0, 0.8) !important;
+  backdrop-filter: blur(4px) !important;
+}
+
+.modal-content {
+  background: var(--meta-dark-card) !important;
+  border-radius: 12px !important;
+  box-shadow: var(--shadow-meta-elevated) !important;
+  border: 1px solid var(--meta-dark-border) !important;
+}
+
+.modal-header {
+  border-bottom: 1px solid var(--meta-dark-border) !important;
+  padding: 1.5rem 2rem !important;
+  background: var(--meta-dark-secondary) !important;
+  border-radius: 12px 12px 0 0 !important;
+}
+
+.modal-header h3 {
+  color: var(--meta-white) !important;
+  font-weight: 600 !important;
+  font-size: 1.2rem !important;
+}
+
+.modal-close {
+  color: var(--meta-gray-light) !important;
+  transition: var(--transition-meta) !important;
+  border-radius: 50% !important;
+  padding: 0.5rem !important;
+}
+
+.modal-close:hover {
+  color: var(--meta-white) !important;
+  background: var(--meta-dark-hover) !important;
+}
+
+/* ===== NAVIGATION STATUS MESSAGES ===== */
+
+.nav-status-message {
+  background: var(--meta-dark-card) !important;
+  border: 1px solid var(--meta-dark-border) !important;
+  border-radius: 8px !important;
+  color: var(--meta-white) !important;
+  font-weight: 500 !important;
+  box-shadow: var(--shadow-meta-subtle) !important;
+  padding: 1rem 1.5rem !important;
+}
+
+/* ===== ICONS META DARK STYLING ===== */
+
+.icon {
+  transition: var(--transition-meta) !important;
+  opacity: 0.8 !important;
+}
+
+.nav-link:hover .icon {
+  color: var(--meta-white) !important;
+  opacity: 1 !important;
+}
+
+.nav-link.active .icon {
+  opacity: 1 !important;
+}
+
+/* ===== STATS AND METRICS ===== */
+
+.hero-stats,
+.dashboard-stats {
+  background: var(--meta-dark-secondary) !important;
+  border-radius: 12px !important;
+  padding: 1.5rem !important;
+  border: 1px solid var(--meta-dark-border) !important;
+  box-shadow: var(--shadow-meta-subtle) !important;
+}
+
+.stat-value {
+  color: var(--meta-white) !important;
+  font-weight: 700 !important;
+  font-size: 1.8rem !important;
+}
+
+.stat-label {
+  color: var(--meta-gray-light) !important;
+  font-weight: 500 !important;
+  font-size: 0.9rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+}
+
+/* ===== ACTIVITY HEATMAP ===== */
+
+.activity-heatmap {
+  background: var(--meta-dark-card) !important;
+  border: 1px solid var(--meta-dark-border) !important;
+  border-radius: 12px !important;
+  box-shadow: var(--shadow-meta-subtle) !important;
+  padding: 1.5rem !important;
+}
+
+.heatmap-title {
+  color: var(--meta-white) !important;
+  font-weight: 600 !important;
+  margin-bottom: 1rem !important;
+}
+
+/* ===== TABLES AND LISTS ===== */
+
+table {
+  background: var(--meta-dark-card) !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+  box-shadow: var(--shadow-meta-subtle) !important;
+  border: 1px solid var(--meta-dark-border) !important;
+}
+
+th {
+  background: var(--meta-dark-secondary) !important;
+  color: var(--meta-white) !important;
+  font-weight: 600 !important;
+  padding: 1rem !important;
+  border-bottom: 1px solid var(--meta-dark-border) !important;
+}
+
+td {
+  color: var(--meta-white) !important;
+  padding: 1rem !important;
+  border-bottom: 1px solid var(--meta-dark-border) !important;
+}
+
+tr:hover {
+  background: var(--meta-dark-hover) !important;
+}
+
+/* ===== RESPONSIVE ADJUSTMENTS ===== */
+
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 2rem !important;
+  }
+  
+  .dashboard-hero {
+    padding: 2rem 1.5rem !important;
+  }
+  
+  .section {
+    padding: 1rem !important;
+  }
+  
+  .nav-link {
+    padding: 0.5rem 0.75rem !important;
+  }
+}
+
+/* ===== ACCESSIBILITY ENHANCEMENTS ===== */
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Focus indicators for keyboard navigation */
+*:focus-visible {
+  outline: 2px solid var(--meta-blue) !important;
+  outline-offset: 2px !important;
+  border-radius: 4px !important;
+}
+
+/* ===== META DARK ANIMATIONS ===== */
+
+@keyframes metaFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes metaSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.meta-fade-in {
+  animation: metaFadeIn 0.3s ease-out !important;
+}
+
+.meta-slide-in {
+  animation: metaSlideIn 0.25s ease-out !important;
+}
+
+/* ===== SCROLLBAR META DARK STYLING ===== */
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--meta-dark-secondary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--meta-dark-hover);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--meta-gray-light);
+}
+
+/* ===== SELECTION STYLING ===== */
+
+::selection {
+  background: var(--meta-blue) !important;
+  color: var(--meta-white) !important;
+}
+
+/* ===== LOADING STATES ===== */
+
+.loading {
+  opacity: 0.6 !important;
+  pointer-events: none !important;
+}
+
+.loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin: -0.75rem 0 0 -0.75rem;
+  border: 2px solid var(--meta-dark-border);
+  border-top: 2px solid var(--meta-blue);
+  border-radius: 50%;
+  animation: metaSpin 1s linear infinite;
+}
+
+@keyframes metaSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ===== SUCCESS/ERROR STATES ===== */
+
+.success {
+  border-color: var(--meta-green) !important;
+  background: rgba(66, 184, 131, 0.1) !important;
+}
+
+.error {
+  border-color: var(--meta-red) !important;
+  background: rgba(240, 40, 73, 0.1) !important;
+}
+
+/* ===== SPECIAL ELEMENTS ===== */
+
+.badge {
+  background: var(--meta-dark-hover) !important;
+  color: var(--meta-white) !important;
+  padding: 0.25rem 0.75rem !important;
+  border-radius: 12px !important;
+  font-size: 0.8rem !important;
+  font-weight: 500 !important;
+  border: 1px solid var(--meta-dark-border) !important;
+}
+
+.divider {
+  border-color: var(--meta-dark-border) !important;
+  opacity: 1 !important;
+}
+
+/* ===== ENHANCED VISUAL HIERARCHY ===== */
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--meta-white) !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.01em !important;
+  line-height: 1.3 !important;
+}
+
+p {
+  color: var(--meta-white) !important;
+  line-height: 1.5 !important;
+}
+
+small {
+  color: var(--meta-gray-light) !important;
+}
+
+/* ===== META SPECIFIC ELEMENTS ===== */
+
+.meta-primary-button {
+  background: var(--meta-blue) !important;
+  color: white !important;
+  border: none !important;
+  padding: 0.75rem 1.5rem !important;
+  border-radius: 6px !important;
+  font-weight: 600 !important;
+  transition: var(--transition-meta) !important;
+}
+
+.meta-primary-button:hover {
+  background: var(--meta-blue-hover) !important;
+  transform: translateY(-1px) !important;
+}
+
+.meta-secondary-button {
+  background: transparent !important;
+  color: var(--meta-blue) !important;
+  border: 1px solid var(--meta-blue) !important;
+  padding: 0.75rem 1.5rem !important;
+  border-radius: 6px !important;
+  font-weight: 600 !important;
+  transition: var(--transition-meta) !important;
+}
+
+.meta-secondary-button:hover {
+  background: var(--meta-blue) !important;
+  color: white !important;
+}
+
+/* ===== TEXT COLORS ===== */
+
+.text-primary {
+  color: var(--meta-white) !important;
+}
+
+.text-secondary {
+  color: var(--meta-gray-light) !important;
+}
+
+.text-muted {
+  color: var(--meta-gray-light) !important;
+  opacity: 0.7 !important;
+}
+
