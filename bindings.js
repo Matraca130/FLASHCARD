@@ -20,11 +20,7 @@ document.addEventListener('click', async (e) => {
       await logout();
       break;
     case 'create-deck': {
-      const form = document.getElementById('create-deck-form');
-      if (!form) return;
-      const name = form.querySelector('input[name="name"]').value;
-      const description = form.querySelector('textarea[name="description"]').value;
-      await createDeck({ name, description });
+      await createDeck();
       break;
     }
     case 'start-study':
@@ -38,3 +34,10 @@ document.addEventListener('click', async (e) => {
       break;
   }
 });
+
+
+    case 'create-flashcard': {
+      await createFlashcard();
+      break;
+    }
+
