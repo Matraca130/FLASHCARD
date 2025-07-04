@@ -28,13 +28,13 @@ function showSection(sectionName) {
           import('./charts.js').then(m => m.initializeCharts && m.initializeCharts());
           break;
         case 'estudiar':
-          import('./services/study.service.js').then(m => m.loadStudyDecks && m.loadStudyDecks());
+          import('./study.service.js').then(m => m.loadStudyDecks && m.loadStudyDecks());
           break;
         case 'crear':
-          import('./services/create.service.js').then(m => m.openCreateDeckModal && m.openCreateDeckModal());
+          import('./create.service.js').then(m => m.openCreateDeckModal && m.openCreateDeckModal());
           break;
         case 'gestionar':
-          import('./services/manage.service.js').then(m => m.loadManageDecks && m.loadManageDecks());
+          import('./manage.service.js').then(m => m.loadManageDecks && m.loadManageDecks());
           break;
         case 'ranking':
           loadRankingData();

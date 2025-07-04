@@ -1,14 +1,14 @@
 // main.js - Punto de entrada principal de la aplicación
 import './router.js';
 import './navigation.js';
-import './events/bindings.js';
-import { loadGamificationData } from './services/gamification.service.js';
-import { initializeAlgorithmModal } from './services/algorithms.service.js';
-import { initializeFlashcardEvents } from './services/flashcards.service.js';
-import { initializeImportExportEvents } from './services/import-export.service.js';
-import { initializeCreateEvents } from './services/create.service.js';
-import { initializeActivityHeatmap } from './services/activity-heatmap.service.js';
-import { initializeParticlesOnReady } from './services/particles.service.js';
+import './bindings.js';
+import { loadGamificationData } from './gamification.service.js';
+import { initializeAlgorithmModal } from './algorithms.service.js';
+import { initializeFlashcardEvents } from './flashcards.service.js';
+import { initializeImportExportEvents } from './import-export.service.js';
+import { initializeCreateEvents } from './create.service.js';
+import { initializeActivityHeatmap } from './activity-heatmap.service.js';
+import { initializeParticlesOnReady } from './particles.service.js';
 import { initializeCharts } from './charts.js';
 
 // Inicialización de la aplicación
