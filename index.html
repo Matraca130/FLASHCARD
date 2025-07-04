@@ -1012,15 +1012,16 @@
       switch (sectionName) {
         case 'dashboard':
           loadDashboardData();
+          import('./charts.js').then(m => m.initializeCharts && m.initializeCharts());
           break;
         case 'estudiar':
-          loadStudyDecks();
+          import('./study.service.js').then(m => m.loadStudyDecks && m.loadStudyDecks());
           break;
         case 'crear':
-          loadCreateDecks();
+          import('./create.service.js').then(m => m.openCreateDeckModal && m.openCreateDeckModal());
           break;
         case 'gestionar':
-          loadManageData();
+          import('./manage.service.js').then(m => m.loadManageDecks && m.loadManageDecks());
           break;
         case 'ranking':
           loadRankingData();
@@ -2507,52 +2508,7 @@
       // In a real app, this would send data to analytics service
       console.log('Analytics:', { category, action, label });
     }
-    
-    // Track section navigation
-    function showSection(sectionName) {
-      trackEvent('Navigation', 'Section Change', sectionName);
-      
-      // Hide all sections
-      document.querySelectorAll('.section').forEach(section => {
-        section.classList.remove('active');
-      });
-      
-      // Show target section
-      const targetSection = document.getElementById(sectionName);
-      if (targetSection) {
-        targetSection.classList.add('active');
-      }
-      
-      // Update navigation
-      document.querySelectorAll('.nav-link').forEach(link => {
-        link.classList.remove('active');
-      });
-      
-      const activeLink = document.querySelector(`[data-section="${sectionName}"]`);
-      if (activeLink) {
-        activeLink.classList.add('active');
-      }
-      
-      // Load section-specific data
-      switch (sectionName) {
-        case 'dashboard':
-          loadDashboardData();
-          break;
-        case 'estudiar':
-          loadStudyDecks();
-          break;
-        case 'crear':
-          loadCreateDecks();
-          break;
-        case 'gestionar':
-          loadManageData();
-          break;
-        case 'ranking':
-          loadRankingData();
-          break;
-      }
-    }
-    
+
     // ===== ERROR HANDLING =====
     window.addEventListener('error', function(e) {
       console.error('Global error:', e.error);
