@@ -175,8 +175,8 @@ const StorageService = {
             const newFlashcard = {
                 id: 'card_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
                 deckId: flashcardData.deckId,
-                frente: flashcardData.frente || '',
-                reverso: flashcardData.reverso || '',
+                front: flashcardData.front || "",
+                back: flashcardData.back || "",
                 dificultad: flashcardData.dificultad || 'medio',
                 fechaCreacion: new Date().toISOString(),
                 estadisticas: {
