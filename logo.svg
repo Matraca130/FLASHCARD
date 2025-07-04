@@ -1,0 +1,90 @@
+<!-- Logo StudyingFlash inspirado en estilo POLYGONE -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 80" style="background: transparent;">
+  <defs>
+    <!-- Gradiente principal azul a fucsia -->
+    <linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#4F46E5;stop-opacity:1" />
+      <stop offset="30%" style="stop-color:#7C3AED;stop-opacity:1" />
+      <stop offset="70%" style="stop-color:#C026D3;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#EC4899;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Gradiente para efectos de líneas -->
+    <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#EC4899;stop-opacity:0.8" />
+      <stop offset="50%" style="stop-color:#C026D3;stop-opacity:0.6" />
+      <stop offset="100%" style="stop-color:#4F46E5;stop-opacity:0.4" />
+    </linearGradient>
+    
+    <!-- Filtro para efecto de brillo -->
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Líneas de fondo decorativas -->
+  <g opacity="0.3">
+    <line x1="50" y1="10" x2="80" y2="25" stroke="url(#lineGradient)" stroke-width="1.5"/>
+    <line x1="120" y1="5" x2="140" y2="30" stroke="url(#lineGradient)" stroke-width="1"/>
+    <line x1="200" y1="8" x2="230" y2="20" stroke="url(#lineGradient)" stroke-width="1.5"/>
+    <line x1="280" y1="12" x2="310" y2="28" stroke="url(#lineGradient)" stroke-width="1"/>
+    <line x1="350" y1="6" x2="380" y2="22" stroke="url(#lineGradient)" stroke-width="1.5"/>
+    
+    <line x1="40" y1="55" x2="70" y2="70" stroke="url(#lineGradient)" stroke-width="1"/>
+    <line x1="150" y1="60" x2="180" y2="75" stroke="url(#lineGradient)" stroke-width="1.5"/>
+    <line x1="250" y1="58" x2="280" y2="72" stroke="url(#lineGradient)" stroke-width="1"/>
+    <line x1="320" y1="62" x2="350" y2="76" stroke="url(#lineGradient)" stroke-width="1.5"/>
+  </g>
+  
+  <!-- Fragmentos decorativos -->
+  <g opacity="0.6">
+    <polygon points="45,15 50,12 48,20" fill="#EC4899"/>
+    <polygon points="125,8 130,5 128,13" fill="#C026D3"/>
+    <polygon points="205,18 210,15 208,23" fill="#7C3AED"/>
+    <polygon points="285,12 290,9 288,17" fill="#4F46E5"/>
+    <polygon points="365,16 370,13 368,21" fill="#EC4899"/>
+    
+    <polygon points="65,65 70,62 68,70" fill="#C026D3"/>
+    <polygon points="175,68 180,65 178,73" fill="#7C3AED"/>
+    <polygon points="275,66 280,63 278,71" fill="#4F46E5"/>
+    <polygon points="345,69 350,66 348,74" fill="#EC4899"/>
+  </g>
+  
+  <!-- Texto principal StudyingFlash -->
+  <text x="200" y="50" 
+        font-family="'Inter', 'Helvetica Neue', Arial, sans-serif" 
+        font-size="28" 
+        font-weight="800" 
+        text-anchor="middle" 
+        fill="url(#textGradient)"
+        filter="url(#glow)"
+        letter-spacing="1px">
+    StudyingFlash
+  </text>
+  
+  <!-- Efecto de overlay para simular fragmentación -->
+  <g opacity="0.8">
+    <!-- Líneas que "cortan" algunas letras -->
+    <line x1="140" y1="35" x2="145" y2="55" stroke="#EC4899" stroke-width="2" opacity="0.7"/>
+    <line x1="180" y1="30" x2="185" y2="50" stroke="#C026D3" stroke-width="1.5" opacity="0.6"/>
+    <line x1="220" y1="32" x2="225" y2="52" stroke="#7C3AED" stroke-width="2" opacity="0.7"/>
+    <line x1="260" y1="28" x2="265" y2="48" stroke="#4F46E5" stroke-width="1.5" opacity="0.6"/>
+  </g>
+  
+  <!-- Puntos de acento -->
+  <g opacity="0.9">
+    <circle cx="130" cy="25" r="1.5" fill="#EC4899"/>
+    <circle cx="190" cy="22" r="1" fill="#C026D3"/>
+    <circle cx="240" cy="26" r="1.5" fill="#7C3AED"/>
+    <circle cx="290" cy="24" r="1" fill="#4F46E5"/>
+    
+    <circle cx="160" cy="65" r="1" fill="#EC4899"/>
+    <circle cx="210" cy="62" r="1.5" fill="#C026D3"/>
+    <circle cx="270" cy="64" r="1" fill="#7C3AED"/>
+  </g>
+</svg>
+

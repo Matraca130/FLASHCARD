@@ -1,0 +1,83 @@
+<!-- Iconos personalizados inspirados en Manhattan Institute y diseño abstracto -->
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  
+  <!-- Dashboard Icon - Líneas geométricas formando gráfico abstracto -->
+  <symbol id="icon-dashboard" viewBox="0 0 24 24">
+    <path d="M3 18h4v-6H3v6zm6-12h4v12h-4V6zm6 4h4v8h-4v-8z" fill="currentColor" opacity="0.8"/>
+    <path d="M2 20h20v2H2v-2z" fill="currentColor" opacity="0.4"/>
+    <circle cx="5" cy="12" r="1.5" fill="currentColor"/>
+    <circle cx="11" cy="8" r="1.5" fill="currentColor"/>
+    <circle cx="17" cy="12" r="1.5" fill="currentColor"/>
+  </symbol>
+
+  <!-- Estudiar Icon - Formas abstractas que sugieren conocimiento -->
+  <symbol id="icon-study" viewBox="0 0 24 24">
+    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" fill="currentColor" opacity="0.1"/>
+    <path d="M8 8h8v2H8V8zm0 4h8v2H8v-2zm0 4h5v2H8v-2z" fill="currentColor" opacity="0.6"/>
+    <path d="M12 6L8 10h8l-4-4z" fill="currentColor" opacity="0.8"/>
+    <circle cx="18" cy="6" r="2" fill="currentColor" opacity="0.9"/>
+  </symbol>
+
+  <!-- Crear Icon - Elementos que se construyen/ensamblan -->
+  <symbol id="icon-create" viewBox="0 0 24 24">
+    <rect x="4" y="4" width="6" height="6" rx="1" fill="currentColor" opacity="0.7"/>
+    <rect x="14" y="4" width="6" height="6" rx="1" fill="currentColor" opacity="0.5"/>
+    <rect x="4" y="14" width="6" height="6" rx="1" fill="currentColor" opacity="0.6"/>
+    <rect x="14" y="14" width="6" height="6" rx="1" fill="currentColor" opacity="0.8"/>
+    <path d="M12 8V4m0 16v-4m4-8h4m-16 0h4" stroke="currentColor" stroke-width="2" opacity="0.4"/>
+  </symbol>
+
+  <!-- Gestionar Icon - Patrones organizados/estructurados -->
+  <symbol id="icon-manage" viewBox="0 0 24 24">
+    <rect x="3" y="3" width="7" height="7" rx="1" fill="currentColor" opacity="0.6"/>
+    <rect x="14" y="3" width="7" height="7" rx="1" fill="currentColor" opacity="0.7"/>
+    <rect x="3" y="14" width="7" height="7" rx="1" fill="currentColor" opacity="0.8"/>
+    <rect x="14" y="14" width="7" height="7" rx="1" fill="currentColor" opacity="0.5"/>
+    <circle cx="6.5" cy="6.5" r="1" fill="currentColor"/>
+    <circle cx="17.5" cy="6.5" r="1" fill="currentColor"/>
+    <circle cx="6.5" cy="17.5" r="1" fill="currentColor"/>
+    <circle cx="17.5" cy="17.5" r="1" fill="currentColor"/>
+  </symbol>
+
+  <!-- Ranking Icon - Elementos ascendentes/niveles -->
+  <symbol id="icon-ranking" viewBox="0 0 24 24">
+    <rect x="2" y="16" width="4" height="6" rx="1" fill="currentColor" opacity="0.5"/>
+    <rect x="10" y="12" width="4" height="10" rx="1" fill="currentColor" opacity="0.7"/>
+    <rect x="18" y="8" width="4" height="14" rx="1" fill="currentColor" opacity="0.9"/>
+    <circle cx="4" cy="14" r="1.5" fill="currentColor"/>
+    <circle cx="12" cy="10" r="1.5" fill="currentColor"/>
+    <circle cx="20" cy="6" r="1.5" fill="currentColor"/>
+    <path d="M6 14l4-2m4-2l4-2" stroke="currentColor" stroke-width="1.5" opacity="0.4"/>
+  </symbol>
+
+  <!-- Logo Icon - Inspirado en Manhattan Institute pero para StudyingFlash -->
+  <symbol id="icon-logo" viewBox="0 0 32 32">
+    <rect x="4" y="4" width="3" height="24" rx="1.5" fill="currentColor" opacity="0.8"/>
+    <rect x="10" y="8" width="3" height="20" rx="1.5" fill="currentColor" opacity="0.9"/>
+    <rect x="16" y="6" width="3" height="22" rx="1.5" fill="currentColor"/>
+    <rect x="22" y="10" width="3" height="18" rx="1.5" fill="currentColor" opacity="0.7"/>
+    <circle cx="5.5" cy="2" r="1.5" fill="currentColor" opacity="0.6"/>
+    <circle cx="11.5" cy="6" r="1.5" fill="currentColor" opacity="0.7"/>
+    <circle cx="17.5" cy="4" r="1.5" fill="currentColor" opacity="0.9"/>
+    <circle cx="23.5" cy="8" r="1.5" fill="currentColor" opacity="0.5"/>
+  </symbol>
+
+  <!-- Settings Icon - Para configuraciones -->
+  <symbol id="icon-settings" viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="3" fill="currentColor" opacity="0.6"/>
+    <path d="M12 1v6m0 10v6m11-7h-6m-10 0H1" stroke="currentColor" stroke-width="2" opacity="0.4"/>
+    <circle cx="12" cy="5" r="2" fill="currentColor" opacity="0.7"/>
+    <circle cx="12" cy="19" r="2" fill="currentColor" opacity="0.7"/>
+    <circle cx="5" cy="12" r="2" fill="currentColor" opacity="0.7"/>
+    <circle cx="19" cy="12" r="2" fill="currentColor" opacity="0.7"/>
+  </symbol>
+
+  <!-- Profile Icon - Para usuario -->
+  <symbol id="icon-profile" viewBox="0 0 24 24">
+    <circle cx="12" cy="8" r="4" fill="currentColor" opacity="0.7"/>
+    <path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2" stroke="currentColor" stroke-width="2" fill="none" opacity="0.6"/>
+    <circle cx="12" cy="8" r="2" fill="currentColor" opacity="0.9"/>
+  </symbol>
+
+</svg>
+
