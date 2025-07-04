@@ -70,22 +70,23 @@
 - **Autenticación:** JWT tokens persistentes
 - **Resultado:** Comunicación fluida entre frontend y backend
 
-## 📁 Estructura Final del Proyecto
+## 📁 Estructura Final del Proyecto (Limpia)
 
 ```
 FLASHCARD/
 ├── Frontend (GitHub Pages)
 │   ├── index.html              # Página principal
-│   ├── meta-dark-theme.css     # Tema oscuro Meta/Instagram
-│   ├── core-navigation.js      # Sistema de navegación robusto
+│   ├── meta-dark-theme.css     # Tema oscuro Meta/Instagram (ÚNICO)
+│   ├── core-navigation.js      # Sistema de navegación robusto (ÚNICO)
 │   ├── apiClient.js           # Cliente para APIs del backend
-│   └── (otros archivos frontend)
+│   ├── *.service.js           # Servicios modulares del frontend
+│   └── (otros archivos frontend activos)
 │
 ├── Backend (Render)
-│   ├── main.py                # Punto de entrada para Gunicorn
-│   ├── run.py                 # Servidor de desarrollo
+│   ├── main.py                # Punto de entrada ÚNICO para Gunicorn
 │   ├── backend_app/           # Código backend modularizado
-│   │   ├── api/              # Endpoints REST
+│   │   ├── __init__.py       # Factory function principal
+│   │   ├── api/              # Endpoints REST modulares
 │   │   ├── models/           # Modelos de base de datos
 │   │   ├── services/         # Lógica de negocio
 │   │   └── utils/            # Utilidades y algoritmos
@@ -94,9 +95,23 @@ FLASHCARD/
 │
 └── Documentación
     ├── DEPLOYMENT_GUIDE.md
+    ├── DEPLOYMENT_SUCCESS.md    # Este archivo
     ├── NAVIGATION_DOCUMENTATION.md
     └── TESTING_CHECKLIST.md
 ```
+
+### 🧹 **LIMPIEZA REALIZADA (Julio 4, 2025):**
+
+**Archivos eliminados para evitar confusión:**
+- ❌ `run.py` - Backend obsoleto con imports incorrectos
+- ❌ `navigation.js`, `navigation-fix.js`, `simple-navigation.js` - Versiones anteriores de navegación
+- ❌ `luxury-theme.css`, `soft-luxury-theme.css`, `instagram-gray-theme.css` - Temas obsoletos
+- ❌ `design-concept.md`, `soft-design-concept.md` - Documentación obsoleta
+
+**Archivos únicos mantenidos:**
+- ✅ `main.py` - Único punto de entrada del backend
+- ✅ `core-navigation.js` - Sistema de navegación robusto definitivo
+- ✅ `meta-dark-theme.css` - Tema final Meta/Instagram
 
 ## 🎨 Diseño Visual
 

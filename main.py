@@ -7,7 +7,8 @@ Integra el backend completo modularizado
 import os
 import sys
 
-print("🚀 Backend StudyingFlash INICIADO!")
+print("🚀 Backend StudyingFlash INICIADO! - VERSIÓN LIMPIA")
+print("📅 Fecha: Julio 4, 2025 - Proyecto limpio sin archivos obsoletos")
 print("📁 Directorio actual:", os.getcwd())
 print("🐍 Python path:", sys.path[:3])
 
