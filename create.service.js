@@ -156,12 +156,22 @@ export function initializeCreateEvents() {
   // Event listener para crear deck
   const createDeckBtn = document.getElementById('create-deck-btn');
   if (createDeckBtn) {
-    createDeckBtn.addEventListener("click", async () => {
-    const name = document.getElementById("deck-name").value.trim();
-    const description = document.getElementById("deck-description").value.trim();
-    const isPublic = document.getElementById("deck-public").checked;
-    await createDeck({ name, description, isPublic });
-  });
+    console.log("Botón 'Crear Deck' encontrado. Adjuntando event listener."); // Añadir este log
+    createDeckBtn.addEventListener("click", async (e) => {
+      e.preventDefault();
+      console.log("Click en 'Crear Deck' detectado."); // Añadir este log
+      const name = document.getElementById("deck-name").value.trim();
+      const description = document.getElementById("deck-description").value.trim();
+      const isPublic = document.getElementById("deck-public").checked;
+      
+      // Añadir logs para verificar los valores de los campos
+      console.log("Nombre del deck:", name);
+      console.log("Descripción del deck:", description);
+      console.log("Público:", isPublic);
+      await createDeck({ name, description, isPublic });
+    });
+  } else {
+    console.error("Error: Botón 'Crear Deck' no encontrado en el DOM."); // Añadir este log
   }
   
   // Event listener para crear flashcard

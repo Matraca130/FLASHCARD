@@ -149,8 +149,8 @@
   
   <!-- External Libraries -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.js" type="module"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js" type="module"></script>
   <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/gsap.min.js"></script>
   
@@ -485,7 +485,7 @@
               </label>
             </div>
             
-            <button id="create-deck-btn" class="btn btn-primary" data-action="create-deck">
+            <button id="create-deck-btn" class="btn btn-primary" data-action="create-deck" type="button">
               ➕ Crear Deck
             </button>
             
@@ -804,7 +804,7 @@
   </div>
 
   <!-- JavaScript -->
-  <script>
+  <script type="module">
     // ===== GLOBAL VARIABLES =====
     let currentUser = null;
     let currentDeck = null;
@@ -831,12 +831,13 @@
     const API_BASE = 'https://5007-iczox3lhteihqe56zh5di-3a250510.manusvm.computer';
     
     // ===== INITIALIZATION =====
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener("DOMContentLoaded", () => {
       initializeApp();
       initializeParticles();
       initializeEventListeners();
       loadGamificationData();
       checkAuthStatus();
+      console.log("DOM Ready: initializeApp() called.");
     });
     
     function initializeApp() {
@@ -1025,10 +1026,9 @@
         case 'estudiar':
           import('./study.service.js').then(m => m.loadStudyDecks && m.loadStudyDecks()).catch(e => console.log('Study service not loaded:', e));
           break;
-        case 'crear':
-          import('./create.service.js').then(m => m.openCreateDeckModal && m.openCreateDeckModal()).catch(e => console.log('Create service not loaded:', e));
-          break;
-        case 'gestionar':
+          case 'crear':
+          import('./create.service.js').then(m => m.initializeCreateEvents && m.initializeCreateEvents()).catch(e => console.log('Create service not loaded:', e));
+          break;       case 'gestionar':
           import('./manage.service.js').then(m => m.loadManageDecks && m.loadManageDecks()).catch(e => console.log('Manage service not loaded:', e));
           break;
         case 'ranking':
@@ -1678,10 +1678,8 @@
       const isPublic = document.getElementById('deck-public').checked;
       
       if (!name) {
-        showNotification
-
-
-('Por favor, ingresa un nombre para el deck', 'error');
+        showNotification(
+          'Por favor, ingresa un nombre para el deck', 'error');
         return;
       }
       
@@ -2539,7 +2537,7 @@
   </script>
 
     <!-- Sistema de Navegación Robusto - Solución Estructural Definitiva -->
-    <script src="./core-navigation.js"></script>
+    <script src="./core-navigation.js" type="module"></script>
 </body>
 </html>
 
@@ -2592,7 +2590,7 @@
         <form id="edit-deck-form" onsubmit="event.preventDefault(); updateDeck();">
           <div class="form-group">
             <label for="edit-deck-name">Nombre del Deck:</label>
-            <input type="text" id="edit-deck-name" required placeholder="Nombre del deck...">
+            <input type="text" id="edit-deck-name-modal" required placeholder="Nombre del deck...">
           </div>
           <div class="form-group">
             <label for="edit-deck-description">Descripción:</label>
