@@ -3,14 +3,11 @@ services:
     name: studyingflash-backend
     env: python
     plan: free
-    runtime: python-3.11.9
     buildCommand: pip install --upgrade pip && pip install -r requirements.txt
-    startCommand: gunicorn --config gunicorn.conf.py run:app
+    startCommand: gunicorn --bind 0.0.0.0:$PORT run:app
     envVars:
       - key: FLASK_ENV
         value: production
-      - key: FLASK_DEBUG
-        value: false
       - key: DATABASE_URL
         fromDatabase:
           name: studyingflash-db
@@ -19,8 +16,6 @@ services:
         generateValue: true
       - key: SECRET_KEY
         generateValue: true
-      - key: CORS_ORIGINS
-        value: https://matraca130.github.io,https://Matraca130.github.io
 
 databases:
   - name: studyingflash-db

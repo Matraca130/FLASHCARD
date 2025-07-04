@@ -11,7 +11,6 @@ from datetime import datetime, timedelta
 from sqlalchemy import and_, or_, func, desc
 from sqlalchemy.orm import joinedload
 import logging
-import bcrypt
 
 logger = logging.getLogger('app.services')
 cache_manager = CacheManager()
