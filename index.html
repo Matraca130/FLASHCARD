@@ -987,15 +987,22 @@
     
     // ===== NAVIGATION =====
     function showSection(sectionName) {
+      console.log('Navigating to section:', sectionName);
+      
       // Hide all sections
       document.querySelectorAll('.section').forEach(section => {
         section.classList.remove('active');
+        section.style.display = 'none';
       });
       
       // Show target section
       const targetSection = document.getElementById(sectionName);
       if (targetSection) {
         targetSection.classList.add('active');
+        targetSection.style.display = 'block';
+        console.log('Section shown:', sectionName);
+      } else {
+        console.error('Section not found:', sectionName);
       }
       
       // Update navigation
@@ -1012,16 +1019,16 @@
       switch (sectionName) {
         case 'dashboard':
           loadDashboardData();
-          import('./charts.js').then(m => m.initializeCharts && m.initializeCharts());
+          import('./charts.js').then(m => m.initializeCharts && m.initializeCharts()).catch(e => console.log('Charts not loaded:', e));
           break;
         case 'estudiar':
-          import('./study.service.js').then(m => m.loadStudyDecks && m.loadStudyDecks());
+          import('./study.service.js').then(m => m.loadStudyDecks && m.loadStudyDecks()).catch(e => console.log('Study service not loaded:', e));
           break;
         case 'crear':
-          import('./create.service.js').then(m => m.openCreateDeckModal && m.openCreateDeckModal());
+          import('./create.service.js').then(m => m.openCreateDeckModal && m.openCreateDeckModal()).catch(e => console.log('Create service not loaded:', e));
           break;
         case 'gestionar':
-          import('./manage.service.js').then(m => m.loadManageDecks && m.loadManageDecks());
+          import('./manage.service.js').then(m => m.loadManageDecks && m.loadManageDecks()).catch(e => console.log('Manage service not loaded:', e));
           break;
         case 'ranking':
           loadRankingData();
