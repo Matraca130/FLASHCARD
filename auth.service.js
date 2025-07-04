@@ -1,5 +1,5 @@
-import { api } from '../apiClient.js';
-import { store } from '../store/store.js';
+import { api } from './apiClient.js';
+import { store } from './store/store.js';
 import { loadDashboardData } from './dashboard.service.js';
 
 export async function checkAuthStatus() {

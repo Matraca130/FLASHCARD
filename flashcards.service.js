@@ -1,6 +1,6 @@
-import { api } from '../apiClient.js';
-import { store } from '../store/store.js';
-import { showNotification } from '../utils/helpers.js';
+import { api } from './apiClient.js';
+import { store } from './store/store.js';
+import { showNotification } from './utils/helpers.js';
 
 // Variable para el ID de flashcard en edición
 let editingFlashcardId = null;

@@ -1,5 +1,5 @@
-import { api } from '../apiClient.js';
-import { showNotification } from '../utils/helpers.js';
+import { api } from './apiClient.js';
+import { showNotification } from './utils/helpers.js';
 
 // Variables globales para el proceso de importación
 let importFileContent = null;

@@ -1,5 +1,5 @@
-import { api } from '../apiClient.js';
-import { store } from '../store/store.js';
+import { api } from './apiClient.js';
+import { store } from './store/store.js';
 
 /**
  * Carga los decks del usuario para gestión y los renderiza.

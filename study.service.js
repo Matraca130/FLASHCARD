@@ -1,5 +1,5 @@
-import { api } from '../apiClient.js';
-import { store } from '../store/store.js';
+import { api } from './apiClient.js';
+import { store } from './store/store.js';
 
 export async function loadStudyDecks() {
   try {

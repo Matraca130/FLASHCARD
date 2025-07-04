@@ -1,7 +1,7 @@
-import { api } from '../apiClient.js';
-import { store } from '../store/store.js';
+import { api } from './apiClient.js';
+import { store } from './store/store.js';
 import { localStorageService } from './storage.service.js';
-import { showNotification } from '../utils/helpers.js';
+import { showNotification } from './utils/helpers.js';
 
 /**
  * Carga los decks disponibles en el dropdown

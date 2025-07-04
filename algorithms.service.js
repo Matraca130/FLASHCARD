@@ -1,5 +1,5 @@
-import { api } from '../apiClient.js';
-import { store } from '../store/store.js';
+import { api } from './apiClient.js';
+import { store } from './store/store.js';
 
 // Variable para el algoritmo seleccionado en el modal
 let selectedModalAlgorithm = 'ultra_sm2';

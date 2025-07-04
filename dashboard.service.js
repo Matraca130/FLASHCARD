@@ -1,4 +1,4 @@
-import { api } from '../apiClient.js';
+import { api } from './apiClient.js';
 import { initializeCharts, updateProgressChart, updateAccuracyChart, updateChartPeriod } from '../charts.js';
 import { generateActivityHeatmap, updateHeatmapWithData } from './activity-heatmap.service.js';
 

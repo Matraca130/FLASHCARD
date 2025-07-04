@@ -1,5 +1,5 @@
-import { store } from '../store/store.js';
-import { showNotification } from '../utils/helpers.js';
+import { store } from './store/store.js';
+import { showNotification } from './utils/helpers.js';
 
 // Datos de gamificación
 let gamificationData = {
