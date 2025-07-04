@@ -41,26 +41,14 @@ export function openCreateDeckModal() {
 /**
  * Envía los datos del formulario y crea un nuevo deck.
  */
-export async function createDeck() {
-  const nameInput = document.getElementById('deck-name');
-  const descriptionInput = document.getElementById('deck-description');
-  const publicInput = document.getElementById('deck-public');
-  
-  if (!nameInput || !descriptionInput) {
-    showNotification('Formulario no encontrado', 'error');
-    return;
-  }
-  
-  const data = {
-    name: nameInput.value.trim(),
-    description: descriptionInput.value.trim(),
-    public: publicInput ? publicInput.checked : false
-  };
-  
-  if (!data.name) {
-    showNotification('El nombre es obligatorio', 'warning');
-    return;
-  }
+export async function createDeck(deckData) {
+  const nameInput = document.getElementById("deck-name");
+  const descriptionInput = document.getElementById("deck-description");
+  const publicInput = document.getElementById("deck-public");
+
+  const name = deckData.name || nameInput.value.trim();
+  const description = deckData.description || descriptionInput.value.trim();
+  const isPublic = deckData.isPublic || (publicInput ? publicInput.checked : false);
   
   try {
     let deck;
@@ -163,13 +151,18 @@ export function initializeCreateEvents() {
   // Event listener para crear deck
   const createDeckBtn = document.getElementById('create-deck-btn');
   if (createDeckBtn) {
-    // createDeckBtn.addEventListener("click", createDeck);
+    createDeckBtn.addEventListener("click", async () => {
+    const name = document.getElementById("deck-name").value.trim();
+    const description = document.getElementById("deck-description").value.trim();
+    const isPublic = document.getElementById("deck-public").checked;
+    await createDeck({ name, description, isPublic });
+  });
   }
   
   // Event listener para crear flashcard
   const createFlashcardBtn = document.getElementById('create-flashcard-btn');
   if (createFlashcardBtn) {
-    // createFlashcardBtn.addEventListener("click", createFlashcard);
+    createFlashcardBtn.addEventListener("click", createFlashcard);
   }
   
   // Cargar decks al inicializar
