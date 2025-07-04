@@ -163,13 +163,13 @@ export function initializeCreateEvents() {
   // Event listener para crear deck
   const createDeckBtn = document.getElementById('create-deck-btn');
   if (createDeckBtn) {
-    createDeckBtn.addEventListener('click', createDeck);
+    // createDeckBtn.addEventListener("click", createDeck);
   }
   
   // Event listener para crear flashcard
   const createFlashcardBtn = document.getElementById('create-flashcard-btn');
   if (createFlashcardBtn) {
-    createFlashcardBtn.addEventListener('click', createFlashcard);
+    // createFlashcardBtn.addEventListener("click", createFlashcard);
   }
   
   // Cargar decks al inicializar
