@@ -64,11 +64,11 @@ const StorageService = {
             
             const newDeck = {
                 id: 'deck_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
-                nombre: deckData.nombre || 'Nuevo Deck',
+                name: deckData.name || 'Nuevo Deck',
                 descripcion: deckData.descripcion || '',
                 categoria: deckData.categoria || 'general',
                 dificultad: deckData.dificultad || 'medio',
-                publico: deckData.publico || false,
+                public: deckData.public || false,
                 fechaCreacion: new Date().toISOString(),
                 autor: 'user_demo',
                 flashcards: [],
