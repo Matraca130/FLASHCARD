@@ -6,15 +6,20 @@ Aplicación Flask modularizada para sistema de flashcards con repetición espaci
 from flask import Flask
 from flask_cors import CORS
 from app.extensions import db, jwt, bcrypt, limiter
-from app.config import Config
+from app.config import get_config
 import logging
 import os
 
-def create_app(config_class=Config):
+def create_app(config_class=None):
     """
     Factory function para crear la aplicación Flask
     """
     app = Flask(__name__)
+    
+    # Usar configuración dinámica si no se especifica una
+    if config_class is None:
+        config_class = get_config()
+    
     app.config.from_object(config_class)
     
     # Configurar CORS para permitir conexiones desde frontend

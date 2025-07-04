@@ -2,7 +2,7 @@
 // API Client para StudyingFlash - Conectado con Backend Real
 const API_BASE = window.location.hostname === 'localhost' 
   ? 'http://localhost:5000' 
-  : 'https://api.studyingflash.com';
+  : 'https://studyingflash-backend.onrender.com';
 
 export class ApiClient {
   static getAuthToken() {

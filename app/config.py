@@ -2,93 +2,106 @@ import os
 from datetime import timedelta
 
 class Config:
+    """Configuración base para StudyingFlash"""
+    
+    # Flask Configuration
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-secret-key-change-in-production'
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///flashcards.db'
+    
+    # Database Configuration
+    if os.environ.get('DATABASE_URL'):
+        # Producción (Render con PostgreSQL)
+        SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
+        if SQLALCHEMY_DATABASE_URI.startswith("postgres://"):
+            SQLALCHEMY_DATABASE_URI = SQLALCHEMY_DATABASE_URI.replace("postgres://", "postgresql://", 1)
+    else:
+        # Desarrollo (SQLite local)
+        SQLALCHEMY_DATABASE_URI = 'sqlite:///flashcards.db'
+    
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-
-    # JWT Configuration optimizada para frontend
-    JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY') or SECRET_KEY
-    JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=24)
-    JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=30)
-    JWT_BLACKLIST_ENABLED = True
-    JWT_BLACKLIST_TOKEN_CHECKS = ['access', 'refresh']
-    
-    # CORS Configuration para integración frontend
-    CORS_ORIGINS = os.environ.get('CORS_ORIGINS', '').split(',') if os.environ.get('CORS_ORIGINS') else [
-        'http://localhost:3000',    # React
-        'http://localhost:5173',    # Vite
-        'http://localhost:8080',    # Vue
-        'http://localhost:4200',    # Angular
-        'http://127.0.0.1:3000',
-        'http://127.0.0.1:5173',
-        'http://127.0.0.1:8080',
-        'http://127.0.0.1:4200'
-    ]
-    
-    # Security Headers
-    SECURITY_HEADERS = {
-        'X-Content-Type-Options': 'nosniff',
-        'X-Frame-Options': 'DENY',
-        'X-XSS-Protection': '1; mode=block',
-        'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
-        'Content-Security-Policy': "default-src 'self'"
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        'pool_pre_ping': True,
+        'pool_recycle': 300,
     }
-
-    # Email Configuration (para recuperación de contraseña)
-    MAIL_SERVER = os.environ.get('MAIL_SERVER')
-    MAIL_PORT = int(os.environ.get('MAIL_PORT') or 587)
-    MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS', 'true').lower() in ['true', 'on', '1']
-    MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
-    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
-
-    # Rate Limiting optimizado
-    RATELIMIT_STORAGE_URL = os.environ.get('REDIS_URL') or 'memory://'
-    RATELIMIT_HEADERS_ENABLED = True
     
-    # API Configuration
-    API_VERSION = '1.0.0'
-    MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB max file upload
+    # JWT Configuration
+    JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY') or 'jwt-secret-change-in-production'
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(days=1)
+    JWT_ALGORITHM = 'HS256'
+    
+    # CORS Configuration
+    CORS_ORIGINS = os.environ.get('CORS_ORIGINS', 'http://localhost:3000').split(',')
+    
+    # Rate Limiting
+    RATELIMIT_STORAGE_URL = os.environ.get('REDIS_URL', 'memory://')
+    
+    # File Upload
+    MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB
+    UPLOAD_FOLDER = 'uploads'
+    
+    # Security Headers (Talisman)
+    TALISMAN_CONFIG = {
+        'force_https': os.environ.get('FLASK_ENV') == 'production',
+        'strict_transport_security': True,
+        'content_security_policy': {
+            'default-src': "'self'",
+            'script-src': "'self' 'unsafe-inline'",
+            'style-src': "'self' 'unsafe-inline'",
+            'img-src': "'self' data: https:",
+            'connect-src': "'self'",
+        }
+    }
+    
+    # Logging
+    LOG_LEVEL = os.environ.get('LOG_LEVEL', 'INFO')
+    
+    # Cache Configuration
+    CACHE_TYPE = 'simple'
+    CACHE_DEFAULT_TIMEOUT = 300
 
 class DevelopmentConfig(Config):
+    """Configuración para desarrollo"""
     DEBUG = True
-    # En desarrollo, CORS más permisivo
-    CORS_ORIGINS = [
-        'http://localhost:3000',
-        'http://localhost:5173', 
-        'http://localhost:8080',
-        'http://localhost:4200',
-        'http://127.0.0.1:3000',
-        'http://127.0.0.1:5173',
-        'http://127.0.0.1:8080',
-        'http://127.0.0.1:4200',
-        'http://localhost:3001',  # Storybook
-        'http://localhost:6006'   # Storybook default
-    ]
-    # Headers de seguridad más relajados en desarrollo
-    SECURITY_HEADERS = {
-        'X-Content-Type-Options': 'nosniff',
-        'X-Frame-Options': 'SAMEORIGIN',  # Más permisivo para desarrollo
-        'X-XSS-Protection': '1; mode=block'
+    FLASK_ENV = 'development'
+    TALISMAN_CONFIG = {
+        'force_https': False,
+        'strict_transport_security': False,
+        'content_security_policy': False
     }
 
 class ProductionConfig(Config):
+    """Configuración para producción"""
     DEBUG = False
-    # En producción, CORS específico
-    CORS_ORIGINS = os.environ.get('CORS_ORIGINS', '').split(',') if os.environ.get('CORS_ORIGINS') else []
+    FLASK_ENV = 'production'
     
-    # Headers de seguridad estrictos en producción
-    SECURITY_HEADERS = {
-        'X-Content-Type-Options': 'nosniff',
-        'X-Frame-Options': 'DENY',
-        'X-XSS-Protection': '1; mode=block',
-        'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
-        'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'",
-        'Referrer-Policy': 'strict-origin-when-cross-origin'
+    # Security enhancements for production
+    SESSION_COOKIE_SECURE = True
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = 'Lax'
+    
+    # Database optimizations for production
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        'pool_size': 10,
+        'pool_recycle': 120,
+        'pool_pre_ping': True,
+        'max_overflow': 20
     }
 
 class TestingConfig(Config):
+    """Configuración para testing"""
     TESTING = True
     SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
-    JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=5)  # Tokens cortos para testing
-    CORS_ORIGINS = ['http://localhost:3000']  # Solo para tests
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=5)
+
+# Configuración por defecto basada en variable de entorno
+config = {
+    'development': DevelopmentConfig,
+    'production': ProductionConfig,
+    'testing': TestingConfig,
+    'default': DevelopmentConfig
+}
+
+def get_config():
+    """Obtener configuración basada en FLASK_ENV"""
+    env = os.environ.get('FLASK_ENV', 'development')
+    return config.get(env, config['default'])
 
