@@ -50,24 +50,30 @@ export async function createDeck(deckData) {
   const description = deckData.description || descriptionInput.value.trim();
   const isPublic = deckData.isPublic || (publicInput ? publicInput.checked : false);
   
+  const data = {
+    name: name,
+    description: description,
+    is_public: isPublic
+  };
+  
   try {
     let deck;
     try {
       // Intentar crear en API primero
-      deck = await api('/api/decks', {
-        method: 'POST',
+      deck = await api("/api/decks", {
+        method: "POST",
         body: JSON.stringify(data)
       });
     } catch (error) {
-      console.log('API no disponible, usando almacenamiento local');
+      console.log("API no disponible, usando almacenamiento local");
       deck = localStorageService.createDeck(data);
     }
     
-    showNotification('Deck creado con éxito 🎉', 'success');
+    showNotification("Deck creado con éxito 🎉", "success");
     
     // Limpiar formulario
-    nameInput.value = '';
-    descriptionInput.value = '';
+    nameInput.value = "";
+    descriptionInput.value = "";
     if (publicInput) publicInput.checked = false;
     
     // Recargar decks en el dropdown
@@ -78,10 +84,9 @@ export async function createDeck(deckData) {
     
     return deck;
   } catch (error) {
-    console.error('Error creando deck:', error);
-    showNotification('Error al crear deck', 'error');
+    console.error("Error creando deck:", error);
+    showNotification("Error al crear deck", "error");
   }
-}
 
 /**
  * Crea una nueva flashcard

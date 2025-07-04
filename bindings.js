@@ -20,7 +20,14 @@ document.addEventListener('click', async (e) => {
       await logout();
       break;
     case 'create-deck': {
-      await createDeck();
+      const name = document.getElementById('deck-name').value.trim();
+      const description = document.getElementById('deck-description').value.trim();
+      const isPublic = document.getElementById('deck-public').checked;
+      await createDeck({ name, description, isPublic });
+      break;
+    }
+    case 'create-flashcard': {
+      await createFlashcard();
       break;
     }
     case 'start-study':
@@ -34,10 +41,3 @@ document.addEventListener('click', async (e) => {
       break;
   }
 });
-
-
-    case 'create-flashcard': {
-      await createFlashcard();
-      break;
-    }
-
