@@ -1,7 +1,7 @@
-import { login, logout } from '../services/auth.service.js';
-import { startStudySession, submitAnswer } from '../services/study.service.js';
-import { createDeck } from '../services/create.service.js';
-import { deleteDeck } from '../services/manage.service.js';
+import { login, logout } from './auth.service.js';
+import { startStudySession, submitAnswer } from './study.service.js';
+import { createDeck } from './create.service.js';
+import { deleteDeck } from './manage.service.js';
 
 document.addEventListener('click', async (e) => {
   const el = e.target.closest('[data-action]');

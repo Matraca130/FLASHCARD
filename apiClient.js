@@ -1,29 +1,39 @@
-// Centralized API wrapper
-const API_BASE = window.API_BASE || '';
+// apiClient.js - Cliente API básico
+const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://api.studyingflash.com';
 
-export async function api(path, options = {}) {
-  const token = localStorage.getItem('authToken');
-  const headers = {
-    'Content-Type': 'application/json',
-    ...(options.headers || {})
-  };
-  if (token) headers['Authorization'] = `Bearer ${token}`;
-
-  const response = await fetch(`${API_BASE}${path}`, { ...options, headers });
-
-  let data;
-  try {
-    data = await response.json();
-  } catch (err) {
-    data = null;
+export class ApiClient {
+  static async get(endpoint) {
+    try {
+      const response = await fetch(`${API_BASE}${endpoint}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('API GET error:', error);
+      return { error: error.message };
+    }
   }
 
-  if (!response.ok) {
-    // Attach status for easier debugging
-    const error = data || { message: 'Request failed' };
-    error.status = response.status;
-    throw error;
+  static async post(endpoint, data) {
+    try {
+      const response = await fetch(`${API_BASE}${endpoint}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('API POST error:', error);
+      return { error: error.message };
+    }
   }
-
-  return data;
 }
+
+export default ApiClient;
+
