@@ -17,14 +17,14 @@ const STUDY_CONFIG = {
     sm2: 'SM-2 Clásico',
     ultra_sm2: 'Ultra SM-2',
     anki: 'Algoritmo Anki',
-    fsrs: 'FSRS v4'
+    fsrs: 'FSRS v4',
   },
   difficultyLevels: {
-    again: 1,    // Muy difícil
-    hard: 2,     // Difícil  
-    good: 3,     // Bien
-    easy: 4      // Fácil
-  }
+    again: 1, // Muy difícil
+    hard: 2, // Difícil
+    good: 3, // Bien
+    easy: 4, // Fácil
+  },
 };
 
 // Estado de la sesión actual
@@ -41,7 +41,7 @@ export async function loadStudyDecks(options = {}) {
   const {
     containerId = 'deck-selection',
     showStats = true,
-    filterDue = false
+    filterDue = false,
   } = options;
 
   const container = document.getElementById(containerId);
@@ -53,7 +53,7 @@ export async function loadStudyDecks(options = {}) {
   try {
     // Cargar decks con fallback
     const decks = await apiWithFallback('/api/decks', []);
-    
+
     if (!decks || decks.length === 0) {
       renderEmptyDecksMessage(container);
       return;
@@ -67,16 +67,16 @@ export async function loadStudyDecks(options = {}) {
 
     // Filtrar decks con cartas pendientes si está habilitado
     if (filterDue) {
-      decksWithStats = decksWithStats.filter(deck => deck.due_cards > 0);
+      decksWithStats = decksWithStats.filter((deck) => deck.due_cards > 0);
     }
 
     // Renderizar decks
     renderStudyDecks(container, decksWithStats, { showStats });
-
   } catch (error) {
     console.error('Error loading study decks:', error);
     showNotification('Error al cargar decks para estudiar', 'error');
-    container.innerHTML = '<div class="error-message">Error al cargar decks</div>';
+    container.innerHTML =
+      '<div class="error-message">Error al cargar decks</div>';
   }
 }
 
@@ -93,9 +93,9 @@ async function loadDecksWithStats(decks) {
         new_cards: 0,
         learning_cards: 0,
         review_cards: 0,
-        last_studied: null
+        last_studied: null,
       });
-      
+
       return { ...deck, ...stats };
     } catch (error) {
       console.error(`Error loading stats for deck ${deck.id}:`, error);
@@ -132,13 +132,15 @@ function renderEmptyDecksMessage(container) {
 function renderStudyDecks(container, decks, options = {}) {
   const { showStats = true } = options;
 
-  const decksHTML = decks.map(deck => {
-    const dueCards = deck.due_cards || 0;
-    const newCards = deck.new_cards || 0;
-    const lastStudied = deck.last_studied ? 
-      formatDate(new Date(deck.last_studied), 'DD/MM/YYYY') : 'Nunca';
+  const decksHTML = decks
+    .map((deck) => {
+      const dueCards = deck.due_cards || 0;
+      const newCards = deck.new_cards || 0;
+      const lastStudied = deck.last_studied
+        ? formatDate(new Date(deck.last_studied), 'DD/MM/YYYY')
+        : 'Nunca';
 
-    return `
+      return `
       <div class="study-deck-card ${dueCards > 0 ? 'has-due-cards' : ''}" 
            onclick="startStudySession(${deck.id})">
         <div class="deck-header">
@@ -150,7 +152,9 @@ function renderStudyDecks(container, decks, options = {}) {
           <p>${deck.description || 'Sin descripción'}</p>
         </div>
         
-        ${showStats ? `
+        ${
+          showStats
+            ? `
           <div class="deck-stats">
             <div class="stat-item ${dueCards > 0 ? 'highlight' : ''}">
               <span class="stat-value">${dueCards}</span>
@@ -169,11 +173,13 @@ function renderStudyDecks(container, decks, options = {}) {
           <div class="deck-meta">
             <span class="last-studied">Último estudio: ${lastStudied}</span>
           </div>
-        ` : `
+        `
+            : `
           <div class="deck-simple-stats">
             <span class="card-count">${deck.card_count || 0} cartas</span>
           </div>
-        `}
+        `
+        }
         
         <div class="deck-actions">
           <button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); startStudySession(${deck.id})">
@@ -185,7 +191,8 @@ function renderStudyDecks(container, decks, options = {}) {
         </div>
       </div>
     `;
-  }).join('');
+    })
+    .join('');
 
   container.innerHTML = `
     <div class="study-decks-grid">
@@ -209,7 +216,7 @@ export async function startStudySession(deckId, options = {}) {
   const {
     algorithm = 'sm2',
     maxCards = STUDY_CONFIG.maxCardsPerSession,
-    reviewMode = false
+    reviewMode = false,
   } = options;
 
   try {
@@ -223,12 +230,12 @@ export async function startStudySession(deckId, options = {}) {
     }
 
     // Cargar cartas para estudiar
-    const endpoint = reviewMode ? 
-      `/api/study/cards/review/${deckId}` : 
-      `/api/study/cards/due/${deckId}`;
-    
+    const endpoint = reviewMode
+      ? `/api/study/cards/review/${deckId}`
+      : `/api/study/cards/due/${deckId}`;
+
     const cards = await apiWithFallback(endpoint, []);
-    
+
     if (!cards || cards.length === 0) {
       showNotification('No hay cartas para estudiar en este deck', 'warning');
       showCompletionMessage(deck);
@@ -240,11 +247,11 @@ export async function startStudySession(deckId, options = {}) {
 
     // Crear sesión
     const session = await createStudySession(deck, studyCards, algorithm);
-    
+
     // Inicializar estado de la sesión
     currentSession = session;
     sessionStartTime = Date.now();
-    
+
     // Actualizar store
     store.setState({
       studySession: {
@@ -255,9 +262,9 @@ export async function startStudySession(deckId, options = {}) {
           correct: 0,
           incorrect: 0,
           totalTime: 0,
-          averageTime: 0
-        }
-      }
+          averageTime: 0,
+        },
+      },
     });
 
     // Iniciar interfaz de estudio
@@ -269,7 +276,6 @@ export async function startStudySession(deckId, options = {}) {
     startSessionTimer();
 
     showNotification(`Sesión iniciada: ${studyCards.length} cartas`, 'success');
-
   } catch (error) {
     console.error('Error starting study session:', error);
     showNotification('Error al iniciar sesión de estudio', 'error');
@@ -288,16 +294,17 @@ async function createStudySession(deck, cards, algorithm) {
     deck_id: deck.id,
     algorithm: algorithm,
     cards_count: cards.length,
-    started_at: new Date().toISOString()
+    started_at: new Date().toISOString(),
   };
 
   try {
     // Crear sesión en el servidor
     const session = await performCrudOperation(
-      () => api('/api/study/sessions', {
-        method: 'POST',
-        body: JSON.stringify(sessionData)
-      }),
+      () =>
+        api('/api/study/sessions', {
+          method: 'POST',
+          body: JSON.stringify(sessionData),
+        }),
       null, // No mostrar notificación
       null
     );
@@ -308,12 +315,11 @@ async function createStudySession(deck, cards, algorithm) {
       cards: cards,
       algorithm: algorithm,
       startedAt: sessionData.started_at,
-      ...session
+      ...session,
     };
-
   } catch (error) {
     console.error('Error creating session on server:', error);
-    
+
     // Fallback: crear sesión local
     return {
       id: generateId(),
@@ -321,7 +327,7 @@ async function createStudySession(deck, cards, algorithm) {
       cards: cards,
       algorithm: algorithm,
       startedAt: sessionData.started_at,
-      isLocal: true
+      isLocal: true,
     };
   }
 }
@@ -340,28 +346,37 @@ export async function submitAnswer(difficulty, responseTime = null) {
 
   const state = store.getState();
   const sessionState = state.studySession;
-  
-  if (!sessionState || sessionState.currentCardIndex >= sessionState.cards.length) {
+
+  if (
+    !sessionState ||
+    sessionState.currentCardIndex >= sessionState.cards.length
+  ) {
     showNotification('Sesión completada', 'info');
     return;
   }
 
   const currentCard = sessionState.cards[sessionState.currentCardIndex];
-  const actualResponseTime = responseTime || (Date.now() - (currentCard.startTime || Date.now()));
+  const actualResponseTime =
+    responseTime || Date.now() - (currentCard.startTime || Date.now());
 
   try {
     // Procesar respuesta con algoritmo
-    const result = await processCardAnswer(currentCard, difficulty, actualResponseTime);
-    
+    const result = await processCardAnswer(
+      currentCard,
+      difficulty,
+      actualResponseTime
+    );
+
     // Actualizar estadísticas de la sesión
     const isCorrect = difficulty >= STUDY_CONFIG.difficultyLevels.good;
     const newStats = {
       ...sessionState.sessionStats,
       correct: sessionState.sessionStats.correct + (isCorrect ? 1 : 0),
       incorrect: sessionState.sessionStats.incorrect + (isCorrect ? 0 : 1),
-      totalTime: sessionState.sessionStats.totalTime + actualResponseTime
+      totalTime: sessionState.sessionStats.totalTime + actualResponseTime,
     };
-    newStats.averageTime = newStats.totalTime / (sessionState.currentCardIndex + 1);
+    newStats.averageTime =
+      newStats.totalTime / (sessionState.currentCardIndex + 1);
 
     // Agregar carta respondida al historial
     const answeredCard = {
@@ -370,19 +385,19 @@ export async function submitAnswer(difficulty, responseTime = null) {
       responseTime: actualResponseTime,
       isCorrect: isCorrect,
       answeredAt: new Date().toISOString(),
-      ...result
+      ...result,
     };
 
     const nextIndex = sessionState.currentCardIndex + 1;
-    
+
     // Actualizar estado
     store.setState({
       studySession: {
         ...sessionState,
         currentCardIndex: nextIndex,
         answeredCards: [...sessionState.answeredCards, answeredCard],
-        sessionStats: newStats
-      }
+        sessionStats: newStats,
+      },
     });
 
     // Verificar si la sesión ha terminado
@@ -392,16 +407,15 @@ export async function submitAnswer(difficulty, responseTime = null) {
       // Mostrar siguiente carta
       const nextCard = sessionState.cards[nextIndex];
       nextCard.startTime = Date.now();
-      
+
       if (window.updateFlashcard) {
         window.updateFlashcard(nextCard, {
           progress: Math.round((nextIndex / sessionState.cards.length) * 100),
           remaining: sessionState.cards.length - nextIndex,
-          stats: newStats
+          stats: newStats,
         });
       }
     }
-
   } catch (error) {
     console.error('Error submitting answer:', error);
     showNotification('Error al procesar respuesta', 'error');
@@ -417,31 +431,31 @@ export async function submitAnswer(difficulty, responseTime = null) {
  */
 async function processCardAnswer(card, difficulty, responseTime) {
   const algorithm = currentSession.algorithm;
-  
+
   const answerData = {
     card_id: card.id,
     session_id: currentSession.id,
     difficulty: difficulty,
     response_time: responseTime,
-    algorithm: algorithm
+    algorithm: algorithm,
   };
 
   try {
     // Enviar al servidor para procesamiento
     const result = await performCrudOperation(
-      () => api('/api/study/answer', {
-        method: 'POST',
-        body: JSON.stringify(answerData)
-      }),
+      () =>
+        api('/api/study/answer', {
+          method: 'POST',
+          body: JSON.stringify(answerData),
+        }),
       null, // No mostrar notificación
       null
     );
 
     return result;
-
   } catch (error) {
     console.error('Error processing answer on server:', error);
-    
+
     // Fallback: procesamiento local básico
     return processAnswerLocally(card, difficulty, responseTime, algorithm);
   }
@@ -478,7 +492,10 @@ function processAnswerLocally(card, difficulty, responseTime, algorithm) {
   }
 
   // Ajustar factor de facilidad
-  easeFactor = Math.max(1.3, easeFactor + (0.1 - (5 - difficulty) * (0.08 + (5 - difficulty) * 0.02)));
+  easeFactor = Math.max(
+    1.3,
+    easeFactor + (0.1 - (5 - difficulty) * (0.08 + (5 - difficulty) * 0.02))
+  );
 
   const nextReview = new Date();
   nextReview.setDate(nextReview.getDate() + interval);
@@ -488,7 +505,7 @@ function processAnswerLocally(card, difficulty, responseTime, algorithm) {
     ease_factor: easeFactor,
     repetitions: repetitions,
     next_review: nextReview.toISOString(),
-    processed_locally: true
+    processed_locally: true,
   };
 }
 
@@ -516,16 +533,17 @@ export async function endStudySession() {
       cards_studied: sessionState.answeredCards.length,
       cards_correct: sessionState.sessionStats.correct,
       cards_incorrect: sessionState.sessionStats.incorrect,
-      average_response_time: Math.round(sessionState.sessionStats.averageTime)
+      average_response_time: Math.round(sessionState.sessionStats.averageTime),
     };
 
     // Finalizar sesión en el servidor
     try {
       await performCrudOperation(
-        () => api(`/api/study/sessions/${currentSession.id}/end`, {
-          method: 'POST',
-          body: JSON.stringify(sessionEndData)
-        }),
+        () =>
+          api(`/api/study/sessions/${currentSession.id}/end`, {
+            method: 'POST',
+            body: JSON.stringify(sessionEndData),
+          }),
         null, // No mostrar notificación
         null
       );
@@ -546,16 +564,15 @@ export async function endStudySession() {
     // Limpiar estado
     currentSession = null;
     sessionStartTime = null;
-    
+
     store.setState({
-      studySession: null
+      studySession: null,
     });
 
     // Volver a la vista de decks
     if (window.exitStudyMode) {
       window.exitStudyMode();
     }
-
   } catch (error) {
     console.error('Error ending study session:', error);
     showNotification('Error al finalizar sesión', 'error');
@@ -568,10 +585,18 @@ export async function endStudySession() {
  * @param {Object} sessionData - Datos de finalización
  */
 function showSessionResults(sessionState, sessionData) {
-  const accuracy = sessionState.answeredCards.length > 0 ? 
-    Math.round((sessionState.sessionStats.correct / sessionState.answeredCards.length) * 100) : 0;
-  
-  const avgTimeSeconds = Math.round(sessionState.sessionStats.averageTime / 1000);
+  const accuracy =
+    sessionState.answeredCards.length > 0
+      ? Math.round(
+          (sessionState.sessionStats.correct /
+            sessionState.answeredCards.length) *
+            100
+        )
+      : 0;
+
+  const avgTimeSeconds = Math.round(
+    sessionState.sessionStats.averageTime / 1000
+  );
   const totalMinutes = Math.round(sessionData.total_duration / 60);
 
   const message = `
@@ -589,7 +614,7 @@ function showSessionResults(sessionState, sessionData) {
     window.updateUserStats({
       cardsStudied: sessionState.answeredCards.length,
       accuracy: accuracy,
-      studyTime: sessionData.total_duration
+      studyTime: sessionData.total_duration,
     });
   }
 }
@@ -621,7 +646,7 @@ function startSessionTimer() {
   sessionTimer = setInterval(() => {
     if (currentSession && sessionStartTime) {
       const elapsed = Math.round((Date.now() - sessionStartTime) / 1000);
-      
+
       // Actualizar UI del timer si existe
       if (window.updateSessionTimer) {
         window.updateSessionTimer(elapsed);
@@ -638,7 +663,7 @@ export function pauseStudySession() {
     clearInterval(sessionTimer);
     sessionTimer = null;
   }
-  
+
   showNotification('Sesión pausada', 'info');
 }
 
@@ -657,22 +682,30 @@ export function resumeStudySession() {
  * @returns {Object|null} - Estadísticas actuales
  */
 export function getCurrentSessionStats() {
-  if (!currentSession) {return null;}
+  if (!currentSession) {
+    return null;
+  }
 
   const state = store.getState();
   const sessionState = state.studySession;
-  
-  if (!sessionState) {return null;}
 
-  const elapsed = sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : 0;
-  
+  if (!sessionState) {
+    return null;
+  }
+
+  const elapsed = sessionStartTime
+    ? Math.round((Date.now() - sessionStartTime) / 1000)
+    : 0;
+
   return {
     ...sessionState.sessionStats,
     cardsRemaining: sessionState.cards.length - sessionState.currentCardIndex,
     cardsTotal: sessionState.cards.length,
-    progress: Math.round((sessionState.currentCardIndex / sessionState.cards.length) * 100),
+    progress: Math.round(
+      (sessionState.currentCardIndex / sessionState.cards.length) * 100
+    ),
     elapsedTime: elapsed,
-    deck: currentSession.deck
+    deck: currentSession.deck,
   };
 }
 
@@ -684,4 +717,3 @@ window.endStudySession = endStudySession;
 window.pauseStudySession = pauseStudySession;
 window.resumeStudySession = resumeStudySession;
 window.getCurrentSessionStats = getCurrentSessionStats;
-

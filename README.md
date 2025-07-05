@@ -51,4 +51,3 @@ Visita la aplicación en: https://matraca130.github.io/FLASHCARD/
 ---
 
 **Última actualización**: Workflows CI/CD optimizados y funcionando correctamente
-

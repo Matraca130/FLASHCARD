@@ -11,8 +11,11 @@ import { showNotification } from './helpers.js';
  * @param {string} customMessage - Mensaje personalizado (opcional)
  * @returns {boolean} - true si todos los campos son válidos
  */
-export function validateRequiredFields(fields, customMessage = 'Por favor, completa todos los campos') {
-  const emptyFields = Object.entries(fields).filter(([key, value]) => {
+export function validateRequiredFields(
+  fields,
+  customMessage = 'Por favor, completa todos los campos'
+) {
+  const emptyFields = Object.entries(fields).filter(([, value]) => {
     return !value || (typeof value === 'string' && value.trim() === '');
   });
 
@@ -20,7 +23,7 @@ export function validateRequiredFields(fields, customMessage = 'Por favor, compl
     showNotification(customMessage, 'error');
     return false;
   }
-  
+
   return true;
 }
 
@@ -57,22 +60,28 @@ export function validateFlashcardData(deckId, front, back) {
  * @param {string} description - Descripción del deck (opcional)
  * @returns {boolean} - true si los datos son válidos
  */
-export function validateDeckData(name, description = '') {
+export function validateDeckData(name) {
   if (!name || name.trim() === '') {
     showNotification('El nombre del deck es requerido', 'error');
     return false;
   }
-  
+
   if (name.length < 3) {
-    showNotification('El nombre del deck debe tener al menos 3 caracteres', 'error');
+    showNotification(
+      'El nombre del deck debe tener al menos 3 caracteres',
+      'error'
+    );
     return false;
   }
-  
+
   if (name.length > 50) {
-    showNotification('El nombre del deck no puede exceder 50 caracteres', 'error');
+    showNotification(
+      'El nombre del deck no puede exceder 50 caracteres',
+      'error'
+    );
     return false;
   }
-  
+
   return true;
 }
 
@@ -83,12 +92,12 @@ export function validateDeckData(name, description = '') {
  */
 export function validateEmail(email) {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  
+
   if (!email || !emailRegex.test(email)) {
     showNotification('Por favor, ingresa un email válido', 'error');
     return false;
   }
-  
+
   return true;
 }
 
@@ -102,7 +111,7 @@ export function validatePassword(password) {
     showNotification('La contraseña debe tener al menos 6 caracteres', 'error');
     return false;
   }
-  
+
   return true;
 }
 
@@ -117,20 +126,19 @@ export function validateRegistrationData(email, password, confirmPassword) {
   if (!validateRequiredFields({ email, password, confirmPassword })) {
     return false;
   }
-  
+
   if (!validateEmail(email)) {
     return false;
   }
-  
+
   if (!validatePassword(password)) {
     return false;
   }
-  
+
   if (password !== confirmPassword) {
     showNotification('Las contraseñas no coinciden', 'error');
     return false;
   }
-  
+
   return true;
 }
-

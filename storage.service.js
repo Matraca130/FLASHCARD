@@ -13,7 +13,7 @@ const STORAGE_CONFIG = {
   maxStorageSize: 50 * 1024 * 1024, // 50MB
   compressionEnabled: true,
   encryptionEnabled: false, // Para futuras implementaciones
-  syncEnabled: true
+  syncEnabled: true,
 };
 
 // Cache en memoria para optimización
@@ -70,13 +70,15 @@ class StorageService {
    * @param {string} oldVersion - Versión anterior
    */
   migrateStorage(oldVersion) {
-    console.log(`Migrando almacenamiento de ${oldVersion || 'unknown'} a ${STORAGE_CONFIG.version}`);
-    
+    console.log(
+      `Migrando almacenamiento de ${oldVersion || 'unknown'} a ${STORAGE_CONFIG.version}`
+    );
+
     try {
       // Aquí se implementarían las migraciones específicas
       // Por ahora, solo actualizamos la versión
       this.save('version', STORAGE_CONFIG.version);
-      
+
       showNotification('Almacenamiento actualizado', 'info');
     } catch (error) {
       console.error('Error en migración:', error);
@@ -98,7 +100,7 @@ class StorageService {
         const expiryKey = key;
         const dataKey = key.replace('exp_', '');
         const expiry = localStorage.getItem(expiryKey);
-        
+
         if (expiry && parseInt(expiry) < now) {
           keysToRemove.push(dataKey);
           keysToRemove.push(expiryKey);
@@ -107,7 +109,7 @@ class StorageService {
     }
 
     // Remover datos expirados
-    keysToRemove.forEach(key => {
+    keysToRemove.forEach((key) => {
       localStorage.removeItem(key);
       memoryCache.delete(key);
       cacheExpiry.delete(key);
@@ -134,7 +136,7 @@ class StorageService {
     const {
       expiry = null, // Tiempo de expiración en ms
       compress = STORAGE_CONFIG.compressionEnabled,
-      validate = true
+      validate = true,
     } = options;
 
     try {
@@ -167,16 +169,18 @@ class StorageService {
 
       console.log('✅ Datos guardados:', key);
       return true;
-
     } catch (error) {
       console.error('❌ Error al guardar:', error);
-      
+
       // Intentar liberar espacio si el error es por falta de espacio
       if (error.name === 'QuotaExceededError') {
         this.freeUpSpace();
-        showNotification('Almacenamiento lleno, liberando espacio...', 'warning');
+        showNotification(
+          'Almacenamiento lleno, liberando espacio...',
+          'warning'
+        );
       }
-      
+
       return false;
     }
   }
@@ -207,18 +211,17 @@ class StorageService {
 
       const fullKey = this.prefix + key;
       const data = localStorage.getItem(fullKey);
-      
+
       if (data === null) {
         return defaultValue;
       }
 
       const parsedData = JSON.parse(data);
-      
+
       // Actualizar cache en memoria
       memoryCache.set(key, parsedData);
-      
-      return parsedData;
 
+      return parsedData;
     } catch (error) {
       console.error('❌ Error al cargar:', error);
       return defaultValue;
@@ -238,13 +241,13 @@ class StorageService {
     try {
       const fullKey = this.prefix + key;
       const expiryKey = this.prefix + 'exp_' + key;
-      
+
       localStorage.removeItem(fullKey);
       localStorage.removeItem(expiryKey);
-      
+
       memoryCache.delete(key);
       cacheExpiry.delete(key);
-      
+
       return true;
     } catch (error) {
       console.error('❌ Error al eliminar:', error);
@@ -257,13 +260,13 @@ class StorageService {
    */
   freeUpSpace() {
     const keysToRemove = [];
-    
+
     // Identificar datos temporales o menos importantes
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
       if (key && key.startsWith(this.prefix)) {
         const shortKey = key.replace(this.prefix, '');
-        
+
         // Remover caches temporales primero
         if (shortKey.includes('cache_') || shortKey.includes('temp_')) {
           keysToRemove.push(shortKey);
@@ -272,8 +275,8 @@ class StorageService {
     }
 
     // Remover datos identificados
-    keysToRemove.forEach(key => this.remove(key));
-    
+    keysToRemove.forEach((key) => this.remove(key));
+
     console.log(`Liberado espacio: ${keysToRemove.length} elementos removidos`);
   }
 
@@ -296,7 +299,7 @@ class StorageService {
    */
   getDeck(deckId) {
     const decks = this.getDecks();
-    const deck = decks.find(d => d.id === deckId);
+    const deck = decks.find((d) => d.id === deckId);
     console.log('📖 Deck encontrado:', deck ? deck.name : 'No encontrado');
     return deck;
   }
@@ -322,11 +325,11 @@ class StorageService {
       is_public: deckData.is_public || false,
       category: deckData.category || 'General',
       tags: deckData.tags || [],
-      ...deckData
+      ...deckData,
     };
 
     decks.push(newDeck);
-    
+
     if (this.save('decks', decks)) {
       console.log('✅ Deck creado:', newDeck.name);
       showNotification(`Deck "${newDeck.name}" creado exitosamente`, 'success');
@@ -344,8 +347,8 @@ class StorageService {
    */
   updateDeck(deckId, updateData) {
     const decks = this.getDecks();
-    const deckIndex = decks.findIndex(d => d.id === deckId);
-    
+    const deckIndex = decks.findIndex((d) => d.id === deckId);
+
     if (deckIndex === -1) {
       showNotification('Deck no encontrado', 'error');
       return null;
@@ -354,9 +357,11 @@ class StorageService {
     // Validar datos si se está actualizando nombre o descripción
     if (updateData.name || updateData.description !== undefined) {
       const name = updateData.name || decks[deckIndex].name;
-      const description = updateData.description !== undefined ? 
-        updateData.description : decks[deckIndex].description;
-      
+      const description =
+        updateData.description !== undefined
+          ? updateData.description
+          : decks[deckIndex].description;
+
       if (!validateDeckData(name, description)) {
         return null;
       }
@@ -366,7 +371,7 @@ class StorageService {
     decks[deckIndex] = {
       ...decks[deckIndex],
       ...updateData,
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
     };
 
     if (this.save('decks', decks)) {
@@ -385,8 +390,8 @@ class StorageService {
    */
   deleteDeck(deckId) {
     const decks = this.getDecks();
-    const deckIndex = decks.findIndex(d => d.id === deckId);
-    
+    const deckIndex = decks.findIndex((d) => d.id === deckId);
+
     if (deckIndex === -1) {
       showNotification('Deck no encontrado', 'error');
       return false;
@@ -424,7 +429,7 @@ class StorageService {
    */
   getFlashcardsByDeck(deckId) {
     const flashcards = this.getFlashcards();
-    return flashcards.filter(card => card.deck_id === deckId);
+    return flashcards.filter((card) => card.deck_id === deckId);
   }
 
   /**
@@ -433,7 +438,9 @@ class StorageService {
    * @returns {Object|null} - Flashcard creada
    */
   createFlashcard(cardData) {
-    if (!validateFlashcardData(cardData.deck_id, cardData.front, cardData.back)) {
+    if (
+      !validateFlashcardData(cardData.deck_id, cardData.front, cardData.back)
+    ) {
       return null;
     }
 
@@ -445,23 +452,23 @@ class StorageService {
       back: cardData.back,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
-      
+
       // Datos de repetición espaciada
       interval: 1,
       ease_factor: 2.5,
       repetitions: 0,
       next_review: new Date().toISOString(),
       last_reviewed: null,
-      
-      ...cardData
+
+      ...cardData,
     };
 
     flashcards.push(newCard);
-    
+
     if (this.save('flashcards', flashcards)) {
       // Actualizar contador del deck
       this.updateDeckCardCount(cardData.deck_id);
-      
+
       console.log('✅ Flashcard creada');
       return newCard;
     }
@@ -477,8 +484,8 @@ class StorageService {
    */
   updateFlashcard(cardId, updateData) {
     const flashcards = this.getFlashcards();
-    const cardIndex = flashcards.findIndex(c => c.id === cardId);
-    
+    const cardIndex = flashcards.findIndex((c) => c.id === cardId);
+
     if (cardIndex === -1) {
       showNotification('Flashcard no encontrada', 'error');
       return null;
@@ -489,7 +496,7 @@ class StorageService {
       const front = updateData.front || flashcards[cardIndex].front;
       const back = updateData.back || flashcards[cardIndex].back;
       const deckId = flashcards[cardIndex].deck_id;
-      
+
       if (!validateFlashcardData(deckId, front, back)) {
         return null;
       }
@@ -499,7 +506,7 @@ class StorageService {
     flashcards[cardIndex] = {
       ...flashcards[cardIndex],
       ...updateData,
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
     };
 
     if (this.save('flashcards', flashcards)) {
@@ -517,8 +524,8 @@ class StorageService {
    */
   deleteFlashcard(cardId) {
     const flashcards = this.getFlashcards();
-    const cardIndex = flashcards.findIndex(c => c.id === cardId);
-    
+    const cardIndex = flashcards.findIndex((c) => c.id === cardId);
+
     if (cardIndex === -1) {
       showNotification('Flashcard no encontrada', 'error');
       return false;
@@ -530,7 +537,7 @@ class StorageService {
     if (this.save('flashcards', flashcards)) {
       // Actualizar contador del deck
       this.updateDeckCardCount(deckId);
-      
+
       console.log('✅ Flashcard eliminada');
       return true;
     }
@@ -545,8 +552,8 @@ class StorageService {
    */
   deleteFlashcardsByDeck(deckId) {
     const flashcards = this.getFlashcards();
-    const filteredCards = flashcards.filter(card => card.deck_id !== deckId);
-    
+    const filteredCards = flashcards.filter((card) => card.deck_id !== deckId);
+
     return this.save('flashcards', filteredCards);
   }
 
@@ -572,7 +579,7 @@ class StorageService {
       decks: this.getDecks(),
       flashcards: this.getFlashcards(),
       settings: this.load('settings', {}),
-      stats: this.load('stats', {})
+      stats: this.load('stats', {}),
     };
   }
 
@@ -583,11 +590,19 @@ class StorageService {
    */
   importData(data) {
     try {
-      if (data.decks) {this.save('decks', data.decks);}
-      if (data.flashcards) {this.save('flashcards', data.flashcards);}
-      if (data.settings) {this.save('settings', data.settings);}
-      if (data.stats) {this.save('stats', data.stats);}
-      
+      if (data.decks) {
+        this.save('decks', data.decks);
+      }
+      if (data.flashcards) {
+        this.save('flashcards', data.flashcards);
+      }
+      if (data.settings) {
+        this.save('settings', data.settings);
+      }
+      if (data.stats) {
+        this.save('stats', data.stats);
+      }
+
       showNotification('Datos importados exitosamente', 'success');
       return true;
     } catch (error) {
@@ -610,11 +625,11 @@ class StorageService {
           keys.push(key);
         }
       }
-      
-      keys.forEach(key => localStorage.removeItem(key));
+
+      keys.forEach((key) => localStorage.removeItem(key));
       memoryCache.clear();
       cacheExpiry.clear();
-      
+
       showNotification('Todos los datos eliminados', 'info');
       return true;
     } catch (error) {
@@ -634,7 +649,7 @@ class StorageService {
 
     let totalSize = 0;
     let itemCount = 0;
-    
+
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
       if (key && key.startsWith(this.prefix)) {
@@ -649,11 +664,13 @@ class StorageService {
       totalSize: totalSize,
       itemCount: itemCount,
       maxSize: STORAGE_CONFIG.maxStorageSize,
-      usagePercentage: Math.round((totalSize / STORAGE_CONFIG.maxStorageSize) * 100),
+      usagePercentage: Math.round(
+        (totalSize / STORAGE_CONFIG.maxStorageSize) * 100
+      ),
       memoryCache: {
         size: memoryCache.size,
-        keys: Array.from(memoryCache.keys())
-      }
+        keys: Array.from(memoryCache.keys()),
+      },
     };
   }
 }
@@ -679,7 +696,7 @@ export const {
   exportAllData,
   importData,
   clearAllData,
-  getStorageInfo
+  getStorageInfo,
 } = storageService;
 
 // Exportar la instancia completa
@@ -687,4 +704,3 @@ export default storageService;
 
 // Exponer globalmente para compatibilidad
 window.StorageService = storageService;
-

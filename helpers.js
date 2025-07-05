@@ -1,16 +1,16 @@
 /**
  * HELPERS - REFACTORIZADO
  * =======================
- * 
+ *
  * Archivo de compatibilidad que re-exporta las utilidades comunes
  * para mantener compatibilidad con código legacy mientras elimina duplicación
  */
 
 // Importar todas las utilidades refactorizadas
-import { 
-  showNotification, 
-  debounce, 
-  formatDate, 
+import {
+  showNotification,
+  debounce,
+  formatDate,
   formatRelativeDate,
   copyToClipboard,
   clearForm,
@@ -23,23 +23,23 @@ import {
   isValidPassword,
   truncateText,
   capitalizeFirst,
-  slugify
+  slugify,
 } from './utils/helpers.js';
 
-import { 
+import {
   validateRequiredFields,
   validateLoginCredentials,
   validateFlashcardData,
   validateDeckData,
   validateEmail,
-  validatePassword
+  validatePassword,
 } from './utils/validation.js';
 
-import { 
+import {
   apiWithFallback,
   multipleApiWithFallback,
   performCrudOperation,
-  loadDataWithRetry
+  loadDataWithRetry,
 } from './utils/apiHelpers.js';
 
 /**
@@ -58,39 +58,39 @@ function initializeParticles(config = {}) {
       shape: { type: 'circle' },
       opacity: { value: 0.1, random: true },
       size: { value: 3, random: true },
-      line_linked: { 
-        enable: true, 
-        distance: 150, 
-        color: '#ffffff', 
-        opacity: 0.1, 
-        width: 1 
+      line_linked: {
+        enable: true,
+        distance: 150,
+        color: '#ffffff',
+        opacity: 0.1,
+        width: 1,
       },
-      move: { 
-        enable: true, 
-        speed: 1, 
-        direction: 'none', 
-        random: false, 
-        straight: false, 
-        out_mode: 'out', 
-        bounce: false 
-      }
+      move: {
+        enable: true,
+        speed: 1,
+        direction: 'none',
+        random: false,
+        straight: false,
+        out_mode: 'out',
+        bounce: false,
+      },
     },
     interactivity: {
       detect_on: 'canvas',
-      events: { 
-        onhover: { enable: true, mode: 'repulse' }, 
-        onclick: { enable: true, mode: 'push' }, 
-        resize: true 
+      events: {
+        onhover: { enable: true, mode: 'repulse' },
+        onclick: { enable: true, mode: 'push' },
+        resize: true,
       },
-      modes: { 
-        grab: { distance: 400, line_linked: { opacity: 1 } }, 
-        bubble: { distance: 400, size: 40, duration: 2, opacity: 8, speed: 3 }, 
-        repulse: { distance: 200, duration: 0.4 }, 
-        push: { particles_nb: 4 }, 
-        remove: { particles_nb: 2 } 
-      }
+      modes: {
+        grab: { distance: 400, line_linked: { opacity: 1 } },
+        bubble: { distance: 400, size: 40, duration: 2, opacity: 8, speed: 3 },
+        repulse: { distance: 200, duration: 0.4 },
+        push: { particles_nb: 4 },
+        remove: { particles_nb: 2 },
+      },
     },
-    retina_detect: true
+    retina_detect: true,
   };
 
   // Combinar configuración por defecto con la personalizada
@@ -116,31 +116,36 @@ function initializeParticles(config = {}) {
  */
 function autoInitParticles() {
   const container = document.getElementById('particles-js');
-  
+
   if (!container) {
     console.log('📄 Contenedor de partículas no encontrado');
     return false;
   }
 
   // Detectar si el dispositivo es de bajo rendimiento
-  const isLowPerformance = navigator.hardwareConcurrency < 4 || 
-                          navigator.deviceMemory < 4 ||
-                          /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  const isLowPerformance =
+    navigator.hardwareConcurrency < 4 ||
+    navigator.deviceMemory < 4 ||
+    /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent
+    );
 
   // Configuración adaptativa según el rendimiento
-  const adaptiveConfig = isLowPerformance ? {
-    particles: {
-      number: { value: 25 },
-      line_linked: { enable: false },
-      move: { speed: 0.5 }
-    },
-    interactivity: {
-      events: { 
-        onhover: { enable: false }, 
-        onclick: { enable: false } 
+  const adaptiveConfig = isLowPerformance
+    ? {
+        particles: {
+          number: { value: 25 },
+          line_linked: { enable: false },
+          move: { speed: 0.5 },
+        },
+        interactivity: {
+          events: {
+            onhover: { enable: false },
+            onclick: { enable: false },
+          },
+        },
       }
-    }
-  } : {};
+    : {};
 
   return initializeParticles(adaptiveConfig);
 }
@@ -154,26 +159,30 @@ function showSection(sectionId, options = {}) {
   if (window.showSection && typeof window.showSection === 'function') {
     return window.showSection(sectionId, options);
   }
-  
+
   // Fallback básico si el sistema de navegación no está disponible
-  console.warn('⚠️ Sistema de navegación no disponible, usando fallback básico');
-  
-  const section = document.querySelector(`[data-section="${sectionId}"], #${sectionId}`);
+  console.warn(
+    '⚠️ Sistema de navegación no disponible, usando fallback básico'
+  );
+
+  const section = document.querySelector(
+    `[data-section="${sectionId}"], #${sectionId}`
+  );
   if (section) {
     // Ocultar todas las secciones
-    document.querySelectorAll('[data-section], .section').forEach(s => {
+    document.querySelectorAll('[data-section], .section').forEach((s) => {
       s.style.display = 'none';
       s.classList.remove('active');
     });
-    
+
     // Mostrar la sección solicitada
     section.style.display = 'block';
     section.classList.add('active');
-    
+
     showNotification(`Sección ${sectionId} mostrada`, 'info', 2000);
     return true;
   }
-  
+
   showNotification(`Sección ${sectionId} no encontrada`, 'error', 3000);
   return false;
 }
@@ -183,14 +192,14 @@ function showSection(sectionId, options = {}) {
  */
 function handleGlobalError(error, context = 'Unknown') {
   console.error(`[${context}] Error global:`, error);
-  
+
   // Mostrar notificación al usuario
   showNotification(
-    `Error en ${context}: ${error.message || 'Error desconocido'}`, 
-    'error', 
+    `Error en ${context}: ${error.message || 'Error desconocido'}`,
+    'error',
     5000
   );
-  
+
   // Enviar error a servicio de logging si está disponible
   if (window.logError && typeof window.logError === 'function') {
     window.logError(error, context);
@@ -202,13 +211,13 @@ function handleGlobalError(error, context = 'Unknown') {
  */
 async function checkConnectivity() {
   try {
-    const response = await fetch('/health', { 
+    const response = await fetch('/health', {
       method: 'HEAD',
       cache: 'no-cache',
-      timeout: 5000
+      timeout: 5000,
     });
     return response.ok;
-  } catch (error) {
+  } catch {
     console.log('🔌 Sin conectividad con el servidor');
     return false;
   }
@@ -219,14 +228,18 @@ async function checkConnectivity() {
  */
 function getDeviceInfo() {
   return {
-    isMobile: /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
+    isMobile: /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent
+    ),
     isTablet: /iPad|Android(?!.*Mobile)/i.test(navigator.userAgent),
-    isDesktop: !/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
+    isDesktop: !/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent
+    ),
     hasTouch: 'ontouchstart' in window,
     cores: navigator.hardwareConcurrency || 1,
     memory: navigator.deviceMemory || 1,
     connection: navigator.connection?.effectiveType || 'unknown',
-    online: navigator.onLine
+    online: navigator.onLine,
   };
 }
 
@@ -236,21 +249,21 @@ function getDeviceInfo() {
  */
 
 // Exportar funciones específicas de este archivo
-export { 
-  initializeParticles, 
-  autoInitParticles, 
-  showSection, 
-  handleGlobalError, 
-  checkConnectivity, 
-  getDeviceInfo 
+export {
+  initializeParticles,
+  autoInitParticles,
+  showSection,
+  handleGlobalError,
+  checkConnectivity,
+  getDeviceInfo,
 };
 
 // Re-exportar todas las utilidades comunes para compatibilidad
-export { 
+export {
   // Utilidades generales
-  showNotification, 
-  debounce, 
-  formatDate, 
+  showNotification,
+  debounce,
+  formatDate,
   formatRelativeDate,
   copyToClipboard,
   clearForm,
@@ -264,7 +277,7 @@ export {
   truncateText,
   capitalizeFirst,
   slugify,
-  
+
   // Validaciones
   validateRequiredFields,
   validateLoginCredentials,
@@ -272,12 +285,12 @@ export {
   validateDeckData,
   validateEmail,
   validatePassword,
-  
+
   // API helpers
   apiWithFallback,
   multipleApiWithFallback,
   performCrudOperation,
-  loadDataWithRetry
+  loadDataWithRetry,
 };
 
 /**
@@ -336,5 +349,6 @@ window.addEventListener('offline', () => {
   showNotification('Sin conexión a internet', 'warning', 5000);
 });
 
-console.log('🔧 Helpers refactorizados inicializados - Compatibilidad total mantenida');
-
+console.log(
+  '🔧 Helpers refactorizados inicializados - Compatibilidad total mantenida'
+);

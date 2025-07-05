@@ -62,4 +62,3 @@ global.cancelAnimationFrame = vi.fn();
 beforeEach(() => {
   vi.clearAllMocks();
 });
-

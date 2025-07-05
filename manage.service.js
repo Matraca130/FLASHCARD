@@ -1,8 +1,17 @@
 import { api } from './apiClient.js';
 import { store } from './store/store.js';
 import { validateDeckData } from './utils/validation.js';
-import { apiWithFallback, performCrudOperation, FALLBACK_DATA } from './utils/apiHelpers.js';
-import { showNotification, formatDate, formatRelativeDate, renderEmptyDecksState } from './utils/helpers.js';
+import {
+  apiWithFallback,
+  performCrudOperation,
+  FALLBACK_DATA,
+} from './utils/apiHelpers.js';
+import {
+  showNotification,
+  formatDate,
+  formatRelativeDate,
+  renderEmptyDecksState,
+} from './utils/helpers.js';
 
 /**
  * Carga los decks del usuario para gestión y los renderiza
@@ -26,14 +35,18 @@ export async function loadManageDecks() {
  */
 function renderManageDecks(decks) {
   const container = document.getElementById('manage-decks');
-  if (!container) {return;}
-  
+  if (!container) {
+    return;
+  }
+
   if (!Array.isArray(decks) || decks.length === 0) {
     renderEmptyDecksState(container);
     return;
   }
-  
-  const decksHTML = decks.map(deck => `
+
+  const decksHTML = decks
+    .map(
+      (deck) => `
     <div class="deck-manage-card" data-deck-id="${deck.id}">
       <div class="deck-header">
         <h4 class="deck-name">${deck.name || 'Sin nombre'}</h4>
@@ -62,8 +75,10 @@ function renderManageDecks(decks) {
         </button>
       </div>
     </div>
-  `).join('');
-  
+  `
+    )
+    .join('');
+
   container.innerHTML = decksHTML;
 }
 
@@ -72,25 +87,28 @@ function renderManageDecks(decks) {
  * @param {number} id - ID del deck a eliminar
  */
 export async function deleteDeck(id) {
-  if (!confirm('¿Seguro que quieres eliminar este deck? Esta acción no se puede deshacer.')) {
+  if (
+    !confirm(
+      '¿Seguro que quieres eliminar este deck? Esta acción no se puede deshacer.'
+    )
+  ) {
     return;
   }
-  
+
   try {
     await performCrudOperation(
       () => api(`/api/decks/${id}`, { method: 'DELETE' }),
       'Deck eliminado exitosamente',
       'Error al eliminar deck'
     );
-    
+
     // Recargar datos
     await loadManageDecks();
-    
+
     // Actualizar dashboard si está disponible
     if (window.loadDashboardData) {
       window.loadDashboardData();
     }
-    
   } catch (error) {
     console.error('Error eliminando deck:', error);
     // El error ya fue manejado por performCrudOperation
@@ -105,12 +123,11 @@ export async function editDeck(deckId) {
   try {
     const deck = await apiWithFallback(
       `/api/decks/${deckId}`,
-      FALLBACK_DATA.decks.find(d => d.id === deckId) || {}
+      FALLBACK_DATA.decks.find((d) => d.id === deckId) || {}
     );
-    
+
     // Mostrar modal de edición o formulario inline
     showEditDeckForm(deck);
-    
   } catch (error) {
     console.error('Error cargando deck para edición:', error);
     showNotification('Error al cargar deck', 'error');
@@ -128,22 +145,28 @@ function showEditDeckForm(deck) {
     createEditDeckModal(deck);
     return;
   }
-  
+
   // Llenar formulario con datos del deck
   const nameInput = document.getElementById('edit-deck-name');
   const descriptionInput = document.getElementById('edit-deck-description');
   const publicInput = document.getElementById('edit-deck-public');
-  
-  if (nameInput) {nameInput.value = deck.name || '';}
-  if (descriptionInput) {descriptionInput.value = deck.description || '';}
-  if (publicInput) {publicInput.checked = deck.is_public || false;}
-  
+
+  if (nameInput) {
+    nameInput.value = deck.name || '';
+  }
+  if (descriptionInput) {
+    descriptionInput.value = deck.description || '';
+  }
+  if (publicInput) {
+    publicInput.checked = deck.is_public || false;
+  }
+
   // Configurar botón de guardar
   const saveBtn = document.getElementById('save-deck-btn');
   if (saveBtn) {
     saveBtn.onclick = () => updateDeck(deck.id);
   }
-  
+
   // Mostrar modal
   modal.style.display = 'block';
 }
@@ -185,7 +208,7 @@ function createEditDeckModal(deck) {
       </div>
     </div>
   `;
-  
+
   document.body.insertAdjacentHTML('beforeend', modalHTML);
 }
 
@@ -195,39 +218,41 @@ function createEditDeckModal(deck) {
  */
 export async function updateDeck(deckId) {
   const name = document.getElementById('edit-deck-name')?.value?.trim();
-  const description = document.getElementById('edit-deck-description')?.value?.trim();
+  const description = document
+    .getElementById('edit-deck-description')
+    ?.value?.trim();
   const isPublic = document.getElementById('edit-deck-public')?.checked;
-  
+
   // Validar datos usando utilidad común
   if (!validateDeckData(name, description)) {
     return;
   }
-  
+
   try {
     await performCrudOperation(
-      () => api(`/api/decks/${deckId}`, {
-        method: 'PUT',
-        body: JSON.stringify({
-          name: name,
-          description: description,
-          is_public: isPublic
-        })
-      }),
+      () =>
+        api(`/api/decks/${deckId}`, {
+          method: 'PUT',
+          body: JSON.stringify({
+            name: name,
+            description: description,
+            is_public: isPublic,
+          }),
+        }),
       'Deck actualizado exitosamente',
       'Error al actualizar deck'
     );
-    
+
     // Cerrar modal
     closeEditDeckModal();
-    
+
     // Recargar datos
     await loadManageDecks();
-    
+
     // Actualizar dashboard
     if (window.loadDashboardData) {
       window.loadDashboardData();
     }
-    
   } catch (error) {
     console.error('Error actualizando deck:', error);
     // El error ya fue manejado por performCrudOperation
@@ -252,11 +277,10 @@ export async function loadDeckFlashcards(deckId) {
   try {
     const flashcards = await apiWithFallback(
       `/api/flashcards/deck/${deckId}`,
-      FALLBACK_DATA.flashcards.filter(f => f.deck_id === deckId)
+      FALLBACK_DATA.flashcards.filter((f) => f.deck_id === deckId)
     );
-    
+
     renderDeckFlashcards(flashcards, deckId);
-    
   } catch (error) {
     console.error('Error cargando flashcards:', error);
     showNotification('Error al cargar flashcards', 'error');
@@ -269,11 +293,14 @@ export async function loadDeckFlashcards(deckId) {
  * @param {number} deckId - ID del deck
  */
 function renderDeckFlashcards(flashcards, deckId) {
-  const container = document.getElementById('deck-flashcards') || 
-                   document.getElementById('manage-decks');
-  
-  if (!container) {return;}
-  
+  const container =
+    document.getElementById('deck-flashcards') ||
+    document.getElementById('manage-decks');
+
+  if (!container) {
+    return;
+  }
+
   if (!Array.isArray(flashcards) || flashcards.length === 0) {
     container.innerHTML = `
       <div class="flashcards-section">
@@ -289,7 +316,7 @@ function renderDeckFlashcards(flashcards, deckId) {
     `;
     return;
   }
-  
+
   const flashcardsHTML = `
     <div class="flashcards-section">
       <div class="section-header">
@@ -297,7 +324,9 @@ function renderDeckFlashcards(flashcards, deckId) {
         <button class="btn btn-secondary" onclick="loadManageDecks()">Volver</button>
       </div>
       <div class="flashcards-grid">
-        ${flashcards.map(card => `
+        ${flashcards
+          .map(
+            (card) => `
           <div class="flashcard-manage-item" data-card-id="${card.id}">
             <div class="flashcard-content">
               <div class="flashcard-front">
@@ -316,11 +345,13 @@ function renderDeckFlashcards(flashcards, deckId) {
               </button>
             </div>
           </div>
-        `).join('')}
+        `
+          )
+          .join('')}
       </div>
     </div>
   `;
-  
+
   container.innerHTML = flashcardsHTML;
 }
 
@@ -332,21 +363,21 @@ export async function exportDeck(deckId) {
   try {
     const [deck, flashcards] = await Promise.all([
       apiWithFallback(`/api/decks/${deckId}`, {}),
-      apiWithFallback(`/api/flashcards/deck/${deckId}`, [])
+      apiWithFallback(`/api/flashcards/deck/${deckId}`, []),
     ]);
-    
+
     const exportData = {
       deck: deck,
       flashcards: flashcards,
       exportDate: new Date().toISOString(),
-      version: '1.0'
+      version: '1.0',
     };
-    
+
     // Crear y descargar archivo
     const blob = new Blob([JSON.stringify(exportData, null, 2)], {
-      type: 'application/json'
+      type: 'application/json',
     });
-    
+
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -355,9 +386,8 @@ export async function exportDeck(deckId) {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    
+
     showNotification('Deck exportado exitosamente', 'success');
-    
   } catch (error) {
     console.error('Error exportando deck:', error);
     showNotification('Error al exportar deck', 'error');
@@ -380,4 +410,3 @@ window.updateDeck = updateDeck;
 window.closeEditDeckModal = closeEditDeckModal;
 window.loadDeckFlashcards = loadDeckFlashcards;
 window.exportDeck = exportDeck;
-

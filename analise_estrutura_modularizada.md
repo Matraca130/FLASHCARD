@@ -94,24 +94,29 @@ Serviços Frontend:
 ## Características da Modularização
 
 ### 1. Separação de Responsabilidades
+
 - **Backend**: API REST pura, lógica de negócio, persistência
 - **Frontend**: Interface de usuário, experiência do usuário, estado local
 
 ### 2. Padrões Arquiteturais
+
 - **Backend**: Application Factory, Blueprint pattern, Service layer
 - **Frontend**: Module pattern, Service-oriented architecture
 
 ### 3. Reutilização de Código
+
 - Utilitários comuns no frontend (`utils/helpers.js`, `utils/validation.js`)
 - Serviços base no backend (`base_service.py`)
 - Cliente API centralizado (`apiClient.js`)
 
 ### 4. Escalabilidade
+
 - Estrutura preparada para crescimento (6,000+ usuários)
 - Separação clara entre serviços antigos e novos
 - Modularização permite desenvolvimento paralelo
 
 ### 5. Manutenibilidade
+
 - Código organizado por funcionalidade
 - Separação clara entre camadas
 - Documentação integrada no código
@@ -119,6 +124,7 @@ Serviços Frontend:
 ## Tecnologias Utilizadas
 
 ### Backend
+
 - **Flask** - Framework web
 - **SQLAlchemy** - ORM
 - **JWT** - Autenticação
@@ -126,6 +132,7 @@ Serviços Frontend:
 - **Sentry** - Monitoramento de erros
 
 ### Frontend
+
 - **Vanilla JavaScript** - ES6+ modules
 - **Vite** - Build tool
 - **PWA** - Progressive Web App
@@ -135,10 +142,12 @@ Serviços Frontend:
 ## Estado Atual
 
 O projeto está **funcionando e deployado** em:
+
 - **Frontend**: https://matraca130.github.io/FLASHCARD/
 - **Backend**: Configurado para deploy em Railway/Render
 
 A aplicação possui:
+
 - ✅ Interface funcional com navegação SPA
 - ✅ Sistema de autenticação
 - ✅ Dashboard com métricas
@@ -156,4 +165,3 @@ A aplicação possui:
 5. **Testar localmente** antes de fazer push para produção
 
 A estrutura está bem organizada e preparada para expansão e manutenção contínua.
-

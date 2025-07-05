@@ -1,8 +1,16 @@
 import { api } from './apiClient.js';
 import { store } from './store/store.js';
 import { validateFlashcardData } from './utils/validation.js';
-import { performCrudOperation, apiWithFallback, FALLBACK_DATA } from './utils/apiHelpers.js';
-import { showNotification, clearForm, getVisibleElement } from './utils/helpers.js';
+import {
+  performCrudOperation,
+  apiWithFallback,
+  FALLBACK_DATA,
+} from './utils/apiHelpers.js';
+import {
+  showNotification,
+  clearForm,
+  getVisibleElement,
+} from './utils/helpers.js';
 
 // Variable para el ID de flashcard en edición
 let editingFlashcardId = null;
@@ -14,36 +22,36 @@ export async function createFlashcard() {
   const deckId = document.getElementById('flashcard-deck')?.value;
   const front = document.getElementById('flashcard-front')?.value?.trim();
   const back = document.getElementById('flashcard-back')?.value?.trim();
-  
+
   // Validar datos usando utilidad común
   if (!validateFlashcardData(deckId, front, back)) {
     return;
   }
-  
+
   try {
     const result = await performCrudOperation(
-      () => api('/api/flashcards', {
-        method: 'POST',
-        body: JSON.stringify({
-          deck_id: deckId,
-          front: front,
-          back: back
-        })
-      }),
+      () =>
+        api('/api/flashcards', {
+          method: 'POST',
+          body: JSON.stringify({
+            deck_id: deckId,
+            front: front,
+            back: back,
+          }),
+        }),
       'Flashcard creada exitosamente',
       'Error al crear la flashcard'
     );
-    
+
     // Limpiar formulario usando utilidad común
     clearForm('#flashcard-form');
-    
+
     // Recargar datos si estamos en la sección de gestión
     if (window.loadManageData) {
       window.loadManageData();
     }
-    
+
     return result;
-    
   } catch (error) {
     console.error('Error creating flashcard:', error);
     // El error ya fue manejado por performCrudOperation
@@ -58,27 +66,32 @@ export async function editFlashcard(flashcardId) {
   try {
     const flashcard = await apiWithFallback(
       `/api/flashcards/${flashcardId}`,
-      FALLBACK_DATA.flashcards.find(f => f.id === flashcardId) || {}
+      FALLBACK_DATA.flashcards.find((f) => f.id === flashcardId) || {}
     );
-    
+
     editingFlashcardId = flashcardId;
-    
+
     // Llenar formulario de edición
     const frontInput = document.getElementById('flashcard-front');
     const backInput = document.getElementById('flashcard-back');
     const deckSelect = document.getElementById('flashcard-deck');
-    
-    if (frontInput) {frontInput.value = flashcard.front || '';}
-    if (backInput) {backInput.value = flashcard.back || '';}
-    if (deckSelect) {deckSelect.value = flashcard.deck_id || '';}
-    
+
+    if (frontInput) {
+      frontInput.value = flashcard.front || '';
+    }
+    if (backInput) {
+      backInput.value = flashcard.back || '';
+    }
+    if (deckSelect) {
+      deckSelect.value = flashcard.deck_id || '';
+    }
+
     // Cambiar texto del botón
     const submitBtn = document.getElementById('create-flashcard-btn');
     if (submitBtn) {
       submitBtn.textContent = 'Actualizar Flashcard';
       submitBtn.onclick = () => updateFlashcard();
     }
-    
   } catch (error) {
     console.error('Error loading flashcard for edit:', error);
     showNotification('Error al cargar la flashcard', 'error');
@@ -93,40 +106,40 @@ export async function updateFlashcard() {
     showNotification('No hay flashcard en edición', 'error');
     return;
   }
-  
+
   const deckId = document.getElementById('flashcard-deck')?.value;
   const front = document.getElementById('flashcard-front')?.value?.trim();
   const back = document.getElementById('flashcard-back')?.value?.trim();
-  
+
   // Validar datos usando utilidad común
   if (!validateFlashcardData(deckId, front, back)) {
     return;
   }
-  
+
   try {
     const result = await performCrudOperation(
-      () => api(`/api/flashcards/${editingFlashcardId}`, {
-        method: 'PUT',
-        body: JSON.stringify({
-          deck_id: deckId,
-          front: front,
-          back: back
-        })
-      }),
+      () =>
+        api(`/api/flashcards/${editingFlashcardId}`, {
+          method: 'PUT',
+          body: JSON.stringify({
+            deck_id: deckId,
+            front: front,
+            back: back,
+          }),
+        }),
       'Flashcard actualizada exitosamente',
       'Error al actualizar la flashcard'
     );
-    
+
     // Resetear modo de edición
     resetEditMode();
-    
+
     // Recargar datos
     if (window.loadManageData) {
       window.loadManageData();
     }
-    
+
     return result;
-    
   } catch (error) {
     console.error('Error updating flashcard:', error);
     // El error ya fue manejado por performCrudOperation
@@ -141,21 +154,21 @@ export async function deleteFlashcard(flashcardId) {
   if (!confirm('¿Estás seguro de que quieres eliminar esta flashcard?')) {
     return;
   }
-  
+
   try {
     await performCrudOperation(
-      () => api(`/api/flashcards/${flashcardId}`, {
-        method: 'DELETE'
-      }),
+      () =>
+        api(`/api/flashcards/${flashcardId}`, {
+          method: 'DELETE',
+        }),
       'Flashcard eliminada exitosamente',
       'Error al eliminar la flashcard'
     );
-    
+
     // Recargar datos
     if (window.loadManageData) {
       window.loadManageData();
     }
-    
   } catch (error) {
     console.error('Error deleting flashcard:', error);
     // El error ya fue manejado por performCrudOperation
@@ -171,11 +184,10 @@ export async function loadFlashcardsByDeck(deckId) {
   try {
     const flashcards = await apiWithFallback(
       `/api/flashcards/deck/${deckId}`,
-      FALLBACK_DATA.flashcards.filter(f => f.deck_id === deckId)
+      FALLBACK_DATA.flashcards.filter((f) => f.deck_id === deckId)
     );
-    
+
     return flashcards || [];
-    
   } catch (error) {
     console.error('Error loading flashcards:', error);
     return [];
@@ -192,9 +204,8 @@ export async function loadAllFlashcards() {
       '/api/flashcards',
       FALLBACK_DATA.flashcards
     );
-    
+
     return flashcards || [];
-    
   } catch (error) {
     console.error('Error loading all flashcards:', error);
     return [];
@@ -206,10 +217,10 @@ export async function loadAllFlashcards() {
  */
 function resetEditMode() {
   editingFlashcardId = null;
-  
+
   // Limpiar formulario
   clearForm('#flashcard-form');
-  
+
   // Restaurar texto del botón
   const submitBtn = document.getElementById('create-flashcard-btn');
   if (submitBtn) {
@@ -233,4 +244,3 @@ export function cancelEdit() {
 export function getEditingFlashcardId() {
   return editingFlashcardId;
 }
-

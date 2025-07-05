@@ -1,7 +1,7 @@
 /**
  * STORE/STORE.JS - COMPATIBILIDAD Y RE-EXPORTACIÓN
  * ================================================
- * 
+ *
  * Este archivo mantiene compatibilidad con imports que usan 'store/store.js'
  * mientras redirige al sistema de store refactorizado principal
  */
@@ -12,25 +12,27 @@ import store, { StudyingFlashStore, simpleStore } from '../store.js';
 /**
  * CLASE DE COMPATIBILIDAD
  * =======================
- * 
+ *
  * Mantiene la interfaz original para código legacy
  */
 class LegacyStore {
   constructor() {
     // Usar el store refactorizado como backend
     this.store = store;
-    
+
     // Mantener compatibilidad con la interfaz original
     this.state = this.store.getState();
     this.listeners = [];
-    
+
     // Suscribirse a cambios del store principal
     this.store.subscribe((newState) => {
       this.state = newState;
       this.notifyListeners();
     });
-    
-    console.log('🔄 LegacyStore inicializado - Redirigiendo al store refactorizado');
+
+    console.log(
+      '🔄 LegacyStore inicializado - Redirigiendo al store refactorizado'
+    );
   }
 
   /**
@@ -47,12 +49,12 @@ class LegacyStore {
   subscribe(listener) {
     this.listeners.push(listener);
     return () => {
-      this.listeners = this.listeners.filter(l => l !== listener);
+      this.listeners = this.listeners.filter((l) => l !== listener);
     };
   }
 
   notifyListeners() {
-    this.listeners.forEach(listener => {
+    this.listeners.forEach((listener) => {
       try {
         listener(this.state);
       } catch (error) {
@@ -119,4 +121,3 @@ El store refactorizado ofrece:
 ✅ Persistencia automática
 ✅ Validación de estado
 `);
-

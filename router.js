@@ -11,36 +11,32 @@ const ROUTER_CONFIG = {
   defaultRoute: 'inicio',
   validRoutes: [
     'inicio',
-    'estudiar', 
+    'estudiar',
     'crear',
     'gestionar',
     'ranking',
     'configuracion',
     'perfil',
     'estadisticas',
-    'ayuda'
+    'ayuda',
   ],
-  protectedRoutes: [
-    'perfil',
-    'estadisticas',
-    'configuracion'
-  ],
+  protectedRoutes: ['perfil', 'estadisticas', 'configuracion'],
   routeAliases: {
-    'home': 'inicio',
-    'study': 'estudiar',
-    'create': 'crear',
-    'manage': 'gestionar',
-    'leaderboard': 'ranking',
-    'settings': 'configuracion',
-    'profile': 'perfil',
-    'stats': 'estadisticas',
-    'help': 'ayuda'
+    home: 'inicio',
+    study: 'estudiar',
+    create: 'crear',
+    manage: 'gestionar',
+    leaderboard: 'ranking',
+    settings: 'configuracion',
+    profile: 'perfil',
+    stats: 'estadisticas',
+    help: 'ayuda',
   },
   animations: {
     enabled: true,
     duration: 300,
-    easing: 'ease-in-out'
-  }
+    easing: 'ease-in-out',
+  },
 };
 
 // Estado del router
@@ -49,7 +45,7 @@ const routerState = {
   previousRoute: null,
   history: [],
   isNavigating: false,
-  authRequired: false
+  authRequired: false,
 };
 
 /**
@@ -63,21 +59,21 @@ export function navigate(section, options = {}) {
     replace = false,
     silent = false,
     force = false,
-    data = null
+    data = null,
   } = options;
 
   try {
     // Normalizar sección
     const normalizedSection = normalizeRoute(section);
-    
+
     // Validar ruta
     if (!isValidRoute(normalizedSection) && !force) {
       console.warn(`⚠️ Ruta inválida: ${section}`);
-      
+
       if (!silent) {
         showNotification(`Página "${section}" no encontrada`, 'error', 3000);
       }
-      
+
       return false;
     }
 
@@ -90,11 +86,15 @@ export function navigate(section, options = {}) {
     // Verificar autenticación si es necesario
     if (isProtectedRoute(normalizedSection) && !isAuthenticated()) {
       console.warn(`🔒 Ruta protegida: ${normalizedSection}`);
-      
+
       if (!silent) {
-        showNotification('Debes iniciar sesión para acceder a esta página', 'warning', 4000);
+        showNotification(
+          'Debes iniciar sesión para acceder a esta página',
+          'warning',
+          4000
+        );
       }
-      
+
       // Redirigir al login o inicio
       navigate('inicio', { replace: true, silent: true });
       return false;
@@ -127,17 +127,18 @@ export function navigate(section, options = {}) {
     executeNavigation(normalizedSection, data);
 
     // Log de navegación
-    console.log(`🧭 Navegando: ${routerState.previousRoute || 'inicio'} → ${normalizedSection}`);
+    console.log(
+      `🧭 Navegando: ${routerState.previousRoute || 'inicio'} → ${normalizedSection}`
+    );
 
     return true;
-
   } catch (error) {
     console.error('❌ Error durante la navegación:', error);
-    
+
     if (!silent) {
       showNotification('Error de navegación', 'error', 3000);
     }
-    
+
     routerState.isNavigating = false;
     return false;
   }
@@ -154,7 +155,7 @@ function executeNavigation(section, data = null) {
     showSection(section, {
       previousSection: routerState.previousRoute,
       data: data,
-      animated: ROUTER_CONFIG.animations.enabled
+      animated: ROUTER_CONFIG.animations.enabled,
     });
 
     // Actualizar título de la página
@@ -167,7 +168,6 @@ function executeNavigation(section, data = null) {
     setTimeout(() => {
       routerState.isNavigating = false;
     }, ROUTER_CONFIG.animations.duration);
-
   } catch (error) {
     console.error('❌ Error ejecutando navegación:', error);
     routerState.isNavigating = false;
@@ -179,8 +179,10 @@ function executeNavigation(section, data = null) {
  * Maneja cambios en el hash de la URL
  */
 function handleHashChange() {
-  const section = window.location.hash ? window.location.hash.slice(1) : ROUTER_CONFIG.defaultRoute;
-  
+  const section = window.location.hash
+    ? window.location.hash.slice(1)
+    : ROUTER_CONFIG.defaultRoute;
+
   // Solo navegar si no estamos ya navegando programáticamente
   if (!routerState.isNavigating) {
     navigate(section, { silent: true });
@@ -191,10 +193,12 @@ function handleHashChange() {
  * Maneja la carga inicial de la página
  */
 function handleInitialLoad() {
-  const section = window.location.hash ? window.location.hash.slice(1) : ROUTER_CONFIG.defaultRoute;
-  
+  const section = window.location.hash
+    ? window.location.hash.slice(1)
+    : ROUTER_CONFIG.defaultRoute;
+
   console.log(`🚀 Carga inicial: navegando a ${section}`);
-  
+
   // Navegación inicial
   navigate(section, { silent: true, force: true });
 }
@@ -210,7 +214,7 @@ function normalizeRoute(route) {
   }
 
   const cleanRoute = route.toLowerCase().trim();
-  
+
   // Aplicar aliases
   return ROUTER_CONFIG.routeAliases[cleanRoute] || cleanRoute;
 }
@@ -240,9 +244,11 @@ function isProtectedRoute(route) {
 function isAuthenticated() {
   // Verificar token en localStorage
   const token = localStorage.getItem('studyingflash_auth_token');
-  
-  if (!token) {return false;}
-  
+
+  if (!token) {
+    return false;
+  }
+
   try {
     // Verificar si el token no ha expirado (básico)
     const payload = JSON.parse(atob(token.split('.')[1]));
@@ -263,7 +269,7 @@ function updateHistory(route, data = null) {
   const historyEntry = {
     route: route,
     timestamp: Date.now(),
-    data: data
+    data: data,
   };
 
   routerState.history.push(historyEntry);
@@ -280,15 +286,15 @@ function updateHistory(route, data = null) {
  */
 function updatePageTitle(section) {
   const titles = {
-    'inicio': 'StudyingFlash - Inicio',
-    'estudiar': 'StudyingFlash - Estudiar',
-    'crear': 'StudyingFlash - Crear Contenido',
-    'gestionar': 'StudyingFlash - Gestionar Decks',
-    'ranking': 'StudyingFlash - Ranking',
-    'configuracion': 'StudyingFlash - Configuración',
-    'perfil': 'StudyingFlash - Mi Perfil',
-    'estadisticas': 'StudyingFlash - Estadísticas',
-    'ayuda': 'StudyingFlash - Ayuda'
+    inicio: 'StudyingFlash - Inicio',
+    estudiar: 'StudyingFlash - Estudiar',
+    crear: 'StudyingFlash - Crear Contenido',
+    gestionar: 'StudyingFlash - Gestionar Decks',
+    ranking: 'StudyingFlash - Ranking',
+    configuracion: 'StudyingFlash - Configuración',
+    perfil: 'StudyingFlash - Mi Perfil',
+    estadisticas: 'StudyingFlash - Estadísticas',
+    ayuda: 'StudyingFlash - Ayuda',
   };
 
   document.title = titles[section] || `StudyingFlash - ${section}`;
@@ -306,8 +312,8 @@ function dispatchNavigationEvent(currentRoute, previousRoute, data) {
       currentRoute,
       previousRoute,
       data,
-      timestamp: Date.now()
-    }
+      timestamp: Date.now(),
+    },
   });
 
   window.dispatchEvent(event);
@@ -325,7 +331,7 @@ export function goBack() {
 
   // Obtener la ruta anterior (excluyendo la actual)
   const previousEntry = routerState.history[routerState.history.length - 2];
-  
+
   if (previousEntry) {
     console.log(`⬅️ Navegando hacia atrás: ${previousEntry.route}`);
     return navigate(previousEntry.route, { data: previousEntry.data });
@@ -350,7 +356,7 @@ export function goForward() {
  */
 export function refresh() {
   console.log('🔄 Refrescando ruta actual');
-  
+
   if (routerState.currentRoute) {
     navigate(routerState.currentRoute, { force: true });
   }
@@ -371,7 +377,7 @@ export function getCurrentRoute() {
 export function getRouterState() {
   return {
     ...routerState,
-    config: ROUTER_CONFIG
+    config: ROUTER_CONFIG,
   };
 }
 
@@ -417,9 +423,12 @@ document.addEventListener('DOMContentLoaded', handleInitialLoad);
 // Escuchar eventos de autenticación
 window.addEventListener('authStateChanged', (event) => {
   routerState.authRequired = !event.detail.isAuthenticated;
-  
+
   // Si se cerró sesión y estamos en una ruta protegida, redirigir
-  if (!event.detail.isAuthenticated && isProtectedRoute(routerState.currentRoute)) {
+  if (
+    !event.detail.isAuthenticated &&
+    isProtectedRoute(routerState.currentRoute)
+  ) {
     navigate('inicio', { replace: true });
   }
 });
@@ -443,9 +452,12 @@ if (window.APP_CONFIG?.features?.debugging) {
     registerRoute,
     configureRouter,
     state: routerState,
-    config: ROUTER_CONFIG
+    config: ROUTER_CONFIG,
   };
 }
 
-console.log('🧭 Router inicializado con', ROUTER_CONFIG.validRoutes.length, 'rutas válidas');
-
+console.log(
+  '🧭 Router inicializado con',
+  ROUTER_CONFIG.validRoutes.length,
+  'rutas válidas'
+);

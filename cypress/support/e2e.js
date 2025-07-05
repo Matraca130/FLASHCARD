@@ -28,16 +28,22 @@ Cypress.on('uncaught:exception', (err, runnable) => {
 });
 
 // Custom commands for common actions
-Cypress.Commands.add('login', (email = 'test@example.com', password = 'password123') => {
-  cy.window().then((win) => {
-    win.localStorage.setItem('authToken', 'fake-token-for-testing');
-    win.localStorage.setItem('currentUser', JSON.stringify({
-      id: 1,
-      email: email,
-      name: 'Test User'
-    }));
-  });
-});
+Cypress.Commands.add(
+  'login',
+  (email = 'test@example.com', password = 'password123') => {
+    cy.window().then((win) => {
+      win.localStorage.setItem('authToken', 'fake-token-for-testing');
+      win.localStorage.setItem(
+        'currentUser',
+        JSON.stringify({
+          id: 1,
+          email: email,
+          name: 'Test User',
+        })
+      );
+    });
+  }
+);
 
 Cypress.Commands.add('logout', () => {
   cy.window().then((win) => {
@@ -49,4 +55,3 @@ Cypress.Commands.add('logout', () => {
 Cypress.Commands.add('waitForApp', () => {
   cy.get('[data-testid="app-loaded"]', { timeout: 10000 }).should('exist');
 });
-

@@ -7,14 +7,15 @@ import { showNotification } from './utils/helpers.js';
 
 // Configuración de la API
 const API_CONFIG = {
-  baseUrl: window.location.hostname === 'localhost' 
-    ? 'http://localhost:5000' 
-    : 'https://flashcard-u10n.onrender.com',
+  baseUrl:
+    window.location.hostname === 'localhost'
+      ? 'http://localhost:5000'
+      : 'https://flashcard-u10n.onrender.com',
   timeout: 30000, // 30 segundos
   retryAttempts: 3,
   retryDelay: 1000, // 1 segundo
   authTokenKey: 'studyingflash_auth_token',
-  refreshTokenKey: 'studyingflash_refresh_token'
+  refreshTokenKey: 'studyingflash_refresh_token',
 };
 
 // Estado del cliente
@@ -25,9 +26,8 @@ let failedQueue = [];
  * Clase principal del cliente API
  */
 export class ApiClient {
-  
   // MÉTODOS DE AUTENTICACIÓN
-  
+
   /**
    * Obtiene el token de autenticación
    * @returns {string|null} - Token de autenticación
@@ -64,8 +64,10 @@ export class ApiClient {
    */
   static isAuthenticated() {
     const token = this.getAuthToken();
-    if (!token) {return false;}
-    
+    if (!token) {
+      return false;
+    }
+
     try {
       // Verificar si el token no ha expirado (básico)
       const payload = JSON.parse(atob(token.split('.')[1]));
@@ -86,8 +88,8 @@ export class ApiClient {
     const token = this.getAuthToken();
     const baseHeaders = {
       'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      ...additionalHeaders
+      Accept: 'application/json',
+      ...additionalHeaders,
     };
 
     if (token) {
@@ -108,7 +110,7 @@ export class ApiClient {
   static async get(endpoint, options = {}) {
     return this.request(endpoint, {
       method: 'GET',
-      ...options
+      ...options,
     });
   }
 
@@ -123,7 +125,7 @@ export class ApiClient {
     return this.request(endpoint, {
       method: 'POST',
       body: data ? JSON.stringify(data) : null,
-      ...options
+      ...options,
     });
   }
 
@@ -138,7 +140,7 @@ export class ApiClient {
     return this.request(endpoint, {
       method: 'PUT',
       body: data ? JSON.stringify(data) : null,
-      ...options
+      ...options,
     });
   }
 
@@ -153,7 +155,7 @@ export class ApiClient {
     return this.request(endpoint, {
       method: 'PATCH',
       body: data ? JSON.stringify(data) : null,
-      ...options
+      ...options,
     });
   }
 
@@ -166,7 +168,7 @@ export class ApiClient {
   static async delete(endpoint, options = {}) {
     return this.request(endpoint, {
       method: 'DELETE',
-      ...options
+      ...options,
     });
   }
 
@@ -196,7 +198,7 @@ export class ApiClient {
       method,
       headers: requestHeaders,
       body,
-      ...fetchOptions
+      ...fetchOptions,
     };
 
     // Implementar timeout
@@ -205,12 +207,15 @@ export class ApiClient {
     requestOptions.signal = controller.signal;
 
     try {
-      const response = await this.executeRequestWithRetry(url, requestOptions, retries);
+      const response = await this.executeRequestWithRetry(
+        url,
+        requestOptions,
+        retries
+      );
       clearTimeout(timeoutId);
 
       // Manejar respuestas según status
       return await this.handleResponse(response, endpoint, showNotifications);
-
     } catch (error) {
       clearTimeout(timeoutId);
       return this.handleError(error, endpoint, showNotifications);
@@ -230,23 +235,22 @@ export class ApiClient {
     for (let attempt = 0; attempt <= retries; attempt++) {
       try {
         const response = await fetch(url, options);
-        
+
         // Si la respuesta es exitosa o es un error del cliente (4xx), no reintentar
         if (response.ok || (response.status >= 400 && response.status < 500)) {
           return response;
         }
-        
+
         // Error del servidor (5xx), reintentar
         throw new Error(`Server error: ${response.status}`);
-
       } catch (error) {
         lastError = error;
-        
+
         // Si es el último intento, lanzar error
         if (attempt === retries) {
           throw error;
         }
-        
+
         // Esperar antes del siguiente intento
         await this.delay(API_CONFIG.retryDelay * (attempt + 1));
         console.log(`Reintentando petición (${attempt + 1}/${retries}):`, url);
@@ -273,40 +277,40 @@ export class ApiClient {
     if (response.status >= 400 && response.status < 500) {
       const errorData = await this.safeJsonParse(response);
       const errorMessage = errorData.message || `Error ${response.status}`;
-      
+
       if (showNotifications) {
         showNotification(errorMessage, 'error');
       }
-      
-      return { 
-        error: true, 
+
+      return {
+        error: true,
         status: response.status,
         message: errorMessage,
-        data: errorData 
+        data: errorData,
       };
     }
 
     // Manejar errores del servidor
     if (response.status >= 500) {
       const errorMessage = `Error del servidor (${response.status})`;
-      
+
       if (showNotifications) {
         showNotification(errorMessage, 'error');
       }
-      
-      return { 
-        error: true, 
+
+      return {
+        error: true,
         status: response.status,
-        message: errorMessage 
+        message: errorMessage,
       };
     }
 
     // Respuesta exitosa
     const data = await this.safeJsonParse(response);
-    return { 
-      error: false, 
+    return {
+      error: false,
       status: response.status,
-      data: data 
+      data: data,
     };
   }
 
@@ -319,7 +323,7 @@ export class ApiClient {
    */
   static handleError(error, endpoint, showNotifications) {
     let errorMessage = 'Error de conexión';
-    
+
     if (error.name === 'AbortError') {
       errorMessage = 'Tiempo de espera agotado';
     } else if (error.message.includes('Failed to fetch')) {
@@ -329,15 +333,15 @@ export class ApiClient {
     }
 
     console.error(`API Error [${endpoint}]:`, error);
-    
+
     if (showNotifications) {
       showNotification(errorMessage, 'error');
     }
 
-    return { 
-      error: true, 
+    return {
+      error: true,
       message: errorMessage,
-      networkError: true 
+      networkError: true,
     };
   }
 
@@ -355,7 +359,7 @@ export class ApiClient {
     }
 
     const refreshToken = localStorage.getItem(API_CONFIG.refreshTokenKey);
-    
+
     if (!refreshToken) {
       this.logout();
       return { error: true, message: 'Sesión expirada', unauthorized: true };
@@ -363,30 +367,32 @@ export class ApiClient {
 
     // Intentar renovar el token
     isRefreshingToken = true;
-    
+
     try {
-      const refreshResponse = await fetch(`${API_CONFIG.baseUrl}/api/auth/refresh`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ refresh_token: refreshToken })
-      });
+      const refreshResponse = await fetch(
+        `${API_CONFIG.baseUrl}/api/auth/refresh`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ refresh_token: refreshToken }),
+        }
+      );
 
       if (refreshResponse.ok) {
         const { access_token, refresh_token } = await refreshResponse.json();
         this.setAuthToken(access_token, refresh_token);
-        
+
         // Procesar cola de peticiones fallidas
         failedQueue.forEach(({ resolve, endpoint: queuedEndpoint }) => {
           resolve(this.request(queuedEndpoint));
         });
         failedQueue = [];
-        
+
         // Reintentar petición original
         return this.request(endpoint);
       } else {
         throw new Error('Token refresh failed');
       }
-      
     } catch (error) {
       console.error('Error renovando token:', error);
       this.logout();
@@ -401,13 +407,16 @@ export class ApiClient {
    */
   static logout() {
     this.removeAuthToken();
-    
+
     // Limpiar cola de peticiones fallidas
     failedQueue = [];
-    
+
     // Notificar al usuario
-    showNotification('Sesión expirada. Por favor, inicia sesión nuevamente.', 'warning');
-    
+    showNotification(
+      'Sesión expirada. Por favor, inicia sesión nuevamente.',
+      'warning'
+    );
+
     // Redirigir al login si no estamos ya ahí
     if (!window.location.pathname.includes('login')) {
       setTimeout(() => {
@@ -439,7 +448,7 @@ export class ApiClient {
    * @returns {Promise<void>}
    */
   static delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   /**
@@ -448,12 +457,12 @@ export class ApiClient {
    */
   static async checkConnection() {
     try {
-      const response = await this.get('/health', { 
-        timeout: 5000, 
-        showNotifications: false 
+      const response = await this.get('/health', {
+        timeout: 5000,
+        showNotifications: false,
       });
       return !response.error;
-    } catch (_error) {
+    } catch {
       return false;
     }
   }
@@ -486,16 +495,28 @@ export class ApiClient {
 // Función de conveniencia para compatibilidad con código existente
 export async function api(endpoint, options = {}) {
   const method = options.method || 'GET';
-  
+
   switch (method.toUpperCase()) {
     case 'GET':
       return ApiClient.get(endpoint, options);
     case 'POST':
-      return ApiClient.post(endpoint, options.body ? JSON.parse(options.body) : null, options);
+      return ApiClient.post(
+        endpoint,
+        options.body ? JSON.parse(options.body) : null,
+        options
+      );
     case 'PUT':
-      return ApiClient.put(endpoint, options.body ? JSON.parse(options.body) : null, options);
+      return ApiClient.put(
+        endpoint,
+        options.body ? JSON.parse(options.body) : null,
+        options
+      );
     case 'PATCH':
-      return ApiClient.patch(endpoint, options.body ? JSON.parse(options.body) : null, options);
+      return ApiClient.patch(
+        endpoint,
+        options.body ? JSON.parse(options.body) : null,
+        options
+      );
     case 'DELETE':
       return ApiClient.delete(endpoint, options);
     default:
@@ -509,4 +530,3 @@ export default ApiClient;
 // Exponer globalmente para compatibilidad
 window.ApiClient = ApiClient;
 window.api = api;
-

@@ -5,7 +5,9 @@ describe('StudyingFlash App', () => {
 
   it('should load the main page', () => {
     cy.contains('StudyingFlash');
-    cy.contains('Tu plataforma de aprendizaje inteligente con repetición espaciada');
+    cy.contains(
+      'Tu plataforma de aprendizaje inteligente con repetición espaciada'
+    );
   });
 
   it('should have navigation menu', () => {
@@ -53,4 +55,3 @@ describe('StudyingFlash App', () => {
     cy.contains('StudyingFlash').should('be.visible');
   });
 });
-

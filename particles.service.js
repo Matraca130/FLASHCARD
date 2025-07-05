@@ -13,18 +13,18 @@ const PARTICLES_CONFIG = {
         value: 50,
         density: {
           enable: true,
-          value_area: 800
-        }
+          value_area: 800,
+        },
       },
       color: {
-        value: '#ffffff'
+        value: '#ffffff',
       },
       shape: {
         type: 'circle',
         stroke: {
           width: 0,
-          color: '#000000'
-        }
+          color: '#000000',
+        },
       },
       opacity: {
         value: 0.1,
@@ -33,8 +33,8 @@ const PARTICLES_CONFIG = {
           enable: true,
           speed: 1,
           opacity_min: 0.05,
-          sync: false
-        }
+          sync: false,
+        },
       },
       size: {
         value: 3,
@@ -43,15 +43,15 @@ const PARTICLES_CONFIG = {
           enable: true,
           speed: 2,
           size_min: 0.5,
-          sync: false
-        }
+          sync: false,
+        },
       },
       line_linked: {
         enable: true,
         distance: 150,
         color: '#ffffff',
         opacity: 0.1,
-        width: 1
+        width: 1,
       },
       move: {
         enable: true,
@@ -64,50 +64,50 @@ const PARTICLES_CONFIG = {
         attract: {
           enable: false,
           rotateX: 600,
-          rotateY: 1200
-        }
-      }
+          rotateY: 1200,
+        },
+      },
     },
     interactivity: {
       detect_on: 'canvas',
       events: {
         onhover: {
           enable: true,
-          mode: 'repulse'
+          mode: 'repulse',
         },
         onclick: {
           enable: true,
-          mode: 'push'
+          mode: 'push',
         },
-        resize: true
+        resize: true,
       },
       modes: {
         grab: {
           distance: 140,
           line_linked: {
-            opacity: 1
-          }
+            opacity: 1,
+          },
         },
         bubble: {
           distance: 400,
           size: 40,
           duration: 2,
           opacity: 8,
-          speed: 3
+          speed: 3,
         },
         repulse: {
           distance: 100,
-          duration: 0.4
+          duration: 0.4,
         },
         push: {
-          particles_nb: 4
+          particles_nb: 4,
         },
         remove: {
-          particles_nb: 2
-        }
-      }
+          particles_nb: 2,
+        },
+      },
     },
-    retina_detect: true
+    retina_detect: true,
   },
 
   minimal: {
@@ -116,25 +116,25 @@ const PARTICLES_CONFIG = {
         value: 20,
         density: {
           enable: true,
-          value_area: 1000
-        }
+          value_area: 1000,
+        },
       },
       color: {
-        value: '#ffffff'
+        value: '#ffffff',
       },
       shape: {
-        type: 'circle'
+        type: 'circle',
       },
       opacity: {
         value: 0.05,
-        random: true
+        random: true,
       },
       size: {
         value: 2,
-        random: true
+        random: true,
       },
       line_linked: {
-        enable: false
+        enable: false,
       },
       move: {
         enable: true,
@@ -143,22 +143,22 @@ const PARTICLES_CONFIG = {
         random: true,
         straight: false,
         out_mode: 'out',
-        bounce: false
-      }
+        bounce: false,
+      },
     },
     interactivity: {
       detect_on: 'canvas',
       events: {
         onhover: {
-          enable: false
+          enable: false,
         },
         onclick: {
-          enable: false
+          enable: false,
         },
-        resize: true
-      }
+        resize: true,
+      },
     },
-    retina_detect: true
+    retina_detect: true,
   },
 
   intense: {
@@ -167,18 +167,18 @@ const PARTICLES_CONFIG = {
         value: 100,
         density: {
           enable: true,
-          value_area: 600
-        }
+          value_area: 600,
+        },
       },
       color: {
-        value: ['#ffffff', '#f0f0f0', '#e0e0e0']
+        value: ['#ffffff', '#f0f0f0', '#e0e0e0'],
       },
       shape: {
         type: ['circle', 'triangle'],
         stroke: {
           width: 0,
-          color: '#000000'
-        }
+          color: '#000000',
+        },
       },
       opacity: {
         value: 0.15,
@@ -187,8 +187,8 @@ const PARTICLES_CONFIG = {
           enable: true,
           speed: 2,
           opacity_min: 0.05,
-          sync: false
-        }
+          sync: false,
+        },
       },
       size: {
         value: 4,
@@ -197,15 +197,15 @@ const PARTICLES_CONFIG = {
           enable: true,
           speed: 3,
           size_min: 1,
-          sync: false
-        }
+          sync: false,
+        },
       },
       line_linked: {
         enable: true,
         distance: 120,
         color: '#ffffff',
         opacity: 0.15,
-        width: 1.5
+        width: 1.5,
       },
       move: {
         enable: true,
@@ -218,51 +218,51 @@ const PARTICLES_CONFIG = {
         attract: {
           enable: true,
           rotateX: 600,
-          rotateY: 600
-        }
-      }
+          rotateY: 600,
+        },
+      },
     },
     interactivity: {
       detect_on: 'canvas',
       events: {
         onhover: {
           enable: true,
-          mode: ['grab', 'bubble']
+          mode: ['grab', 'bubble'],
         },
         onclick: {
           enable: true,
-          mode: 'push'
+          mode: 'push',
         },
-        resize: true
+        resize: true,
       },
       modes: {
         grab: {
           distance: 200,
           line_linked: {
-            opacity: 0.3
-          }
+            opacity: 0.3,
+          },
         },
         bubble: {
           distance: 300,
           size: 8,
           duration: 2,
           opacity: 0.8,
-          speed: 3
+          speed: 3,
         },
         repulse: {
           distance: 150,
-          duration: 0.4
+          duration: 0.4,
         },
         push: {
-          particles_nb: 6
+          particles_nb: 6,
         },
         remove: {
-          particles_nb: 3
-        }
-      }
+          particles_nb: 3,
+        },
+      },
     },
-    retina_detect: true
-  }
+    retina_detect: true,
+  },
 };
 
 // Estado del servicio
@@ -281,14 +281,14 @@ export async function initializeParticles(options = {}) {
     containerId = 'particles-js',
     config = 'default',
     autoDetectPerformance = true,
-    fallbackOnError = true
+    fallbackOnError = true,
   } = options;
 
   try {
     // Verificar si particles.js está disponible
     if (typeof particlesJS === 'undefined') {
       console.warn('particles.js no está cargado');
-      
+
       if (fallbackOnError) {
         await loadParticlesLibrary();
       } else {
@@ -314,26 +314,27 @@ export async function initializeParticles(options = {}) {
 
     // Inicializar partículas
     particlesJS(containerId, particlesConfig);
-    
+
     // Guardar estado
     particlesInstance = window.pJSDom[0];
     currentConfig = selectedConfig;
     isInitialized = true;
 
-    console.log(`✅ Partículas inicializadas con configuración: ${selectedConfig}`);
-    
+    console.log(
+      `✅ Partículas inicializadas con configuración: ${selectedConfig}`
+    );
+
     // Configurar eventos de rendimiento
     setupPerformanceMonitoring();
 
     return true;
-
   } catch (error) {
     console.error('Error inicializando partículas:', error);
-    
+
     if (fallbackOnError) {
       createFallbackEffect(containerId);
     }
-    
+
     return false;
   }
 }
@@ -359,7 +360,7 @@ async function loadParticlesLibrary() {
       console.error('Error cargando particles.js');
       reject(new Error('Failed to load particles.js'));
     };
-    
+
     document.head.appendChild(script);
   });
 }
@@ -370,25 +371,31 @@ async function loadParticlesLibrary() {
  */
 function detectPerformanceMode() {
   // Detectar dispositivos móviles
-  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-  
+  const isMobile =
+    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent
+    );
+
   // Detectar conexión lenta
-  const isSlowConnection = navigator.connection && 
-    (navigator.connection.effectiveType === 'slow-2g' || 
-     navigator.connection.effectiveType === '2g');
-  
+  const isSlowConnection =
+    navigator.connection &&
+    (navigator.connection.effectiveType === 'slow-2g' ||
+      navigator.connection.effectiveType === '2g');
+
   // Detectar hardware limitado
-  const isLowEndDevice = navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 2;
-  
+  const isLowEndDevice =
+    navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 2;
+
   // Detectar memoria limitada
   const isLowMemory = navigator.deviceMemory && navigator.deviceMemory <= 2;
 
-  const shouldUsePerformanceMode = isMobile || isSlowConnection || isLowEndDevice || isLowMemory;
-  
+  const shouldUsePerformanceMode =
+    isMobile || isSlowConnection || isLowEndDevice || isLowMemory;
+
   if (shouldUsePerformanceMode) {
     console.log('🔧 Modo de rendimiento activado');
   }
-  
+
   return shouldUsePerformanceMode;
 }
 
@@ -399,11 +406,11 @@ function detectPerformanceMode() {
  */
 function getParticlesConfig(configName) {
   const baseConfig = PARTICLES_CONFIG[configName] || PARTICLES_CONFIG.default;
-  
+
   // Aplicar tema actual
   const theme = getCurrentTheme();
   const themedConfig = applyThemeToConfig(baseConfig, theme);
-  
+
   return themedConfig;
 }
 
@@ -415,31 +422,31 @@ function getParticlesConfig(configName) {
  */
 function applyThemeToConfig(config, theme) {
   const themedConfig = JSON.parse(JSON.stringify(config)); // Deep clone
-  
+
   switch (theme) {
     case 'dark':
       themedConfig.particles.color.value = '#ffffff';
       themedConfig.particles.line_linked.color = '#ffffff';
       themedConfig.particles.opacity.value = 0.1;
       break;
-      
+
     case 'light':
       themedConfig.particles.color.value = '#000000';
       themedConfig.particles.line_linked.color = '#000000';
       themedConfig.particles.opacity.value = 0.05;
       break;
-      
+
     case 'blue':
       themedConfig.particles.color.value = '#4a90e2';
       themedConfig.particles.line_linked.color = '#4a90e2';
       themedConfig.particles.opacity.value = 0.12;
       break;
-      
+
     default:
       // Mantener configuración por defecto
       break;
   }
-  
+
   return themedConfig;
 }
 
@@ -453,12 +460,15 @@ function getCurrentTheme() {
   if (savedTheme) {
     return savedTheme;
   }
-  
+
   // Detectar tema del sistema
-  if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+  if (
+    window.matchMedia &&
+    window.matchMedia('(prefers-color-scheme: dark)').matches
+  ) {
     return 'dark';
   }
-  
+
   return 'light';
 }
 
@@ -468,7 +478,10 @@ function getCurrentTheme() {
  * @param {string} containerId - ID del contenedor
  * @returns {boolean} - Éxito del cambio
  */
-export function changeParticlesConfig(configName, containerId = 'particles-js') {
+export function changeParticlesConfig(
+  configName,
+  containerId = 'particles-js'
+) {
   if (!isInitialized) {
     console.warn('Partículas no inicializadas');
     return false;
@@ -483,14 +496,13 @@ export function changeParticlesConfig(configName, containerId = 'particles-js') 
     // Reinicializar con nueva configuración
     const newConfig = getParticlesConfig(configName);
     particlesJS(containerId, newConfig);
-    
+
     // Actualizar estado
     particlesInstance = window.pJSDom[0];
     currentConfig = configName;
 
     console.log(`🔄 Configuración cambiada a: ${configName}`);
     return true;
-
   } catch (error) {
     console.error('Error cambiando configuración:', error);
     return false;
@@ -538,7 +550,7 @@ export function addParticles(count = 10) {
     for (let i = 0; i < count; i++) {
       particlesInstance.pJS.fn.modes.pushParticles(1, {
         pos_x: Math.random() * particlesInstance.pJS.canvas.w,
-        pos_y: Math.random() * particlesInstance.pJS.canvas.h
+        pos_y: Math.random() * particlesInstance.pJS.canvas.h,
       });
     }
     console.log(`➕ ${count} partículas agregadas`);
@@ -560,36 +572,44 @@ export function removeParticles(count = 10) {
  * Configura monitoreo de rendimiento
  */
 function setupPerformanceMonitoring() {
-  if (!particlesInstance || !particlesInstance.pJS) {return;}
+  if (!particlesInstance || !particlesInstance.pJS) {
+    return;
+  }
 
   let frameCount = 0;
   let lastTime = performance.now();
-  
+
   const monitorPerformance = () => {
     frameCount++;
     const currentTime = performance.now();
-    
+
     // Calcular FPS cada segundo
     if (currentTime - lastTime >= 1000) {
       const fps = Math.round((frameCount * 1000) / (currentTime - lastTime));
-      
+
       // Si el FPS es muy bajo, cambiar a modo de rendimiento
       if (fps < 30 && !performanceMode) {
-        console.warn(`⚠️ FPS bajo detectado (${fps}), cambiando a modo de rendimiento`);
+        console.warn(
+          `⚠️ FPS bajo detectado (${fps}), cambiando a modo de rendimiento`
+        );
         performanceMode = true;
         changeParticlesConfig('minimal');
-        showNotification('Efectos reducidos para mejor rendimiento', 'info', 3000);
+        showNotification(
+          'Efectos reducidos para mejor rendimiento',
+          'info',
+          3000
+        );
       }
-      
+
       frameCount = 0;
       lastTime = currentTime;
     }
-    
+
     if (isInitialized) {
       requestAnimationFrame(monitorPerformance);
     }
   };
-  
+
   requestAnimationFrame(monitorPerformance);
 }
 
@@ -599,7 +619,9 @@ function setupPerformanceMonitoring() {
  */
 function createFallbackEffect(containerId) {
   const container = document.getElementById(containerId);
-  if (!container) {return;}
+  if (!container) {
+    return;
+  }
 
   container.innerHTML = `
     <div class="fallback-particles">
@@ -680,9 +702,9 @@ function createFallbackEffect(containerId) {
       }
     }
   `;
-  
+
   document.head.appendChild(style);
-  
+
   console.log('🎨 Efecto de fallback activado');
 }
 
@@ -695,10 +717,14 @@ export function getParticlesInfo() {
     isInitialized: isInitialized,
     currentConfig: currentConfig,
     performanceMode: performanceMode,
-    particleCount: particlesInstance && particlesInstance.pJS ? 
-      particlesInstance.pJS.particles.array.length : 0,
-    isPlaying: particlesInstance && particlesInstance.pJS ? 
-      !particlesInstance.pJS.fn.vendors.checkBeforeDraw() : false
+    particleCount:
+      particlesInstance && particlesInstance.pJS
+        ? particlesInstance.pJS.particles.array.length
+        : 0,
+    isPlaying:
+      particlesInstance && particlesInstance.pJS
+        ? !particlesInstance.pJS.fn.vendors.checkBeforeDraw()
+        : false,
   };
 }
 
@@ -707,14 +733,16 @@ export function getParticlesInfo() {
  * @param {string} newTheme - Nuevo tema
  */
 export function updateParticlesTheme(newTheme) {
-  if (!isInitialized) {return;}
-  
+  if (!isInitialized) {
+    return;
+  }
+
   // Guardar tema
   localStorage.setItem('studyingflash_theme', newTheme);
-  
+
   // Reinicializar con nuevo tema
   changeParticlesConfig(currentConfig);
-  
+
   console.log(`🎨 Tema de partículas actualizado: ${newTheme}`);
 }
 
@@ -728,4 +756,3 @@ window.addParticles = addParticles;
 window.removeParticles = removeParticles;
 window.getParticlesInfo = getParticlesInfo;
 window.updateParticlesTheme = updateParticlesTheme;
-

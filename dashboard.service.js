@@ -1,8 +1,20 @@
 import { api } from './apiClient.js';
 import { initializeCharts, updateChart } from './charts.js';
-import { generateActivityHeatmap, updateHeatmapWithData } from './activity-heatmap.service.js';
-import { multipleApiWithFallback, apiWithFallback, FALLBACK_DATA } from './utils/apiHelpers.js';
-import { showNotification, formatDate, formatRelativeDate, renderEmptyDecksState } from './utils/helpers.js';
+import {
+  generateActivityHeatmap,
+  updateHeatmapWithData,
+} from './activity-heatmap.service.js';
+import {
+  multipleApiWithFallback,
+  apiWithFallback,
+  FALLBACK_DATA,
+} from './utils/apiHelpers.js';
+import {
+  showNotification,
+  formatDate,
+  formatRelativeDate,
+  renderEmptyDecksState,
+} from './utils/helpers.js';
 
 /**
  * Carga estadísticas y decks del usuario en el Dashboard
@@ -13,24 +25,23 @@ export async function loadDashboardData() {
     const [stats, decks] = await multipleApiWithFallback([
       {
         endpoint: '/api/stats',
-        fallback: FALLBACK_DATA.stats
+        fallback: FALLBACK_DATA.stats,
       },
       {
         endpoint: '/api/decks',
-        fallback: FALLBACK_DATA.decks
-      }
+        fallback: FALLBACK_DATA.decks,
+      },
     ]);
-    
+
     // Actualizar UI con datos cargados
     updateDashboardStats(stats);
     updateDashboardDecks(decks);
-    
+
     // Inicializar gráficos con datos reales
     initializeChartsWithData(stats);
-    
+
     // Generar heatmap de actividad
     await loadAndUpdateActivityHeatmap();
-    
   } catch (error) {
     console.error('Error loading dashboard data:', error);
     showNotification('Error al cargar datos del dashboard', 'error');
@@ -75,26 +86,23 @@ export async function loadUserDecks() {
  */
 export async function loadWeeklyStats() {
   try {
-    const weeklyStats = await apiWithFallback(
-      '/api/dashboard/stats/weekly',
-      {
-        weeklyProgress: [12, 19, 15, 25, 22, 18, 30],
-        weeklyAccuracy: [75, 80, 85, 78, 82, 88, 90],
-        totalStudyTime: 420 // minutos
-      }
-    );
-    
+    const weeklyStats = await apiWithFallback('/api/dashboard/stats/weekly', {
+      weeklyProgress: [12, 19, 15, 25, 22, 18, 30],
+      weeklyAccuracy: [75, 80, 85, 78, 82, 88, 90],
+      totalStudyTime: 420, // minutos
+    });
+
     // Actualizar gráficos con datos semanales
     if (weeklyStats.weeklyProgress) {
       // TODO: Implementar updateProgressChart
       // updateProgressChart(weeklyStats.weeklyProgress);
     }
-    
+
     if (weeklyStats.weeklyAccuracy) {
       // TODO: Implementar updateAccuracyChart
       // updateAccuracyChart(weeklyStats.weeklyAccuracy);
     }
-    
+
     return weeklyStats;
   } catch (error) {
     console.error('Error loading weekly stats:', error);
@@ -107,31 +115,41 @@ export async function loadWeeklyStats() {
  * @param {Object} stats - Estadísticas a mostrar
  */
 function updateDashboardStats(stats) {
-  if (!stats) {return;}
-  
+  if (!stats) {
+    return;
+  }
+
   // Actualizar tarjetas de estadísticas usando selectores mejorados
   const statElements = {
-    totalCards: document.querySelector('[data-stat="total-cards"]') || document.getElementById('total-cards'),
-    studiedToday: document.querySelector('[data-stat="studied-today"]') || document.getElementById('studied-today'),
-    accuracy: document.querySelector('[data-stat="accuracy"]') || document.getElementById('accuracy'),
-    streak: document.querySelector('[data-stat="streak"]') || document.getElementById('streak')
+    totalCards:
+      document.querySelector('[data-stat="total-cards"]') ||
+      document.getElementById('total-cards'),
+    studiedToday:
+      document.querySelector('[data-stat="studied-today"]') ||
+      document.getElementById('studied-today'),
+    accuracy:
+      document.querySelector('[data-stat="accuracy"]') ||
+      document.getElementById('accuracy'),
+    streak:
+      document.querySelector('[data-stat="streak"]') ||
+      document.getElementById('streak'),
   };
-  
+
   // Actualizar elementos con validación
   Object.entries(statElements).forEach(([key, element]) => {
     if (element && stats[key] !== undefined) {
       const value = key === 'accuracy' ? `${stats[key]}%` : stats[key];
       element.textContent = value;
-      
+
       // Agregar animación de actualización
       element.classList.add('stat-updated');
       setTimeout(() => element.classList.remove('stat-updated'), 500);
     }
   });
-  
+
   // Actualizar elementos adicionales
   updateAdditionalStats(stats);
-  
+
   // Llamar función global si existe (compatibilidad)
   if (window.updateDashboardStats) {
     window.updateDashboardStats(stats);
@@ -147,13 +165,13 @@ function updateAdditionalStats(stats) {
   const totalCorrect = stats.totalCorrect || 0;
   const totalIncorrect = stats.totalIncorrect || 0;
   const totalAnswered = totalCorrect + totalIncorrect;
-  
+
   const progressElement = document.getElementById('total-progress');
   if (progressElement && totalAnswered > 0) {
     const accuracyPercent = Math.round((totalCorrect / totalAnswered) * 100);
     progressElement.textContent = `${totalCorrect}/${totalAnswered} (${accuracyPercent}%)`;
   }
-  
+
   // Actualizar tiempo de estudio
   const studyTimeElement = document.getElementById('study-time');
   if (studyTimeElement && stats.totalStudyTime) {
@@ -168,21 +186,28 @@ function updateAdditionalStats(stats) {
  * @param {Array} decks - Array de decks del usuario
  */
 function updateDashboardDecks(decks) {
-  if (!Array.isArray(decks)) {return;}
-  
-  const decksList = document.getElementById('dashboard-decks-list') || 
-                   document.querySelector('.decks-list') ||
-                   document.querySelector('[data-section="decks"]');
-  
-  if (!decksList) {return;}
-  
+  if (!Array.isArray(decks)) {
+    return;
+  }
+
+  const decksList =
+    document.getElementById('dashboard-decks-list') ||
+    document.querySelector('.decks-list') ||
+    document.querySelector('[data-section="decks"]');
+
+  if (!decksList) {
+    return;
+  }
+
   if (decks.length === 0) {
     renderEmptyDecksState(decksList);
     return;
   }
-  
+
   // Generar HTML para cada deck
-  const decksHTML = decks.map(deck => `
+  const decksHTML = decks
+    .map(
+      (deck) => `
     <div class="deck-card" data-deck-id="${deck.id}">
       <div class="deck-header">
         <h3 class="deck-name">${deck.name || 'Sin nombre'}</h3>
@@ -203,10 +228,12 @@ function updateDashboardDecks(decks) {
         </button>
       </div>
     </div>
-  `).join('');
-  
+  `
+    )
+    .join('');
+
   decksList.innerHTML = decksHTML;
-  
+
   // Llamar función global si existe (compatibilidad)
   if (window.updateDashboardDecks) {
     window.updateDashboardDecks(decks);
@@ -221,21 +248,20 @@ function initializeChartsWithData(stats) {
   try {
     // Inicializar gráficos base
     initializeCharts();
-    
+
     // Actualizar con datos reales
     if (stats.weeklyProgress) {
       // TODO: Implementar updateProgressChart
       // updateProgressChart(stats.weeklyProgress);
     }
-    
+
     if (stats.weeklyAccuracy) {
       // TODO: Implementar updateAccuracyChart
       // updateAccuracyChart(stats.weeklyAccuracy);
     }
-    
+
     // Cargar estadísticas semanales adicionales
     loadWeeklyStats();
-    
   } catch (error) {
     console.error('Error initializing charts:', error);
   }
@@ -250,15 +276,14 @@ async function loadAndUpdateActivityHeatmap() {
       '/api/dashboard/stats/heatmap',
       generateMockActivityData()
     );
-    
+
     // Generar heatmap base
     generateActivityHeatmap();
-    
+
     // Actualizar con datos reales
     if (activityData && updateHeatmapWithData) {
       updateHeatmapWithData(activityData);
     }
-    
   } catch (error) {
     console.error('Error loading activity heatmap:', error);
     // Generar heatmap con datos mock
@@ -273,18 +298,18 @@ async function loadAndUpdateActivityHeatmap() {
 function generateMockActivityData() {
   const data = [];
   const today = new Date();
-  
+
   for (let i = 0; i < 365; i++) {
     const date = new Date(today);
     date.setDate(date.getDate() - i);
-    
+
     data.push({
       date: date.toISOString().split('T')[0],
       count: Math.floor(Math.random() * 10),
-      level: Math.floor(Math.random() * 5)
+      level: Math.floor(Math.random() * 5),
     });
   }
-  
+
   return data;
 }
 
@@ -299,15 +324,14 @@ export async function updateDashboardPeriod(period) {
     // if (updateChartPeriod) {
     //   updateChartPeriod(period);
     // }
-    
+
     // Cargar datos específicos del período
     const periodStats = await apiWithFallback(
       `/api/dashboard/stats/${period}`,
       FALLBACK_DATA.stats
     );
-    
+
     updateDashboardStats(periodStats);
-    
   } catch (error) {
     console.error('Error updating dashboard period:', error);
     showNotification('Error al actualizar período', 'error');
@@ -332,4 +356,3 @@ export async function refreshDashboard() {
 window.loadDashboardData = loadDashboardData;
 window.refreshDashboard = refreshDashboard;
 window.updateDashboardPeriod = updateDashboardPeriod;
-

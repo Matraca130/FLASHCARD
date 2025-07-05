@@ -28,12 +28,17 @@ export function debounce(func, wait) {
  * @param {number} duration - Duración en ms (default: 4000)
  * @param {Object} options - Opciones adicionales
  */
-export function showNotification(message, type = 'info', duration = 4000, options = {}) {
+export function showNotification(
+  message,
+  type = 'info',
+  duration = 4000,
+  options = {}
+) {
   const {
     title = null,
     persistent = false,
     actionText = null,
-    actionCallback = null
+    actionCallback = null,
   } = options;
 
   // Iconos para cada tipo de notificación
@@ -41,7 +46,7 @@ export function showNotification(message, type = 'info', duration = 4000, option
     success: '✅',
     error: '❌',
     warning: '⚠️',
-    info: 'ℹ️'
+    info: 'ℹ️',
   };
 
   // Create notification element
@@ -64,35 +69,39 @@ export function showNotification(message, type = 'info', duration = 4000, option
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.1);
   `;
-  
+
   // Set background color based on type
   switch (type) {
     case 'success':
-      notification.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+      notification.style.background =
+        'linear-gradient(135deg, #10b981, #059669)';
       break;
     case 'error':
-      notification.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
+      notification.style.background =
+        'linear-gradient(135deg, #ef4444, #dc2626)';
       break;
     case 'warning':
-      notification.style.background = 'linear-gradient(135deg, #f59e0b, #d97706)';
+      notification.style.background =
+        'linear-gradient(135deg, #f59e0b, #d97706)';
       break;
     default:
-      notification.style.background = 'linear-gradient(135deg, #3b82f6, #2563eb)';
+      notification.style.background =
+        'linear-gradient(135deg, #3b82f6, #2563eb)';
   }
-  
+
   // Construir contenido de la notificación
   let content = `
     <div style="display: flex; align-items: flex-start; gap: 0.75rem;">
       <span style="font-size: 1.25rem; flex-shrink: 0;">${icons[type]}</span>
       <div style="flex: 1;">
   `;
-  
+
   if (title) {
     content += `<div style="font-weight: 600; margin-bottom: 0.25rem;">${title}</div>`;
   }
-  
+
   content += `<div style="font-size: 0.9rem; line-height: 1.4;">${message}</div>`;
-  
+
   if (actionText && actionCallback) {
     content += `
       <button onclick="(${actionCallback.toString()})()" 
@@ -104,7 +113,7 @@ export function showNotification(message, type = 'info', duration = 4000, option
       </button>
     `;
   }
-  
+
   content += `
       </div>
       <button onclick="this.parentElement.parentElement.remove()" 
@@ -114,15 +123,15 @@ export function showNotification(message, type = 'info', duration = 4000, option
       </button>
     </div>
   `;
-  
+
   notification.innerHTML = content;
   document.body.appendChild(notification);
-  
+
   // Animate in
   setTimeout(() => {
     notification.style.transform = 'translateX(0)';
   }, 100);
-  
+
   // Auto remove (unless persistent)
   if (!persistent) {
     setTimeout(() => {
@@ -145,16 +154,20 @@ export function showNotification(message, type = 'info', duration = 4000, option
  * @returns {string} - Fecha formateada
  */
 export function formatDate(date, locale = 'es-ES') {
-  if (!date) {return 'N/A';}
-  
+  if (!date) {
+    return 'N/A';
+  }
+
   const dateObj = typeof date === 'string' ? new Date(date) : date;
-  
-  if (isNaN(dateObj.getTime())) {return 'Fecha inválida';}
-  
+
+  if (isNaN(dateObj.getTime())) {
+    return 'Fecha inválida';
+  }
+
   return dateObj.toLocaleDateString(locale, {
     year: 'numeric',
     month: 'short',
-    day: 'numeric'
+    day: 'numeric',
   });
 }
 
@@ -164,19 +177,31 @@ export function formatDate(date, locale = 'es-ES') {
  * @returns {string} - Fecha relativa formateada
  */
 export function formatRelativeDate(date) {
-  if (!date) {return 'N/A';}
-  
+  if (!date) {
+    return 'N/A';
+  }
+
   const dateObj = typeof date === 'string' ? new Date(date) : date;
   const now = new Date();
   const diffMs = now - dateObj;
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-  
-  if (diffDays === 0) {return 'Hoy';}
-  if (diffDays === 1) {return 'Ayer';}
-  if (diffDays < 7) {return `Hace ${diffDays} días`;}
-  if (diffDays < 30) {return `Hace ${Math.floor(diffDays / 7)} semanas`;}
-  if (diffDays < 365) {return `Hace ${Math.floor(diffDays / 30)} meses`;}
-  
+
+  if (diffDays === 0) {
+    return 'Hoy';
+  }
+  if (diffDays === 1) {
+    return 'Ayer';
+  }
+  if (diffDays < 7) {
+    return `Hace ${diffDays} días`;
+  }
+  if (diffDays < 30) {
+    return `Hace ${Math.floor(diffDays / 7)} semanas`;
+  }
+  if (diffDays < 365) {
+    return `Hace ${Math.floor(diffDays / 30)} meses`;
+  }
+
   return `Hace ${Math.floor(diffDays / 365)} años`;
 }
 
@@ -186,7 +211,9 @@ export function formatRelativeDate(date) {
  * @returns {string} - Cadena capitalizada
  */
 export function capitalize(str) {
-  if (!str || typeof str !== 'string') {return '';}
+  if (!str || typeof str !== 'string') {
+    return '';
+  }
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 }
 
@@ -198,9 +225,13 @@ export function capitalize(str) {
  * @returns {string} - Texto truncado
  */
 export function truncateText(text, maxLength, suffix = '...') {
-  if (!text || typeof text !== 'string') {return '';}
-  if (text.length <= maxLength) {return text;}
-  
+  if (!text || typeof text !== 'string') {
+    return '';
+  }
+  if (text.length <= maxLength) {
+    return text;
+  }
+
   return text.substring(0, maxLength - suffix.length) + suffix;
 }
 
@@ -236,14 +267,16 @@ export async function copyToClipboard(text) {
  */
 export function getVisibleElement(selector) {
   const element = document.querySelector(selector);
-  
-  if (!element) {return null;}
-  
+
+  if (!element) {
+    return null;
+  }
+
   const style = window.getComputedStyle(element);
   if (style.display === 'none' || style.visibility === 'hidden') {
     return null;
   }
-  
+
   return element;
 }
 
@@ -252,14 +285,17 @@ export function getVisibleElement(selector) {
  * @param {string|HTMLFormElement} formSelector - Selector del formulario o elemento del formulario
  */
 export function clearForm(formSelector) {
-  const form = typeof formSelector === 'string' 
-    ? document.querySelector(formSelector) 
-    : formSelector;
-    
-  if (!form) {return;}
-  
+  const form =
+    typeof formSelector === 'string'
+      ? document.querySelector(formSelector)
+      : formSelector;
+
+  if (!form) {
+    return;
+  }
+
   const inputs = form.querySelectorAll('input, textarea, select');
-  inputs.forEach(input => {
+  inputs.forEach((input) => {
     if (input.type === 'checkbox' || input.type === 'radio') {
       input.checked = false;
     } else {
@@ -267,7 +303,6 @@ export function clearForm(formSelector) {
     }
   });
 }
-
 
 /**
  * Renderiza un estado vacío en un contenedor
@@ -287,30 +322,31 @@ export function renderEmptyState(container, options = {}) {
     actionTarget = null,
     actionCallback = null,
     icon = null,
-    className = ''
+    className = '',
   } = options;
-  
+
   // Obtener elemento contenedor
-  const element = typeof container === 'string' 
-    ? document.querySelector(container) 
-    : container;
-    
+  const element =
+    typeof container === 'string'
+      ? document.querySelector(container)
+      : container;
+
   if (!element) {
     console.warn('Contenedor no encontrado para renderizar estado vacío');
     return;
   }
-  
+
   // Construir HTML del estado vacío
   let html = `<div class="empty-state ${className}">`;
-  
+
   // Agregar icono si se especifica
   if (icon) {
     html += `<div class="empty-state-icon">${icon}</div>`;
   }
-  
+
   // Agregar mensaje
   html += `<p class="text-muted empty-state-message">${message}</p>`;
-  
+
   // Agregar botón de acción si se especifica
   if (actionText) {
     if (actionTarget) {
@@ -331,9 +367,9 @@ export function renderEmptyState(container, options = {}) {
       `;
     }
   }
-  
+
   html += '</div>';
-  
+
   // Insertar HTML en el contenedor
   element.innerHTML = html;
 }
@@ -349,9 +385,9 @@ export function renderEmptyDecksState(container, options = {}) {
     actionText: 'Crear tu primer deck',
     actionTarget: 'crear',
     icon: '📚',
-    className: 'empty-decks-state'
+    className: 'empty-decks-state',
   };
-  
+
   const finalOptions = { ...defaultOptions, ...options };
   renderEmptyState(container, finalOptions);
 }
@@ -367,9 +403,9 @@ export function renderEmptyFlashcardsState(container, options = {}) {
     actionText: 'Agregar flashcards',
     actionTarget: 'crear',
     icon: '🃏',
-    className: 'empty-flashcards-state'
+    className: 'empty-flashcards-state',
   };
-  
+
   const finalOptions = { ...defaultOptions, ...options };
   renderEmptyState(container, finalOptions);
 }
@@ -380,15 +416,19 @@ export function renderEmptyFlashcardsState(container, options = {}) {
  * @param {string} searchTerm - Término de búsqueda
  * @param {Object} options - Opciones adicionales
  */
-export function renderEmptySearchState(container, searchTerm = '', options = {}) {
+export function renderEmptySearchState(
+  container,
+  searchTerm = '',
+  options = {}
+) {
   const defaultOptions = {
-    message: searchTerm 
-      ? `No se encontraron resultados para "${searchTerm}"` 
+    message: searchTerm
+      ? `No se encontraron resultados para "${searchTerm}"`
       : 'No se encontraron resultados',
     icon: '🔍',
-    className: 'empty-search-state'
+    className: 'empty-search-state',
   };
-  
+
   const finalOptions = { ...defaultOptions, ...options };
   renderEmptyState(container, finalOptions);
 }
@@ -404,10 +444,9 @@ export function renderEmptyStatsState(container, options = {}) {
     actionText: 'Comenzar a estudiar',
     actionTarget: 'estudiar',
     icon: '📊',
-    className: 'empty-stats-state'
+    className: 'empty-stats-state',
   };
-  
+
   const finalOptions = { ...defaultOptions, ...options };
   renderEmptyState(container, finalOptions);
 }
-

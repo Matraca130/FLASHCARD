@@ -1,7 +1,10 @@
 import { api } from './apiClient.js';
 import { store } from './store/store.js';
 import { loadDashboardData } from './dashboard.service.js';
-import { validateLoginCredentials, validateRegistrationData } from './utils/validation.js';
+import {
+  validateLoginCredentials,
+  validateRegistrationData,
+} from './utils/validation.js';
 import { performCrudOperation } from './utils/apiHelpers.js';
 import { showNotification } from './utils/helpers.js';
 
@@ -10,13 +13,17 @@ import { showNotification } from './utils/helpers.js';
  */
 export async function checkAuthStatus() {
   const token = localStorage.getItem('authToken');
-  if (!token) {return;}
-  
+  if (!token) {
+    return;
+  }
+
   try {
     const data = await api('/api/auth/verify');
     if (data && data.user) {
       store.setState({ currentUser: data.user });
-      if (window.updateAuthUI) {window.updateAuthUI();}
+      if (window.updateAuthUI) {
+        window.updateAuthUI();
+      }
       await loadDashboardData();
     } else {
       clearAuthData();
@@ -37,28 +44,32 @@ export async function login(email, password) {
   if (!validateLoginCredentials(email, password)) {
     return;
   }
-  
+
   try {
     const result = await performCrudOperation(
-      () => api('/api/auth/login', {
-        method: 'POST',
-        body: JSON.stringify({ email, password })
-      }),
+      () =>
+        api('/api/auth/login', {
+          method: 'POST',
+          body: JSON.stringify({ email, password }),
+        }),
       'Sesión iniciada exitosamente',
       'Error al iniciar sesión'
     );
-    
+
     // Guardar token y datos de usuario
     localStorage.setItem('authToken', result.token);
     store.setState({ currentUser: result.user });
-    
+
     // Actualizar UI
-    if (window.updateAuthUI) {window.updateAuthUI();}
-    if (window.hideLoginModal) {window.hideLoginModal();}
-    
+    if (window.updateAuthUI) {
+      window.updateAuthUI();
+    }
+    if (window.hideLoginModal) {
+      window.hideLoginModal();
+    }
+
     // Cargar datos del dashboard
     await loadDashboardData();
-    
   } catch (error) {
     console.error('Login failed:', error);
     // El error ya fue manejado por performCrudOperation
@@ -77,20 +88,20 @@ export async function register(email, password, confirmPassword, name = '') {
   if (!validateRegistrationData(email, password, confirmPassword)) {
     return;
   }
-  
+
   try {
     const result = await performCrudOperation(
-      () => api('/api/auth/register', {
-        method: 'POST',
-        body: JSON.stringify({ email, password, name })
-      }),
+      () =>
+        api('/api/auth/register', {
+          method: 'POST',
+          body: JSON.stringify({ email, password, name }),
+        }),
       'Cuenta creada exitosamente',
       'Error al crear la cuenta'
     );
-    
+
     // Auto-login después del registro
     await login(email, password);
-    
   } catch (error) {
     console.error('Registration failed:', error);
     // El error ya fue manejado por performCrudOperation
@@ -102,11 +113,15 @@ export async function register(email, password, confirmPassword, name = '') {
  */
 export function logout() {
   clearAuthData();
-  
+
   // Actualizar UI
-  if (window.updateAuthUI) {window.updateAuthUI();}
-  if (window.showSection) {window.showSection('inicio');}
-  
+  if (window.updateAuthUI) {
+    window.updateAuthUI();
+  }
+  if (window.showSection) {
+    window.showSection('inicio');
+  }
+
   showNotification('Sesión cerrada', 'info');
 }
 
@@ -144,4 +159,3 @@ export function getCurrentUser() {
 
 // Mantener compatibilidad con código existente
 window.checkAuthStatus = checkAuthStatus;
-

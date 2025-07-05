@@ -7,19 +7,25 @@ Cypress.Commands.add('navigateToSection', (sectionName) => {
 });
 
 // Command to create a test deck
-Cypress.Commands.add('createTestDeck', (deckName = 'Test Deck', description = 'Test Description') => {
-  cy.navigateToSection('Crear');
-  cy.get('[data-testid="deck-name-input"]').type(deckName);
-  cy.get('[data-testid="deck-description-input"]').type(description);
-  cy.get('[data-testid="create-deck-button"]').click();
-});
+Cypress.Commands.add(
+  'createTestDeck',
+  (deckName = 'Test Deck', description = 'Test Description') => {
+    cy.navigateToSection('Crear');
+    cy.get('[data-testid="deck-name-input"]').type(deckName);
+    cy.get('[data-testid="deck-description-input"]').type(description);
+    cy.get('[data-testid="create-deck-button"]').click();
+  }
+);
 
 // Command to create a test flashcard
-Cypress.Commands.add('createTestFlashcard', (front = 'Test Question', back = 'Test Answer') => {
-  cy.get('[data-testid="flashcard-front-input"]').type(front);
-  cy.get('[data-testid="flashcard-back-input"]').type(back);
-  cy.get('[data-testid="add-flashcard-button"]').click();
-});
+Cypress.Commands.add(
+  'createTestFlashcard',
+  (front = 'Test Question', back = 'Test Answer') => {
+    cy.get('[data-testid="flashcard-front-input"]').type(front);
+    cy.get('[data-testid="flashcard-back-input"]').type(back);
+    cy.get('[data-testid="add-flashcard-button"]').click();
+  }
+);
 
 // Command to start a study session
 Cypress.Commands.add('startStudySession', (deckName) => {
@@ -54,12 +60,15 @@ Cypress.Commands.add('waitForAnimations', () => {
 });
 
 // Command to mock API responses
-Cypress.Commands.add('mockApiResponse', (endpoint, response, statusCode = 200) => {
-  cy.intercept('GET', endpoint, {
-    statusCode: statusCode,
-    body: response
-  }).as('apiCall');
-});
+Cypress.Commands.add(
+  'mockApiResponse',
+  (endpoint, response, statusCode = 200) => {
+    cy.intercept('GET', endpoint, {
+      statusCode: statusCode,
+      body: response,
+    }).as('apiCall');
+  }
+);
 
 // Command to check accessibility
 Cypress.Commands.add('checkA11y', () => {
@@ -67,11 +76,11 @@ Cypress.Commands.add('checkA11y', () => {
   cy.get('img').each(($img) => {
     cy.wrap($img).should('have.attr', 'alt');
   });
-  
+
   cy.get('button').each(($btn) => {
     cy.wrap($btn).should('be.visible');
   });
-  
+
   cy.get('input').each(($input) => {
     const type = $input.attr('type');
     if (type !== 'hidden') {
@@ -79,4 +88,3 @@ Cypress.Commands.add('checkA11y', () => {
     }
   });
 });
-

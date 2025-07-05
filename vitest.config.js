@@ -17,25 +17,18 @@ export default defineConfig({
         '*.config.ts',
         'tests/',
         '**/*.test.js',
-        '**/*.spec.js'
+        '**/*.spec.js',
       ],
       thresholds: {
         global: {
           branches: 70,
           functions: 70,
           lines: 70,
-          statements: 70
-        }
-      }
+          statements: 70,
+        },
+      },
     },
     include: ['tests/**/*.test.js', 'src/**/*.test.js'],
-    exclude: [
-      'node_modules/',
-      'dist/',
-      'build/',
-      'cypress/',
-      'backend_app/'
-    ]
-  }
+    exclude: ['node_modules/', 'dist/', 'build/', 'cypress/', 'backend_app/'],
+  },
 });
-
