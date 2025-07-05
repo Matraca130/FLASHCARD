@@ -18,6 +18,8 @@ export default [
       'node_modules/**/*',
       'logs/**/*',
       'backend_app/**/*',
+      'venv/**/*',
+      '__pycache__/**/*',
       '*.py'
     ]
   },

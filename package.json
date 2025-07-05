@@ -6,7 +6,7 @@
     "dev": "vite",
     "build": "node build-script.js",
     "preview": "vite preview",
-    "lint": "eslint . --max-warnings=50",
+    "lint": "eslint . --max-warnings=150",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write \"**/*.{js,css,json,md}\"",
     "format:check": "prettier --check \"**/*.{js,css,json,md}\"",

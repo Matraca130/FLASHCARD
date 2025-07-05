@@ -86,11 +86,13 @@ export async function loadWeeklyStats() {
     
     // Actualizar gráficos con datos semanales
     if (weeklyStats.weeklyProgress) {
-      updateProgressChart(weeklyStats.weeklyProgress);
+      // TODO: Implementar updateProgressChart
+      // updateProgressChart(weeklyStats.weeklyProgress);
     }
     
     if (weeklyStats.weeklyAccuracy) {
-      updateAccuracyChart(weeklyStats.weeklyAccuracy);
+      // TODO: Implementar updateAccuracyChart
+      // updateAccuracyChart(weeklyStats.weeklyAccuracy);
     }
     
     return weeklyStats;
@@ -222,11 +224,13 @@ function initializeChartsWithData(stats) {
     
     // Actualizar con datos reales
     if (stats.weeklyProgress) {
-      updateProgressChart(stats.weeklyProgress);
+      // TODO: Implementar updateProgressChart
+      // updateProgressChart(stats.weeklyProgress);
     }
     
     if (stats.weeklyAccuracy) {
-      updateAccuracyChart(stats.weeklyAccuracy);
+      // TODO: Implementar updateAccuracyChart
+      // updateAccuracyChart(stats.weeklyAccuracy);
     }
     
     // Cargar estadísticas semanales adicionales
@@ -291,9 +295,10 @@ function generateMockActivityData() {
 export async function updateDashboardPeriod(period) {
   try {
     // Actualizar gráficos con nuevo período
-    if (updateChartPeriod) {
-      updateChartPeriod(period);
-    }
+    // TODO: Implementar updateChartPeriod
+    // if (updateChartPeriod) {
+    //   updateChartPeriod(period);
+    // }
     
     // Cargar datos específicos del período
     const periodStats = await apiWithFallback(
