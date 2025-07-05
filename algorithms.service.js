@@ -1,15 +1,69 @@
 import { api } from './apiClient.js';
 import { store } from './store/store.js';
+import { apiWithFallback, performCrudOperation } from './utils/apiHelpers.js';
+import { showNotification } from './utils/helpers.js';
 
 // Variable para el algoritmo seleccionado en el modal
 let selectedModalAlgorithm = 'ultra_sm2';
+
+// Configuraciones de algoritmos disponibles
+const ALGORITHM_CONFIGS = {
+  ultra_sm2: {
+    name: 'Ultra SM-2',
+    description: 'Algoritmo optimizado basado en SM-2 con ajustes dinámicos',
+    difficulty: 'Intermedio',
+    features: ['Intervalos adaptativos', 'Factor de facilidad dinámico', 'Optimizado para retención'],
+    defaultParams: {
+      initial_interval: 1,
+      easy_factor: 2.5,
+      hard_factor: 1.2,
+      min_factor: 1.3,
+      max_factor: 3.0
+    }
+  },
+  sm2: {
+    name: 'SM-2 Clásico',
+    description: 'Algoritmo SuperMemo 2 tradicional y confiable',
+    difficulty: 'Básico',
+    features: ['Intervalos fijos', 'Factor de facilidad estático', 'Probado y confiable'],
+    defaultParams: {
+      initial_interval: 1,
+      easy_factor: 2.5,
+      hard_factor: 1.2
+    }
+  },
+  anki: {
+    name: 'Estilo Anki',
+    description: 'Algoritmo similar al usado por Anki con graduación',
+    difficulty: 'Avanzado',
+    features: ['Graduación por pasos', 'Intervalos personalizables', 'Lapsos optimizados'],
+    defaultParams: {
+      learning_steps: [1, 10],
+      graduating_interval: 1,
+      easy_interval: 4,
+      max_interval: 36500
+    }
+  },
+  fsrs: {
+    name: 'FSRS v4',
+    description: 'Free Spaced Repetition Scheduler - Algoritmo de última generación',
+    difficulty: 'Experto',
+    features: ['IA adaptativa', 'Predicción de memoria', 'Optimización continua'],
+    defaultParams: {
+      w: [0.4, 0.6, 2.4, 5.8, 4.93, 0.94, 0.86, 0.01, 1.49, 0.14, 0.94, 2.18, 0.05, 0.34, 1.26, 0.29, 2.61]
+    }
+  }
+};
 
 /**
  * Muestra el modal de selección de algoritmo
  */
 export function showAlgorithmModal() {
   const modal = document.getElementById('algorithm-modal');
-  if (!modal) return;
+  if (!modal) {
+    createAlgorithmModal();
+    return;
+  }
   
   modal.style.display = 'flex';
   
@@ -27,6 +81,49 @@ export function showAlgorithmModal() {
 }
 
 /**
+ * Crea el modal de algoritmos dinámicamente
+ */
+function createAlgorithmModal() {
+  const modalHTML = `
+    <div id="algorithm-modal" class="modal algorithm-modal" style="display: flex;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Seleccionar Algoritmo de Repetición</h3>
+          <span class="close" onclick="closeAlgorithmModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+          <div class="algorithms-grid">
+            ${Object.entries(ALGORITHM_CONFIGS).map(([id, config]) => `
+              <div class="algorithm-option" data-algorithm="${id}" onclick="selectModalAlgorithm('${id}')">
+                <div class="algorithm-header">
+                  <h4>${config.name}</h4>
+                  <span class="algorithm-difficulty ${config.difficulty.toLowerCase()}">${config.difficulty}</span>
+                </div>
+                <p class="algorithm-description">${config.description}</p>
+                <div class="algorithm-features">
+                  ${config.features.map(feature => `<span class="feature-tag">${feature}</span>`).join('')}
+                </div>
+                <div class="algorithm-check">✓</div>
+              </div>
+            `).join('')}
+          </div>
+          <div class="algorithm-details" id="algorithm-details">
+            <h4>Configuración del Algoritmo</h4>
+            <div id="algorithm-params"></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" onclick="closeAlgorithmModal()">Cancelar</button>
+          <button class="btn btn-primary" onclick="confirmAlgorithmSelection()">Confirmar</button>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  document.body.insertAdjacentHTML('beforeend', modalHTML);
+}
+
+/**
  * Cierra el modal de algoritmos
  */
 export function closeAlgorithmModal() {
@@ -38,6 +135,7 @@ export function closeAlgorithmModal() {
 
 /**
  * Selecciona un algoritmo en el modal
+ * @param {string} algorithmId - ID del algoritmo a seleccionar
  */
 export function selectModalAlgorithm(algorithmId) {
   selectedModalAlgorithm = algorithmId;
@@ -48,228 +146,262 @@ export function selectModalAlgorithm(algorithmId) {
     if (option.dataset.algorithm === algorithmId) {
       option.style.borderColor = '#4caf50';
       option.style.background = 'rgba(76, 175, 80, 0.1)';
-      if (check) {
-        check.style.background = '#4caf50';
-        check.style.borderColor = '#4caf50';
-        check.style.color = 'white';
-      }
+      if (check) check.style.display = 'block';
     } else {
-      option.style.borderColor = 'rgba(255, 255, 255, 0.2)';
-      option.style.background = 'rgba(255, 255, 255, 0.05)';
-      if (check) {
-        check.style.background = 'transparent';
-        check.style.borderColor = 'rgba(255, 255, 255, 0.3)';
-        check.style.color = 'transparent';
-      }
+      option.style.borderColor = '#ddd';
+      option.style.background = 'white';
+      if (check) check.style.display = 'none';
     }
   });
+  
+  // Update algorithm details
+  updateAlgorithmDetails(algorithmId);
 }
 
 /**
- * Inicia el estudio con el algoritmo seleccionado
+ * Actualiza los detalles del algoritmo seleccionado
+ * @param {string} algorithmId - ID del algoritmo
  */
-export async function startStudyWithAlgorithm() {
-  try {
-    const deckId = store.get('selectedDeckId');
-    if (!deckId) {
-      if (window.showNotification) {
-        window.showNotification('Por favor selecciona un deck primero', 'warning');
-      }
-      return;
-    }
+function updateAlgorithmDetails(algorithmId) {
+  const config = ALGORITHM_CONFIGS[algorithmId];
+  if (!config) return;
+  
+  const detailsContainer = document.getElementById('algorithm-params');
+  if (!detailsContainer) return;
+  
+  const paramsHTML = Object.entries(config.defaultParams).map(([key, value]) => `
+    <div class="param-item">
+      <label for="param-${key}">${formatParamName(key)}:</label>
+      <input type="number" id="param-${key}" value="${value}" step="0.1" min="0">
+    </div>
+  `).join('');
+  
+  detailsContainer.innerHTML = `
+    <div class="algorithm-params">
+      ${paramsHTML}
+    </div>
+    <div class="algorithm-info">
+      <p><strong>Descripción:</strong> ${config.description}</p>
+      <p><strong>Características:</strong> ${config.features.join(', ')}</p>
+    </div>
+  `;
+}
 
-    // Guardar el algoritmo seleccionado
-    store.set('selectedAlgorithm', selectedModalAlgorithm);
+/**
+ * Formatea el nombre de un parámetro para mostrar
+ * @param {string} paramName - Nombre del parámetro
+ * @returns {string} - Nombre formateado
+ */
+function formatParamName(paramName) {
+  return paramName
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, l => l.toUpperCase());
+}
+
+/**
+ * Confirma la selección del algoritmo
+ */
+export async function confirmAlgorithmSelection() {
+  try {
+    // Recopilar parámetros personalizados
+    const params = {};
+    const config = ALGORITHM_CONFIGS[selectedModalAlgorithm];
     
-    // Cerrar modal
+    Object.keys(config.defaultParams).forEach(key => {
+      const input = document.getElementById(`param-${key}`);
+      if (input) {
+        params[key] = parseFloat(input.value) || config.defaultParams[key];
+      }
+    });
+    
+    // Guardar configuración del algoritmo
+    await saveAlgorithmConfig(selectedModalAlgorithm, params);
+    
     closeAlgorithmModal();
-    
-    // Iniciar sesión de estudio
-    const response = await api(`/api/study/start`, {
-      method: 'POST',
-      body: JSON.stringify({
-        deck_id: deckId,
-        algorithm: selectedModalAlgorithm
-      })
-    });
-
-    if (response.session_id) {
-      store.set('currentSessionId', response.session_id);
-      
-      // Navegar a la sesión de estudio
-      if (window.navigate) {
-        window.navigate('study-session');
-      }
-      
-      if (window.showNotification) {
-        window.showNotification(`Sesión iniciada con ${getAlgorithmName(selectedModalAlgorithm)}`, 'success');
-      }
-    }
+    showNotification(`Algoritmo ${config.name} configurado exitosamente`, 'success');
     
   } catch (error) {
-    console.error('Error starting study session:', error);
-    if (window.showNotification) {
-      window.showNotification('Error al iniciar la sesión', 'error');
-    }
+    console.error('Error confirmando selección de algoritmo:', error);
+    showNotification('Error al configurar algoritmo', 'error');
   }
 }
 
 /**
- * Obtiene el nombre legible del algoritmo
+ * Guarda la configuración del algoritmo
+ * @param {string} algorithmId - ID del algoritmo
+ * @param {Object} params - Parámetros del algoritmo
  */
-export function getAlgorithmName(algorithmId) {
-  const algorithms = {
-    'ultra_sm2': 'Ultra SM-2',
-    'anki': 'Anki',
-    'fsrs': 'FSRS',
-    'leitner': 'Sistema Leitner',
-    'simple': 'Repetición Simple'
-  };
-  
-  return algorithms[algorithmId] || algorithmId;
-}
-
-/**
- * Obtiene información detallada del algoritmo
- */
-export function getAlgorithmInfo(algorithmId) {
-  const algorithms = {
-    'ultra_sm2': {
-      name: 'Ultra SM-2',
-      description: 'Algoritmo avanzado basado en SM-2 con optimizaciones para retención a largo plazo',
-      features: ['Intervalos adaptativos', 'Factor de facilidad dinámico', 'Análisis de confianza'],
-      recommended: true
-    },
-    'anki': {
-      name: 'Anki',
-      description: 'Algoritmo utilizado por la popular aplicación Anki',
-      features: ['Intervalos graduales', 'Revisiones programadas', 'Factores de dificultad'],
-      recommended: false
-    },
-    'fsrs': {
-      name: 'FSRS',
-      description: 'Free Spaced Repetition Scheduler - Algoritmo moderno basado en investigación',
-      features: ['Predicción de memoria', 'Optimización automática', 'Análisis estadístico'],
-      recommended: false
-    },
-    'leitner': {
-      name: 'Sistema Leitner',
-      description: 'Sistema clásico de cajas para repetición espaciada',
-      features: ['Cajas de intervalos', 'Promoción/degradación', 'Simplicidad'],
-      recommended: false
-    },
-    'simple': {
-      name: 'Repetición Simple',
-      description: 'Sistema básico de repetición con intervalos fijos',
-      features: ['Intervalos fijos', 'Fácil de entender', 'Sin complejidad'],
-      recommended: false
-    }
-  };
-  
-  return algorithms[algorithmId] || null;
-}
-
-/**
- * Evalúa una carta con el algoritmo seleccionado
- */
-export async function evaluateCard(cardId, quality, responseTime = 0) {
+export async function saveAlgorithmConfig(algorithmId, params) {
   try {
-    const algorithm = store.get('selectedAlgorithm') || 'ultra_sm2';
+    const config = {
+      algorithm: algorithmId,
+      parameters: params,
+      updated_at: new Date().toISOString()
+    };
     
-    const response = await api('/api/study/card/answer', {
-      method: 'POST',
-      body: JSON.stringify({
-        card_id: cardId,
-        quality: quality,
-        response_time: responseTime,
-        algorithm: algorithm,
-        confidence: quality + 1 // Convertir a escala 1-5
-      })
-    });
+    await performCrudOperation(
+      () => api('/api/user/algorithm-config', {
+        method: 'POST',
+        body: JSON.stringify(config)
+      }),
+      null, // No mostrar notificación aquí
+      'Error al guardar configuración del algoritmo'
+    );
     
-    if (!response.ok && response.status) {
-      throw new Error('Error al evaluar carta');
-    }
+    // Actualizar store local
+    store.setState({ algorithmConfig: config });
     
-    return response;
+    // Actualizar UI si es necesario
+    updateAlgorithmDisplay(algorithmId);
     
   } catch (error) {
-    console.error('Error evaluating card:', error);
+    console.error('Error guardando configuración:', error);
     throw error;
   }
 }
 
 /**
- * Actualiza la repetición espaciada de una carta
+ * Carga la configuración actual del algoritmo
+ * @returns {Promise<Object>} - Configuración del algoritmo
  */
-export async function updateSpacedRepetition(cardId, quality, algorithm = 'ultra_sm2') {
+export async function loadAlgorithmConfig() {
   try {
-    const response = await api('/api/cards/spaced-repetition', {
-      method: 'POST',
-      body: JSON.stringify({
-        card_id: cardId,
-        quality: quality,
-        algorithm: algorithm
-      })
-    });
+    const config = await apiWithFallback(
+      '/api/user/algorithm-config',
+      {
+        algorithm: 'ultra_sm2',
+        parameters: ALGORITHM_CONFIGS.ultra_sm2.defaultParams,
+        updated_at: new Date().toISOString()
+      }
+    );
     
-    return response;
+    // Actualizar store
+    store.setState({ algorithmConfig: config });
+    
+    // Actualizar UI
+    updateAlgorithmDisplay(config.algorithm);
+    
+    return config;
     
   } catch (error) {
-    console.error('Error updating spaced repetition:', error);
-    throw error;
+    console.error('Error cargando configuración del algoritmo:', error);
+    return null;
   }
 }
 
 /**
- * Obtiene el algoritmo seleccionado actualmente
+ * Actualiza la visualización del algoritmo actual
+ * @param {string} algorithmId - ID del algoritmo actual
  */
-export function getSelectedAlgorithm() {
-  return selectedModalAlgorithm;
+function updateAlgorithmDisplay(algorithmId) {
+  const config = ALGORITHM_CONFIGS[algorithmId];
+  if (!config) return;
+  
+  // Actualizar elementos de UI que muestran el algoritmo actual
+  const algorithmDisplay = document.getElementById('current-algorithm');
+  if (algorithmDisplay) {
+    algorithmDisplay.textContent = config.name;
+  }
+  
+  const algorithmDescription = document.getElementById('algorithm-description');
+  if (algorithmDescription) {
+    algorithmDescription.textContent = config.description;
+  }
 }
 
 /**
- * Establece el algoritmo seleccionado
+ * Calcula el próximo intervalo usando el algoritmo configurado
+ * @param {Object} cardData - Datos de la tarjeta
+ * @param {number} quality - Calidad de la respuesta (0-5)
+ * @returns {Promise<Object>} - Datos actualizados de la tarjeta
  */
-export function setSelectedAlgorithm(algorithmId) {
-  selectedModalAlgorithm = algorithmId;
-  store.set('selectedAlgorithm', algorithmId);
+export async function calculateNextInterval(cardData, quality) {
+  try {
+    const config = store.getState().algorithmConfig || await loadAlgorithmConfig();
+    
+    const result = await performCrudOperation(
+      () => api('/api/study/calculate-interval', {
+        method: 'POST',
+        body: JSON.stringify({
+          card_data: cardData,
+          quality: quality,
+          algorithm: config.algorithm,
+          parameters: config.parameters
+        })
+      }),
+      null, // No mostrar notificación
+      'Error al calcular intervalo'
+    );
+    
+    return result;
+    
+  } catch (error) {
+    console.error('Error calculando intervalo:', error);
+    // Fallback a cálculo local simple
+    return calculateSimpleInterval(cardData, quality);
+  }
 }
 
 /**
- * Inicializa los event listeners para el modal de algoritmos
+ * Cálculo de intervalo simple como fallback
+ * @param {Object} cardData - Datos de la tarjeta
+ * @param {number} quality - Calidad de la respuesta
+ * @returns {Object} - Datos actualizados
  */
-export function initializeAlgorithmModal() {
-  // Event listeners para las opciones de algoritmo
-  document.querySelectorAll('.algorithm-option').forEach(option => {
-    option.addEventListener('click', () => {
-      const algorithmId = option.dataset.algorithm;
-      if (algorithmId) {
-        selectModalAlgorithm(algorithmId);
+function calculateSimpleInterval(cardData, quality) {
+  const interval = cardData.interval || 1;
+  const easeFactor = cardData.ease_factor || 2.5;
+  
+  let newInterval = interval;
+  let newEaseFactor = easeFactor;
+  
+  if (quality >= 3) {
+    // Respuesta correcta
+    if (cardData.repetitions === 0) {
+      newInterval = 1;
+    } else if (cardData.repetitions === 1) {
+      newInterval = 6;
+    } else {
+      newInterval = Math.round(interval * easeFactor);
+    }
+    
+    newEaseFactor = easeFactor + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02));
+  } else {
+    // Respuesta incorrecta
+    newInterval = 1;
+    newEaseFactor = Math.max(1.3, easeFactor - 0.2);
+  }
+  
+  return {
+    ...cardData,
+    interval: Math.max(1, newInterval),
+    ease_factor: Math.max(1.3, newEaseFactor),
+    repetitions: quality >= 3 ? (cardData.repetitions || 0) + 1 : 0,
+    next_review: new Date(Date.now() + newInterval * 24 * 60 * 60 * 1000).toISOString()
+  };
+}
+
+/**
+ * Obtiene estadísticas del algoritmo actual
+ * @returns {Promise<Object>} - Estadísticas del algoritmo
+ */
+export async function getAlgorithmStats() {
+  try {
+    const stats = await apiWithFallback(
+      '/api/stats/algorithm',
+      {
+        total_reviews: 0,
+        average_retention: 0,
+        algorithm_efficiency: 0,
+        optimal_intervals: []
       }
-    });
-  });
-  
-  // Event listener para el botón de cerrar
-  const closeBtn = document.querySelector('#algorithm-modal .close-modal');
-  if (closeBtn) {
-    closeBtn.addEventListener('click', closeAlgorithmModal);
-  }
-  
-  // Event listener para el botón de iniciar
-  const startBtn = document.querySelector('#algorithm-modal .start-study-btn');
-  if (startBtn) {
-    startBtn.addEventListener('click', startStudyWithAlgorithm);
-  }
-  
-  // Cerrar modal al hacer clic fuera
-  const modal = document.getElementById('algorithm-modal');
-  if (modal) {
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) {
-        closeAlgorithmModal();
-      }
-    });
+    );
+    
+    return stats;
+    
+  } catch (error) {
+    console.error('Error obteniendo estadísticas del algoritmo:', error);
+    return null;
   }
 }
 
@@ -277,7 +409,5 @@ export function initializeAlgorithmModal() {
 window.showAlgorithmModal = showAlgorithmModal;
 window.closeAlgorithmModal = closeAlgorithmModal;
 window.selectModalAlgorithm = selectModalAlgorithm;
-window.startStudyWithAlgorithm = startStudyWithAlgorithm;
-window.evaluateCard = evaluateCard;
-window.updateSpacedRepetition = updateSpacedRepetition;
+window.confirmAlgorithmSelection = confirmAlgorithmSelection;
 

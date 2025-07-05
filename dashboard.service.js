@@ -1,74 +1,134 @@
 import { api } from './apiClient.js';
 import { initializeCharts, updateProgressChart, updateAccuracyChart, updateChartPeriod } from '../charts.js';
 import { generateActivityHeatmap, updateHeatmapWithData } from './activity-heatmap.service.js';
+import { multipleApiWithFallback, apiWithFallback, FALLBACK_DATA } from './utils/apiHelpers.js';
+import { showNotification, formatDate, formatRelativeDate } from './utils/helpers.js';
 
-// Carga estadísticas y decks del usuario en el Dashboard
+/**
+ * Carga estadísticas y decks del usuario en el Dashboard
+ */
 export async function loadDashboardData() {
   try {
-    // Cargar estadísticas del usuario
-    let stats;
-    try {
-      stats = await api('/api/stats');
-    } catch (error) {
-      console.log('API no disponible, usando datos de ejemplo');
-      stats = {
-        totalCards: 150,
-        studiedToday: 25,
-        accuracy: 78,
-        streak: 5,
-        totalCorrect: 120,
-        totalIncorrect: 30,
-        weeklyProgress: [12, 19, 15, 25, 22, 18, 30]
-      };
-    }
+    // Cargar múltiples endpoints en paralelo usando utilidad común
+    const [stats, decks] = await multipleApiWithFallback([
+      {
+        endpoint: '/api/stats',
+        fallback: FALLBACK_DATA.stats
+      },
+      {
+        endpoint: '/api/decks',
+        fallback: FALLBACK_DATA.decks
+      }
+    ]);
     
-    // Actualizar estadísticas en la UI
+    // Actualizar UI con datos cargados
     updateDashboardStats(stats);
-
-    // Cargar decks del usuario
-    let decks;
-    try {
-      decks = await api('/api/decks');
-    } catch (error) {
-      console.log('API no disponible, usando datos de ejemplo');
-      decks = [
-        { id: 1, name: 'Vocabulario Inglés', card_count: 50, last_studied: '2024-01-15' },
-        { id: 2, name: 'Matemáticas Básicas', card_count: 30, last_studied: '2024-01-14' }
-      ];
-    }
-    
     updateDashboardDecks(decks);
     
     // Inicializar gráficos con datos reales
     initializeChartsWithData(stats);
     
     // Generar heatmap de actividad
-    generateActivityHeatmap();
+    await loadAndUpdateActivityHeatmap();
     
   } catch (error) {
     console.error('Error loading dashboard data:', error);
-    if (window.showNotification) {
-      window.showNotification('Error al cargar datos del dashboard', 'error');
+    showNotification('Error al cargar datos del dashboard', 'error');
+  }
+}
+
+/**
+ * Carga datos específicos de estadísticas
+ * @returns {Promise<Object>} - Estadísticas del usuario
+ */
+export async function loadUserStats() {
+  try {
+    const stats = await apiWithFallback('/api/stats', FALLBACK_DATA.stats);
+    updateDashboardStats(stats);
+    return stats;
+  } catch (error) {
+    console.error('Error loading user stats:', error);
+    showNotification('Error al cargar estadísticas', 'error');
+    return FALLBACK_DATA.stats;
+  }
+}
+
+/**
+ * Carga datos específicos de decks
+ * @returns {Promise<Array>} - Array de decks del usuario
+ */
+export async function loadUserDecks() {
+  try {
+    const decks = await apiWithFallback('/api/decks', FALLBACK_DATA.decks);
+    updateDashboardDecks(decks);
+    return decks;
+  } catch (error) {
+    console.error('Error loading user decks:', error);
+    showNotification('Error al cargar decks', 'error');
+    return FALLBACK_DATA.decks;
+  }
+}
+
+/**
+ * Carga estadísticas semanales
+ * @returns {Promise<Object>} - Estadísticas semanales
+ */
+export async function loadWeeklyStats() {
+  try {
+    const weeklyStats = await apiWithFallback(
+      '/api/dashboard/stats/weekly',
+      {
+        weeklyProgress: [12, 19, 15, 25, 22, 18, 30],
+        weeklyAccuracy: [75, 80, 85, 78, 82, 88, 90],
+        totalStudyTime: 420 // minutos
+      }
+    );
+    
+    // Actualizar gráficos con datos semanales
+    if (weeklyStats.weeklyProgress) {
+      updateProgressChart(weeklyStats.weeklyProgress);
     }
+    
+    if (weeklyStats.weeklyAccuracy) {
+      updateAccuracyChart(weeklyStats.weeklyAccuracy);
+    }
+    
+    return weeklyStats;
+  } catch (error) {
+    console.error('Error loading weekly stats:', error);
+    return null;
   }
 }
 
 /**
  * Actualiza las estadísticas del dashboard
+ * @param {Object} stats - Estadísticas a mostrar
  */
 function updateDashboardStats(stats) {
-  // Actualizar tarjetas de estadísticas
-  const elements = {
-    totalCards: document.querySelector('[data-stat="total-cards"]'),
-    studiedToday: document.querySelector('[data-stat="studied-today"]'),
-    accuracy: document.querySelector('[data-stat="accuracy"]'),
-    streak: document.querySelector('[data-stat="streak"]')
+  if (!stats) return;
+  
+  // Actualizar tarjetas de estadísticas usando selectores mejorados
+  const statElements = {
+    totalCards: document.querySelector('[data-stat="total-cards"]') || document.getElementById('total-cards'),
+    studiedToday: document.querySelector('[data-stat="studied-today"]') || document.getElementById('studied-today'),
+    accuracy: document.querySelector('[data-stat="accuracy"]') || document.getElementById('accuracy'),
+    streak: document.querySelector('[data-stat="streak"]') || document.getElementById('streak')
   };
   
-  if (elements.totalCards) elements.totalCards.textContent = stats.totalCards || 0;
-  if (elements.studiedToday) elements.studiedToday.textContent = stats.studiedToday || 0;
-  if (elements.accuracy) elements.accuracy.textContent = `${stats.accuracy || 0}%`;
-  if (elements.streak) elements.streak.textContent = stats.streak || 0;
+  // Actualizar elementos con validación
+  Object.entries(statElements).forEach(([key, element]) => {
+    if (element && stats[key] !== undefined) {
+      const value = key === 'accuracy' ? `${stats[key]}%` : stats[key];
+      element.textContent = value;
+      
+      // Agregar animación de actualización
+      element.classList.add('stat-updated');
+      setTimeout(() => element.classList.remove('stat-updated'), 500);
+    }
+  });
+  
+  // Actualizar elementos adicionales
+  updateAdditionalStats(stats);
   
   // Llamar función global si existe (compatibilidad)
   if (window.updateDashboardStats) {
@@ -77,16 +137,47 @@ function updateDashboardStats(stats) {
 }
 
 /**
+ * Actualiza estadísticas adicionales
+ * @param {Object} stats - Estadísticas del usuario
+ */
+function updateAdditionalStats(stats) {
+  // Actualizar progreso total
+  const totalCorrect = stats.totalCorrect || 0;
+  const totalIncorrect = stats.totalIncorrect || 0;
+  const totalAnswered = totalCorrect + totalIncorrect;
+  
+  const progressElement = document.getElementById('total-progress');
+  if (progressElement && totalAnswered > 0) {
+    const accuracyPercent = Math.round((totalCorrect / totalAnswered) * 100);
+    progressElement.textContent = `${totalCorrect}/${totalAnswered} (${accuracyPercent}%)`;
+  }
+  
+  // Actualizar tiempo de estudio
+  const studyTimeElement = document.getElementById('study-time');
+  if (studyTimeElement && stats.totalStudyTime) {
+    const hours = Math.floor(stats.totalStudyTime / 60);
+    const minutes = stats.totalStudyTime % 60;
+    studyTimeElement.textContent = `${hours}h ${minutes}m`;
+  }
+}
+
+/**
  * Actualiza la lista de decks en el dashboard
+ * @param {Array} decks - Array de decks del usuario
  */
 function updateDashboardDecks(decks) {
-  const deckContainer = document.getElementById('dashboard-decks');
-  if (!deckContainer) return;
+  if (!Array.isArray(decks)) return;
   
-  if (!decks || decks.length === 0) {
-    deckContainer.innerHTML = `
+  const decksList = document.getElementById('dashboard-decks-list') || 
+                   document.querySelector('.decks-list') ||
+                   document.querySelector('[data-section="decks"]');
+  
+  if (!decksList) return;
+  
+  if (decks.length === 0) {
+    decksList.innerHTML = `
       <div class="empty-state">
-        <p>No tienes decks creados aún.</p>
+        <p>No tienes decks creados aún</p>
         <button onclick="window.showSection('crear')" class="btn btn-primary">
           Crear tu primer deck
         </button>
@@ -95,13 +186,31 @@ function updateDashboardDecks(decks) {
     return;
   }
   
-  deckContainer.innerHTML = decks.map(deck => `
-    <div class="deck-card" onclick="startStudySession('${deck.id}')">
-      <h3>${deck.name}</h3>
-      <p>${deck.card_count || 0} cartas</p>
-      <small>Última vez: ${deck.last_studied ? new Date(deck.last_studied).toLocaleDateString() : 'Nunca'}</small>
+  // Generar HTML para cada deck
+  const decksHTML = decks.map(deck => `
+    <div class="deck-card" data-deck-id="${deck.id}">
+      <div class="deck-header">
+        <h3 class="deck-name">${deck.name || 'Sin nombre'}</h3>
+        <span class="deck-count">${deck.card_count || 0} tarjetas</span>
+      </div>
+      <div class="deck-info">
+        <p class="deck-description">${deck.description || 'Sin descripción'}</p>
+        <p class="deck-last-studied">
+          Último estudio: ${formatRelativeDate(deck.last_studied)}
+        </p>
+      </div>
+      <div class="deck-actions">
+        <button onclick="startStudySession(${deck.id})" class="btn btn-primary btn-sm">
+          Estudiar
+        </button>
+        <button onclick="window.showSection('gestionar')" class="btn btn-secondary btn-sm">
+          Gestionar
+        </button>
+      </div>
     </div>
   `).join('');
+  
+  decksList.innerHTML = decksHTML;
   
   // Llamar función global si existe (compatibilidad)
   if (window.updateDashboardDecks) {
@@ -110,114 +219,119 @@ function updateDashboardDecks(decks) {
 }
 
 /**
- * Inicializa los gráficos con datos reales
+ * Inicializa gráficos con datos del usuario
+ * @param {Object} stats - Estadísticas del usuario
  */
 function initializeChartsWithData(stats) {
-  // Asegurar que los gráficos estén inicializados
-  setTimeout(() => {
+  try {
+    // Inicializar gráficos base
     initializeCharts();
     
-    // Actualizar gráfico de progreso si hay datos
+    // Actualizar con datos reales
     if (stats.weeklyProgress) {
       updateProgressChart(stats.weeklyProgress);
     }
     
-    // Actualizar gráfico de precisión
-    if (stats.totalCorrect !== undefined && stats.totalIncorrect !== undefined) {
-      updateAccuracyChart(stats.totalCorrect, stats.totalIncorrect);
-    }
-  }, 200);
-}
-
-/**
- * Maneja el cambio de período en los gráficos
- */
-export function handlePeriodChange(period) {
-  updateChartPeriod(period);
-  
-  // Actualizar botones activos
-  document.querySelectorAll('.period-btn').forEach(btn => {
-    btn.classList.remove('active');
-  });
-  
-  const activeBtn = document.querySelector(`[data-period="${period}"]`);
-  if (activeBtn) {
-    activeBtn.classList.add('active');
-  }
-}
-
-/**
- * Carga datos de ranking/leaderboard
- */
-export async function loadRankingData() {
-  try {
-    let rankingData;
-    try {
-      rankingData = await api('/api/ranking');
-    } catch (error) {
-      console.log('API no disponible, usando datos de ejemplo');
-      rankingData = {
-        userStats: {
-          points: 1250,
-          level: 5,
-          streak: 7,
-          achievements: 12
-        },
-        leaderboard: [
-          { position: 1, username: 'StudyMaster', points: 2500, level: 8, streak: 15 },
-          { position: 2, username: 'FlashGenius', points: 2200, level: 7, streak: 12 },
-          { position: 3, username: 'CardWizard', points: 1800, level: 6, streak: 9 }
-        ]
-      };
+    if (stats.weeklyAccuracy) {
+      updateAccuracyChart(stats.weeklyAccuracy);
     }
     
-    updateRankingUI(rankingData);
+    // Cargar estadísticas semanales adicionales
+    loadWeeklyStats();
     
   } catch (error) {
-    console.error('Error loading ranking data:', error);
-    if (window.showNotification) {
-      window.showNotification('Error al cargar datos del ranking', 'error');
-    }
+    console.error('Error initializing charts:', error);
   }
 }
 
 /**
- * Actualiza la UI del ranking
+ * Carga y actualiza el heatmap de actividad
  */
-function updateRankingUI(data) {
-  // Actualizar estadísticas del usuario
-  const userStats = data.userStats;
-  const elements = {
-    points: document.querySelector('[data-stat="user-points"]'),
-    level: document.querySelector('[data-stat="user-level"]'),
-    streak: document.querySelector('[data-stat="user-streak"]'),
-    achievements: document.querySelector('[data-stat="user-achievements"]')
-  };
-  
-  if (elements.points) elements.points.textContent = userStats.points || 0;
-  if (elements.level) elements.level.textContent = userStats.level || 1;
-  if (elements.streak) elements.streak.textContent = userStats.streak || 0;
-  if (elements.achievements) elements.achievements.textContent = userStats.achievements || 0;
-  
-  // Actualizar leaderboard
-  const leaderboardContainer = document.getElementById('leaderboard-table');
-  if (leaderboardContainer && data.leaderboard) {
-    const tbody = leaderboardContainer.querySelector('tbody');
-    if (tbody) {
-      tbody.innerHTML = data.leaderboard.map(user => `
-        <tr>
-          <td>${user.position}</td>
-          <td>${user.username}</td>
-          <td>${user.points}</td>
-          <td>${user.level}</td>
-          <td>${user.streak}</td>
-        </tr>
-      `).join('');
+async function loadAndUpdateActivityHeatmap() {
+  try {
+    const activityData = await apiWithFallback(
+      '/api/dashboard/stats/heatmap',
+      generateMockActivityData()
+    );
+    
+    // Generar heatmap base
+    generateActivityHeatmap();
+    
+    // Actualizar con datos reales
+    if (activityData && updateHeatmapWithData) {
+      updateHeatmapWithData(activityData);
     }
+    
+  } catch (error) {
+    console.error('Error loading activity heatmap:', error);
+    // Generar heatmap con datos mock
+    generateActivityHeatmap();
+  }
+}
+
+/**
+ * Genera datos mock para el heatmap de actividad
+ * @returns {Array} - Array de datos de actividad
+ */
+function generateMockActivityData() {
+  const data = [];
+  const today = new Date();
+  
+  for (let i = 0; i < 365; i++) {
+    const date = new Date(today);
+    date.setDate(date.getDate() - i);
+    
+    data.push({
+      date: date.toISOString().split('T')[0],
+      count: Math.floor(Math.random() * 10),
+      level: Math.floor(Math.random() * 5)
+    });
+  }
+  
+  return data;
+}
+
+/**
+ * Actualiza el período de los gráficos
+ * @param {string} period - Período a mostrar ('week', 'month', 'year')
+ */
+export async function updateDashboardPeriod(period) {
+  try {
+    // Actualizar gráficos con nuevo período
+    if (updateChartPeriod) {
+      updateChartPeriod(period);
+    }
+    
+    // Cargar datos específicos del período
+    const periodStats = await apiWithFallback(
+      `/api/dashboard/stats/${period}`,
+      FALLBACK_DATA.stats
+    );
+    
+    updateDashboardStats(periodStats);
+    
+  } catch (error) {
+    console.error('Error updating dashboard period:', error);
+    showNotification('Error al actualizar período', 'error');
+  }
+}
+
+/**
+ * Refresca todos los datos del dashboard
+ */
+export async function refreshDashboard() {
+  try {
+    showNotification('Actualizando dashboard...', 'info', 1000);
+    await loadDashboardData();
+    showNotification('Dashboard actualizado', 'success');
+  } catch (error) {
+    console.error('Error refreshing dashboard:', error);
+    showNotification('Error al actualizar dashboard', 'error');
   }
 }
 
 // Exponer funciones globalmente para compatibilidad
 window.loadDashboardData = loadDashboardData;
-window.handlePeriodChange = handlePeriodChange;
-window.loadRankingData = loadRankingData;
+window.refreshDashboard = refreshDashboard;
+window.updateDashboardPeriod = updateDashboardPeriod;
+

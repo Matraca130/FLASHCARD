@@ -1,35 +1,94 @@
 import { api } from './apiClient.js';
-import { showNotification } from './utils/helpers.js';
+import { validateDeckData } from './utils/validation.js';
+import { performCrudOperation, apiWithFallback } from './utils/apiHelpers.js';
+import { showNotification, generateId } from './utils/helpers.js';
 
 // Variables globales para el proceso de importación
 let importFileContent = null;
 let importFileFormat = null;
 
+// Formatos soportados
+const SUPPORTED_FORMATS = {
+  json: {
+    name: 'JSON',
+    extension: '.json',
+    mimeType: 'application/json',
+    description: 'Formato nativo de StudyingFlash'
+  },
+  csv: {
+    name: 'CSV',
+    extension: '.csv',
+    mimeType: 'text/csv',
+    description: 'Valores separados por comas'
+  },
+  anki: {
+    name: 'Anki',
+    extension: '.apkg',
+    mimeType: 'application/zip',
+    description: 'Paquete de Anki'
+  },
+  txt: {
+    name: 'Texto',
+    extension: '.txt',
+    mimeType: 'text/plain',
+    description: 'Texto plano (frente|reverso por línea)'
+  }
+};
+
 /**
  * Exporta un deck en el formato especificado
+ * @param {number} deckId - ID del deck a exportar
+ * @param {string} format - Formato de exportación
+ * @returns {Promise<void>}
  */
 export async function exportDeck(deckId, format = 'json') {
+  if (!SUPPORTED_FORMATS[format]) {
+    showNotification('Formato de exportación no soportado', 'error');
+    return;
+  }
+  
   try {
-    const response = await fetch(`${window.API_BASE || ''}/api/decks/${deckId}/export?format=${format}`, {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-      }
-    });
+    // Cargar datos del deck y flashcards
+    const [deck, flashcards] = await Promise.all([
+      apiWithFallback(`/api/decks/${deckId}`, {}),
+      apiWithFallback(`/api/flashcards/deck/${deckId}`, [])
+    ]);
     
-    if (!response.ok) {
-      throw new Error('Error al exportar deck');
+    if (!deck.id) {
+      showNotification('Deck no encontrado', 'error');
+      return;
     }
     
-    if (format === 'csv') {
-      const blob = await response.blob();
-      downloadFile(blob, `deck_${deckId}.csv`, 'text/csv');
-    } else {
-      const data = await response.json();
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-      downloadFile(blob, `deck_${deckId}.json`, 'application/json');
+    // Generar contenido según formato
+    let content, filename, mimeType;
+    
+    switch (format) {
+      case 'json':
+        content = generateJSONExport(deck, flashcards);
+        filename = `${sanitizeFilename(deck.name)}_${getCurrentDate()}.json`;
+        mimeType = SUPPORTED_FORMATS.json.mimeType;
+        break;
+        
+      case 'csv':
+        content = generateCSVExport(deck, flashcards);
+        filename = `${sanitizeFilename(deck.name)}_${getCurrentDate()}.csv`;
+        mimeType = SUPPORTED_FORMATS.csv.mimeType;
+        break;
+        
+      case 'txt':
+        content = generateTXTExport(flashcards);
+        filename = `${sanitizeFilename(deck.name)}_${getCurrentDate()}.txt`;
+        mimeType = SUPPORTED_FORMATS.txt.mimeType;
+        break;
+        
+      default:
+        throw new Error('Formato no implementado');
     }
     
-    showNotification('Deck exportado exitosamente', 'success');
+    // Descargar archivo
+    downloadFile(content, filename, mimeType);
+    
+    showNotification(`Deck exportado exitosamente en formato ${format.toUpperCase()}`, 'success');
     
   } catch (error) {
     console.error('Error exporting deck:', error);
@@ -38,371 +97,585 @@ export async function exportDeck(deckId, format = 'json') {
 }
 
 /**
- * Descarga un archivo
+ * Exporta múltiples decks en un archivo comprimido
+ * @param {Array} deckIds - Array de IDs de decks
+ * @param {string} format - Formato de exportación
  */
-function downloadFile(blob, filename, mimeType) {
-  const url = window.URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  a.style.display = 'none';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  window.URL.revokeObjectURL(url);
+export async function exportMultipleDecks(deckIds, format = 'json') {
+  if (!Array.isArray(deckIds) || deckIds.length === 0) {
+    showNotification('Selecciona al menos un deck para exportar', 'warning');
+    return;
+  }
+  
+  try {
+    showNotification('Preparando exportación múltiple...', 'info');
+    
+    const exportPromises = deckIds.map(async (deckId) => {
+      const [deck, flashcards] = await Promise.all([
+        apiWithFallback(`/api/decks/${deckId}`, {}),
+        apiWithFallback(`/api/flashcards/deck/${deckId}`, [])
+      ]);
+      
+      return { deck, flashcards };
+    });
+    
+    const results = await Promise.all(exportPromises);
+    
+    // Generar archivo combinado
+    const combinedData = {
+      export_info: {
+        date: new Date().toISOString(),
+        format: format,
+        version: '1.0',
+        total_decks: results.length,
+        total_cards: results.reduce((sum, r) => sum + r.flashcards.length, 0)
+      },
+      decks: results
+    };
+    
+    const content = JSON.stringify(combinedData, null, 2);
+    const filename = `studyingflash_export_${getCurrentDate()}.json`;
+    
+    downloadFile(content, filename, 'application/json');
+    
+    showNotification(`${deckIds.length} decks exportados exitosamente`, 'success');
+    
+  } catch (error) {
+    console.error('Error exporting multiple decks:', error);
+    showNotification('Error al exportar decks', 'error');
+  }
 }
 
 /**
- * Maneja la subida de archivos
+ * Maneja la subida de archivos para importación
+ * @param {Event} event - Evento de cambio del input file
  */
 export function handleFileUpload(event) {
   const file = event.target.files[0];
-  if (file) {
-    processImportFile(file);
-  }
-}
-
-/**
- * Maneja el drag over
- */
-export function handleDragOver(event) {
-  event.preventDefault();
-  event.currentTarget.classList.add('dragover');
-}
-
-/**
- * Maneja el drag leave
- */
-export function handleDragLeave(event) {
-  event.preventDefault();
-  event.currentTarget.classList.remove('dragover');
-}
-
-/**
- * Maneja el drop de archivos
- */
-export function handleFileDrop(event) {
-  event.preventDefault();
-  event.currentTarget.classList.remove('dragover');
+  if (!file) return;
   
-  const files = event.dataTransfer.files;
-  if (files.length > 0) {
-    processImportFile(files[0]);
+  // Validar tamaño del archivo (máximo 10MB)
+  if (file.size > 10 * 1024 * 1024) {
+    showNotification('El archivo es demasiado grande (máximo 10MB)', 'error');
+    return;
   }
-}
-
-/**
- * Procesa un archivo para importación
- */
-export async function processImportFile(file) {
-  try {
-    const fileExtension = file.name.split('.').pop().toLowerCase();
-    
-    if (!['json', 'csv', 'txt'].includes(fileExtension)) {
-      showNotification('Formato de archivo no soportado. Use JSON, CSV o TXT', 'error');
-      return;
-    }
-    
-    const content = await readFileContent(file);
-    
-    // Validar contenido según el formato
-    if (fileExtension === 'json') {
-      try {
-        const parsed = JSON.parse(content);
-        if (!parsed.flashcards || !Array.isArray(parsed.flashcards)) {
-          throw new Error('Formato JSON inválido');
-        }
-        importFileContent = parsed;
-        importFileFormat = 'json';
-      } catch (error) {
-        showNotification('Archivo JSON inválido', 'error');
-        return;
-      }
-    } else if (fileExtension === 'csv') {
-      const lines = content.split('\n').filter(line => line.trim());
-      if (lines.length < 2) {
-        showNotification('El archivo CSV debe tener al menos una fila de datos', 'error');
-        return;
-      }
-      importFileContent = content;
-      importFileFormat = 'csv';
-    } else if (fileExtension === 'txt') {
-      importFileContent = content;
-      importFileFormat = 'txt';
-    }
-    
-    // Mostrar preview del archivo
-    showImportPreview(file.name, fileExtension);
-    showNotification(`Archivo ${file.name} cargado exitosamente`, 'success');
-    
-  } catch (error) {
-    console.error('Error processing file:', error);
-    showNotification('Error al procesar el archivo', 'error');
+  
+  // Detectar formato por extensión
+  const extension = file.name.toLowerCase().split('.').pop();
+  const format = detectFileFormat(extension);
+  
+  if (!format) {
+    showNotification('Formato de archivo no soportado', 'error');
+    return;
   }
-}
-
-/**
- * Lee el contenido de un archivo
- */
-function readFileContent(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = (e) => resolve(e.target.result);
-    reader.onerror = (e) => reject(e);
+  
+  importFileFormat = format;
+  
+  // Leer contenido del archivo
+  const reader = new FileReader();
+  
+  reader.onload = function(e) {
+    importFileContent = e.target.result;
+    showImportPreview(file.name, format);
+  };
+  
+  reader.onerror = function() {
+    showNotification('Error al leer el archivo', 'error');
+  };
+  
+  // Leer como texto para la mayoría de formatos
+  if (format === 'anki') {
+    reader.readAsArrayBuffer(file);
+  } else {
     reader.readAsText(file);
-  });
+  }
 }
 
 /**
- * Muestra preview del archivo importado
+ * Detecta el formato del archivo por extensión
+ * @param {string} extension - Extensión del archivo
+ * @returns {string|null} - Formato detectado o null
+ */
+function detectFileFormat(extension) {
+  const formatMap = {
+    'json': 'json',
+    'csv': 'csv',
+    'txt': 'txt',
+    'apkg': 'anki'
+  };
+  
+  return formatMap[extension] || null;
+}
+
+/**
+ * Muestra la vista previa de importación
+ * @param {string} filename - Nombre del archivo
+ * @param {string} format - Formato detectado
  */
 function showImportPreview(filename, format) {
-  const previewContainer = document.getElementById('import-preview');
-  if (!previewContainer) return;
-  
-  let previewContent = '';
-  let cardCount = 0;
-  
-  if (format === 'json' && importFileContent) {
-    cardCount = importFileContent.flashcards ? importFileContent.flashcards.length : 0;
-    previewContent = `
-      <div class="import-preview-item">
-        <strong>Archivo:</strong> ${filename}
-      </div>
-      <div class="import-preview-item">
-        <strong>Formato:</strong> JSON
-      </div>
-      <div class="import-preview-item">
-        <strong>Flashcards:</strong> ${cardCount}
-      </div>
-    `;
-  } else if (format === 'csv' && importFileContent) {
-    const lines = importFileContent.split('\n').filter(line => line.trim());
-    cardCount = Math.max(0, lines.length - 1); // Restar header
-    previewContent = `
-      <div class="import-preview-item">
-        <strong>Archivo:</strong> ${filename}
-      </div>
-      <div class="import-preview-item">
-        <strong>Formato:</strong> CSV
-      </div>
-      <div class="import-preview-item">
-        <strong>Flashcards:</strong> ${cardCount}
-      </div>
-    `;
-  } else if (format === 'txt' && importFileContent) {
-    const lines = importFileContent.split('\n').filter(line => line.trim());
-    cardCount = Math.floor(lines.length / 2); // Asumiendo formato front/back alternado
-    previewContent = `
-      <div class="import-preview-item">
-        <strong>Archivo:</strong> ${filename}
-      </div>
-      <div class="import-preview-item">
-        <strong>Formato:</strong> TXT
-      </div>
-      <div class="import-preview-item">
-        <strong>Flashcards estimadas:</strong> ${cardCount}
-      </div>
-    `;
+  try {
+    let previewData;
+    
+    switch (format) {
+      case 'json':
+        previewData = parseJSONImport(importFileContent);
+        break;
+      case 'csv':
+        previewData = parseCSVImport(importFileContent);
+        break;
+      case 'txt':
+        previewData = parseTXTImport(importFileContent);
+        break;
+      default:
+        throw new Error('Formato no soportado para vista previa');
+    }
+    
+    renderImportPreview(filename, format, previewData);
+    
+  } catch (error) {
+    console.error('Error parsing import file:', error);
+    showNotification('Error al procesar el archivo de importación', 'error');
   }
+}
+
+/**
+ * Renderiza la vista previa de importación
+ * @param {string} filename - Nombre del archivo
+ * @param {string} format - Formato del archivo
+ * @param {Object} previewData - Datos de vista previa
+ */
+function renderImportPreview(filename, format, previewData) {
+  const previewContainer = document.getElementById('import-preview') || createImportPreviewContainer();
   
-  previewContainer.innerHTML = previewContent;
+  const previewHTML = `
+    <div class="import-preview-content">
+      <div class="import-header">
+        <h3>Vista Previa de Importación</h3>
+        <span class="import-format">${SUPPORTED_FORMATS[format].name}</span>
+      </div>
+      
+      <div class="import-info">
+        <p><strong>Archivo:</strong> ${filename}</p>
+        <p><strong>Decks encontrados:</strong> ${previewData.decks.length}</p>
+        <p><strong>Total de tarjetas:</strong> ${previewData.totalCards}</p>
+      </div>
+      
+      <div class="import-decks">
+        ${previewData.decks.map((deck, index) => `
+          <div class="import-deck-item">
+            <label>
+              <input type="checkbox" checked data-deck-index="${index}">
+              <strong>${deck.name}</strong> (${deck.cards.length} tarjetas)
+            </label>
+            <div class="deck-preview">
+              ${deck.cards.slice(0, 3).map(card => `
+                <div class="card-preview">
+                  <span class="card-front">${card.front}</span>
+                  <span class="card-separator">→</span>
+                  <span class="card-back">${card.back}</span>
+                </div>
+              `).join('')}
+              ${deck.cards.length > 3 ? `<p class="more-cards">... y ${deck.cards.length - 3} tarjetas más</p>` : ''}
+            </div>
+          </div>
+        `).join('')}
+      </div>
+      
+      <div class="import-actions">
+        <button class="btn btn-secondary" onclick="cancelImport()">Cancelar</button>
+        <button class="btn btn-primary" onclick="confirmImport()">Importar Seleccionados</button>
+      </div>
+    </div>
+  `;
+  
+  previewContainer.innerHTML = previewHTML;
   previewContainer.style.display = 'block';
 }
 
 /**
- * Importa un deck
+ * Crea el contenedor de vista previa si no existe
+ * @returns {HTMLElement} - Contenedor creado
  */
-export async function importDeck() {
-  if (!importFileContent || !importFileFormat) {
-    showNotification('Por favor, selecciona un archivo primero', 'error');
-    return;
-  }
+function createImportPreviewContainer() {
+  const container = document.createElement('div');
+  container.id = 'import-preview';
+  container.className = 'import-preview-modal';
+  container.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    z-index: 1000;
+    overflow-y: auto;
+  `;
   
-  const deckNameInput = document.getElementById('import-deck-name');
-  const deckName = deckNameInput ? deckNameInput.value.trim() : '';
-  
-  if (!deckName) {
-    showNotification('Por favor, ingresa un nombre para el deck importado', 'error');
-    return;
-  }
-  
+  document.body.appendChild(container);
+  return container;
+}
+
+/**
+ * Confirma y ejecuta la importación
+ */
+export async function confirmImport() {
   try {
-    const response = await api('/api/decks/import', {
-      method: 'POST',
-      body: JSON.stringify({
-        content: importFileContent,
-        format: importFileFormat,
-        deck_name: deckName
-      })
-    });
+    const selectedDecks = getSelectedDecksForImport();
     
-    if (response.id) {
-      showNotification(`Deck "${deckName}" importado exitosamente`, 'success');
-      
-      // Limpiar formulario
-      if (deckNameInput) deckNameInput.value = '';
-      clearImportData();
-      
-      // Recargar datos si estamos en gestión
-      if (window.loadManageData) {
-        window.loadManageData();
-      }
-      
-      // Ocultar modal si existe
-      const modal = document.getElementById('import-modal');
-      if (modal) {
-        modal.style.display = 'none';
+    if (selectedDecks.length === 0) {
+      showNotification('Selecciona al menos un deck para importar', 'warning');
+      return;
+    }
+    
+    showNotification('Importando decks...', 'info');
+    
+    const importResults = [];
+    
+    for (const deckData of selectedDecks) {
+      try {
+        const result = await importSingleDeck(deckData);
+        importResults.push(result);
+      } catch (error) {
+        console.error('Error importing deck:', deckData.name, error);
       }
     }
     
+    // Cerrar vista previa
+    cancelImport();
+    
+    // Mostrar resultados
+    const successCount = importResults.filter(r => r.success).length;
+    const totalCount = selectedDecks.length;
+    
+    if (successCount === totalCount) {
+      showNotification(`${successCount} decks importados exitosamente`, 'success');
+    } else {
+      showNotification(`${successCount}/${totalCount} decks importados. Algunos fallaron.`, 'warning');
+    }
+    
+    // Recargar datos
+    if (window.loadDashboardData) {
+      window.loadDashboardData();
+    }
+    
   } catch (error) {
-    console.error('Error importing deck:', error);
-    showNotification('Error al importar el deck', 'error');
+    console.error('Error during import:', error);
+    showNotification('Error durante la importación', 'error');
   }
 }
 
 /**
- * Limpia los datos de importación
+ * Obtiene los decks seleccionados para importar
+ * @returns {Array} - Array de datos de decks seleccionados
  */
-export function clearImportData() {
-  importFileContent = null;
-  importFileFormat = null;
+function getSelectedDecksForImport() {
+  const checkboxes = document.querySelectorAll('#import-preview input[type="checkbox"]:checked');
+  const selectedDecks = [];
   
+  checkboxes.forEach(checkbox => {
+    const deckIndex = parseInt(checkbox.dataset.deckIndex);
+    const previewData = parseCurrentImportFile();
+    
+    if (previewData && previewData.decks[deckIndex]) {
+      selectedDecks.push(previewData.decks[deckIndex]);
+    }
+  });
+  
+  return selectedDecks;
+}
+
+/**
+ * Importa un deck individual
+ * @param {Object} deckData - Datos del deck a importar
+ * @returns {Promise<Object>} - Resultado de la importación
+ */
+async function importSingleDeck(deckData) {
+  try {
+    // Validar datos del deck
+    if (!validateDeckData(deckData.name, deckData.description || '')) {
+      throw new Error('Datos de deck inválidos');
+    }
+    
+    // Crear deck
+    const deck = await performCrudOperation(
+      () => api('/api/decks', {
+        method: 'POST',
+        body: JSON.stringify({
+          name: deckData.name,
+          description: deckData.description || '',
+          is_public: deckData.is_public || false
+        })
+      }),
+      null, // No mostrar notificación individual
+      null
+    );
+    
+    // Importar flashcards
+    if (deckData.cards && deckData.cards.length > 0) {
+      await performCrudOperation(
+        () => api('/api/flashcards/bulk', {
+          method: 'POST',
+          body: JSON.stringify({
+            deck_id: deck.id,
+            flashcards: deckData.cards
+          })
+        }),
+        null, // No mostrar notificación individual
+        null
+      );
+    }
+    
+    return { success: true, deck: deck };
+    
+  } catch (error) {
+    console.error('Error importing single deck:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Cancela la importación
+ */
+export function cancelImport() {
   const previewContainer = document.getElementById('import-preview');
   if (previewContainer) {
     previewContainer.style.display = 'none';
-    previewContainer.innerHTML = '';
   }
   
-  const fileInput = document.getElementById('import-file-input');
-  if (fileInput) {
-    fileInput.value = '';
+  // Limpiar variables globales
+  importFileContent = null;
+  importFileFormat = null;
+}
+
+/**
+ * Parsea el archivo de importación actual
+ * @returns {Object} - Datos parseados
+ */
+function parseCurrentImportFile() {
+  if (!importFileContent || !importFileFormat) return null;
+  
+  switch (importFileFormat) {
+    case 'json':
+      return parseJSONImport(importFileContent);
+    case 'csv':
+      return parseCSVImport(importFileContent);
+    case 'txt':
+      return parseTXTImport(importFileContent);
+    default:
+      return null;
   }
 }
 
 /**
- * Carga las opciones de exportación para un deck
+ * Genera exportación en formato JSON
+ * @param {Object} deck - Datos del deck
+ * @param {Array} flashcards - Array de flashcards
+ * @returns {string} - Contenido JSON
  */
-export async function loadExportOptions(deckId) {
-  try {
-    const response = await api(`/api/decks/${deckId}`);
-    const deck = response;
-    
-    const container = document.getElementById('export-options');
-    if (!container) return;
-    
-    container.innerHTML = `
-      <div class="export-deck-info">
-        <h4>${deck.name}</h4>
-        <p>${deck.description || 'Sin descripción'}</p>
-        <p><strong>Flashcards:</strong> ${deck.flashcard_count || 0}</p>
-      </div>
-      <div class="export-formats">
-        <button class="btn btn-primary" onclick="exportDeck(${deckId}, 'json')">
-          Exportar como JSON
-        </button>
-        <button class="btn btn-secondary" onclick="exportDeck(${deckId}, 'csv')">
-          Exportar como CSV
-        </button>
-      </div>
-    `;
-    
-  } catch (error) {
-    console.error('Error loading export options:', error);
-    showNotification('Error al cargar opciones de exportación', 'error');
-  }
-}
-
-/**
- * Inicializa los event listeners para importación/exportación
- */
-export function initializeImportExportEvents() {
-  // Event listener para subida de archivos
-  const fileInput = document.getElementById('import-file-input');
-  if (fileInput) {
-    fileInput.addEventListener('change', handleFileUpload);
-  }
-  
-  // Event listeners para drag and drop
-  const dropZone = document.getElementById('import-drop-zone');
-  if (dropZone) {
-    dropZone.addEventListener('dragover', handleDragOver);
-    dropZone.addEventListener('dragleave', handleDragLeave);
-    dropZone.addEventListener('drop', handleFileDrop);
-  }
-  
-  // Event listener para importar
-  const importBtn = document.getElementById('import-deck-btn');
-  if (importBtn) {
-    importBtn.addEventListener('click', importDeck);
-  }
-  
-  // Event listener para limpiar
-  const clearBtn = document.getElementById('clear-import-btn');
-  if (clearBtn) {
-    clearBtn.addEventListener('click', clearImportData);
-  }
-}
-
-/**
- * Obtiene formatos de exportación soportados
- */
-export function getSupportedExportFormats() {
-  return [
-    {
+function generateJSONExport(deck, flashcards) {
+  const exportData = {
+    export_info: {
+      date: new Date().toISOString(),
       format: 'json',
-      name: 'JSON',
-      description: 'Formato JSON con metadatos completos',
-      extension: '.json'
+      version: '1.0',
+      source: 'StudyingFlash'
     },
-    {
-      format: 'csv',
-      name: 'CSV',
-      description: 'Archivo CSV compatible con Excel',
-      extension: '.csv'
-    }
-  ];
+    deck: {
+      name: deck.name,
+      description: deck.description || '',
+      is_public: deck.is_public || false,
+      created_at: deck.created_at,
+      card_count: flashcards.length
+    },
+    flashcards: flashcards.map(card => ({
+      front: card.front,
+      back: card.back,
+      created_at: card.created_at
+    }))
+  };
+  
+  return JSON.stringify(exportData, null, 2);
 }
 
 /**
- * Obtiene formatos de importación soportados
+ * Genera exportación en formato CSV
+ * @param {Object} deck - Datos del deck
+ * @param {Array} flashcards - Array de flashcards
+ * @returns {string} - Contenido CSV
  */
-export function getSupportedImportFormats() {
-  return [
-    {
-      format: 'json',
-      name: 'JSON',
-      description: 'Archivo JSON exportado desde la aplicación',
-      extension: '.json'
-    },
-    {
-      format: 'csv',
-      name: 'CSV',
-      description: 'Archivo CSV con columnas: front, back',
-      extension: '.csv'
-    },
-    {
-      format: 'txt',
-      name: 'TXT',
-      description: 'Archivo de texto con formato front/back alternado',
-      extension: '.txt'
+function generateCSVExport(deck, flashcards) {
+  const headers = ['Frente', 'Reverso', 'Fecha Creación'];
+  const rows = flashcards.map(card => [
+    `"${card.front.replace(/"/g, '""')}"`,
+    `"${card.back.replace(/"/g, '""')}"`,
+    `"${card.created_at || ''}"`
+  ]);
+  
+  return [headers.join(','), ...rows.map(row => row.join(','))].join('\n');
+}
+
+/**
+ * Genera exportación en formato TXT
+ * @param {Array} flashcards - Array de flashcards
+ * @returns {string} - Contenido TXT
+ */
+function generateTXTExport(flashcards) {
+  return flashcards.map(card => `${card.front}|${card.back}`).join('\n');
+}
+
+/**
+ * Parsea importación JSON
+ * @param {string} content - Contenido del archivo
+ * @returns {Object} - Datos parseados
+ */
+function parseJSONImport(content) {
+  const data = JSON.parse(content);
+  
+  // Detectar formato
+  if (data.decks && Array.isArray(data.decks)) {
+    // Formato múltiple
+    return {
+      decks: data.decks.map(item => ({
+        name: item.deck.name,
+        description: item.deck.description || '',
+        is_public: item.deck.is_public || false,
+        cards: item.flashcards || []
+      })),
+      totalCards: data.decks.reduce((sum, item) => sum + (item.flashcards?.length || 0), 0)
+    };
+  } else if (data.deck && data.flashcards) {
+    // Formato simple
+    return {
+      decks: [{
+        name: data.deck.name,
+        description: data.deck.description || '',
+        is_public: data.deck.is_public || false,
+        cards: data.flashcards || []
+      }],
+      totalCards: data.flashcards?.length || 0
+    };
+  }
+  
+  throw new Error('Formato JSON no reconocido');
+}
+
+/**
+ * Parsea importación CSV
+ * @param {string} content - Contenido del archivo
+ * @returns {Object} - Datos parseados
+ */
+function parseCSVImport(content) {
+  const lines = content.split('\n').filter(line => line.trim());
+  const cards = [];
+  
+  // Detectar si tiene headers
+  const hasHeaders = lines[0].toLowerCase().includes('frente') || lines[0].toLowerCase().includes('front');
+  const startIndex = hasHeaders ? 1 : 0;
+  
+  for (let i = startIndex; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line) continue;
+    
+    // Parsear CSV simple (asumiendo que no hay comas en el contenido)
+    const parts = line.split(',').map(part => part.replace(/^"|"$/g, '').replace(/""/g, '"'));
+    
+    if (parts.length >= 2) {
+      cards.push({
+        front: parts[0].trim(),
+        back: parts[1].trim()
+      });
     }
-  ];
+  }
+  
+  return {
+    decks: [{
+      name: 'Deck Importado CSV',
+      description: 'Importado desde archivo CSV',
+      is_public: false,
+      cards: cards
+    }],
+    totalCards: cards.length
+  };
+}
+
+/**
+ * Parsea importación TXT
+ * @param {string} content - Contenido del archivo
+ * @returns {Object} - Datos parseados
+ */
+function parseTXTImport(content) {
+  const lines = content.split('\n').filter(line => line.trim());
+  const cards = [];
+  
+  for (const line of lines) {
+    const parts = line.split('|');
+    if (parts.length >= 2) {
+      cards.push({
+        front: parts[0].trim(),
+        back: parts[1].trim()
+      });
+    }
+  }
+  
+  return {
+    decks: [{
+      name: 'Deck Importado TXT',
+      description: 'Importado desde archivo de texto',
+      is_public: false,
+      cards: cards
+    }],
+    totalCards: cards.length
+  };
+}
+
+/**
+ * Descarga un archivo
+ * @param {string} content - Contenido del archivo
+ * @param {string} filename - Nombre del archivo
+ * @param {string} mimeType - Tipo MIME
+ */
+function downloadFile(content, filename, mimeType) {
+  const blob = new Blob([content], { type: mimeType });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  
+  a.href = url;
+  a.download = filename;
+  a.style.display = 'none';
+  
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  
+  window.URL.revokeObjectURL(url);
+}
+
+/**
+ * Sanitiza un nombre de archivo
+ * @param {string} filename - Nombre original
+ * @returns {string} - Nombre sanitizado
+ */
+function sanitizeFilename(filename) {
+  return filename
+    .replace(/[^a-z0-9]/gi, '_')
+    .replace(/_+/g, '_')
+    .replace(/^_|_$/g, '')
+    .toLowerCase();
+}
+
+/**
+ * Obtiene la fecha actual en formato YYYY-MM-DD
+ * @returns {string} - Fecha formateada
+ */
+function getCurrentDate() {
+  return new Date().toISOString().split('T')[0];
 }
 
 // Exponer funciones globalmente para compatibilidad
 window.exportDeck = exportDeck;
-window.importDeck = importDeck;
+window.exportMultipleDecks = exportMultipleDecks;
 window.handleFileUpload = handleFileUpload;
-window.handleDragOver = handleDragOver;
-window.handleDragLeave = handleDragLeave;
-window.handleFileDrop = handleFileDrop;
-window.processImportFile = processImportFile;
-window.loadExportOptions = loadExportOptions;
-window.clearImportData = clearImportData;
-
-// Exponer variables globalmente para compatibilidad
-window.importFileContent = importFileContent;
-window.importFileFormat = importFileFormat;
+window.confirmImport = confirmImport;
+window.cancelImport = cancelImport;
 
