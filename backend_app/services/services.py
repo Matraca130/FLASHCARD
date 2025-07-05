@@ -111,7 +111,7 @@ class UserService(BaseService):
             if not user:
                 return self._error_response('Usuario no encontrado')
             
-            return self._success_response(user)
+            return self._success_response(user.to_dict())
             
         except Exception as e:
             self.logger.error(f"Error getting user profile: {str(e)}")
@@ -132,7 +132,7 @@ class UserService(BaseService):
             user.updated_at = datetime.utcnow()
             db.session.commit()
             
-            return self._success_response(user)
+            return self._success_response(user.to_dict())
             
         except Exception as e:
             db.session.rollback()
@@ -182,7 +182,13 @@ class DeckService(BaseService):
                 query = query.filter(Deck.difficulty_level == query_params['difficulty'])
             if query_params.get('tags'):
                 # Implementar filtro por tags
-                pass
+                tags_filter = query_params['tags'].split(',')
+                if len(tags_filter) == 1:
+                    query = query.filter(Deck.tags.contains(tags_filter[0]))
+                else:
+                    query = query.filter(
+                        db.or_(*[Deck.tags.contains(tag.strip()) for tag in tags_filter])
+                    )
             
             # Paginación
             page = query_params.get('page', 1)
@@ -218,7 +224,7 @@ class DeckService(BaseService):
                 user_id=user_id,
                 name=deck_data['name'],
                 description=deck_data.get('description', ''),
-                difficulty_level=deck_data.get('difficulty_level', 'medium'),
+                difficulty_level=deck_data.get('difficulty_level', 'intermediate'),
                 tags=deck_data.get('tags', []),
                 is_public=deck_data.get('is_public', False)
             )
@@ -459,7 +465,7 @@ class FlashcardService(BaseService):
                 front_audio=flashcard_data.get('front_audio'),
                 back_audio=flashcard_data.get('back_audio'),
                 tags=flashcard_data.get('tags', []),
-                difficulty=flashcard_data.get('difficulty', 'medium')
+                difficulty=flashcard_data.get('difficulty', 'normal')
             )
             
             db.session.add(flashcard)
@@ -567,7 +573,7 @@ class FlashcardService(BaseService):
                         front_text=card_data['front_text'],
                         back_text=card_data['back_text'],
                         tags=card_data.get('tags', []),
-                        difficulty=card_data.get('difficulty', 'medium')
+                        difficulty=card_data.get('difficulty', 'normal')
                     )
                     db.session.add(flashcard)
                     created_cards.append(flashcard)
@@ -697,7 +703,7 @@ class StudyService(BaseService):
                 user_id=user_id,
                 deck_id=session_data['deck_id'],
                 algorithm=session_data.get('algorithm', 'fsrs'),
-                target_cards=session_data.get('target_cards', 20)
+                max_cards=session_data.get('target_cards', 20)
             )
             
             db.session.add(session)
@@ -734,8 +740,8 @@ class StudyService(BaseService):
             return self._success_response({
                 'flashcard': flashcard.to_dict(),
                 'session_progress': {
-                    'cards_reviewed': session.cards_reviewed,
-                    'target_cards': session.target_cards
+                    'cards_studied': session.cards_studied,
+                    'target_cards': session.max_cards
                 }
             })
             
@@ -795,7 +801,7 @@ class StudyService(BaseService):
             db.session.add(review)
             
             # Actualizar sesión
-            session.cards_reviewed += 1
+            session.cards_studied += 1
             session.updated_at = datetime.utcnow()
             
             db.session.commit()
@@ -804,8 +810,8 @@ class StudyService(BaseService):
                 'review': review.to_dict(),
                 'next_review_date': result['next_review_date'],
                 'session_progress': {
-                    'cards_reviewed': session.cards_reviewed,
-                    'target_cards': session.target_cards
+                    'cards_studied': session.cards_studied,
+                    'target_cards': session.max_cards
                 }
             })
             
@@ -830,9 +836,9 @@ class StudyService(BaseService):
             
             return self._success_response({
                 'session_id': session_id,
-                'cards_reviewed': session.cards_reviewed,
+                'cards_studied': session.cards_studied,
                 'duration': (session.completed_at - session.created_at).total_seconds(),
-                'completion_rate': (session.cards_reviewed / session.target_cards) * 100
+                'completion_rate': (session.cards_studied / session.max_cards) * 100
             })
             
         except Exception as e:

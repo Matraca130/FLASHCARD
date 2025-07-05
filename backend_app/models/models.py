@@ -369,7 +369,7 @@ class Flashcard(BaseModel):
         CheckConstraint('correct_reviews >= 0', name='check_non_negative_correct_reviews'),
         CheckConstraint('correct_reviews <= total_reviews', name='check_correct_reviews_logic'),
         CheckConstraint("difficulty IN ('easy', 'normal', 'hard')", name='check_difficulty_values'),
-        CheckConstraint('last_review_rating >= 1 AND last_review_rating <= 4', name='check_rating_range'),
+        CheckConstraint('last_review_rating >= 1 AND last_review_rating <= 5', name='check_rating_range'),
         Index('idx_flashcard_deck_difficulty', 'deck_id', 'difficulty'),
         Index('idx_flashcard_review_schedule', 'next_review', 'deck_id'),
         Index('idx_flashcard_stats', 'total_reviews', 'correct_reviews'),
@@ -556,7 +556,7 @@ class CardReview(BaseModel):
     
     # Constraints
     __table_args__ = (
-        CheckConstraint('rating >= 1 AND rating <= 4', name='check_rating_range'),
+        CheckConstraint('rating >= 1 AND rating <= 5', name='check_rating_range'),
         CheckConstraint('response_time >= 0', name='check_non_negative_response_time'),
         CheckConstraint('previous_ease > 0', name='check_positive_previous_ease'),
         CheckConstraint('new_ease > 0', name='check_positive_new_ease'),
