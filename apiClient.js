@@ -453,7 +453,7 @@ export class ApiClient {
         showNotifications: false 
       });
       return !response.error;
-    } catch (error) {
+    } catch (_error) {
       return false;
     }
   }

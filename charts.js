@@ -1,5 +1,5 @@
 import { apiWithFallback } from './utils/apiHelpers.js';
-import { showNotification, formatDate } from './utils/helpers.js';
+import { formatDate } from './utils/helpers.js';
 
 /**
  * Servicio de gráficas refactorizado

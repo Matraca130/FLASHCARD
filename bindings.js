@@ -86,7 +86,7 @@ document.addEventListener('click', async (e) => {
  * @param {HTMLElement} el - Elemento que disparó la acción
  * @param {Event} event - Evento original
  */
-async function executeAction(action, el, event) {
+async function executeAction(action, el, _event) {
   switch (action) {
     // AUTENTICACIÓN
     case 'login':
