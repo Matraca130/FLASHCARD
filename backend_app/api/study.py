@@ -104,26 +104,35 @@ def answer_card(validated_data):
             if card.last_reviewed:
                 elapsed_days = (datetime.utcnow() - card.last_reviewed).days
             
-            result = calculate_fsrs(
+            # FSRS returns: (new_stability, new_difficulty, new_interval)
+            new_stability, new_difficulty, new_interval = calculate_fsrs(
                 quality,                # rating (1-4)
                 card.stability,         # stability (float)
                 card.difficulty_fsrs,   # difficulty_fsrs (float)
                 elapsed_days           # elapsed_days (int)
             )
+            
+            # Update card with FSRS results
+            card.stability = new_stability
+            card.difficulty_fsrs = new_difficulty
+            card.interval_days = new_interval
+            card.repetitions = card.repetitions + 1
+            
         else:  # SM-2 fallback
-            result = calculate_sm2(
+            # SM-2 returns: (new_ease_factor, new_interval, new_repetitions)
+            new_ease_factor, new_interval, new_repetitions = calculate_sm2(
                 quality,                # rating (1-4)
                 card.ease_factor,       # ease_factor (correct field name)
                 card.interval_days,     # interval_days (correct field name)
                 card.repetitions
             )
+            
+            # Update card with SM-2 results
+            card.ease_factor = new_ease_factor
+            card.interval_days = new_interval
+            card.repetitions = new_repetitions
         
-        # Actualizar carta con nuevos valores
-        card.difficulty_fsrs = result.get('difficulty', card.difficulty_fsrs)
-        card.stability = result.get('stability', card.stability)
-        card.ease_factor = result.get('ease_factor', card.ease_factor)
-        card.interval_days = result['interval']
-        card.repetitions = result.get('repetitions', card.repetitions + 1)
+        # Common updates for both algorithms
         card.last_reviewed = datetime.utcnow()
         card.next_review = get_next_review_date(card.interval_days)
         
@@ -133,7 +142,7 @@ def answer_card(validated_data):
             session_id=session_id,
             rating=quality,                    # Use 'rating' field, not 'quality'
             previous_interval=card.interval_days,  # Use correct field name
-            new_interval=result['interval'],
+            new_interval=card.interval_days,   # Use updated interval from card
             response_time=validated_data.get('response_time', 0)
         )
         
