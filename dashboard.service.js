@@ -224,7 +224,6 @@ function initializeChartsWithData(stats) {
     
     // Actualizar con datos reales
     if (stats.weeklyProgress) {
-<<<<<<< HEAD
       // TODO: Implementar updateProgressChart
       // updateProgressChart(stats.weeklyProgress);
     }
@@ -232,13 +231,6 @@ function initializeChartsWithData(stats) {
     if (stats.weeklyAccuracy) {
       // TODO: Implementar updateAccuracyChart
       // updateAccuracyChart(stats.weeklyAccuracy);
-=======
-      // updateProgressChart(stats.weeklyProgress); // TODO: Implementar função
-    }
-    
-    if (stats.weeklyAccuracy) {
-      // updateAccuracyChart(stats.weeklyAccuracy); // TODO: Implementar função
->>>>>>> 04f3f1b (fix: Corrigir problemas CI/CD - atualizar GitHub Actions, resolver erros ESLint e limpar variáveis não utilizadas)
     }
     
     // Cargar estadísticas semanales adicionales
@@ -303,14 +295,10 @@ function generateMockActivityData() {
 export async function updateDashboardPeriod(period) {
   try {
     // Actualizar gráficos con nuevo período
-<<<<<<< HEAD
     // TODO: Implementar updateChartPeriod
     // if (updateChartPeriod) {
     //   updateChartPeriod(period);
     // }
-=======
-    // updateChartPeriod(period); // TODO: Implementar função
->>>>>>> 04f3f1b (fix: Corrigir problemas CI/CD - atualizar GitHub Actions, resolver erros ESLint e limpar variáveis não utilizadas)
     
     // Cargar datos específicos del período
     const periodStats = await apiWithFallback(
