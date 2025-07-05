@@ -22,12 +22,28 @@ export function debounce(func, wait) {
 }
 
 /**
- * Muestra una notificación temporal en la UI
+ * Muestra una notificación temporal en la UI con iconos y mejor UX
  * @param {string} message - Mensaje a mostrar
  * @param {string} type - Tipo de notificación (success, error, warning, info)
  * @param {number} duration - Duración en ms (default: 4000)
+ * @param {Object} options - Opciones adicionales
  */
-export function showNotification(message, type = 'info', duration = 4000) {
+export function showNotification(message, type = 'info', duration = 4000, options = {}) {
+  const {
+    title = null,
+    persistent = false,
+    actionText = null,
+    actionCallback = null
+  } = options;
+
+  // Iconos para cada tipo de notificación
+  const icons = {
+    success: '✅',
+    error: '❌',
+    warning: '⚠️',
+    info: 'ℹ️'
+  };
+
   // Create notification element
   const notification = document.createElement('div');
   notification.className = `notification notification-${type}`;
@@ -37,13 +53,16 @@ export function showNotification(message, type = 'info', duration = 4000) {
     right: 20px;
     z-index: 10000;
     padding: 1rem 1.5rem;
-    border-radius: 0.5rem;
+    border-radius: 0.75rem;
     color: white;
     font-weight: 500;
-    max-width: 300px;
+    max-width: 350px;
+    min-width: 280px;
     transform: translateX(100%);
     transition: transform 0.3s ease;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
   `;
   
   // Set background color based on type
@@ -61,7 +80,42 @@ export function showNotification(message, type = 'info', duration = 4000) {
       notification.style.background = 'linear-gradient(135deg, #3b82f6, #2563eb)';
   }
   
-  notification.textContent = message;
+  // Construir contenido de la notificación
+  let content = `
+    <div style="display: flex; align-items: flex-start; gap: 0.75rem;">
+      <span style="font-size: 1.25rem; flex-shrink: 0;">${icons[type]}</span>
+      <div style="flex: 1;">
+  `;
+  
+  if (title) {
+    content += `<div style="font-weight: 600; margin-bottom: 0.25rem;">${title}</div>`;
+  }
+  
+  content += `<div style="font-size: 0.9rem; line-height: 1.4;">${message}</div>`;
+  
+  if (actionText && actionCallback) {
+    content += `
+      <button onclick="(${actionCallback.toString()})()" 
+              style="margin-top: 0.5rem; background: rgba(255,255,255,0.2); 
+                     border: 1px solid rgba(255,255,255,0.3); color: white; 
+                     padding: 0.25rem 0.75rem; border-radius: 0.375rem; 
+                     font-size: 0.8rem; cursor: pointer;">
+        ${actionText}
+      </button>
+    `;
+  }
+  
+  content += `
+      </div>
+      <button onclick="this.parentElement.parentElement.remove()" 
+              style="background: none; border: none; color: rgba(255,255,255,0.7); 
+                     font-size: 1.2rem; cursor: pointer; padding: 0; margin-left: 0.5rem;">
+        ×
+      </button>
+    </div>
+  `;
+  
+  notification.innerHTML = content;
   document.body.appendChild(notification);
   
   // Animate in
@@ -69,15 +123,19 @@ export function showNotification(message, type = 'info', duration = 4000) {
     notification.style.transform = 'translateX(0)';
   }, 100);
   
-  // Auto remove
-  setTimeout(() => {
-    notification.style.transform = 'translateX(100%)';
+  // Auto remove (unless persistent)
+  if (!persistent) {
     setTimeout(() => {
       if (notification.parentNode) {
-        notification.parentNode.removeChild(notification);
+        notification.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+          if (notification.parentNode) {
+            notification.parentNode.removeChild(notification);
+          }
+        }, 300);
       }
-    }, 300);
-  }, duration);
+    }, duration);
+  }
 }
 
 /**

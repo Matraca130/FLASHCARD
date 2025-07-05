@@ -4,6 +4,7 @@ import { localStorageService } from './storage.service.js';
 import { validateDeckData, validateFlashcardData } from './utils/validation.js';
 import { apiWithFallback, performCrudOperation, FALLBACK_DATA } from './utils/apiHelpers.js';
 import { showNotification, clearForm, getVisibleElement } from './utils/helpers.js';
+import { showButtonLoading, showFieldValidation, withLoadingFeedback } from './utils/loading.js';
 
 /**
  * Carga los decks disponibles en el dropdown
@@ -40,7 +41,7 @@ export function openCreateDeckModal() {
 }
 
 /**
- * Crea un nuevo deck
+ * Crea un nuevo deck con feedback visual mejorado
  * @param {Object} deckData - Datos del deck a crear
  * @param {string} deckData.name - Nombre del deck
  * @param {string} deckData.description - Descripción del deck
@@ -56,6 +57,20 @@ export async function createDeck(deckData = {}) {
   const description = deckData.description || descriptionInput?.value?.trim() || '';
   const isPublic = deckData.isPublic !== undefined ? deckData.isPublic : (publicInput?.checked || false);
   
+  // Validación con feedback visual
+  const isNameValid = name.length >= 3 && name.length <= 50;
+  const isDescriptionValid = !description || description.length <= 500;
+  
+  if (nameInput) {
+    showFieldValidation(nameInput, isNameValid, 
+      isNameValid ? 'Nombre válido' : 'El nombre debe tener entre 3 y 50 caracteres');
+  }
+  
+  if (descriptionInput && description) {
+    showFieldValidation(descriptionInput, isDescriptionValid,
+      isDescriptionValid ? 'Descripción válida' : 'La descripción no puede exceder 500 caracteres');
+  }
+  
   // Validar datos del deck usando utilidad común
   if (!validateDeckData(name, description)) {
     return;
@@ -68,26 +83,49 @@ export async function createDeck(deckData = {}) {
   };
   
   try {
-    const deck = await performCrudOperation(
+    const deck = await withLoadingFeedback(
       async () => {
         try {
           // Intentar crear en API primero
-          return await api("/api/decks", {
+          const response = await api("/api/decks", {
             method: "POST",
             body: JSON.stringify(data)
           });
+          
+          if (response.error) {
+            throw new Error(response.message || 'Error al crear deck');
+          }
+          
+          return response.data;
         } catch (error) {
           console.log("API no disponible, usando almacenamiento local");
           return localStorageService?.createDeck(data) || { ...data, id: Date.now() };
         }
       },
-      "Deck creado con éxito 🎉",
-      "Error al crear deck"
+      {
+        buttonSelector: '#create-deck-btn',
+        loadingText: 'Creando deck...',
+        successMessage: '🎉 Deck creado exitosamente',
+        errorMessage: 'Error al crear el deck'
+      }
     );
     
-    // Limpiar formulario usando utilidad común
+    // Limpiar formulario y validaciones
     if (nameInput || descriptionInput || publicInput) {
       clearForm('#deck-form');
+      
+      // Limpiar validaciones visuales
+      if (nameInput) {
+        nameInput.classList.remove('field-valid', 'field-invalid');
+        const validationMsg = nameInput.parentNode.querySelector('.validation-message');
+        if (validationMsg) validationMsg.remove();
+      }
+      
+      if (descriptionInput) {
+        descriptionInput.classList.remove('field-valid', 'field-invalid');
+        const validationMsg = descriptionInput.parentNode.querySelector('.validation-message');
+        if (validationMsg) validationMsg.remove();
+      }
     }
     
     // Recargar decks en el dropdown
@@ -101,8 +139,15 @@ export async function createDeck(deckData = {}) {
     return deck;
     
   } catch (error) {
-    console.error("Error creando deck:", error);
-    // El error ya fue manejado por performCrudOperation
+    console.error('Error creando deck:', error);
+    
+    // Mostrar error específico si está disponible
+    const errorMessage = error.message || 'Error desconocido al crear deck';
+    showNotification(errorMessage, 'error', 5000, {
+      title: 'Error al crear deck',
+      actionText: 'Reintentar',
+      actionCallback: () => createDeck(deckData)
+    });
   }
 }
 
