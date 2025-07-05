@@ -3,6 +3,25 @@
  * StudyingFlash - CSS Responsive Completo
  */
 
+/* ===== ROOT FIXES PARA MÓVIL ===== */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: clamp(15px, 2.5vw, 18px);
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  overflow-x: hidden;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
 /* ===== BASE MOBILE STYLES (320px+) ===== */
 
 /* Contenedor principal responsive */
@@ -476,6 +495,168 @@ p {
     break-inside: avoid;
     box-shadow: none;
     border: 1px solid #000;
+  }
+}
+
+
+
+/* ===== NAVEGACIÓN MÓVIL HAMBURGUESA ===== */
+
+/* Botón hamburguesa */
+.hamburger-btn {
+  display: block;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+  min-width: 48px;
+  min-height: 48px;
+  position: relative;
+}
+
+.hamburger-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.hamburger-icon {
+  width: 24px;
+  height: 18px;
+  position: relative;
+  margin: auto;
+}
+
+.hamburger-icon span {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background-color: white;
+  margin: 3px 0;
+  transition: all 0.3s ease;
+  transform-origin: center;
+}
+
+/* Animación del hamburguesa a X */
+.hamburger-btn.active .hamburger-icon span:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+.hamburger-btn.active .hamburger-icon span:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger-btn.active .hamburger-icon span:nth-child(3) {
+  transform: rotate(-45deg) translate(7px, -6px);
+}
+
+/* Menú móvil */
+.mobile-nav .nav-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 8px;
+  margin: 8px;
+  padding: 16px 0;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  flex-direction: column;
+}
+
+.mobile-nav .nav-menu.active {
+  display: flex;
+}
+
+.mobile-nav .nav-item {
+  margin: 0;
+}
+
+.mobile-nav .nav-link {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  color: white;
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+  border-radius: 4px;
+  margin: 2px 8px;
+  min-height: 48px;
+}
+
+.mobile-nav .nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.mobile-nav .nav-link.active {
+  background-color: rgba(99, 102, 241, 0.2);
+  color: #6366f1;
+}
+
+/* Header responsive */
+.nav-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+}
+
+/* Desktop: ocultar hamburguesa, mostrar menú horizontal */
+@media (min-width: 768px) {
+  .hamburger-btn {
+    display: none;
+  }
+  
+  .mobile-nav .nav-menu {
+    display: flex !important;
+    position: static;
+    background: transparent;
+    backdrop-filter: none;
+    border-radius: 0;
+    margin: 0;
+    padding: 0;
+    box-shadow: none;
+    flex-direction: row;
+    gap: 1rem;
+  }
+  
+  .mobile-nav .nav-link {
+    padding: 8px 16px;
+    margin: 0;
+    border-radius: 6px;
+  }
+}
+
+/* Tablet: menú horizontal compacto */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .mobile-nav .nav-link {
+    padding: 6px 12px;
+    font-size: 0.9rem;
+  }
+  
+  .mobile-nav .icon {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+/* Móvil pequeño: ajustes adicionales */
+@media (max-width: 480px) {
+  .nav-header .logo svg {
+    width: 140px;
+    height: 32px;
+  }
+  
+  .mobile-nav .nav-menu {
+    margin: 4px;
+  }
+  
+  .mobile-nav .nav-link {
+    padding: 14px 16px;
+    font-size: 1rem;
   }
 }
 

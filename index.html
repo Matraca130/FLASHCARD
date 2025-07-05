@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes, viewport-fit=cover">
   <meta name="description" content="StudyingFlash - Aplicación de flashcards con repetición espaciada para optimizar tu aprendizaje">
   <meta name="theme-color" content="#2563eb">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -186,15 +186,24 @@
     </div>
 
     <!-- Navigation -->
-    <nav class="navbar">
-      <div class="navbar-content">
+    <nav class="navbar mobile-nav">
+      <div class="navbar-content nav-header">
         <a href="#" class="logo">
           <svg style="width: 180px; height: 40px;">
             <use href="#logo"></use>
           </svg>
         </a>
         
-        <ul class="nav-menu">
+        <!-- Botón hamburguesa para móvil -->
+        <button id="mobile-menu-btn" class="hamburger-btn" aria-label="Menú">
+          <div class="hamburger-icon">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </button>
+        
+        <ul class="nav-menu" id="mobile-menu">
           <li class="nav-item">
             <a href="#" class="nav-link active" data-section="dashboard">
               <svg class="icon">

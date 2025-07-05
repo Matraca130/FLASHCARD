@@ -3,10 +3,10 @@
  * Implementa cache offline y estrategias de cache optimizadas
  */
 
-const CACHE_NAME = 'studyingflash-v1.0.0';
-const STATIC_CACHE = 'studyingflash-static-v1.0.0';
-const DYNAMIC_CACHE = 'studyingflash-dynamic-v1.0.0';
-const API_CACHE = 'studyingflash-api-v1.0.0';
+const CACHE_NAME = 'studyingflash-v2.0.0';
+const STATIC_CACHE = 'studyingflash-static-v2.0.0';
+const DYNAMIC_CACHE = 'studyingflash-dynamic-v2.0.0';
+const API_CACHE = 'studyingflash-api-v2.0.0';
 
 // Archivos críticos para precache
 const STATIC_ASSETS = [
