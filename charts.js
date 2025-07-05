@@ -964,7 +964,6 @@ window.destroyAllCharts = destroyAllCharts;
 window.updateChartsTheme = updateChartsTheme;
 window.getChartsInfo = getChartsInfo;
 
-
 /**
  * FUNCIONES FALTANTES IMPLEMENTADAS
  * =================================
@@ -981,31 +980,34 @@ window.getChartsInfo = getChartsInfo;
 export async function updateProgressChart(data = null, period = '7d') {
   try {
     console.log(`🔄 Actualizando gráfico de progreso (período: ${period})`);
-    
+
     // Si no se proporcionan datos, obtenerlos de la API
     if (!data) {
       const endpoint = `/api/stats/progress?period=${period}`;
       data = await apiWithFallback(endpoint, {
         labels: generateDateLabels(period),
         progress: generateMockProgressData(period),
-        target: 85
+        target: 85,
       });
     }
-    
+
     // Buscar el gráfico de progreso existente
-    const progressChart = chartInstances.get('studyProgress') || 
-                         chartInstances.get('progressChart') ||
-                         chartInstances.get('progress');
-    
+    const progressChart =
+      chartInstances.get('studyProgress') ||
+      chartInstances.get('progressChart') ||
+      chartInstances.get('progress');
+
     if (progressChart) {
       // Actualizar datos existentes
       progressChart.data.labels = data.labels;
       progressChart.data.datasets[0].data = data.progress;
-      
+
       if (data.target && progressChart.data.datasets[1]) {
-        progressChart.data.datasets[1].data = Array(data.labels.length).fill(data.target);
+        progressChart.data.datasets[1].data = Array(data.labels.length).fill(
+          data.target
+        );
       }
-      
+
       progressChart.update('active');
       console.log('✅ Gráfico de progreso actualizado exitosamente');
       return true;
@@ -1015,7 +1017,6 @@ export async function updateProgressChart(data = null, period = '7d') {
       await createProgressChart(data, period);
       return true;
     }
-    
   } catch (error) {
     console.error('❌ Error actualizando gráfico de progreso:', error);
     return false;
@@ -1031,31 +1032,34 @@ export async function updateProgressChart(data = null, period = '7d') {
 export async function updateAccuracyChart(data = null, period = '7d') {
   try {
     console.log(`🔄 Actualizando gráfico de precisión (período: ${period})`);
-    
+
     // Si no se proporcionan datos, obtenerlos de la API
     if (!data) {
       const endpoint = `/api/stats/accuracy?period=${period}`;
       data = await apiWithFallback(endpoint, {
         labels: generateDateLabels(period),
         accuracy: generateMockAccuracyData(period),
-        target: 85
+        target: 85,
       });
     }
-    
+
     // Buscar el gráfico de precisión existente
-    const accuracyChart = chartInstances.get('accuracyTrend') || 
-                         chartInstances.get('accuracyChart') ||
-                         chartInstances.get('accuracy');
-    
+    const accuracyChart =
+      chartInstances.get('accuracyTrend') ||
+      chartInstances.get('accuracyChart') ||
+      chartInstances.get('accuracy');
+
     if (accuracyChart) {
       // Actualizar datos existentes
       accuracyChart.data.labels = data.labels;
       accuracyChart.data.datasets[0].data = data.accuracy;
-      
+
       if (data.target && accuracyChart.data.datasets[1]) {
-        accuracyChart.data.datasets[1].data = Array(data.labels.length).fill(data.target);
+        accuracyChart.data.datasets[1].data = Array(data.labels.length).fill(
+          data.target
+        );
       }
-      
+
       accuracyChart.update('active');
       console.log('✅ Gráfico de precisión actualizado exitosamente');
       return true;
@@ -1065,7 +1069,6 @@ export async function updateAccuracyChart(data = null, period = '7d') {
       await createAccuracyChart(data, period);
       return true;
     }
-    
   } catch (error) {
     console.error('❌ Error actualizando gráfico de precisión:', error);
     return false;
@@ -1080,46 +1083,49 @@ export async function updateAccuracyChart(data = null, period = '7d') {
 export async function updateChartPeriod(period = '7d') {
   try {
     console.log(`🔄 Cambiando período de gráficos a: ${period}`);
-    
+
     // Validar período
     const validPeriods = ['7d', '30d', '90d'];
     if (!validPeriods.includes(period)) {
       console.warn(`Período inválido: ${period}. Usando 7d por defecto.`);
       period = '7d';
     }
-    
+
     // Actualizar todos los gráficos con el nuevo período
     const updatePromises = [];
-    
+
     // Actualizar gráfico de progreso
     updatePromises.push(updateProgressChart(null, period));
-    
+
     // Actualizar gráfico de precisión
     updatePromises.push(updateAccuracyChart(null, period));
-    
+
     // Actualizar otros gráficos si existen
     if (chartInstances.has('studyStreak')) {
       updatePromises.push(updateStreakChart(period));
     }
-    
+
     if (chartInstances.has('deckProgress')) {
       updatePromises.push(updateDeckProgressChart(period));
     }
-    
+
     // Esperar a que todas las actualizaciones terminen
     const results = await Promise.allSettled(updatePromises);
-    
+
     // Verificar resultados
-    const successful = results.filter(result => result.status === 'fulfilled' && result.value === true).length;
+    const successful = results.filter(
+      (result) => result.status === 'fulfilled' && result.value === true
+    ).length;
     const total = results.length;
-    
-    console.log(`✅ Período actualizado: ${successful}/${total} gráficos actualizados exitosamente`);
-    
+
+    console.log(
+      `✅ Período actualizado: ${successful}/${total} gráficos actualizados exitosamente`
+    );
+
     // Actualizar UI para reflejar el período actual
     updatePeriodButtons(period);
-    
+
     return successful > 0;
-    
   } catch (error) {
     console.error('❌ Error cambiando período de gráficos:', error);
     return false;
@@ -1138,12 +1144,12 @@ export async function updateChartPeriod(period = '7d') {
 function generateDateLabels(period) {
   const days = period === '7d' ? 7 : period === '30d' ? 30 : 90;
   const labels = [];
-  
+
   for (let i = days - 1; i >= 0; i--) {
     const date = new Date(Date.now() - i * 24 * 60 * 60 * 1000);
     labels.push(formatDate(date, 'DD/MM'));
   }
-  
+
   return labels;
 }
 
@@ -1156,14 +1162,14 @@ function generateMockProgressData(period) {
   const days = period === '7d' ? 7 : period === '30d' ? 30 : 90;
   const data = [];
   let baseValue = 60;
-  
+
   for (let i = 0; i < days; i++) {
     // Simular progreso gradual con variación
     baseValue += Math.random() * 4 - 1; // Variación de -1 a +3
     baseValue = Math.max(0, Math.min(100, baseValue)); // Mantener entre 0-100
     data.push(Math.round(baseValue));
   }
-  
+
   return data;
 }
 
@@ -1176,14 +1182,14 @@ function generateMockAccuracyData(period) {
   const days = period === '7d' ? 7 : period === '30d' ? 30 : 90;
   const data = [];
   let baseValue = 75;
-  
+
   for (let i = 0; i < days; i++) {
     // Simular precisión con variación más estable
     baseValue += Math.random() * 6 - 2; // Variación de -2 a +4
     baseValue = Math.max(50, Math.min(100, baseValue)); // Mantener entre 50-100
     data.push(Math.round(baseValue));
   }
-  
+
   return data;
 }
 
@@ -1193,14 +1199,15 @@ function generateMockAccuracyData(period) {
  * @param {string} period - Período de tiempo
  */
 async function createProgressChart(data, period) {
-  const ctx = document.getElementById('progressChart') || 
-             document.getElementById('studyProgressChart');
-  
+  const ctx =
+    document.getElementById('progressChart') ||
+    document.getElementById('studyProgressChart');
+
   if (!ctx) {
     console.warn('Elemento canvas para gráfico de progreso no encontrado');
     return;
   }
-  
+
   const chart = new Chart(ctx, {
     type: 'line',
     data: {
@@ -1253,7 +1260,7 @@ async function createProgressChart(data, period) {
       animation: CHARTS_CONFIG.animations,
     },
   });
-  
+
   chartInstances.set('progressChart', chart);
 }
 
@@ -1263,14 +1270,15 @@ async function createProgressChart(data, period) {
  * @param {string} period - Período de tiempo
  */
 async function createAccuracyChart(data, period) {
-  const ctx = document.getElementById('accuracyChart') || 
-             document.getElementById('accuracyTrendChart');
-  
+  const ctx =
+    document.getElementById('accuracyChart') ||
+    document.getElementById('accuracyTrendChart');
+
   if (!ctx) {
     console.warn('Elemento canvas para gráfico de precisión no encontrado');
     return;
   }
-  
+
   const chart = new Chart(ctx, {
     type: 'line',
     data: {
@@ -1323,7 +1331,7 @@ async function createAccuracyChart(data, period) {
       animation: CHARTS_CONFIG.animations,
     },
   });
-  
+
   chartInstances.set('accuracyChart', chart);
 }
 
@@ -1333,8 +1341,8 @@ async function createAccuracyChart(data, period) {
  */
 function updatePeriodButtons(activePeriod) {
   const periodButtons = document.querySelectorAll('[data-period]');
-  
-  periodButtons.forEach(button => {
+
+  periodButtons.forEach((button) => {
     const buttonPeriod = button.getAttribute('data-period');
     if (buttonPeriod === activePeriod) {
       button.classList.add('active');
@@ -1353,17 +1361,19 @@ async function updateStreakChart(period) {
     const data = await apiWithFallback(`/api/stats/streak?period=${period}`, {
       current: Math.floor(Math.random() * 30) + 1,
       best: Math.floor(Math.random() * 50) + 20,
-      history: generateMockProgressData(period)
+      history: generateMockProgressData(period),
     });
-    
+
     return updateChart('studyStreak', {
       labels: generateDateLabels(period),
-      datasets: [{
-        label: 'Racha de Estudio',
-        data: data.history,
-        borderColor: CHARTS_CONFIG.defaultColors.accent,
-        backgroundColor: CHARTS_CONFIG.defaultColors.accent + '20',
-      }]
+      datasets: [
+        {
+          label: 'Racha de Estudio',
+          data: data.history,
+          borderColor: CHARTS_CONFIG.defaultColors.accent,
+          backgroundColor: CHARTS_CONFIG.defaultColors.accent + '20',
+        },
+      ],
     });
   } catch (error) {
     console.error('Error actualizando gráfico de racha:', error);
@@ -1377,18 +1387,29 @@ async function updateStreakChart(period) {
  */
 async function updateDeckProgressChart(period) {
   try {
-    const data = await apiWithFallback(`/api/stats/deck-progress?period=${period}`, {
-      labels: ['Inglés Básico', 'Matemáticas', 'Historia', 'Química', 'Literatura'],
-      progress: [85, 92, 67, 78, 45]
-    });
-    
+    const data = await apiWithFallback(
+      `/api/stats/deck-progress?period=${period}`,
+      {
+        labels: [
+          'Inglés Básico',
+          'Matemáticas',
+          'Historia',
+          'Química',
+          'Literatura',
+        ],
+        progress: [85, 92, 67, 78, 45],
+      }
+    );
+
     return updateChart('deckProgress', {
       labels: data.labels,
-      datasets: [{
-        label: 'Progreso (%)',
-        data: data.progress,
-        backgroundColor: CHARTS_CONFIG.colorPalettes.purple,
-      }]
+      datasets: [
+        {
+          label: 'Progreso (%)',
+          data: data.progress,
+          backgroundColor: CHARTS_CONFIG.colorPalettes.purple,
+        },
+      ],
     });
   } catch (error) {
     console.error('Error actualizando gráfico de progreso de decks:', error);
@@ -1400,4 +1421,3 @@ async function updateDeckProgressChart(period) {
 window.updateProgressChart = updateProgressChart;
 window.updateAccuracyChart = updateAccuracyChart;
 window.updateChartPeriod = updateChartPeriod;
-

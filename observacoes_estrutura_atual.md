@@ -3,7 +3,9 @@
 ## Análise da Interface Web
 
 ### Navegação Principal
+
 A aplicação possui uma navegação bem estruturada com as seguintes seções:
+
 - **Dashboard** - Painel principal com métricas
 - **Estudiar** - Seção de estudo de flashcards
 - **Crear** - Criação de decks e flashcards
@@ -13,17 +15,20 @@ A aplicação possui uma navegação bem estruturada com as seguintes seções:
 ### Funcionalidades Observadas
 
 #### Seção Dashboard
+
 - Interface limpa com título "StudyingFlash"
 - Subtítulo: "Tu plataforma de aprendizaje inteligente con repetición espaciada"
 - Seção "Progreso Semanal" com botões de período (7D, 30D, 90D)
 - Design responsivo e moderno
 
 #### Seção Estudiar
+
 - Interface para seleção de deck
 - Texto: "Selecciona un deck para comenzar tu sesión de estudio"
 - Design minimalista focado na funcionalidade
 
 #### Seção Crear
+
 - **Criar Novo Deck:**
   - Campo "Nombre del Deck" com placeholder "Ej: Vocabulario Inglés"
   - Campo "Descripción" com textarea
@@ -72,4 +77,3 @@ A aplicação possui uma navegação bem estruturada com as seguintes seções:
 - Verificar sistema de ranking/gamificação
 - Analisar código JavaScript dos serviços
 - Identificar oportunidades de melhoria
-

@@ -1,10 +1,10 @@
 import { api } from './apiClient.js';
-import { 
-  initializeCharts, 
-  updateChart, 
-  updateProgressChart, 
-  updateAccuracyChart, 
-  updateChartPeriod 
+import {
+  initializeCharts,
+  updateChart,
+  updateProgressChart,
+  updateAccuracyChart,
+  updateChartPeriod,
 } from './charts.js';
 import {
   generateActivityHeatmap,
@@ -100,19 +100,25 @@ export async function loadWeeklyStats() {
 
     // Atualizar gráficos com dados semanais
     if (weeklyStats.weeklyProgress) {
-      updateProgressChart({
-        labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
-        progress: weeklyStats.weeklyProgress,
-        target: 85
-      }, '7d');
+      updateProgressChart(
+        {
+          labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
+          progress: weeklyStats.weeklyProgress,
+          target: 85,
+        },
+        '7d'
+      );
     }
 
     if (weeklyStats.weeklyAccuracy) {
-      updateAccuracyChart({
-        labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
-        accuracy: weeklyStats.weeklyAccuracy,
-        target: 85
-      }, '7d');
+      updateAccuracyChart(
+        {
+          labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
+          accuracy: weeklyStats.weeklyAccuracy,
+          target: 85,
+        },
+        '7d'
+      );
     }
 
     return weeklyStats;
@@ -263,19 +269,25 @@ function initializeChartsWithData(stats) {
 
     // Actualizar con datos reales
     if (stats.weeklyProgress) {
-      updateProgressChart({
-        labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
-        progress: stats.weeklyProgress,
-        target: 85
-      }, '7d');
+      updateProgressChart(
+        {
+          labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
+          progress: stats.weeklyProgress,
+          target: 85,
+        },
+        '7d'
+      );
     }
 
     if (stats.weeklyAccuracy) {
-      updateAccuracyChart({
-        labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
-        accuracy: stats.weeklyAccuracy,
-        target: 85
-      }, '7d');
+      updateAccuracyChart(
+        {
+          labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
+          accuracy: stats.weeklyAccuracy,
+          target: 85,
+        },
+        '7d'
+      );
     }
 
     // Cargar estadísticas semanales adicionales

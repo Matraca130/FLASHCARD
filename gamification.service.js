@@ -647,9 +647,9 @@ export function getGamificationStats() {
     accuracy:
       gamificationData.totalCards > 0
         ? Math.round(
-            (gamificationData.correctAnswers / gamificationData.totalCards) *
+          (gamificationData.correctAnswers / gamificationData.totalCards) *
               100
-          )
+        )
         : 0,
   };
 }
