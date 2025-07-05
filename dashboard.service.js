@@ -1,5 +1,5 @@
 import { api } from './apiClient.js';
-import { initializeCharts, updateProgressChart, updateAccuracyChart, updateChartPeriod } from '../charts.js';
+import { initializeCharts, updateChart } from './charts.js';
 import { generateActivityHeatmap, updateHeatmapWithData } from './activity-heatmap.service.js';
 import { multipleApiWithFallback, apiWithFallback, FALLBACK_DATA } from './utils/apiHelpers.js';
 import { showNotification, formatDate, formatRelativeDate, renderEmptyDecksState } from './utils/helpers.js';

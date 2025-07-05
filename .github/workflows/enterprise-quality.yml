@@ -35,13 +35,13 @@ jobs:
     
     - name: Run ESLint (Modern Config)
       run: |
-        npx eslint . --ext .js --format=json --output-file=eslint-report.json || true
-        npx eslint . --ext .js
+        npm run lint --format=json --output-file=eslint-report.json || true
+        npm run lint
       continue-on-error: true
     
     - name: Run Prettier check
       run: |
-        npx prettier --check "*.{js,css,json,md}" || echo "⚠️ Formatting issues found"
+        npm run format:check || echo "⚠️ Formatting issues found"
       continue-on-error: true
     
     - name: Security scan - Frontend

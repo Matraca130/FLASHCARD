@@ -119,23 +119,17 @@ jobs:
       run: |
         echo "🔨 Building and optimizing..."
         
-        # Run build if configured
-        npm run build || echo "No build script configured"
+        # Run Vite build to generate dist/
+        npm run build
         
-        # Optimize images (if tools available)
-        echo "🖼️ Image optimization..."
-        find . -name "*.png" -o -name "*.jpg" -o -name "*.jpeg" | head -5
+        # Verify dist directory was created
+        if [ ! -d "dist" ]; then
+          echo "❌ dist directory not created by build"
+          exit 1
+        fi
         
-        # Minify CSS (basic)
-        echo "🎨 CSS optimization..."
-        for css_file in $(find . -name "*.css" -not -path "./node_modules/*"); do
-          if [ -f "$css_file" ]; then
-            echo "Optimizing $css_file"
-            # Basic CSS minification (remove comments and extra spaces)
-            sed 's|/\*.*\*/||g; s/  */ /g; s/^ *//; s/ *$//; /^$/d' "$css_file" > "${css_file}.min"
-            mv "${css_file}.min" "$css_file"
-          fi
-        done
+        echo "✅ Build completed, dist/ directory created"
+        ls -la dist/
     
     - name: Generate deployment manifest
       run: |
@@ -193,34 +187,28 @@ jobs:
     
     - name: Prepare deployment
       run: |
-        echo "🚀 Preparing deployment..."
+        echo "🚀 Preparing deployment from dist/..."
         
-        # Copy build files
-        cp -r build/* . || echo "No build directory found, using current files"
-        
-        # Remove sensitive files
-        rm -rf .github/workflows/*.disabled
-        rm -f workflow_errors.md
-        rm -rf backend_app/
-        rm -rf tests/
-        rm -rf venv/
-        rm -rf __pycache__/
-        rm -f *.py
-        rm -f requirements*.txt
-        rm -f pytest.ini
-        
-        # Ensure critical files exist
-        if [ ! -f "index.html" ]; then
-          echo "❌ index.html not found"
+        # Verify dist directory exists
+        if [ ! -d "dist" ]; then
+          echo "❌ dist directory not found"
           exit 1
         fi
         
-        echo "✅ Deployment prepared"
+        # Verify critical files exist in dist
+        if [ ! -f "dist/index.html" ]; then
+          echo "❌ index.html not found in dist/"
+          exit 1
+        fi
+        
+        echo "✅ Deployment prepared from dist/"
+        echo "Files in dist/:"
+        ls -la dist/
     
     - name: Upload to Pages
       uses: actions/upload-pages-artifact@v2
       with:
-        path: '.'
+        path: './dist'
     
     - name: Deploy to GitHub Pages
       id: deployment

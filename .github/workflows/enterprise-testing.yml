@@ -49,7 +49,7 @@ jobs:
     - name: Linting
       run: |
         echo "🔍 Running ESLint..."
-        npx eslint . --ext .js --max-warnings 10
+        npm run lint
     
     - name: Build validation
       run: |
