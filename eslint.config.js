@@ -28,11 +28,25 @@ export default [
         alert: 'readonly',
         confirm: 'readonly',
         prompt: 'readonly',
+        FormData: 'readonly',
+        AbortController: 'readonly',
+        atob: 'readonly',
+        btoa: 'readonly',
         
         // Third-party libraries
         Chart: 'readonly',
         particlesJS: 'readonly',
         gsap: 'readonly',
+        
+        // Cypress globals
+        cy: 'readonly',
+        describe: 'readonly',
+        it: 'readonly',
+        before: 'readonly',
+        after: 'readonly',
+        beforeEach: 'readonly',
+        afterEach: 'readonly',
+        expect: 'readonly',
         
         // Node.js globals (for build tools)
         process: 'readonly',
@@ -65,6 +79,9 @@ export default [
       'no-eval': 'error',
       'no-implied-eval': 'error',
       
+      // Allow case declarations (common pattern)
+      'no-case-declarations': 'off',
+      
       // Style (basic)
       'indent': ['warn', 2, { SwitchCase: 1 }],
       'quotes': ['warn', 'single', { avoidEscape: true }],
@@ -76,6 +93,14 @@ export default [
     files: ['**/*.service.js'],
     rules: {
       'no-unused-vars': 'off' // Services may export functions not used in same file
+    }
+  },
+  {
+    // Specific rules for test files
+    files: ['**/*.spec.js', '**/cypress/**/*.js'],
+    rules: {
+      'no-unused-vars': 'off',
+      'no-undef': 'off' // Cypress globals are handled above
     }
   },
   {

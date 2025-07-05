@@ -1,6 +1,9 @@
 import { defineConfig } from 'vite'
 
 export default defineConfig({
+  // Base path para GitHub Pages
+  base: '/FLASHCARD/',
+  
   // Configuración de build optimizada
   build: {
     // Directorio de salida
@@ -211,9 +214,6 @@ export default defineConfig({
   
   // Configuración de logging
   logLevel: 'info',
-  clearScreen: false, // No limpiar consola en cada rebuild
-  
-  // Configuración de base URL (para deployment)
-  base: process.env.NODE_ENV === 'production' ? '/FLASHCARD/' : '/'
-})
+  clearScreen: false // No limpiar consola en cada rebuild
+});
 

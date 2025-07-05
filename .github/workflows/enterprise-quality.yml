@@ -86,7 +86,7 @@ jobs:
         fi
     
     - name: Upload quality reports
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: frontend-quality-reports
@@ -123,7 +123,7 @@ jobs:
         npm outdated || echo "Some packages may be outdated"
     
     - name: Upload security reports
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: security-reports

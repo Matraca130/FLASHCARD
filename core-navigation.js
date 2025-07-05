@@ -193,7 +193,7 @@ class NavigationSystem {
           case '2':
           case '3':
           case '4':
-          case '5':
+          case '5': {
             e.preventDefault();
             const sectionIndex = parseInt(e.key) - 1;
             const sections = Array.from(this.sections.keys());
@@ -201,6 +201,7 @@ class NavigationSystem {
               this.showSection(sections[sectionIndex]);
             }
             break;
+          }
         }
       }
     });
