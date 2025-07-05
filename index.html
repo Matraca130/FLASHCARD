@@ -2,10 +2,27 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  <meta name="description" content="StudyingFlash - Aplicación de flashcards con repetición espaciada para optimizar tu aprendizaje">
+  <meta name="theme-color" content="#2563eb">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="StudyingFlash">
+  
   <title>StudyingFlash - Aplicación Completa Integrada</title>
+  
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="./manifest.webmanifest">
+  
+  <!-- Iconos PWA -->
+  <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="./icons/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png">
+  
+  <!-- Stylesheets -->
   <link rel="stylesheet" href="./styles.css">
   <link rel="stylesheet" href="./meta-dark-theme.css">
+  <link rel="stylesheet" href="./responsive.css">
   
   <!-- Cargar iconos SVG embebidos -->
   <style>
@@ -2163,6 +2180,7 @@
 
     <!-- Sistema de Navegación Robusto - Solución Estructural Definitiva -->
     <script src="./core-navigation.js" type="module"></script>
+    <script src="./pwa-installer.js" type="module"></script>
 </body>
 </html>
 

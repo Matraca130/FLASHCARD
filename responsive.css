@@ -1,0 +1,481 @@
+/* 
+ * RESPONSIVE DESIGN - MOBILE FIRST APPROACH
+ * StudyingFlash - CSS Responsive Completo
+ */
+
+/* ===== BASE MOBILE STYLES (320px+) ===== */
+
+/* Contenedor principal responsive */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+/* Navegación móvil */
+.nav-container {
+  position: relative;
+}
+
+.nav-menu {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--bg-color, #ffffff);
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 8px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transform: translateY(-10px);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.nav-menu.active {
+  transform: translateY(0);
+  opacity: 1;
+  visibility: visible;
+}
+
+.nav-link {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-color, #e5e7eb);
+  transition: background-color 0.2s ease;
+}
+
+.nav-link:last-child {
+  border-bottom: none;
+}
+
+.nav-link:hover {
+  background-color: var(--hover-bg, #f3f4f6);
+}
+
+/* Botón hamburguesa */
+.hamburger-btn {
+  display: block;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.hamburger-btn:hover {
+  background-color: var(--hover-bg, #f3f4f6);
+}
+
+.hamburger-icon {
+  width: 24px;
+  height: 24px;
+  position: relative;
+}
+
+.hamburger-icon span {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background-color: var(--text-color, #374151);
+  margin: 4px 0;
+  transition: all 0.3s ease;
+  transform-origin: center;
+}
+
+.hamburger-btn.active .hamburger-icon span:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+.hamburger-btn.active .hamburger-icon span:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger-btn.active .hamburger-icon span:nth-child(3) {
+  transform: rotate(-45deg) translate(7px, -6px);
+}
+
+/* Tarjetas responsive */
+.card {
+  width: 100%;
+  margin-bottom: 16px;
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Grid responsive para tarjetas */
+.cards-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  padding: 16px 0;
+}
+
+/* Botones táctiles optimizados */
+.btn {
+  min-height: 48px;
+  min-width: 48px;
+  padding: 12px 24px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn-primary {
+  background-color: var(--primary-color, #2563eb);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-hover, #1d4ed8);
+}
+
+.btn-secondary {
+  background-color: var(--secondary-color, #6b7280);
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: var(--secondary-hover, #4b5563);
+}
+
+/* Formularios responsive */
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: var(--text-color, #374151);
+}
+
+.form-input {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 16px;
+  border: 1px solid var(--border-color, #d1d5db);
+  border-radius: 8px;
+  font-size: 16px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--primary-color, #2563eb);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* Textarea responsive */
+.form-textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+/* Imágenes responsive */
+img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+
+/* Tipografía responsive */
+h1 {
+  font-size: 1.875rem; /* 30px */
+  line-height: 1.2;
+  margin-bottom: 16px;
+}
+
+h2 {
+  font-size: 1.5rem; /* 24px */
+  line-height: 1.3;
+  margin-bottom: 12px;
+}
+
+h3 {
+  font-size: 1.25rem; /* 20px */
+  line-height: 1.4;
+  margin-bottom: 8px;
+}
+
+p {
+  font-size: 1rem; /* 16px */
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+/* Utilidades responsive */
+.text-center {
+  text-align: center;
+}
+
+.hidden-mobile {
+  display: none;
+}
+
+.visible-mobile {
+  display: block;
+}
+
+/* ===== TABLET STYLES (768px+) ===== */
+@media (min-width: 768px) {
+  .container {
+    padding: 0 24px;
+  }
+  
+  /* Navegación horizontal en tablet */
+  .hamburger-btn {
+    display: none;
+  }
+  
+  .nav-menu {
+    position: static;
+    flex-direction: row;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    transform: none;
+    opacity: 1;
+    visibility: visible;
+  }
+  
+  .nav-link {
+    padding: 8px 16px;
+    border-bottom: none;
+    border-radius: 6px;
+    margin: 0 4px;
+  }
+  
+  /* Grid de 2 columnas en tablet */
+  .cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    padding: 20px 0;
+  }
+  
+  /* Tipografía más grande en tablet */
+  h1 {
+    font-size: 2.25rem; /* 36px */
+  }
+  
+  h2 {
+    font-size: 1.875rem; /* 30px */
+  }
+  
+  h3 {
+    font-size: 1.5rem; /* 24px */
+  }
+  
+  /* Formularios en 2 columnas */
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  
+  .hidden-mobile {
+    display: block;
+  }
+  
+  .visible-mobile {
+    display: none;
+  }
+}
+
+/* ===== DESKTOP STYLES (1024px+) ===== */
+@media (min-width: 1024px) {
+  .container {
+    padding: 0 32px;
+  }
+  
+  /* Grid de 3 columnas en desktop */
+  .cards-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    padding: 24px 0;
+  }
+  
+  /* Navegación con más espacio */
+  .nav-link {
+    padding: 10px 20px;
+    margin: 0 6px;
+  }
+  
+  /* Tipografía más grande en desktop */
+  h1 {
+    font-size: 3rem; /* 48px */
+  }
+  
+  h2 {
+    font-size: 2.25rem; /* 36px */
+  }
+  
+  h3 {
+    font-size: 1.875rem; /* 30px */
+  }
+  
+  /* Botones más pequeños en desktop (mouse) */
+  .btn {
+    min-height: 40px;
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+  
+  /* Formularios en 3 columnas */
+  .form-row-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
+  }
+}
+
+/* ===== LARGE DESKTOP STYLES (1280px+) ===== */
+@media (min-width: 1280px) {
+  .container {
+    max-width: 1280px;
+    padding: 0 40px;
+  }
+  
+  /* Grid de 4 columnas en pantallas grandes */
+  .cards-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 28px;
+    padding: 28px 0;
+  }
+  
+  /* Tipografía aún más grande */
+  h1 {
+    font-size: 3.75rem; /* 60px */
+  }
+  
+  h2 {
+    font-size: 3rem; /* 48px */
+  }
+}
+
+/* ===== EXTRA LARGE DESKTOP (1536px+) ===== */
+@media (min-width: 1536px) {
+  .container {
+    max-width: 1536px;
+  }
+  
+  /* Máximo 5 columnas en pantallas muy grandes */
+  .cards-grid {
+    grid-template-columns: repeat(5, 1fr);
+    gap: 32px;
+  }
+}
+
+/* ===== UTILIDADES RESPONSIVE ===== */
+
+/* Mostrar/ocultar por breakpoint */
+@media (max-width: 767px) {
+  .hidden-mobile {
+    display: none !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .hidden-tablet {
+    display: none !important;
+  }
+  
+  .visible-mobile {
+    display: none !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .hidden-desktop {
+    display: none !important;
+  }
+}
+
+/* Espaciado responsive */
+.spacing-mobile {
+  padding: 16px;
+}
+
+@media (min-width: 768px) {
+  .spacing-mobile {
+    padding: 24px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .spacing-mobile {
+    padding: 32px;
+  }
+}
+
+/* Flexbox utilities responsive */
+.flex-mobile-column {
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 768px) {
+  .flex-mobile-column {
+    flex-direction: row;
+  }
+}
+
+/* Accesibilidad y UX */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Modo oscuro responsive */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-color: #1f2937;
+    --text-color: #f9fafb;
+    --border-color: #374151;
+    --hover-bg: #374151;
+    --primary-color: #3b82f6;
+    --primary-hover: #2563eb;
+  }
+}
+
+/* Print styles */
+@media print {
+  .nav-container,
+  .hamburger-btn,
+  .btn {
+    display: none !important;
+  }
+  
+  .card {
+    break-inside: avoid;
+    box-shadow: none;
+    border: 1px solid #000;
+  }
+}
+

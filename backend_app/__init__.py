@@ -49,19 +49,23 @@ def create_app(config_class=None):
     # Registrar blueprints
     from backend_app.api.routes import api_bp
     from backend_app.api.auth import auth_bp
+    from backend_app.api.auth_refresh import auth_refresh_bp
     from backend_app.api.study import study_bp
     from backend_app.api.dashboard import dashboard_bp
     from backend_app.api.decks import decks_bp
     from backend_app.api.flashcards import flashcards_bp
     from backend_app.api.stats import stats_bp
+    from backend_app.api.health import health_bp
     
     app.register_blueprint(api_bp)
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
+    app.register_blueprint(auth_refresh_bp, url_prefix='/api/auth')
     app.register_blueprint(study_bp, url_prefix='/api/study')
     app.register_blueprint(dashboard_bp, url_prefix='/api/dashboard')
     app.register_blueprint(decks_bp, url_prefix='/api/decks')
     app.register_blueprint(flashcards_bp, url_prefix='/api/flashcards')
     app.register_blueprint(stats_bp, url_prefix='/api/stats')
+    app.register_blueprint(health_bp)
     
     # Crear tablas de base de datos
     with app.app_context():

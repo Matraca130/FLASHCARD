@@ -1,262 +1,166 @@
 /**
- * SERVICE WORKER - REFACTORIZADO
- * ==============================
- * 
- * Service Worker mejorado con capacidades offline robustas,
- * estrategias de cache inteligentes y manejo de errores
+ * Service Worker para StudyingFlash PWA
+ * Implementa cache offline y estrategias de cache optimizadas
  */
 
-// Configuración del cache
-const CACHE_NAME = 'studyingflash-v1.2.0';
-const STATIC_CACHE = 'studyingflash-static-v1.2.0';
-const DYNAMIC_CACHE = 'studyingflash-dynamic-v1.2.0';
-const API_CACHE = 'studyingflash-api-v1.2.0';
+const CACHE_NAME = 'studyingflash-v1.0.0';
+const STATIC_CACHE = 'studyingflash-static-v1.0.0';
+const DYNAMIC_CACHE = 'studyingflash-dynamic-v1.0.0';
+const API_CACHE = 'studyingflash-api-v1.0.0';
 
-// Recursos estáticos para cache
+// Archivos críticos para precache
 const STATIC_ASSETS = [
   '/',
   '/index.html',
-  '/manifest.json',
+  '/styles.css',
   '/meta-dark-theme.css',
-  '/main.js',
-  '/router.js',
-  '/bindings.js',
+  '/responsive.css',
   '/core-navigation.js',
-  '/store.js',
-  '/helpers.js',
+  '/apiClient.js',
+  '/create.service.js',
   '/utils/helpers.js',
   '/utils/validation.js',
-  '/utils/apiHelpers.js',
-  '/apiClient.js',
-  '/charts.js'
+  '/utils/loading.js',
+  '/manifest.webmanifest',
+  '/icons/icon-192x192.png',
+  '/icons/icon-512x512.png',
+  '/icons/favicon-32x32.png'
 ];
 
-// Recursos dinámicos que se cachean bajo demanda
-const DYNAMIC_PATTERNS = [
-  /\.(?:png|jpg|jpeg|svg|gif|webp)$/,
-  /\.(?:js|css)$/,
-  /\/api\/.*$/
+// URLs de API para cache
+const API_URLS = [
+  '/api/auth/validate-token',
+  '/api/decks/',
+  '/api/dashboard/stats'
 ];
 
-// Configuración de estrategias de cache
-const CACHE_STRATEGIES = {
-  // Cache First: Para recursos estáticos
-  CACHE_FIRST: 'cache-first',
-  // Network First: Para contenido dinámico
-  NETWORK_FIRST: 'network-first',
-  // Stale While Revalidate: Para recursos que pueden estar desactualizados
-  STALE_WHILE_REVALIDATE: 'stale-while-revalidate',
-  // Network Only: Para requests críticos
-  NETWORK_ONLY: 'network-only',
-  // Cache Only: Para modo offline
-  CACHE_ONLY: 'cache-only'
-};
-
-// Configuración de timeouts
-const TIMEOUTS = {
-  NETWORK: 5000,
-  CACHE: 1000
-};
+// Archivos que nunca se deben cachear
+const NEVER_CACHE = [
+  '/api/auth/login',
+  '/api/auth/logout',
+  '/api/auth/refresh'
+];
 
 /**
- * EVENTOS DEL SERVICE WORKER
- * ==========================
- */
-
-/**
- * Evento de instalación
+ * Evento de instalación del Service Worker
  */
 self.addEventListener('install', event => {
-  console.log('[SW] Instalando Service Worker v1.2.0');
+  console.log('[SW] Installing Service Worker...');
   
   event.waitUntil(
-    Promise.all([
-      // Pre-cachear recursos estáticos
-      caches.open(STATIC_CACHE).then(cache => {
-        console.log('[SW] Pre-cacheando recursos estáticos');
-        return cache.addAll(STATIC_ASSETS.map(url => new Request(url, { cache: 'reload' })));
-      }),
-      
-      // Configurar cache dinámico
-      caches.open(DYNAMIC_CACHE),
-      caches.open(API_CACHE)
-    ]).then(() => {
-      console.log('[SW] Instalación completada');
-      // Forzar activación inmediata
-      return self.skipWaiting();
-    }).catch(error => {
-      console.error('[SW] Error durante instalación:', error);
-    })
-  );
-});
-
-/**
- * Evento de activación
- */
-self.addEventListener('activate', event => {
-  console.log('[SW] Activando Service Worker v1.2.0');
-  
-  event.waitUntil(
-    Promise.all([
-      // Limpiar caches antiguos
-      cleanupOldCaches(),
-      
-      // Tomar control de todas las pestañas
-      self.clients.claim()
-    ]).then(() => {
-      console.log('[SW] Activación completada');
-      
-      // Notificar a los clientes sobre la actualización
-      return notifyClients('sw-updated', { version: '1.2.0' });
-    }).catch(error => {
-      console.error('[SW] Error durante activación:', error);
-    })
-  );
-});
-
-/**
- * Evento de fetch - Manejo de requests
- */
-self.addEventListener('fetch', event => {
-  const { request } = event;
-  const url = new URL(request.url);
-  
-  // Solo manejar requests GET
-  if (request.method !== 'GET') {
-    return;
-  }
-  
-  // Determinar estrategia de cache
-  const strategy = determineStrategy(request, url);
-  
-  event.respondWith(
-    handleRequest(request, strategy)
+    caches.open(STATIC_CACHE)
+      .then(cache => {
+        console.log('[SW] Precaching static assets...');
+        return cache.addAll(STATIC_ASSETS);
+      })
+      .then(() => {
+        console.log('[SW] Static assets cached successfully');
+        return self.skipWaiting(); // Activar inmediatamente
+      })
       .catch(error => {
-        console.error('[SW] Error manejando request:', error);
-        return handleOfflineResponse(request);
+        console.error('[SW] Error during installation:', error);
       })
   );
 });
 
 /**
- * Evento de mensaje - Comunicación con la app
+ * Evento de activación del Service Worker
  */
-self.addEventListener('message', event => {
-  const { type, payload } = event.data || {};
+self.addEventListener('activate', event => {
+  console.log('[SW] Activating Service Worker...');
   
-  switch (type) {
-    case 'SKIP_WAITING':
-      self.skipWaiting();
-      break;
-      
-    case 'GET_VERSION':
-      event.ports[0].postMessage({ version: '1.2.0' });
-      break;
-      
-    case 'CLEAR_CACHE':
-      clearAllCaches().then(() => {
-        event.ports[0].postMessage({ success: true });
-      });
-      break;
-      
-    case 'CACHE_URLS':
-      if (payload?.urls) {
-        cacheUrls(payload.urls).then(() => {
-          event.ports[0].postMessage({ success: true });
-        });
-      }
-      break;
-      
-    default:
-      console.log('[SW] Mensaje no reconocido:', type);
-  }
+  event.waitUntil(
+    caches.keys()
+      .then(cacheNames => {
+        return Promise.all(
+          cacheNames.map(cacheName => {
+            // Eliminar caches antiguos
+            if (cacheName !== STATIC_CACHE && 
+                cacheName !== DYNAMIC_CACHE && 
+                cacheName !== API_CACHE) {
+              console.log('[SW] Deleting old cache:', cacheName);
+              return caches.delete(cacheName);
+            }
+          })
+        );
+      })
+      .then(() => {
+        console.log('[SW] Service Worker activated');
+        return self.clients.claim(); // Tomar control inmediatamente
+      })
+      .catch(error => {
+        console.error('[SW] Error during activation:', error);
+      })
+  );
 });
 
 /**
- * Evento de sync - Sincronización en background
+ * Evento de fetch - Interceptar todas las requests
  */
-self.addEventListener('sync', event => {
-  console.log('[SW] Evento de sync:', event.tag);
+self.addEventListener('fetch', event => {
+  const { request } = event;
+  const url = new URL(request.url);
   
-  switch (event.tag) {
-    case 'background-sync':
-      event.waitUntil(performBackgroundSync());
-      break;
-      
-    case 'upload-data':
-      event.waitUntil(uploadPendingData());
-      break;
+  // Solo manejar requests del mismo origen
+  if (url.origin !== location.origin) {
+    return;
   }
+  
+  // No cachear requests que nunca se deben cachear
+  if (NEVER_CACHE.some(path => url.pathname.includes(path))) {
+    return;
+  }
+  
+  event.respondWith(handleFetch(request));
 });
 
 /**
- * FUNCIONES DE ESTRATEGIAS DE CACHE
- * =================================
+ * Manejar requests con diferentes estrategias según el tipo
  */
-
-/**
- * Determina la estrategia de cache para un request
- */
-function determineStrategy(request, url) {
-  // API requests - Network First
-  if (url.pathname.startsWith('/api/')) {
-    return CACHE_STRATEGIES.NETWORK_FIRST;
-  }
+async function handleFetch(request) {
+  const url = new URL(request.url);
   
-  // Recursos estáticos - Cache First
-  if (STATIC_ASSETS.includes(url.pathname) || 
-      url.pathname.match(/\.(css|js|png|jpg|jpeg|svg|gif|webp|woff|woff2)$/)) {
-    return CACHE_STRATEGIES.CACHE_FIRST;
-  }
-  
-  // HTML pages - Stale While Revalidate
-  if (request.headers.get('accept')?.includes('text/html')) {
-    return CACHE_STRATEGIES.STALE_WHILE_REVALIDATE;
-  }
-  
-  // Default - Network First
-  return CACHE_STRATEGIES.NETWORK_FIRST;
-}
-
-/**
- * Maneja un request según la estrategia especificada
- */
-async function handleRequest(request, strategy) {
-  switch (strategy) {
-    case CACHE_STRATEGIES.CACHE_FIRST:
-      return cacheFirst(request);
-      
-    case CACHE_STRATEGIES.NETWORK_FIRST:
-      return networkFirst(request);
-      
-    case CACHE_STRATEGIES.STALE_WHILE_REVALIDATE:
-      return staleWhileRevalidate(request);
-      
-    case CACHE_STRATEGIES.NETWORK_ONLY:
-      return fetch(request);
-      
-    case CACHE_STRATEGIES.CACHE_ONLY:
-      return caches.match(request);
-      
-    default:
-      return networkFirst(request);
+  try {
+    // Estrategia para archivos estáticos
+    if (isStaticAsset(url.pathname)) {
+      return await cacheFirst(request, STATIC_CACHE);
+    }
+    
+    // Estrategia para API calls
+    if (url.pathname.startsWith('/api/')) {
+      return await networkFirst(request, API_CACHE);
+    }
+    
+    // Estrategia para páginas HTML
+    if (request.headers.get('accept')?.includes('text/html')) {
+      return await staleWhileRevalidate(request, DYNAMIC_CACHE);
+    }
+    
+    // Estrategia por defecto para otros recursos
+    return await networkFirst(request, DYNAMIC_CACHE);
+    
+  } catch (error) {
+    console.error('[SW] Fetch error:', error);
+    return await handleOfflineFallback(request);
   }
 }
 
 /**
- * Estrategia Cache First
+ * Estrategia Cache First - Para assets estáticos
  */
-async function cacheFirst(request) {
-  const cachedResponse = await caches.match(request);
+async function cacheFirst(request, cacheName) {
+  const cache = await caches.open(cacheName);
+  const cachedResponse = await cache.match(request);
   
   if (cachedResponse) {
+    console.log('[SW] Cache hit:', request.url);
     return cachedResponse;
   }
   
+  console.log('[SW] Cache miss, fetching:', request.url);
   const networkResponse = await fetch(request);
   
-  if (networkResponse.status === 200) {
-    const cache = await caches.open(STATIC_CACHE);
+  if (networkResponse.ok) {
     cache.put(request, networkResponse.clone());
   }
   
@@ -264,28 +168,25 @@ async function cacheFirst(request) {
 }
 
 /**
- * Estrategia Network First
+ * Estrategia Network First - Para API calls
  */
-async function networkFirst(request) {
+async function networkFirst(request, cacheName) {
+  const cache = await caches.open(cacheName);
+  
   try {
-    const networkResponse = await Promise.race([
-      fetch(request),
-      new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Network timeout')), TIMEOUTS.NETWORK)
-      )
-    ]);
+    console.log('[SW] Network first:', request.url);
+    const networkResponse = await fetch(request);
     
-    if (networkResponse.status === 200) {
-      const cacheName = request.url.includes('/api/') ? API_CACHE : DYNAMIC_CACHE;
-      const cache = await caches.open(cacheName);
+    if (networkResponse.ok && request.method === 'GET') {
       cache.put(request, networkResponse.clone());
     }
     
     return networkResponse;
-  } catch (error) {
-    console.log('[SW] Network failed, trying cache:', error.message);
     
-    const cachedResponse = await caches.match(request);
+  } catch (error) {
+    console.log('[SW] Network failed, trying cache:', request.url);
+    const cachedResponse = await cache.match(request);
+    
     if (cachedResponse) {
       return cachedResponse;
     }
@@ -295,183 +196,230 @@ async function networkFirst(request) {
 }
 
 /**
- * Estrategia Stale While Revalidate
+ * Estrategia Stale While Revalidate - Para páginas HTML
  */
-async function staleWhileRevalidate(request) {
-  const cachedResponse = await caches.match(request);
+async function staleWhileRevalidate(request, cacheName) {
+  const cache = await caches.open(cacheName);
+  const cachedResponse = await cache.match(request);
   
-  const networkResponsePromise = fetch(request).then(response => {
-    if (response.status === 200) {
-      const cache = caches.open(DYNAMIC_CACHE);
-      cache.then(c => c.put(request, response.clone()));
+  // Fetch en background para actualizar cache
+  const fetchPromise = fetch(request).then(networkResponse => {
+    if (networkResponse.ok) {
+      cache.put(request, networkResponse.clone());
     }
-    return response;
-  }).catch(error => {
-    console.log('[SW] Network update failed:', error.message);
+    return networkResponse;
   });
   
-  return cachedResponse || networkResponsePromise;
+  // Retornar cache inmediatamente si existe, sino esperar network
+  return cachedResponse || fetchPromise;
 }
 
 /**
- * FUNCIONES DE UTILIDAD
- * =====================
+ * Verificar si es un asset estático
  */
-
-/**
- * Limpia caches antiguos
- */
-async function cleanupOldCaches() {
-  const cacheNames = await caches.keys();
-  const currentCaches = [CACHE_NAME, STATIC_CACHE, DYNAMIC_CACHE, API_CACHE];
-  
-  const deletePromises = cacheNames
-    .filter(cacheName => !currentCaches.includes(cacheName))
-    .map(cacheName => {
-      console.log('[SW] Eliminando cache antiguo:', cacheName);
-      return caches.delete(cacheName);
-    });
-  
-  return Promise.all(deletePromises);
+function isStaticAsset(pathname) {
+  const staticExtensions = ['.css', '.js', '.png', '.jpg', '.jpeg', '.svg', '.ico', '.webp'];
+  return staticExtensions.some(ext => pathname.endsWith(ext)) ||
+         STATIC_ASSETS.includes(pathname);
 }
 
 /**
- * Maneja respuestas offline
+ * Manejar fallback offline
  */
-async function handleOfflineResponse(request) {
+async function handleOfflineFallback(request) {
   const url = new URL(request.url);
   
-  // Para páginas HTML, devolver página offline
+  // Para páginas HTML, mostrar página offline
   if (request.headers.get('accept')?.includes('text/html')) {
-    const offlinePage = await caches.match('/offline.html') || 
-                       await caches.match('/index.html');
-    if (offlinePage) {
-      return offlinePage;
-    }
-  }
-  
-  // Para API requests, devolver respuesta JSON de error
-  if (url.pathname.startsWith('/api/')) {
-    return new Response(
-      JSON.stringify({
-        error: 'offline',
-        message: 'No hay conexión disponible',
-        timestamp: Date.now()
-      }),
-      {
-        status: 503,
-        statusText: 'Service Unavailable',
-        headers: { 'Content-Type': 'application/json' }
+    const cache = await caches.open(STATIC_CACHE);
+    return await cache.match('/') || new Response(
+      createOfflinePage(),
+      { 
+        headers: { 'Content-Type': 'text/html' },
+        status: 200
       }
     );
   }
   
-  // Para otros recursos, devolver error genérico
-  return new Response('Recurso no disponible offline', {
-    status: 503,
-    statusText: 'Service Unavailable'
-  });
-}
-
-/**
- * Notifica a todos los clientes
- */
-async function notifyClients(type, payload) {
-  const clients = await self.clients.matchAll();
+  // Para API calls, retornar respuesta JSON de error
+  if (url.pathname.startsWith('/api/')) {
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: 'offline',
+        message: 'No hay conexión a internet. Algunos datos pueden estar desactualizados.'
+      }),
+      {
+        headers: { 'Content-Type': 'application/json' },
+        status: 503
+      }
+    );
+  }
   
-  clients.forEach(client => {
-    client.postMessage({ type, payload });
-  });
+  // Para otros recursos, retornar error
+  return new Response('Recurso no disponible offline', { status: 503 });
 }
 
 /**
- * Limpia todos los caches
+ * Crear página HTML offline básica
+ */
+function createOfflinePage() {
+  return `
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>StudyingFlash - Sin conexión</title>
+      <style>
+        body {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          min-height: 100vh;
+          margin: 0;
+          background: #f9fafb;
+          color: #374151;
+          text-align: center;
+          padding: 20px;
+        }
+        .offline-icon {
+          font-size: 4rem;
+          margin-bottom: 1rem;
+        }
+        h1 {
+          color: #1f2937;
+          margin-bottom: 0.5rem;
+        }
+        p {
+          color: #6b7280;
+          max-width: 400px;
+          line-height: 1.6;
+        }
+        .retry-btn {
+          background: #2563eb;
+          color: white;
+          border: none;
+          padding: 12px 24px;
+          border-radius: 8px;
+          cursor: pointer;
+          font-size: 16px;
+          margin-top: 1rem;
+        }
+        .retry-btn:hover {
+          background: #1d4ed8;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="offline-icon">📱</div>
+      <h1>Sin conexión a internet</h1>
+      <p>
+        StudyingFlash funciona offline con los datos que ya tienes guardados.
+        Algunas funciones pueden estar limitadas hasta que se restablezca la conexión.
+      </p>
+      <button class="retry-btn" onclick="window.location.reload()">
+        Reintentar conexión
+      </button>
+    </body>
+    </html>
+  `;
+}
+
+/**
+ * Manejar mensajes del cliente
+ */
+self.addEventListener('message', event => {
+  const { type, payload } = event.data;
+  
+  switch (type) {
+    case 'SKIP_WAITING':
+      self.skipWaiting();
+      break;
+      
+    case 'GET_CACHE_STATUS':
+      getCacheStatus().then(status => {
+        event.ports[0].postMessage({ type: 'CACHE_STATUS', payload: status });
+      });
+      break;
+      
+    case 'CLEAR_CACHE':
+      clearAllCaches().then(() => {
+        event.ports[0].postMessage({ type: 'CACHE_CLEARED' });
+      });
+      break;
+      
+    default:
+      console.log('[SW] Unknown message type:', type);
+  }
+});
+
+/**
+ * Obtener estado del cache
+ */
+async function getCacheStatus() {
+  const cacheNames = await caches.keys();
+  const status = {};
+  
+  for (const cacheName of cacheNames) {
+    const cache = await caches.open(cacheName);
+    const keys = await cache.keys();
+    status[cacheName] = keys.length;
+  }
+  
+  return status;
+}
+
+/**
+ * Limpiar todos los caches
  */
 async function clearAllCaches() {
   const cacheNames = await caches.keys();
-  const deletePromises = cacheNames.map(cacheName => caches.delete(cacheName));
-  return Promise.all(deletePromises);
+  await Promise.all(cacheNames.map(name => caches.delete(name)));
+  console.log('[SW] All caches cleared');
 }
 
 /**
- * Cachea URLs específicas
+ * Evento de sincronización en background
  */
-async function cacheUrls(urls) {
-  const cache = await caches.open(DYNAMIC_CACHE);
-  const cachePromises = urls.map(url => {
-    return fetch(url).then(response => {
-      if (response.status === 200) {
-        return cache.put(url, response);
-      }
-    }).catch(error => {
-      console.log('[SW] Error cacheando URL:', url, error);
-    });
-  });
+self.addEventListener('sync', event => {
+  console.log('[SW] Background sync:', event.tag);
   
-  return Promise.all(cachePromises);
-}
+  if (event.tag === 'background-sync') {
+    event.waitUntil(doBackgroundSync());
+  }
+});
 
 /**
- * Sincronización en background
+ * Realizar sincronización en background
  */
-async function performBackgroundSync() {
-  console.log('[SW] Realizando sincronización en background');
-  
+async function doBackgroundSync() {
   try {
-    // Intentar sincronizar datos pendientes
-    await uploadPendingData();
+    // Aquí puedes implementar lógica para sincronizar datos
+    // cuando se recupere la conexión
+    console.log('[SW] Performing background sync...');
     
-    // Actualizar cache con datos frescos
-    await updateCacheWithFreshData();
+    // Ejemplo: revalidar cache de API críticas
+    const criticalAPIs = ['/api/decks/', '/api/dashboard/stats'];
     
-    console.log('[SW] Sincronización completada');
+    for (const apiUrl of criticalAPIs) {
+      try {
+        const response = await fetch(apiUrl);
+        if (response.ok) {
+          const cache = await caches.open(API_CACHE);
+          cache.put(apiUrl, response.clone());
+        }
+      } catch (error) {
+        console.log('[SW] Failed to sync:', apiUrl);
+      }
+    }
+    
   } catch (error) {
-    console.error('[SW] Error en sincronización:', error);
+    console.error('[SW] Background sync failed:', error);
   }
 }
 
-/**
- * Sube datos pendientes
- */
-async function uploadPendingData() {
-  // Implementar lógica para subir datos que están pendientes
-  // cuando la conexión se restaure
-  console.log('[SW] Subiendo datos pendientes...');
-}
-
-/**
- * Actualiza cache con datos frescos
- */
-async function updateCacheWithFreshData() {
-  const cache = await caches.open(API_CACHE);
-  
-  // URLs críticas para actualizar
-  const criticalUrls = [
-    '/api/user/profile',
-    '/api/decks',
-    '/api/stats'
-  ];
-  
-  const updatePromises = criticalUrls.map(async url => {
-    try {
-      const response = await fetch(url);
-      if (response.status === 200) {
-        await cache.put(url, response);
-      }
-    } catch (error) {
-      console.log('[SW] Error actualizando cache para:', url);
-    }
-  });
-  
-  return Promise.all(updatePromises);
-}
-
-/**
- * LOGGING Y DEBUGGING
- * ===================
- */
-
-console.log('[SW] Service Worker refactorizado cargado - v1.2.0');
-console.log('[SW] Estrategias de cache configuradas');
-console.log('[SW] Capacidades offline mejoradas activas');
+console.log('[SW] Service Worker script loaded');
 
