@@ -625,19 +625,8 @@ def update_review_stats(mapper, connection, target):
         }
     )
     
-    # Actualizar estadísticas de la sesión
-    connection.execute(
-        text("""
-            UPDATE study_sessions 
-            SET cards_studied = cards_studied + 1,
-                cards_correct = CASE WHEN :rating >= 3 THEN cards_correct + 1 ELSE cards_correct END
-            WHERE id = :session_id
-        """),
-        {
-            "rating": target.rating,
-            "session_id": target.session_id
-        }
-    )
+    # Actualización de study_sessions eliminada para evitar doble conteo
+    # La lógica de Python en answer_card maneja estos incrementos
 
 # Funciones de consulta optimizadas
 class QueryOptimizer:
@@ -707,4 +696,30 @@ class QueryOptimizer:
             'correct_reviews': performance.correct_reviews or 0,
             'accuracy_rate': round((performance.correct_reviews / performance.total_reviews * 100) if performance.total_reviews else 0, 2)
         }
+    
+    @staticmethod
+    def get_decks_stats(user_id):
+        """Obtener estadísticas de todos los decks del usuario en una sola consulta optimizada"""
+        # Consulta agregada para obtener total de cartas y cartas vencidas por deck
+        stats_query = db.session.query(
+            Flashcard.deck_id.label('deck_id'),
+            db.func.count(Flashcard.id).label('total_cards'),
+            db.func.count(
+                db.case([(Flashcard.next_review <= datetime.utcnow(), 1)])
+            ).label('due_cards')
+        ).join(Deck).filter(
+            Deck.user_id == user_id,
+            Deck.is_deleted == False,
+            Flashcard.is_deleted == False
+        ).group_by(Flashcard.deck_id).all()
+        
+        # Convertir a diccionario para acceso rápido
+        stats_dict = {}
+        for stat in stats_query:
+            stats_dict[stat.deck_id] = {
+                'total_cards': stat.total_cards,
+                'due_cards': stat.due_cards
+            }
+        
+        return stats_dict
 

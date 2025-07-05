@@ -86,34 +86,50 @@ def get_dashboard_data():
     try:
         user_id = get_current_user_id()
         
-        # Decks del usuario con estadísticas
-        decks = db.session.query(Deck).filter_by(user_id=user_id).all()
-        decks_data = []
+        # Obtener decks del usuario
+        decks = db.session.query(Deck).filter_by(user_id=user_id, is_deleted=False).all()
         
+        # Usar consulta optimizada para estadísticas de decks
+        from backend_app.models.models import QueryOptimizer
+        deck_stats = QueryOptimizer.get_decks_stats(user_id)
+        
+        # Construir datos de decks con estadísticas optimizadas
+        decks_data = []
         for deck in decks:
-            total_cards = Flashcard.query.filter_by(deck_id=deck.id).count()
-            due_cards = Flashcard.query.filter_by(deck_id=deck.id)\
-                .filter(Flashcard.next_review <= datetime.utcnow()).count()
+            stats = deck_stats.get(deck.id, {'total_cards': 0, 'due_cards': 0})
             
             decks_data.append({
                 'id': deck.id,
                 'name': deck.name,
                 'description': deck.description,
-                'total_cards': total_cards,
-                'due_cards': due_cards,
+                'total_cards': stats['total_cards'],
+                'due_cards': stats['due_cards'],
                 'created_at': deck.created_at.isoformat(),
                 'updated_at': deck.updated_at.isoformat()
             })
         
-        # Estadísticas de estudio recientes
+        # Estadísticas de estudio recientes (optimizada)
         today = datetime.utcnow().date()
         week_ago = today - timedelta(days=7)
         
+        # Consulta agregada para estadísticas diarias
+        daily_reviews = db.session.query(
+            db.func.date(CardReview.reviewed_at).label('review_date'),
+            db.func.count(CardReview.id).label('reviews_count')
+        ).filter(
+            CardReview.user_id == user_id,
+            CardReview.is_deleted == False,
+            db.func.date(CardReview.reviewed_at) >= week_ago
+        ).group_by(db.func.date(CardReview.reviewed_at)).all()
+        
+        # Crear diccionario para acceso rápido
+        reviews_dict = {review.review_date: review.reviews_count for review in daily_reviews}
+        
+        # Construir estadísticas diarias
         daily_stats = []
         for i in range(7):
             date = week_ago + timedelta(days=i)
-            reviews_count = CardReview.query.filter_by(user_id=user_id)\
-                .filter(db.func.date(CardReview.reviewed_at) == date).count()
+            reviews_count = reviews_dict.get(date, 0)
             
             daily_stats.append({
                 'date': date.isoformat(),
@@ -133,141 +149,24 @@ def get_dashboard_data():
         logger.error(f"Error getting dashboard data: {str(e)}")
         return jsonify({'error': 'Error interno del servidor'}), 500
 
-@frontend_api.route('/deck/<int:deck_id>/study-session', methods=['POST'])
-@jwt_required()
-def start_study_session(deck_id):
-    """Iniciar sesión de estudio optimizada para frontend"""
-    try:
-        user_id = get_current_user_id()
-        
-        # Verificar que el deck pertenece al usuario
-        deck = Deck.query.filter_by(id=deck_id, user_id=user_id).first()
-        if not deck:
-            return jsonify({'error': 'Deck no encontrado'}), 404
-        
-        # Obtener cartas pendientes de revisión
-        due_cards = Flashcard.query.filter_by(deck_id=deck_id)\
-            .filter(Flashcard.next_review <= datetime.utcnow())\
-            .order_by(Flashcard.next_review.asc()).limit(20).all()
-        
-        if not due_cards:
-            return jsonify({
-                'message': 'No hay cartas pendientes de revisión',
-                'cards': []
-            })
-        
-        # Crear sesión de estudio
-        session = StudySession(
-            user_id=user_id,
-            deck_id=deck_id,
-            cards_studied=0
-        )
-        db.session.add(session)
-        db.session.commit()
-        
-        # Formatear cartas para el frontend
-        cards_data = []
-        for card in due_cards:
-            cards_data.append({
-                'id': card.id,
-                'front': card.front,
-                'back': card.back,
-                'difficulty': card.difficulty,
-                'interval': card.interval,
-                'ease_factor': card.ease_factor,
-                'next_review': card.next_review.isoformat()
-            })
-        
-        return jsonify({
-            'session_id': session.id,
-            'deck': {
-                'id': deck.id,
-                'name': deck.name
-            },
-            'cards': cards_data,
-            'total_cards': len(cards_data)
-        })
-    except Exception as e:
-        logger.error(f"Error starting study session: {str(e)}")
-        return jsonify({'error': 'Error interno del servidor'}), 500
+# ENDPOINTS OBSOLETOS COMENTADOS - Usar /api/study/ en su lugar
+# @frontend_api.route('/deck/<int:deck_id>/study-session', methods=['POST'])
+# @jwt_required()
+# def start_study_session(deck_id):
+#     """DEPRECATED: Use /api/study/session instead"""
+#     return jsonify({
+#         'error': 'Este endpoint está deprecated. Use /api/study/session',
+#         'redirect_to': '/api/study/session'
+#     }), 410  # Gone
 
-@frontend_api.route('/study-session/<int:session_id>/review', methods=['POST'])
-@jwt_required()
-def review_card_frontend(session_id):
-    """Revisar carta optimizado para frontend"""
-    try:
-        user_id = get_current_user_id()
-        data = request.get_json()
-        
-        if not data or 'card_id' not in data or 'rating' not in data:
-            return jsonify({'error': 'Datos requeridos: card_id, rating'}), 400
-        
-        card_id = data['card_id']
-        rating = data['rating']
-        
-        # Validar rating
-        if rating not in [1, 2, 3, 4]:
-            return jsonify({'error': 'Rating debe ser 1-4 (Again, Hard, Good, Easy)'}), 400
-        
-        # Verificar sesión
-        session = StudySession.query.filter_by(id=session_id, user_id=user_id).first()
-        if not session:
-            return jsonify({'error': 'Sesión no encontrada'}), 404
-        
-        # Obtener carta
-        card = Flashcard.query.get(card_id)
-        if not card:
-            return jsonify({'error': 'Carta no encontrada'}), 404
-        
-        # Aplicar algoritmo de revisión espaciada
-        from backend_app.algorithms import calculate_fsrs
-        
-        result = calculate_fsrs(
-            difficulty=card.difficulty,
-            stability=card.stability,
-            retrievability=card.retrievability,
-            rating=rating,
-            days_since_last_review=card.days_since_last_review or 0
-        )
-        
-        # Actualizar carta
-        card.difficulty = result['difficulty']
-        card.stability = result['stability']
-        card.retrievability = result['retrievability']
-        card.interval = result['interval']
-        card.next_review = datetime.utcnow() + timedelta(days=result['interval'])
-        card.days_since_last_review = 0
-        
-        # Crear registro de revisión
-        review = CardReview(
-            user_id=user_id,
-            flashcard_id=card_id,
-            rating=rating,
-            response_time=data.get('response_time', 0)
-        )
-        
-        # Actualizar sesión
-        session.cards_studied += 1
-        session.updated_at = datetime.utcnow()
-        
-        db.session.add(review)
-        db.session.commit()
-        
-        return jsonify({
-            'success': True,
-            'card_updated': {
-                'id': card.id,
-                'next_review': card.next_review.isoformat(),
-                'interval': card.interval,
-                'difficulty': card.difficulty
-            },
-            'session_progress': {
-                'cards_studied': session.cards_studied
-            }
-        })
-    except Exception as e:
-        logger.error(f"Error reviewing card: {str(e)}")
-        return jsonify({'error': 'Error interno del servidor'}), 500
+# @frontend_api.route('/study-session/<int:session_id>/review', methods=['POST'])
+# @jwt_required()
+# def review_card_frontend(session_id):
+#     """DEPRECATED: Use /api/study/card/answer instead"""
+#     return jsonify({
+#         'error': 'Este endpoint está deprecated. Use /api/study/card/answer',
+#         'redirect_to': '/api/study/card/answer'
+#     }), 410  # Gone
 
 @frontend_api.route('/search', methods=['GET'])
 @jwt_required()

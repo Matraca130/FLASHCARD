@@ -118,8 +118,8 @@ def answer_card(validated_data):
             card.interval_days = new_interval
             card.repetitions = card.repetitions + 1
             
-        else:  # SM-2 fallback
-            # SM-2 returns: (new_ease_factor, new_interval, new_repetitions)
+        elif algorithm in ('sm2', 'ultra_sm2', 'anki'):
+            # SM-2 and variants
             new_ease_factor, new_interval, new_repetitions = calculate_sm2(
                 quality,                # rating (1-4)
                 card.ease_factor,       # ease_factor (correct field name)
@@ -127,7 +127,36 @@ def answer_card(validated_data):
                 card.repetitions
             )
             
-            # Update card with SM-2 results
+            # Apply algorithm-specific modifications
+            if algorithm == 'ultra_sm2':
+                # Ultra SM-2: Apply factor limits (more dynamic than standard SM-2)
+                min_factor = 1.3
+                max_factor = 3.0
+                new_ease_factor = max(min_factor, min(max_factor, new_ease_factor))
+                
+            elif algorithm == 'anki':
+                # Anki-style: Handle learning steps for new cards
+                if card.repetitions == 0 and quality >= 3:
+                    # First successful review - use graduating interval
+                    new_interval = 1  # Anki default graduating interval
+                elif card.repetitions == 1 and quality >= 3:
+                    # Second successful review - use easy interval
+                    new_interval = 4  # Anki default easy interval
+                elif quality < 3:
+                    # Failed review - reset to learning
+                    new_interval = 1
+                    new_repetitions = 0
+            
+            # Update card with SM-2/variant results
+            card.ease_factor = new_ease_factor
+            card.interval_days = new_interval
+            card.repetitions = new_repetitions
+            
+        else:
+            # Fallback to SM-2 for unknown algorithms
+            new_ease_factor, new_interval, new_repetitions = calculate_sm2(
+                quality, card.ease_factor, card.interval_days, card.repetitions
+            )
             card.ease_factor = new_ease_factor
             card.interval_days = new_interval
             card.repetitions = new_repetitions
