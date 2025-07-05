@@ -15,35 +15,35 @@ jobs:
   frontend-quality:
     name: Frontend Quality & Security
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
       with:
         fetch-depth: 0  # Full history for better analysis
-    
+
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '18'
         cache: 'npm'
-    
+
     - name: Install dependencies
       run: |
         npm ci
         npm install --save-dev @eslint/js
-    
+
     - name: Run ESLint (Modern Config)
       run: |
         npm run lint --format=json --output-file=eslint-report.json || true
         npm run lint
       continue-on-error: true
-    
+
     - name: Run Prettier check
       run: |
         npm run format:check || echo "⚠️ Formatting issues found"
       continue-on-error: true
-    
+
     - name: Security scan - Frontend
       run: |
         echo "🔍 Scanning for security issues..."
@@ -53,19 +53,19 @@ jobs:
         else
           echo "✅ No obvious secrets detected"
         fi
-        
+
         # Check for dangerous functions
         if grep -r "eval\|innerHTML\|document.write" --include="*.js" --exclude-dir=node_modules .; then
           echo "⚠️ Potentially dangerous functions found"
         else
           echo "✅ No dangerous functions detected"
         fi
-    
+
     - name: Bundle size analysis
       run: |
         echo "📊 Analyzing bundle sizes..."
         find . -name "*.js" -not -path "./node_modules/*" -exec wc -c {} + | sort -n
-        
+
         # Check for large files
         large_files=$(find . -name "*.js" -not -path "./node_modules/*" -size +100k)
         if [ -n "$large_files" ]; then
@@ -74,7 +74,7 @@ jobs:
         else
           echo "✅ No oversized JavaScript files"
         fi
-    
+
     - name: Performance checks
       run: |
         echo "⚡ Performance analysis..."
@@ -84,7 +84,7 @@ jobs:
         else
           echo "✅ No obvious DOM performance issues"
         fi
-    
+
     - name: Upload quality reports
       uses: actions/upload-artifact@v4
       if: always()
@@ -97,31 +97,31 @@ jobs:
   dependency-security:
     name: Dependency Security Audit
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-    
+
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '18'
         cache: 'npm'
-    
+
     - name: Install dependencies
       run: npm ci
-    
+
     - name: Run npm audit
       run: |
         npm audit --audit-level=moderate --json > npm-audit.json || true
         npm audit --audit-level=moderate
       continue-on-error: true
-    
+
     - name: Check for outdated packages
       run: |
         echo "📦 Checking for outdated packages..."
         npm outdated || echo "Some packages may be outdated"
-    
+
     - name: Upload security reports
       uses: actions/upload-artifact@v4
       if: always()
@@ -134,31 +134,31 @@ jobs:
   code-metrics:
     name: Code Metrics & Documentation
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-    
+
     - name: Code complexity analysis
       run: |
         echo "📈 Code metrics analysis..."
-        
+
         # Count lines of code
         echo "Lines of code:"
         find . -name "*.js" -not -path "./node_modules/*" | xargs wc -l | tail -1
-        
+
         # Count files
         echo "JavaScript files:"
         find . -name "*.js" -not -path "./node_modules/*" | wc -l
-        
+
         # Function count
         echo "Function definitions:"
         grep -r "function\|=>" --include="*.js" --exclude-dir=node_modules . | wc -l
-    
+
     - name: Documentation check
       run: |
         echo "📚 Documentation analysis..."
-        
+
         # Check README
         if [ -f "README.md" ] && [ -s "README.md" ]; then
           echo "✅ README.md exists and has content"
@@ -166,11 +166,11 @@ jobs:
         else
           echo "⚠️ README.md missing or empty"
         fi
-        
+
         # Check for JSDoc comments
         jsdoc_count=$(grep -r "/\*\*" --include="*.js" --exclude-dir=node_modules . | wc -l)
         echo "JSDoc comments found: $jsdoc_count"
-        
+
         # Check for TODO/FIXME
         todo_count=$(grep -r "TODO\|FIXME\|HACK" --include="*.js" --include="*.html" --exclude-dir=node_modules . | wc -l)
         echo "TODO/FIXME items: $todo_count"
@@ -178,44 +178,44 @@ jobs:
   accessibility-check:
     name: Accessibility & SEO
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-    
+
     - name: HTML validation
       run: |
         echo "🔍 HTML accessibility checks..."
-        
+
         # Check for alt attributes
         if grep -r "<img" --include="*.html" . | grep -v "alt="; then
           echo "⚠️ Images without alt attributes found"
         else
           echo "✅ All images have alt attributes"
         fi
-        
+
         # Check for semantic HTML
         if grep -r "<div.*button\|<span.*button" --include="*.html" .; then
           echo "⚠️ Non-semantic button elements found"
         else
           echo "✅ Semantic button elements used"
         fi
-        
+
         # Check for ARIA labels
         aria_count=$(grep -r "aria-label\|aria-describedby" --include="*.html" . | wc -l)
         echo "ARIA attributes found: $aria_count"
-    
+
     - name: SEO checks
       run: |
         echo "🔍 SEO analysis..."
-        
+
         # Check meta tags
         if grep -r "<meta.*description" --include="*.html" .; then
           echo "✅ Meta description found"
         else
           echo "⚠️ Meta description missing"
         fi
-        
+
         # Check title tags
         if grep -r "<title>" --include="*.html" .; then
           echo "✅ Title tags found"
