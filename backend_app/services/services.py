@@ -67,7 +67,7 @@ class UserService(BaseService):
             token = create_access_token(identity=str(user.id))
             
             return self._success_response({
-                'user': user,
+                'user': user.to_dict(),
                 'token': token,
                 'id': user.id,
                 'email': user.email
@@ -94,7 +94,7 @@ class UserService(BaseService):
             token = create_access_token(identity=str(user.id))
             
             return self._success_response({
-                'user': user,
+                'user': user.to_dict(),
                 'token': token,
                 'id': user.id,
                 'email': user.email
@@ -465,7 +465,7 @@ class FlashcardService(BaseService):
             db.session.add(flashcard)
             db.session.commit()
             
-            return self._success_response(flashcard)
+            return self._success_response(flashcard.to_dict())
             
         except Exception as e:
             db.session.rollback()
@@ -485,7 +485,7 @@ class FlashcardService(BaseService):
             if not flashcard:
                 return self._error_response('Flashcard no encontrada')
             
-            return self._success_response(flashcard)
+            return self._success_response(flashcard.to_dict())
             
         except Exception as e:
             self.logger.error(f"Error getting flashcard: {str(e)}")

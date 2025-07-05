@@ -105,40 +105,41 @@ def answer_card():
         algorithm = session.algorithm or 'fsrs'
         
         if algorithm == 'fsrs':
+            # Calculate elapsed days since last review
+            elapsed_days = 0
+            if card.last_reviewed:
+                elapsed_days = (datetime.utcnow() - card.last_reviewed).days
+            
             result = calculate_fsrs(
-                card.difficulty,
-                card.stability, 
-                card.retrievability,
-                quality,
-                card.interval
+                quality,                # rating (1-4)
+                card.stability,         # stability (float)
+                card.difficulty_fsrs,   # difficulty_fsrs (float)
+                elapsed_days           # elapsed_days (int)
             )
         else:  # SM-2 fallback
             result = calculate_sm2(
-                card.easiness_factor,
-                card.interval,
-                card.repetitions,
-                quality
+                quality,                # rating (1-4)
+                card.ease_factor,       # ease_factor (correct field name)
+                card.interval_days,     # interval_days (correct field name)
+                card.repetitions
             )
         
         # Actualizar carta con nuevos valores
-        card.difficulty = result.get('difficulty', card.difficulty)
+        card.difficulty_fsrs = result.get('difficulty', card.difficulty_fsrs)
         card.stability = result.get('stability', card.stability)
-        card.retrievability = result.get('retrievability', card.retrievability)
-        card.easiness_factor = result.get('easiness_factor', card.easiness_factor)
-        card.interval = result['interval']
+        card.ease_factor = result.get('ease_factor', card.ease_factor)
+        card.interval_days = result['interval']
         card.repetitions = result.get('repetitions', card.repetitions + 1)
-        card.last_review = datetime.utcnow()
-        card.next_review = get_next_review_date(card.interval)
+        card.last_reviewed = datetime.utcnow()
+        card.next_review = get_next_review_date(card.interval_days)
         
         # Crear registro de revisión
         review = CardReview(
             flashcard_id=card_id,
-            user_id=user_id,
             session_id=session_id,
-            quality=quality,
-            previous_interval=card.interval,
+            rating=quality,                    # Use 'rating' field, not 'quality'
+            previous_interval=card.interval_days,  # Use correct field name
             new_interval=result['interval'],
-            algorithm_used=algorithm,
             response_time=data.get('response_time', 0)
         )
         
@@ -162,11 +163,10 @@ def answer_card():
             'success': True,
             'card': {
                 'id': card.id,
-                'interval': card.interval,
+                'interval': card.interval_days,
                 'next_review': card.next_review.isoformat(),
                 'difficulty': card.difficulty,
                 'stability': card.stability,
-                'retrievability': card.retrievability,
                 'repetitions': card.repetitions
             },
             'review': {
@@ -256,7 +256,7 @@ def get_due_cards():
                 'back': card.back,
                 'deck_id': card.deck_id,
                 'deck_name': card.deck.name,
-                'interval': card.interval,
+                'interval': card.interval_days,
                 'difficulty': card.difficulty,
                 'next_review': card.next_review.isoformat()
             })
