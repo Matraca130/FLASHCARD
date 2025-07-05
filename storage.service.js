@@ -18,7 +18,7 @@ const STORAGE_CONFIG = {
 
 // Cache en memoria para optimización
 const memoryCache = new Map();
-let cacheExpiry = new Map();
+const cacheExpiry = new Map();
 
 /**
  * Clase principal del servicio de almacenamiento
@@ -139,7 +139,7 @@ class StorageService {
 
     try {
       const fullKey = this.prefix + key;
-      let serializedData = JSON.stringify(data);
+      const serializedData = JSON.stringify(data);
 
       // Validar tamaño
       if (serializedData.length > STORAGE_CONFIG.maxStorageSize) {
@@ -371,7 +371,7 @@ class StorageService {
 
     if (this.save('decks', decks)) {
       console.log('✅ Deck actualizado:', decks[deckIndex].name);
-      showNotification(`Deck actualizado exitosamente`, 'success');
+      showNotification('Deck actualizado exitosamente', 'success');
       return decks[deckIndex];
     }
 
@@ -583,10 +583,10 @@ class StorageService {
    */
   importData(data) {
     try {
-      if (data.decks) this.save('decks', data.decks);
-      if (data.flashcards) this.save('flashcards', data.flashcards);
-      if (data.settings) this.save('settings', data.settings);
-      if (data.stats) this.save('stats', data.stats);
+      if (data.decks) {this.save('decks', data.decks);}
+      if (data.flashcards) {this.save('flashcards', data.flashcards);}
+      if (data.settings) {this.save('settings', data.settings);}
+      if (data.stats) {this.save('stats', data.stats);}
       
       showNotification('Datos importados exitosamente', 'success');
       return true;

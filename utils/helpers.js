@@ -145,11 +145,11 @@ export function showNotification(message, type = 'info', duration = 4000, option
  * @returns {string} - Fecha formateada
  */
 export function formatDate(date, locale = 'es-ES') {
-  if (!date) return 'N/A';
+  if (!date) {return 'N/A';}
   
   const dateObj = typeof date === 'string' ? new Date(date) : date;
   
-  if (isNaN(dateObj.getTime())) return 'Fecha inválida';
+  if (isNaN(dateObj.getTime())) {return 'Fecha inválida';}
   
   return dateObj.toLocaleDateString(locale, {
     year: 'numeric',
@@ -164,18 +164,18 @@ export function formatDate(date, locale = 'es-ES') {
  * @returns {string} - Fecha relativa formateada
  */
 export function formatRelativeDate(date) {
-  if (!date) return 'N/A';
+  if (!date) {return 'N/A';}
   
   const dateObj = typeof date === 'string' ? new Date(date) : date;
   const now = new Date();
   const diffMs = now - dateObj;
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
   
-  if (diffDays === 0) return 'Hoy';
-  if (diffDays === 1) return 'Ayer';
-  if (diffDays < 7) return `Hace ${diffDays} días`;
-  if (diffDays < 30) return `Hace ${Math.floor(diffDays / 7)} semanas`;
-  if (diffDays < 365) return `Hace ${Math.floor(diffDays / 30)} meses`;
+  if (diffDays === 0) {return 'Hoy';}
+  if (diffDays === 1) {return 'Ayer';}
+  if (diffDays < 7) {return `Hace ${diffDays} días`;}
+  if (diffDays < 30) {return `Hace ${Math.floor(diffDays / 7)} semanas`;}
+  if (diffDays < 365) {return `Hace ${Math.floor(diffDays / 30)} meses`;}
   
   return `Hace ${Math.floor(diffDays / 365)} años`;
 }
@@ -186,7 +186,7 @@ export function formatRelativeDate(date) {
  * @returns {string} - Cadena capitalizada
  */
 export function capitalize(str) {
-  if (!str || typeof str !== 'string') return '';
+  if (!str || typeof str !== 'string') {return '';}
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 }
 
@@ -198,8 +198,8 @@ export function capitalize(str) {
  * @returns {string} - Texto truncado
  */
 export function truncateText(text, maxLength, suffix = '...') {
-  if (!text || typeof text !== 'string') return '';
-  if (text.length <= maxLength) return text;
+  if (!text || typeof text !== 'string') {return '';}
+  if (text.length <= maxLength) {return text;}
   
   return text.substring(0, maxLength - suffix.length) + suffix;
 }
@@ -237,7 +237,7 @@ export async function copyToClipboard(text) {
 export function getVisibleElement(selector) {
   const element = document.querySelector(selector);
   
-  if (!element) return null;
+  if (!element) {return null;}
   
   const style = window.getComputedStyle(element);
   if (style.display === 'none' || style.visibility === 'hidden') {
@@ -256,7 +256,7 @@ export function clearForm(formSelector) {
     ? document.querySelector(formSelector) 
     : formSelector;
     
-  if (!form) return;
+  if (!form) {return;}
   
   const inputs = form.querySelectorAll('input, textarea, select');
   inputs.forEach(input => {

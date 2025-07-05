@@ -128,9 +128,7 @@ function createAlgorithmModal() {
  */
 export function closeAlgorithmModal() {
   const modal = document.getElementById('algorithm-modal');
-  if (!modal) {
-    return;
-  }
+  if (!modal) {return;}
   
   modal.style.display = 'none';
 }
@@ -148,15 +146,11 @@ export function selectModalAlgorithm(algorithmId) {
     if (option.dataset.algorithm === algorithmId) {
       option.style.borderColor = '#4caf50';
       option.style.background = 'rgba(76, 175, 80, 0.1)';
-      if (check) {
-        check.style.display = 'block';
-      }
+      if (check) {check.style.display = 'block';}
     } else {
       option.style.borderColor = '#ddd';
       option.style.background = 'white';
-      if (check) {
-        check.style.display = 'none';
-      }
+      if (check) {check.style.display = 'none';}
     }
   });
   
@@ -170,14 +164,10 @@ export function selectModalAlgorithm(algorithmId) {
  */
 function updateAlgorithmDetails(algorithmId) {
   const config = ALGORITHM_CONFIGS[algorithmId];
-  if (!config) {
-    return;
-  }
+  if (!config) {return;}
   
   const detailsContainer = document.getElementById('algorithm-params');
-  if (!detailsContainer) {
-    return;
-  }
+  if (!detailsContainer) {return;}
   
   const paramsHTML = Object.entries(config.defaultParams).map(([key, value]) => `
     <div class="param-item">
@@ -305,9 +295,7 @@ export async function loadAlgorithmConfig() {
  */
 function updateAlgorithmDisplay(algorithmId) {
   const config = ALGORITHM_CONFIGS[algorithmId];
-  if (!config) {
-    return;
-  }
+  if (!config) {return;}
   
   // Actualizar elementos de UI que muestran el algoritmo actual
   const algorithmDisplay = document.getElementById('current-algorithm');

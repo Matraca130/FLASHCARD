@@ -10,13 +10,13 @@ import { showNotification } from './utils/helpers.js';
  */
 export async function checkAuthStatus() {
   const token = localStorage.getItem('authToken');
-  if (!token) return;
+  if (!token) {return;}
   
   try {
     const data = await api('/api/auth/verify');
     if (data && data.user) {
       store.setState({ currentUser: data.user });
-      if (window.updateAuthUI) window.updateAuthUI();
+      if (window.updateAuthUI) {window.updateAuthUI();}
       await loadDashboardData();
     } else {
       clearAuthData();
@@ -53,8 +53,8 @@ export async function login(email, password) {
     store.setState({ currentUser: result.user });
     
     // Actualizar UI
-    if (window.updateAuthUI) window.updateAuthUI();
-    if (window.hideLoginModal) window.hideLoginModal();
+    if (window.updateAuthUI) {window.updateAuthUI();}
+    if (window.hideLoginModal) {window.hideLoginModal();}
     
     // Cargar datos del dashboard
     await loadDashboardData();
@@ -104,8 +104,8 @@ export function logout() {
   clearAuthData();
   
   // Actualizar UI
-  if (window.updateAuthUI) window.updateAuthUI();
-  if (window.showSection) window.showSection('inicio');
+  if (window.updateAuthUI) {window.updateAuthUI();}
+  if (window.showSection) {window.showSection('inicio');}
   
   showNotification('Sesión cerrada', 'info');
 }

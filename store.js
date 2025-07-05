@@ -494,11 +494,11 @@ class StudyingFlashStore {
 
   matchesFilter(updates, filter) {
     if (typeof filter === 'string') {
-      return updates.hasOwnProperty(filter);
+      return Object.prototype.hasOwnProperty.call(updates, filter);
     }
     
     if (Array.isArray(filter)) {
-      return filter.some(key => updates.hasOwnProperty(key));
+      return filter.some(key => Object.prototype.hasOwnProperty.call(updates, key));
     }
     
     if (typeof filter === 'function') {
@@ -681,7 +681,7 @@ export function createSimpleStore() {
       this._subs.push(fn);
       return () => {
         const index = this._subs.indexOf(fn);
-        if (index > -1) this._subs.splice(index, 1);
+        if (index > -1) {this._subs.splice(index, 1);}
         unsubscribe();
       };
     }

@@ -26,7 +26,7 @@ export async function loadManageDecks() {
  */
 function renderManageDecks(decks) {
   const container = document.getElementById('manage-decks');
-  if (!container) return;
+  if (!container) {return;}
   
   if (!Array.isArray(decks) || decks.length === 0) {
     renderEmptyDecksState(container);
@@ -134,9 +134,9 @@ function showEditDeckForm(deck) {
   const descriptionInput = document.getElementById('edit-deck-description');
   const publicInput = document.getElementById('edit-deck-public');
   
-  if (nameInput) nameInput.value = deck.name || '';
-  if (descriptionInput) descriptionInput.value = deck.description || '';
-  if (publicInput) publicInput.checked = deck.is_public || false;
+  if (nameInput) {nameInput.value = deck.name || '';}
+  if (descriptionInput) {descriptionInput.value = deck.description || '';}
+  if (publicInput) {publicInput.checked = deck.is_public || false;}
   
   // Configurar botón de guardar
   const saveBtn = document.getElementById('save-deck-btn');
@@ -272,7 +272,7 @@ function renderDeckFlashcards(flashcards, deckId) {
   const container = document.getElementById('deck-flashcards') || 
                    document.getElementById('manage-decks');
   
-  if (!container) return;
+  if (!container) {return;}
   
   if (!Array.isArray(flashcards) || flashcards.length === 0) {
     container.innerHTML = `

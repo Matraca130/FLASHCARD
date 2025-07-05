@@ -4,36 +4,72 @@ export default defineConfig({
   // Base path para GitHub Pages
   base: '/FLASHCARD/',
   
-  // Configuración de build que copia archivos sin bundling
+  // Configuración de build simplificada
   build: {
-    // Directorio de salida
     outDir: 'dist',
-    
-    // Limpiar directorio antes de build
     emptyOutDir: true,
+    sourcemap: true,
     
-    // Configuración para copiar archivos sin bundling
+    // Configuración simplificada de rollup
     rollupOptions: {
-      // No hacer bundling de módulos
-      external: () => true,
-      input: 'index.html'
+      output: {
+        // Nombres de archivos con hash para cache busting
+        chunkFileNames: 'assets/[name]-[hash].js',
+        entryFileNames: 'assets/[name]-[hash].js',
+        assetFileNames: 'assets/[name]-[hash].[ext]'
+      }
     },
     
-    // No minificar para evitar problemas
-    minify: false,
+    // Minificación básica
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: false, // Mantener console.log para debugging
+        drop_debugger: true
+      }
+    },
     
-    // Copiar archivos estáticos
-    copyPublicDir: true
+    // Target para compatibilidad
+    target: 'es2020',
+    
+    // Límite de warning para chunks
+    chunkSizeWarningLimit: 1000
   },
   
-  // Configuración de archivos públicos
-  publicDir: false, // No usar directorio public por defecto
-  
-  // Configuración de servidor de desarrollo
+  // Configuración de desarrollo
   server: {
-    port: 3000,
-    open: true,
-    cors: true
+    port: 5173,
+    host: true,
+    open: false,
+    
+    // Proxy para API backend
+    proxy: {
+      '/api': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+        secure: false
+      }
+    }
+  },
+  
+  // Configuración de preview
+  preview: {
+    port: 4173,
+    host: true,
+    open: false
+  },
+  
+  // Directorio público
+  publicDir: 'public',
+  
+  // Configuración de CSS
+  css: {
+    devSourcemap: true
+  },
+  
+  // Optimización de dependencias
+  optimizeDeps: {
+    exclude: ['sw.js']
   }
 });
 

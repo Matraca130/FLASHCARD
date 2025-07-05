@@ -68,9 +68,9 @@ export async function editFlashcard(flashcardId) {
     const backInput = document.getElementById('flashcard-back');
     const deckSelect = document.getElementById('flashcard-deck');
     
-    if (frontInput) frontInput.value = flashcard.front || '';
-    if (backInput) backInput.value = flashcard.back || '';
-    if (deckSelect) deckSelect.value = flashcard.deck_id || '';
+    if (frontInput) {frontInput.value = flashcard.front || '';}
+    if (backInput) {backInput.value = flashcard.back || '';}
+    if (deckSelect) {deckSelect.value = flashcard.deck_id || '';}
     
     // Cambiar texto del botón
     const submitBtn = document.getElementById('create-flashcard-btn');

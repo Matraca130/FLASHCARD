@@ -1,6 +1,6 @@
 import { api } from './apiClient.js';
 import { store } from './store/store.js';
-import { localStorageService } from './storage.service.js';
+import storageService from './storage.service.js';
 import { validateDeckData, validateFlashcardData } from './utils/validation.js';
 import { apiWithFallback, performCrudOperation, FALLBACK_DATA } from './utils/apiHelpers.js';
 import { showNotification, clearForm, getVisibleElement } from './utils/helpers.js';
@@ -14,7 +14,7 @@ export async function loadDecksForCreation() {
   try {
     const decks = await apiWithFallback(
       '/api/decks',
-      localStorageService?.getDecks() || FALLBACK_DATA.decks
+      storageService?.getDecks() || FALLBACK_DATA.decks
     );
     
     const deckSelect = document.getElementById('flashcard-deck');
@@ -49,9 +49,9 @@ export function openCreateDeckModal() {
  * @returns {Promise<Object>} - Deck creado
  */
 export async function createDeck(deckData = {}) {
-  const nameInput = document.getElementById("deck-name");
-  const descriptionInput = document.getElementById("deck-description");
-  const publicInput = document.getElementById("deck-public");
+  const nameInput = document.getElementById('deck-name');
+  const descriptionInput = document.getElementById('deck-description');
+  const publicInput = document.getElementById('deck-public');
 
   const name = deckData.name || nameInput?.value?.trim() || '';
   const description = deckData.description || descriptionInput?.value?.trim() || '';
@@ -87,8 +87,8 @@ export async function createDeck(deckData = {}) {
       async () => {
         try {
           // Intentar crear en API primero
-          const response = await api("/api/decks", {
-            method: "POST",
+          const response = await api('/api/decks', {
+            method: 'POST',
             body: JSON.stringify(data)
           });
           
@@ -98,8 +98,8 @@ export async function createDeck(deckData = {}) {
           
           return response.data;
         } catch (error) {
-          console.log("API no disponible, usando almacenamiento local");
-          return localStorageService?.createDeck(data) || { ...data, id: Date.now() };
+          console.log('API no disponible, usando almacenamiento local');
+          return storageService?.createDeck(data) || { ...data, id: Date.now() };
         }
       },
       {
@@ -118,13 +118,13 @@ export async function createDeck(deckData = {}) {
       if (nameInput) {
         nameInput.classList.remove('field-valid', 'field-invalid');
         const validationMsg = nameInput.parentNode.querySelector('.validation-message');
-        if (validationMsg) validationMsg.remove();
+        if (validationMsg) {validationMsg.remove();}
       }
       
       if (descriptionInput) {
         descriptionInput.classList.remove('field-valid', 'field-invalid');
         const validationMsg = descriptionInput.parentNode.querySelector('.validation-message');
-        if (validationMsg) validationMsg.remove();
+        if (validationMsg) {validationMsg.remove();}
       }
     }
     
@@ -189,7 +189,7 @@ export async function createFlashcard() {
           });
         } catch (error) {
           console.log('API no disponible, usando almacenamiento local');
-          return localStorageService?.createFlashcard({
+          return storageService?.createFlashcard({
             deck_id: deckId,
             front: front,
             back: back
@@ -316,15 +316,15 @@ export function initializeCreateEvents() {
   const createDeckBtn = document.getElementById('create-deck-btn');
   if (createDeckBtn) {
     console.log("Botón 'Crear Deck' encontrado. Adjuntando event listener.");
-    createDeckBtn.addEventListener("click", async (e) => {
+    createDeckBtn.addEventListener('click', async (e) => {
       e.preventDefault();
       console.log("Click en 'Crear Deck' detectado.");
       
-      const name = document.getElementById("deck-name")?.value?.trim() || '';
-      const description = document.getElementById("deck-description")?.value?.trim() || '';
-      const isPublic = document.getElementById("deck-public")?.checked || false;
+      const name = document.getElementById('deck-name')?.value?.trim() || '';
+      const description = document.getElementById('deck-description')?.value?.trim() || '';
+      const isPublic = document.getElementById('deck-public')?.checked || false;
       
-      console.log("Datos del deck:", { name, description, isPublic });
+      console.log('Datos del deck:', { name, description, isPublic });
       await createDeck({ name, description, isPublic });
     });
   } else {
@@ -334,7 +334,7 @@ export function initializeCreateEvents() {
   // Event listener para crear flashcard
   const createFlashcardBtn = document.getElementById('create-flashcard-btn');
   if (createFlashcardBtn) {
-    createFlashcardBtn.addEventListener("click", createFlashcard);
+    createFlashcardBtn.addEventListener('click', createFlashcard);
   }
   
   // Event listener para importar flashcards

@@ -142,3 +142,42 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+
+# Frontend build artifacts
+dist/
+build/
+*.min.js
+*.min.css
+index-*.js
+index-*.css
+*-[A-Za-z0-9]*.js
+*-[A-Za-z0-9]*.css
+
+# Vite build outputs
+assets/
+.vite/
+
+# Cypress
+cypress/videos/
+cypress/screenshots/
+cypress/downloads/
+
+# ESLint cache
+.eslintcache
+
+# Prettier cache
+.prettiercache
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Storybook build outputs
+storybook-static/
+
+# Bundle analyzer
+bundle-analyzer-report.html
+
+# PWA generated files
+sw.js.map
+workbox-*.js
+
