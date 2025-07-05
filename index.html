@@ -23,6 +23,7 @@
   <link rel="stylesheet" href="./styles.css">
   <link rel="stylesheet" href="./meta-dark-theme.css">
   <link rel="stylesheet" href="./responsive.css">
+  <link rel="stylesheet" href="./apple-mobile.css">
   
   <!-- Cargar iconos SVG embebidos -->
   <style>
@@ -174,6 +175,122 @@
   
 </head>
 <body>
+  <!-- ===== ESTRUCTURA APPLE-STYLE MÓVIL ===== -->
+  
+  <!-- Header Apple-style (solo móvil) -->
+  <header class="apple-header">
+    <button class="apple-menu-btn" id="apple-menu-btn" aria-label="Abrir menú">
+      <div class="apple-hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </button>
+    <a href="#" class="apple-logo">StudyingFlash</a>
+    <div style="width: 44px;"></div> <!-- Spacer para centrar logo -->
+  </header>
+  
+  <!-- Overlay del sidebar -->
+  <div class="apple-sidebar-overlay" id="apple-sidebar-overlay"></div>
+  
+  <!-- Sidebar Apple-style -->
+  <nav class="apple-sidebar" id="apple-sidebar">
+    <div class="apple-sidebar-header">
+      <span class="apple-sidebar-title">Menú</span>
+      <button class="apple-close-btn" id="apple-close-btn" aria-label="Cerrar menú">
+        ✕
+      </button>
+    </div>
+    <div class="apple-nav">
+      <a href="#" class="apple-nav-item active" data-section="dashboard">
+        <svg class="apple-nav-icon" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
+        </svg>
+        Dashboard
+      </a>
+      <a href="#" class="apple-nav-item" data-section="estudiar">
+        <svg class="apple-nav-icon" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+        </svg>
+        Estudiar
+      </a>
+      <a href="#" class="apple-nav-item" data-section="crear">
+        <svg class="apple-nav-icon" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+        </svg>
+        Crear Decks
+      </a>
+      <a href="#" class="apple-nav-item" data-section="gestionar">
+        <svg class="apple-nav-icon" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+        </svg>
+        Gestionar
+      </a>
+      <a href="#" class="apple-nav-item" data-section="ranking">
+        <svg class="apple-nav-icon" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M7.5 21H2V9h5.5v12zm7.25-18h-5.5v18h5.5V3zM22 11h-5.5v10H22V11z"/>
+        </svg>
+        Ranking
+      </a>
+      <a href="#" class="apple-nav-item" data-section="configuracion">
+        <svg class="apple-nav-icon" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.82,11.69,4.82,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/>
+        </svg>
+        Configuración
+      </a>
+    </div>
+  </nav>
+  
+  <!-- Contenido principal Apple-style (solo móvil) -->
+  <main class="apple-main" id="apple-main">
+    <!-- Sección hero con acción principal -->
+    <section class="apple-hero-section">
+      <button class="apple-primary-action" id="apple-login-btn">
+        👤 Iniciar Sesión
+      </button>
+    </section>
+    
+    <!-- Tarjeta de stats -->
+    <div class="apple-stats-card">
+      <div class="apple-stats-content">
+        <div>
+          <div class="apple-level">Nivel 1</div>
+          <div class="apple-points">0 puntos</div>
+        </div>
+        <div>
+          🌱
+        </div>
+      </div>
+    </div>
+    
+    <!-- Sección de acciones secundarias -->
+    <section class="apple-actions-section">
+      <button class="apple-secondary-action" data-section="estudiar">
+        📚 Estudiar
+      </button>
+      <button class="apple-secondary-action" data-section="crear">
+        ➕ Crear Decks
+      </button>
+    </section>
+    
+    <!-- Sección de progreso -->
+    <section class="apple-progress-section">
+      <div class="apple-progress-header">
+        <h3 class="apple-progress-title">Progreso Semanal</h3>
+        <div class="apple-progress-controls">
+          <button class="apple-progress-btn active">7D</button>
+          <button class="apple-progress-btn">30D</button>
+          <button class="apple-progress-btn">90D</button>
+        </div>
+      </div>
+      <div style="height: 120px; background: #f8f9fa; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #666;">
+        📊 Gráfico de progreso
+      </div>
+    </section>
+  </main>
+  
+  <!-- ===== ESTRUCTURA ORIGINAL (DESKTOP) ===== -->
+  
   <div class="app-container">
     <!-- Background Effects -->
     <div class="background-effects">

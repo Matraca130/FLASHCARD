@@ -1,0 +1,396 @@
+/*
+ * APPLE-STYLE MOBILE LAYOUT
+ * Menú lateral slide-in inspirado en Apple.com
+ * Mantiene funcionalidad existente intacta
+ */
+
+/* ===== VARIABLES APPLE-STYLE ===== */
+:root {
+  --apple-blue: #007AFF;
+  --apple-gray: #F2F2F7;
+  --apple-dark-gray: #8E8E93;
+  --apple-black: #1D1D1F;
+  --apple-white: #FFFFFF;
+  --apple-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  --apple-radius: 12px;
+  --apple-transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --sidebar-width: 280px;
+}
+
+/* ===== LAYOUT BASE MÓVIL ===== */
+@media (max-width: 768px) {
+  
+  /* Reset de estructura existente para móvil */
+  .app-container {
+    position: relative;
+    overflow-x: hidden;
+  }
+  
+  /* Header Apple-style */
+  .apple-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    z-index: 1000;
+  }
+  
+  .apple-menu-btn {
+    width: 44px;
+    height: 44px;
+    border: none;
+    background: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    transition: var(--apple-transition);
+    cursor: pointer;
+  }
+  
+  .apple-menu-btn:hover {
+    background: var(--apple-gray);
+  }
+  
+  .apple-menu-btn:active {
+    transform: scale(0.95);
+  }
+  
+  /* Icono hamburguesa Apple-style */
+  .apple-hamburger {
+    width: 20px;
+    height: 16px;
+    position: relative;
+  }
+  
+  .apple-hamburger span {
+    display: block;
+    width: 100%;
+    height: 2px;
+    background: var(--apple-black);
+    border-radius: 1px;
+    position: absolute;
+    transition: var(--apple-transition);
+  }
+  
+  .apple-hamburger span:nth-child(1) { top: 0; }
+  .apple-hamburger span:nth-child(2) { top: 7px; }
+  .apple-hamburger span:nth-child(3) { top: 14px; }
+  
+  /* Animación a X */
+  .apple-menu-btn.active .apple-hamburger span:nth-child(1) {
+    transform: rotate(45deg);
+    top: 7px;
+  }
+  
+  .apple-menu-btn.active .apple-hamburger span:nth-child(2) {
+    opacity: 0;
+  }
+  
+  .apple-menu-btn.active .apple-hamburger span:nth-child(3) {
+    transform: rotate(-45deg);
+    top: 7px;
+  }
+  
+  /* Logo en header */
+  .apple-logo {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--apple-black);
+    text-decoration: none;
+    letter-spacing: -0.5px;
+  }
+  
+  /* ===== MENÚ LATERAL SLIDE-IN ===== */
+  
+  /* Overlay */
+  .apple-sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    opacity: 0;
+    visibility: hidden;
+    transition: var(--apple-transition);
+    z-index: 1500;
+  }
+  
+  .apple-sidebar-overlay.active {
+    opacity: 1;
+    visibility: visible;
+  }
+  
+  /* Sidebar */
+  .apple-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: var(--sidebar-width);
+    height: 100%;
+    background: var(--apple-white);
+    transform: translateX(-100%);
+    transition: var(--apple-transition);
+    z-index: 2000;
+    box-shadow: var(--apple-shadow);
+  }
+  
+  .apple-sidebar.active {
+    transform: translateX(0);
+  }
+  
+  /* Header del sidebar */
+  .apple-sidebar-header {
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    border-bottom: 1px solid var(--apple-gray);
+  }
+  
+  .apple-sidebar-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--apple-black);
+  }
+  
+  .apple-close-btn {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: var(--apple-gray);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--apple-transition);
+  }
+  
+  .apple-close-btn:hover {
+    background: var(--apple-dark-gray);
+  }
+  
+  /* Navegación del sidebar */
+  .apple-nav {
+    padding: 20px 0;
+  }
+  
+  .apple-nav-item {
+    display: block;
+    padding: 16px 20px;
+    color: var(--apple-black);
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 400;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    transition: var(--apple-transition);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .apple-nav-item:hover {
+    background: var(--apple-gray);
+  }
+  
+  .apple-nav-item.active {
+    background: rgba(0, 122, 255, 0.1);
+    color: var(--apple-blue);
+    font-weight: 500;
+  }
+  
+  .apple-nav-icon {
+    width: 24px;
+    height: 24px;
+    opacity: 0.8;
+  }
+  
+  /* ===== CONTENIDO PRINCIPAL REORGANIZADO ===== */
+  
+  /* Ajustar contenido para header fijo */
+  .apple-main {
+    margin-top: 60px;
+    padding: 20px;
+    min-height: calc(100vh - 60px);
+  }
+  
+  /* Sección de acción principal */
+  .apple-hero-section {
+    text-align: center;
+    padding: 40px 0;
+    margin-bottom: 30px;
+  }
+  
+  .apple-primary-action {
+    background: var(--apple-blue);
+    color: white;
+    border: none;
+    padding: 16px 32px;
+    border-radius: var(--apple-radius);
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--apple-transition);
+    box-shadow: var(--apple-shadow);
+    margin-bottom: 20px;
+    width: 100%;
+    max-width: 280px;
+  }
+  
+  .apple-primary-action:hover {
+    background: #0056CC;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 122, 255, 0.3);
+  }
+  
+  .apple-primary-action:active {
+    transform: translateY(0);
+  }
+  
+  /* Tarjeta de stats */
+  .apple-stats-card {
+    background: var(--apple-white);
+    border-radius: var(--apple-radius);
+    padding: 20px;
+    margin-bottom: 30px;
+    box-shadow: var(--apple-shadow);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+  }
+  
+  .apple-stats-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .apple-level {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--apple-black);
+  }
+  
+  .apple-points {
+    font-size: 14px;
+    color: var(--apple-dark-gray);
+  }
+  
+  /* Sección de acciones secundarias */
+  .apple-actions-section {
+    margin-bottom: 30px;
+  }
+  
+  .apple-secondary-action {
+    background: var(--apple-gray);
+    color: var(--apple-black);
+    border: none;
+    padding: 14px 24px;
+    border-radius: var(--apple-radius);
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--apple-transition);
+    width: 100%;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  
+  .apple-secondary-action:hover {
+    background: #E5E5EA;
+    transform: translateY(-1px);
+  }
+  
+  /* Sección de progreso */
+  .apple-progress-section {
+    background: var(--apple-white);
+    border-radius: var(--apple-radius);
+    padding: 20px;
+    box-shadow: var(--apple-shadow);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+  }
+  
+  .apple-progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  
+  .apple-progress-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--apple-black);
+  }
+  
+  .apple-progress-controls {
+    display: flex;
+    gap: 8px;
+  }
+  
+  .apple-progress-btn {
+    padding: 6px 12px;
+    border: 1px solid var(--apple-dark-gray);
+    background: transparent;
+    border-radius: 6px;
+    font-size: 12px;
+    color: var(--apple-dark-gray);
+    cursor: pointer;
+    transition: var(--apple-transition);
+  }
+  
+  .apple-progress-btn.active {
+    background: var(--apple-blue);
+    color: white;
+    border-color: var(--apple-blue);
+  }
+  
+  /* Ocultar navegación original en móvil */
+  .navbar {
+    display: none;
+  }
+  
+  /* Sistema de navegación por pestañas - SOLO MÓVIL */
+  .section {
+    display: none; /* Ocultar todas las secciones */
+  }
+  
+  .section.active {
+    display: block; /* Mostrar solo la sección activa */
+  }
+  
+  /* Mantener funcionalidad de charts */
+  .charts-grid {
+    display: none; /* Ocultar temporalmente para layout limpio */
+  }
+}
+
+/* ===== DESKTOP: MANTENER DISEÑO ORIGINAL ===== */
+@media (min-width: 769px) {
+  /* Ocultar elementos Apple-style en desktop */
+  .apple-header,
+  .apple-sidebar,
+  .apple-sidebar-overlay,
+  .apple-main {
+    display: none;
+  }
+  
+  /* Restaurar comportamiento original de secciones en desktop */
+  .section {
+    display: block !important; /* Forzar visibilidad en desktop */
+  }
+}
+
