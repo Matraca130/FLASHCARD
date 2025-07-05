@@ -48,7 +48,9 @@ Cypress.Commands.add('isInViewport', { prevSubject: true }, (subject) => {
 
 // Command to wait for animations to complete
 Cypress.Commands.add('waitForAnimations', () => {
-  cy.wait(500); // Wait for CSS transitions/animations
+  // Wait for CSS transitions/animations to complete by checking for stable DOM
+  cy.get('body').should('be.visible');
+  cy.document().its('readyState').should('equal', 'complete');
 });
 
 // Command to mock API responses

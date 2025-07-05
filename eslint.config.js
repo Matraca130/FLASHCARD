@@ -1,5 +1,6 @@
 import js from '@eslint/js';
 import globals from 'globals';
+import cypress from 'eslint-plugin-cypress';
 
 export default [
   js.configs.recommended,
@@ -15,7 +16,6 @@ export default [
       '*-[A-Za-z0-9]*.css',
       'sw.js',
       'node_modules/**/*',
-      'cypress/**/*',
       'logs/**/*',
       'backend_app/**/*',
       '*.py'
@@ -28,6 +28,18 @@ export default [
       globals: {
         ...globals.browser,
         ...globals.node,
+        // Node 20+ globals
+        FormData: 'readonly',
+        AbortController: 'readonly',
+        AbortSignal: 'readonly',
+        atob: 'readonly',
+        btoa: 'readonly',
+        fetch: 'readonly',
+        Request: 'readonly',
+        Response: 'readonly',
+        Headers: 'readonly',
+        URL: 'readonly',
+        URLSearchParams: 'readonly',
         // Third-party libraries
         Chart: 'readonly',
         particlesJS: 'readonly',
@@ -54,8 +66,8 @@ export default [
       'no-eval': 'error',
       'no-implied-eval': 'error',
       
-      // Allow case declarations (common pattern)
-      'no-case-declarations': 'off',
+      // Case declarations - require braces
+      'no-case-declarations': 'error',
       
       // Style (basic)
       'indent': ['warn', 2, { SwitchCase: 1 }],
@@ -71,18 +83,65 @@ export default [
     }
   },
   {
-    // Specific rules for test files
-    files: ['**/*.spec.js', '**/cypress/**/*.js'],
+    // Cypress test files
+    files: ['cypress/**/*.js', '**/*.cy.js', '**/*.spec.js'],
+    plugins: {
+      cypress
+    },
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+        // Cypress globals
+        cy: 'readonly',
+        Cypress: 'readonly',
+        describe: 'readonly',
+        it: 'readonly',
+        before: 'readonly',
+        after: 'readonly',
+        beforeEach: 'readonly',
+        afterEach: 'readonly',
+        expect: 'readonly',
+        assert: 'readonly',
+        context: 'readonly'
+      }
+    },
     rules: {
+      ...cypress.configs.recommended.rules,
       'no-unused-vars': 'off',
-      'no-undef': 'off' // Cypress globals are handled above
+      'no-undef': 'off' // Cypress globals are defined above
     }
   },
   {
-    // Specific rules for config files
-    files: ['*.config.js', 'vite.config.js'],
+    // Vitest test files
+    files: ['tests/**/*.js', '**/*.test.js'],
     languageOptions: {
-      sourceType: 'module'
+      globals: {
+        ...globals.node,
+        // Vitest globals
+        describe: 'readonly',
+        it: 'readonly',
+        test: 'readonly',
+        expect: 'readonly',
+        beforeEach: 'readonly',
+        afterEach: 'readonly',
+        beforeAll: 'readonly',
+        afterAll: 'readonly',
+        vi: 'readonly'
+      }
+    },
+    rules: {
+      'no-unused-vars': 'off',
+      'no-undef': 'off'
+    }
+  },
+  {
+    // Config files
+    files: ['*.config.js', 'vite.config.js', 'vitest.config.js'],
+    languageOptions: {
+      sourceType: 'module',
+      globals: {
+        ...globals.node
+      }
     },
     rules: {
       'no-undef': 'off' // Config files may use build-time variables

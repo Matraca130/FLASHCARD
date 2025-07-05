@@ -7,8 +7,8 @@ import { login, logout, register } from './auth.service.js';
 import { startStudySession, submitAnswer, pauseStudySession, resumeStudySession } from './study.service.js';
 import { createDeck, createFlashcard } from './create.service.js';
 import { deleteDeck, editDeck, exportDeck } from './manage.service.js';
-import { showNotification, validateRequiredFields } from './utils/helpers.js';
-import { validateLoginCredentials, validateDeckData, validateFlashcardData } from './utils/validation.js';
+import { showNotification } from './utils/helpers.js';
+import { validateLoginCredentials, validateDeckData, validateFlashcardData, validateRequiredFields } from './utils/validation.js';
 
 // Configuración del sistema de bindings
 const BINDINGS_CONFIG = {

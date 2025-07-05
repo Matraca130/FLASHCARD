@@ -9,12 +9,12 @@ import './bindings.js';
 
 // Importar servicios refactorizados
 import { loadGamificationData } from './gamification.service.js';
-import { initializeAlgorithmModal } from './algorithms.service.js';
-import { initializeFlashcardEvents } from './flashcards.service.js';
-import { initializeImportExportEvents } from './import-export.service.js';
-import { initializeCreateEvents } from './create.service.js';
-import { initializeActivityHeatmap } from './activity-heatmap.service.js';
-import { initializeParticlesOnReady } from './particles.service.js';
+// import { initializeAlgorithmModal } from './algorithms.service.js';
+// import { initializeFlashcardEvents } from './flashcards.service.js';
+// import { initializeImportExportEvents } from './import-export.service.js';
+// import { initializeCreateEvents } from './create.service.js';
+// import { initializeActivityHeatmap } from './activity-heatmap.service.js';
+// import { initializeParticlesOnReady } from './particles.service.js';
 import { initializeCharts } from './charts.js';
 
 // Importar utilidades comunes
@@ -139,11 +139,11 @@ async function initializeServices() {
   
   const services = [
     { name: 'gamification', init: loadGamificationData, critical: false },
-    { name: 'algorithms', init: initializeAlgorithmModal, critical: false },
-    { name: 'flashcards', init: initializeFlashcardEvents, critical: true },
-    { name: 'importExport', init: initializeImportExportEvents, critical: false },
-    { name: 'create', init: initializeCreateEvents, critical: true },
-    { name: 'activityHeatmap', init: initializeActivityHeatmap, critical: false }
+    // { name: 'algorithms', init: initializeAlgorithmModal, critical: false },
+    // { name: 'flashcards', init: initializeFlashcardEvents, critical: true },
+    // { name: 'importExport', init: initializeImportExportEvents, critical: false },
+    // { name: 'create', init: initializeCreateEvents, critical: true },
+    // { name: 'activityHeatmap', init: initializeActivityHeatmap, critical: false }
   ];
 
   for (const service of services) {
@@ -185,7 +185,7 @@ async function initializeVisualComponents() {
   try {
     // Inicializar partículas con delay
     setTimeout(() => {
-      initializeParticlesOnReady();
+      // initializeParticlesOnReady();
       console.log('  ✅ Partículas inicializadas');
     }, APP_CONFIG.initialization.particlesDelay);
     
