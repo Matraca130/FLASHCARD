@@ -235,7 +235,7 @@ class DeckService(BaseService):
             # Invalidar cache
             cache_manager.delete_pattern(f"user_decks:{user_id}:*")
             
-            return self._success_response(deck)
+            return self._success_response(deck.to_dict())
             
         except Exception as e:
             db.session.rollback()
@@ -252,7 +252,7 @@ class DeckService(BaseService):
             if not deck:
                 return self._error_response('Deck no encontrado')
             
-            return self._success_response(deck)
+            return self._success_response(deck.to_dict())
             
         except Exception as e:
             self.logger.error(f"Error getting deck: {str(e)}")
@@ -279,7 +279,7 @@ class DeckService(BaseService):
             # Invalidar cache
             cache_manager.delete_pattern(f"user_decks:{user_id}:*")
             
-            return self._success_response(deck)
+            return self._success_response(deck.to_dict())
             
         except Exception as e:
             db.session.rollback()
@@ -393,7 +393,7 @@ class DeckService(BaseService):
             # Invalidar cache
             cache_manager.delete_pattern(f"user_decks:{user_id}:*")
             
-            return self._success_response(new_deck)
+            return self._success_response(new_deck.to_dict())
             
         except Exception as e:
             db.session.rollback()

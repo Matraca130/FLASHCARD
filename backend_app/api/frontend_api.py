@@ -8,6 +8,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from backend_app.extensions import db
 from backend_app.models import User, Deck, Flashcard, StudySession, CardReview
 from backend_app.utils import get_current_user_id
+from backend_app.utils.statistics import calculate_study_streak
 from datetime import datetime, timedelta
 import logging
 
@@ -63,7 +64,7 @@ def get_user_profile():
                 'total_decks': total_decks,
                 'total_cards': total_cards,
                 'total_reviews': total_reviews,
-                'study_streak': 0  # TODO: Implementar cálculo de racha
+                'study_streak': calculate_study_streak(user_id)  # Implemented study streak calculation
             },
             'recent_activity': [
                 {
