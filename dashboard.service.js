@@ -2,7 +2,7 @@ import { api } from './apiClient.js';
 import { initializeCharts, updateProgressChart, updateAccuracyChart, updateChartPeriod } from '../charts.js';
 import { generateActivityHeatmap, updateHeatmapWithData } from './activity-heatmap.service.js';
 import { multipleApiWithFallback, apiWithFallback, FALLBACK_DATA } from './utils/apiHelpers.js';
-import { showNotification, formatDate, formatRelativeDate } from './utils/helpers.js';
+import { showNotification, formatDate, formatRelativeDate, renderEmptyDecksState } from './utils/helpers.js';
 
 /**
  * Carga estadísticas y decks del usuario en el Dashboard
@@ -175,14 +175,7 @@ function updateDashboardDecks(decks) {
   if (!decksList) return;
   
   if (decks.length === 0) {
-    decksList.innerHTML = `
-      <div class="empty-state">
-        <p>No tienes decks creados aún</p>
-        <button onclick="window.showSection('crear')" class="btn btn-primary">
-          Crear tu primer deck
-        </button>
-      </div>
-    `;
+    renderEmptyDecksState(decksList);
     return;
   }
   

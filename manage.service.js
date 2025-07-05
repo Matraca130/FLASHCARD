@@ -2,7 +2,7 @@ import { api } from './apiClient.js';
 import { store } from './store/store.js';
 import { validateDeckData } from './utils/validation.js';
 import { apiWithFallback, performCrudOperation, FALLBACK_DATA } from './utils/apiHelpers.js';
-import { showNotification, formatDate, formatRelativeDate } from './utils/helpers.js';
+import { showNotification, formatDate, formatRelativeDate, renderEmptyDecksState } from './utils/helpers.js';
 
 /**
  * Carga los decks del usuario para gestión y los renderiza
@@ -29,14 +29,7 @@ function renderManageDecks(decks) {
   if (!container) return;
   
   if (!Array.isArray(decks) || decks.length === 0) {
-    container.innerHTML = `
-      <div class="empty-state">
-        <p class="text-muted">No tienes decks creados.</p>
-        <button onclick="window.showSection('crear')" class="btn btn-primary">
-          Crear tu primer deck
-        </button>
-      </div>
-    `;
+    renderEmptyDecksState(container);
     return;
   }
   

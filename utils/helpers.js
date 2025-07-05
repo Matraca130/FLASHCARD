@@ -210,3 +210,146 @@ export function clearForm(formSelector) {
   });
 }
 
+
+/**
+ * Renderiza un estado vacío en un contenedor
+ * @param {HTMLElement|string} container - Elemento contenedor o selector CSS
+ * @param {Object} options - Opciones de configuración
+ * @param {string} options.message - Mensaje a mostrar
+ * @param {string} options.actionText - Texto del botón de acción (opcional)
+ * @param {string} options.actionTarget - Sección a mostrar al hacer click (opcional)
+ * @param {Function} options.actionCallback - Función a ejecutar al hacer click (opcional)
+ * @param {string} options.icon - Icono a mostrar (opcional)
+ * @param {string} options.className - Clase CSS adicional (opcional)
+ */
+export function renderEmptyState(container, options = {}) {
+  const {
+    message = 'No hay elementos disponibles',
+    actionText = null,
+    actionTarget = null,
+    actionCallback = null,
+    icon = null,
+    className = ''
+  } = options;
+  
+  // Obtener elemento contenedor
+  const element = typeof container === 'string' 
+    ? document.querySelector(container) 
+    : container;
+    
+  if (!element) {
+    console.warn('Contenedor no encontrado para renderizar estado vacío');
+    return;
+  }
+  
+  // Construir HTML del estado vacío
+  let html = `<div class="empty-state ${className}">`;
+  
+  // Agregar icono si se especifica
+  if (icon) {
+    html += `<div class="empty-state-icon">${icon}</div>`;
+  }
+  
+  // Agregar mensaje
+  html += `<p class="text-muted empty-state-message">${message}</p>`;
+  
+  // Agregar botón de acción si se especifica
+  if (actionText) {
+    if (actionTarget) {
+      // Acción de navegación
+      html += `
+        <button onclick="window.showSection('${actionTarget}')" class="btn btn-primary empty-state-action">
+          ${actionText}
+        </button>
+      `;
+    } else if (actionCallback) {
+      // Acción personalizada
+      const callbackName = `emptyStateAction_${Date.now()}`;
+      window[callbackName] = actionCallback;
+      html += `
+        <button onclick="window.${callbackName}()" class="btn btn-primary empty-state-action">
+          ${actionText}
+        </button>
+      `;
+    }
+  }
+  
+  html += '</div>';
+  
+  // Insertar HTML en el contenedor
+  element.innerHTML = html;
+}
+
+/**
+ * Renderiza estado vacío específico para decks
+ * @param {HTMLElement|string} container - Elemento contenedor o selector CSS
+ * @param {Object} options - Opciones adicionales
+ */
+export function renderEmptyDecksState(container, options = {}) {
+  const defaultOptions = {
+    message: 'No tienes decks creados',
+    actionText: 'Crear tu primer deck',
+    actionTarget: 'crear',
+    icon: '📚',
+    className: 'empty-decks-state'
+  };
+  
+  const finalOptions = { ...defaultOptions, ...options };
+  renderEmptyState(container, finalOptions);
+}
+
+/**
+ * Renderiza estado vacío específico para flashcards
+ * @param {HTMLElement|string} container - Elemento contenedor o selector CSS
+ * @param {Object} options - Opciones adicionales
+ */
+export function renderEmptyFlashcardsState(container, options = {}) {
+  const defaultOptions = {
+    message: 'No hay flashcards en este deck',
+    actionText: 'Agregar flashcards',
+    actionTarget: 'crear',
+    icon: '🃏',
+    className: 'empty-flashcards-state'
+  };
+  
+  const finalOptions = { ...defaultOptions, ...options };
+  renderEmptyState(container, finalOptions);
+}
+
+/**
+ * Renderiza estado vacío específico para resultados de búsqueda
+ * @param {HTMLElement|string} container - Elemento contenedor o selector CSS
+ * @param {string} searchTerm - Término de búsqueda
+ * @param {Object} options - Opciones adicionales
+ */
+export function renderEmptySearchState(container, searchTerm = '', options = {}) {
+  const defaultOptions = {
+    message: searchTerm 
+      ? `No se encontraron resultados para "${searchTerm}"` 
+      : 'No se encontraron resultados',
+    icon: '🔍',
+    className: 'empty-search-state'
+  };
+  
+  const finalOptions = { ...defaultOptions, ...options };
+  renderEmptyState(container, finalOptions);
+}
+
+/**
+ * Renderiza estado vacío específico para estadísticas
+ * @param {HTMLElement|string} container - Elemento contenedor o selector CSS
+ * @param {Object} options - Opciones adicionales
+ */
+export function renderEmptyStatsState(container, options = {}) {
+  const defaultOptions = {
+    message: 'No hay datos de estadísticas disponibles',
+    actionText: 'Comenzar a estudiar',
+    actionTarget: 'estudiar',
+    icon: '📊',
+    className: 'empty-stats-state'
+  };
+  
+  const finalOptions = { ...defaultOptions, ...options };
+  renderEmptyState(container, finalOptions);
+}
+
