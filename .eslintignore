@@ -1,0 +1,52 @@
+# Build outputs
+dist/
+build/
+
+# Minified files
+*.min.js
+*.min.css
+
+# Generated files
+index-*.js
+index-*.css
+*-[A-Za-z0-9]*.js
+*-[A-Za-z0-9]*.css
+
+# Node modules
+node_modules/
+
+# Cypress
+cypress/
+
+# Logs
+logs/
+*.log
+
+# Cache
+.eslintcache
+.prettiercache
+
+# Dependencies
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Service worker
+sw.js
+
+# Backend Python files
+backend_app/
+*.py
+
+# Config files that don't need linting
+*.config.js
+*.config.ts
+vite.config.*
+vitest.config.*
+cypress.config.*
+
+
+# Test files that use different globals
+basic.spec.js
+*.spec.js
+

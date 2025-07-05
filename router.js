@@ -44,7 +44,7 @@ const ROUTER_CONFIG = {
 };
 
 // Estado del router
-let routerState = {
+const routerState = {
   currentRoute: null,
   previousRoute: null,
   history: [],
@@ -241,7 +241,7 @@ function isAuthenticated() {
   // Verificar token en localStorage
   const token = localStorage.getItem('studyingflash_auth_token');
   
-  if (!token) return false;
+  if (!token) {return false;}
   
   try {
     // Verificar si el token no ha expirado (básico)

@@ -1,62 +1,37 @@
 import js from '@eslint/js';
+import globals from 'globals';
 
 export default [
   js.configs.recommended,
+  {
+    ignores: [
+      'dist/**/*',
+      'build/**/*',
+      '*.min.js',
+      '*.min.css',
+      'index-*.js',
+      'index-*.css',
+      '*-[A-Za-z0-9]*.js',
+      '*-[A-Za-z0-9]*.css',
+      'sw.js',
+      'node_modules/**/*',
+      'cypress/**/*',
+      'logs/**/*',
+      'backend_app/**/*',
+      '*.py'
+    ]
+  },
   {
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: 'module',
       globals: {
-        // Browser globals
-        window: 'readonly',
-        document: 'readonly',
-        console: 'readonly',
-        localStorage: 'readonly',
-        sessionStorage: 'readonly',
-        fetch: 'readonly',
-        URL: 'readonly',
-        URLSearchParams: 'readonly',
-        requestAnimationFrame: 'readonly',
-        cancelAnimationFrame: 'readonly',
-        setTimeout: 'readonly',
-        clearTimeout: 'readonly',
-        setInterval: 'readonly',
-        clearInterval: 'readonly',
-        navigator: 'readonly',
-        location: 'readonly',
-        history: 'readonly',
-        alert: 'readonly',
-        confirm: 'readonly',
-        prompt: 'readonly',
-        FormData: 'readonly',
-        AbortController: 'readonly',
-        atob: 'readonly',
-        btoa: 'readonly',
-        
+        ...globals.browser,
+        ...globals.node,
         // Third-party libraries
         Chart: 'readonly',
         particlesJS: 'readonly',
-        gsap: 'readonly',
-        
-        // Cypress globals
-        cy: 'readonly',
-        describe: 'readonly',
-        it: 'readonly',
-        before: 'readonly',
-        after: 'readonly',
-        beforeEach: 'readonly',
-        afterEach: 'readonly',
-        expect: 'readonly',
-        
-        // Node.js globals (for build tools)
-        process: 'readonly',
-        Buffer: 'readonly',
-        __dirname: 'readonly',
-        __filename: 'readonly',
-        module: 'readonly',
-        require: 'readonly',
-        exports: 'readonly',
-        global: 'readonly'
+        gsap: 'readonly'
       }
     },
     rules: {
@@ -108,6 +83,9 @@ export default [
     files: ['*.config.js', 'vite.config.js'],
     languageOptions: {
       sourceType: 'module'
+    },
+    rules: {
+      'no-undef': 'off' // Config files may use build-time variables
     }
   }
 ];

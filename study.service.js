@@ -657,12 +657,12 @@ export function resumeStudySession() {
  * @returns {Object|null} - Estadísticas actuales
  */
 export function getCurrentSessionStats() {
-  if (!currentSession) return null;
+  if (!currentSession) {return null;}
 
   const state = store.getState();
   const sessionState = state.studySession;
   
-  if (!sessionState) return null;
+  if (!sessionState) {return null;}
 
   const elapsed = sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : 0;
   

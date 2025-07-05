@@ -560,7 +560,7 @@ export function removeParticles(count = 10) {
  * Configura monitoreo de rendimiento
  */
 function setupPerformanceMonitoring() {
-  if (!particlesInstance || !particlesInstance.pJS) return;
+  if (!particlesInstance || !particlesInstance.pJS) {return;}
 
   let frameCount = 0;
   let lastTime = performance.now();
@@ -599,7 +599,7 @@ function setupPerformanceMonitoring() {
  */
 function createFallbackEffect(containerId) {
   const container = document.getElementById(containerId);
-  if (!container) return;
+  if (!container) {return;}
 
   container.innerHTML = `
     <div class="fallback-particles">
@@ -707,7 +707,7 @@ export function getParticlesInfo() {
  * @param {string} newTheme - Nuevo tema
  */
 export function updateParticlesTheme(newTheme) {
-  if (!isInitialized) return;
+  if (!isInitialized) {return;}
   
   // Guardar tema
   localStorage.setItem('studyingflash_theme', newTheme);

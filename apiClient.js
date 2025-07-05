@@ -64,7 +64,7 @@ export class ApiClient {
    */
   static isAuthenticated() {
     const token = this.getAuthToken();
-    if (!token) return false;
+    if (!token) {return false;}
     
     try {
       // Verificar si el token no ha expirado (básico)
@@ -91,7 +91,7 @@ export class ApiClient {
     };
 
     if (token) {
-      baseHeaders['Authorization'] = `Bearer ${token}`;
+      baseHeaders.Authorization = `Bearer ${token}`;
     }
 
     return baseHeaders;

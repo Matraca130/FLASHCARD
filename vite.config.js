@@ -1,219 +1,81 @@
-import { defineConfig } from 'vite'
+import { defineConfig } from 'vite';
 
 export default defineConfig({
-  // Base path para GitHub Pages
-  base: '/FLASHCARD/',
-  
-  // Configuración de build optimizada
+  // Configuração básica de build
   build: {
-    // Directorio de salida
     outDir: 'dist',
-    
-    // Limpiar directorio antes de build
     emptyOutDir: true,
-    
-    // Generar sourcemaps para debugging
     sourcemap: true,
     
-    // Optimizaciones de bundle
+    // Configuração simplificada de rollup
     rollupOptions: {
       output: {
-        // Separar chunks por tipo
-        manualChunks: {
-          // Vendor chunk para librerías externas
-          vendor: ['./utils/helpers.js', './utils/validation.js'],
-          
-          // Core chunk para funcionalidad principal
-          core: ['./core-navigation.js', './apiClient.js'],
-          
-          // PWA chunk para funcionalidad offline
-          pwa: ['./pwa-installer.js']
-        },
-        
-        // Nombres de archivos con hash para cache busting
-        chunkFileNames: 'assets/js/[name]-[hash].js',
-        entryFileNames: 'assets/js/[name]-[hash].js',
-        assetFileNames: (assetInfo) => {
-          const info = assetInfo.name.split('.');
-          const ext = info[info.length - 1];
-          
-          if (/\.(css)$/.test(assetInfo.name)) {
-            return 'assets/css/[name]-[hash].[ext]';
-          }
-          
-          if (/\.(png|jpe?g|svg|gif|tiff|bmp|ico)$/i.test(assetInfo.name)) {
-            return 'assets/images/[name]-[hash].[ext]';
-          }
-          
-          if (/\.(woff2?|eot|ttf|otf)$/i.test(assetInfo.name)) {
-            return 'assets/fonts/[name]-[hash].[ext]';
-          }
-          
-          return 'assets/[name]-[hash].[ext]';
-        }
+        // Nomes de arquivos com hash para cache busting
+        chunkFileNames: 'assets/[name]-[hash].js',
+        entryFileNames: 'assets/[name]-[hash].js',
+        assetFileNames: 'assets/[name]-[hash].[ext]'
       }
     },
     
-    // Configuración de minificación
+    // Minificação básica
     minify: 'terser',
     terserOptions: {
       compress: {
-        // Remover console.log en producción
-        drop_console: true,
-        drop_debugger: true,
-        
-        // Optimizaciones adicionales
-        pure_funcs: ['console.log', 'console.info'],
-        passes: 2
-      },
-      mangle: {
-        // Mantener nombres de clases para debugging
-        keep_classnames: false,
-        keep_fnames: false
-      },
-      format: {
-        // Remover comentarios
-        comments: false
+        drop_console: false, // Manter console.log para debugging
+        drop_debugger: true
       }
     },
     
-    // Configuración de assets
-    assetsInlineLimit: 4096, // 4kb - inline assets pequeños como base64
+    // Target para compatibilidade
+    target: 'es2020',
     
-    // Configuración de CSS
-    cssCodeSplit: true, // Separar CSS por chunks
-    cssMinify: true,
-    
-    // Target para compatibilidad
-    target: ['es2020', 'chrome80', 'firefox78', 'safari14', 'edge88'],
-    
-    // Configuración de reportes
-    reportCompressedSize: true,
-    chunkSizeWarningLimit: 1000 // Warning si chunk > 1MB
+    // Limite de warning para chunks
+    chunkSizeWarningLimit: 1000
   },
   
-  // Configuración de desarrollo
+  // Configuração de desenvolvimento
   server: {
     port: 5173,
-    host: true, // Permitir acceso desde red local
-    open: true, // Abrir navegador automáticamente
+    host: true,
+    open: false,
     
-    // Configuración de proxy para API
+    // Proxy para API backend
     proxy: {
       '/api': {
         target: 'http://localhost:5000',
         changeOrigin: true,
         secure: false
       }
-    },
-    
-    // Headers de seguridad en desarrollo
-    headers: {
-      'X-Content-Type-Options': 'nosniff',
-      'X-Frame-Options': 'DENY',
-      'X-XSS-Protection': '1; mode=block'
     }
   },
   
-  // Configuración de preview (para testing de build)
+  // Configuração de preview
   preview: {
     port: 4173,
     host: true,
-    open: true
+    open: false
   },
   
-  // Configuración de assets públicos
+  // Diretório público
   publicDir: 'public',
   
-  // Configuración de resolución de módulos
-  resolve: {
-    alias: {
-      '@': '/src', // Alias para imports más limpios
-      '@utils': '/utils',
-      '@assets': '/assets'
-    }
-  },
-  
-  // Configuración de CSS
+  // Configuração de CSS
   css: {
-    // Configuración de preprocesadores
-    preprocessorOptions: {
-      scss: {
-        additionalData: `@import "@/styles/variables.scss";`
-      }
-    },
-    
-    // PostCSS plugins
-    postcss: {
-      plugins: [
-        // Autoprefixer para compatibilidad de navegadores
-        require('autoprefixer')({
-          overrideBrowserslist: [
-            '> 1%',
-            'last 2 versions',
-            'not dead',
-            'not ie 11'
-          ]
-        })
-      ]
-    },
-    
-    // Configuración de CSS modules (si se usan)
-    modules: {
-      localsConvention: 'camelCase'
-    }
+    devSourcemap: true
   },
   
-  // Configuración de optimización de dependencias
+  // Otimização de dependências
   optimizeDeps: {
-    // Incluir dependencias que necesitan pre-bundling
-    include: [
-      // Agregar aquí librerías que necesiten optimización
-    ],
-    
-    // Excluir dependencias del pre-bundling
-    exclude: [
-      // Service Worker no debe ser pre-bundled
-      'sw.js'
-    ]
+    exclude: ['sw.js']
   },
   
-  // Configuración de plugins
-  plugins: [
-    // Plugin para PWA (si se instala @vite/plugin-pwa)
-    // VitePWA({
-    //   registerType: 'autoUpdate',
-    //   workbox: {
-    //     globPatterns: ['**/*.{js,css,html,ico,png,svg}']
-    //   }
-    // })
-  ],
+  // Base URL para GitHub Pages
+  base: process.env.NODE_ENV === 'production' ? '/FLASHCARD/' : '/',
   
-  // Configuración de variables de entorno
+  // Configuração de variáveis de ambiente
   define: {
-    __APP_VERSION__: JSON.stringify(process.env.npm_package_version || '1.0.0'),
+    __APP_VERSION__: JSON.stringify('1.0.0'),
     __BUILD_TIME__: JSON.stringify(new Date().toISOString())
-  },
-  
-  // Configuración de worker
-  worker: {
-    format: 'es'
-  },
-  
-  // Configuración experimental
-  experimental: {
-    // Renderizado optimizado
-    renderBuiltUrl(filename, { hostType }) {
-      if (hostType === 'js') {
-        return { js: `/${filename}` }
-      } else {
-        return { relative: true }
-      }
-    }
-  },
-  
-  // Configuración de logging
-  logLevel: 'info',
-  clearScreen: false // No limpiar consola en cada rebuild
+  }
 });
 

@@ -20,7 +20,7 @@ const BINDINGS_CONFIG = {
 };
 
 // Estado del sistema de bindings
-let bindingsState = {
+const bindingsState = {
   activeActions: new Set(),
   lastActionTime: new Map(),
   confirmationPending: new Map()
@@ -31,7 +31,7 @@ let bindingsState = {
  */
 document.addEventListener('click', async (e) => {
   const el = e.target.closest('[data-action]');
-  if (!el) return;
+  if (!el) {return;}
 
   const action = el.dataset.action;
   
@@ -176,7 +176,7 @@ async function executeAction(action, el, event) {
  */
 async function handleLogin(el) {
   const form = getFormFromElement(el, 'login-form');
-  if (!form) return;
+  if (!form) {return;}
 
   const email = form.querySelector('input[name="email"]')?.value?.trim();
   const password = form.querySelector('input[name="password"]')?.value?.trim();
@@ -208,7 +208,7 @@ async function handleLogin(el) {
  */
 async function handleRegister(el) {
   const form = getFormFromElement(el, 'register-form');
-  if (!form) return;
+  if (!form) {return;}
 
   const email = form.querySelector('input[name="email"]')?.value?.trim();
   const password = form.querySelector('input[name="password"]')?.value?.trim();
@@ -307,7 +307,7 @@ async function handleSubmitAnswer(el) {
  */
 async function handleCreateDeck(el) {
   const form = getFormFromElement(el, 'create-deck-form');
-  if (!form) return;
+  if (!form) {return;}
 
   const name = form.querySelector('#deck-name')?.value?.trim();
   const description = form.querySelector('#deck-description')?.value?.trim();
@@ -333,7 +333,7 @@ async function handleCreateDeck(el) {
  */
 async function handleCreateFlashcard(el) {
   const form = getFormFromElement(el, 'create-flashcard-form');
-  if (!form) return;
+  if (!form) {return;}
 
   const deckId = form.querySelector('#flashcard-deck-id')?.value;
   const front = form.querySelector('#flashcard-front')?.value?.trim();
@@ -479,7 +479,7 @@ async function handleToggleTheme(el) {
  */
 async function handleSaveSettings(el) {
   const form = getFormFromElement(el, 'settings-form');
-  if (!form) return;
+  if (!form) {return;}
 
   const formData = new FormData(form);
   const settings = Object.fromEntries(formData.entries());
@@ -552,7 +552,7 @@ function getFormFromElement(el, defaultFormId) {
   }
   
   if (!form) {
-    console.warn(`⚠️ Formulario no encontrado para elemento:`, el);
+    console.warn('⚠️ Formulario no encontrado para elemento:', el);
     showNotification('Formulario no encontrado', 'error', 3000);
   }
   

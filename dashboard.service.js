@@ -105,7 +105,7 @@ export async function loadWeeklyStats() {
  * @param {Object} stats - Estadísticas a mostrar
  */
 function updateDashboardStats(stats) {
-  if (!stats) return;
+  if (!stats) {return;}
   
   // Actualizar tarjetas de estadísticas usando selectores mejorados
   const statElements = {
@@ -166,13 +166,13 @@ function updateAdditionalStats(stats) {
  * @param {Array} decks - Array de decks del usuario
  */
 function updateDashboardDecks(decks) {
-  if (!Array.isArray(decks)) return;
+  if (!Array.isArray(decks)) {return;}
   
   const decksList = document.getElementById('dashboard-decks-list') || 
                    document.querySelector('.decks-list') ||
                    document.querySelector('[data-section="decks"]');
   
-  if (!decksList) return;
+  if (!decksList) {return;}
   
   if (decks.length === 0) {
     renderEmptyDecksState(decksList);

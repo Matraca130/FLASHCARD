@@ -37,7 +37,7 @@ const CHARTS_CONFIG = {
 };
 
 // Estado de las gráficas
-let chartInstances = new Map();
+const chartInstances = new Map();
 let isChartJsLoaded = false;
 
 /**
@@ -174,7 +174,7 @@ async function initializeAllCharts() {
  */
 async function initializeWeeklyProgressChart() {
   const ctx = document.getElementById('weeklyProgressChart');
-  if (!ctx) return;
+  if (!ctx) {return;}
 
   try {
     // Cargar datos reales con fallback
@@ -285,7 +285,7 @@ async function initializeWeeklyProgressChart() {
  */
 async function initializeCategoryDistributionChart() {
   const ctx = document.getElementById('categoryDistributionChart');
-  if (!ctx) return;
+  if (!ctx) {return;}
 
   try {
     // Cargar datos reales con fallback
@@ -379,7 +379,7 @@ async function initializeCategoryDistributionChart() {
  */
 async function initializePerformanceChart() {
   const ctx = document.getElementById('performanceChart');
-  if (!ctx) return;
+  if (!ctx) {return;}
 
   try {
     // Cargar datos reales con fallback
@@ -459,7 +459,7 @@ async function initializePerformanceChart() {
  */
 async function initializeStudyTimeChart() {
   const ctx = document.getElementById('studyTimeChart');
-  if (!ctx) return;
+  if (!ctx) {return;}
 
   try {
     const studyTimeData = await apiWithFallback('/api/stats/study-time', {
@@ -527,7 +527,7 @@ async function initializeStudyTimeChart() {
  */
 async function initializeAccuracyTrendChart() {
   const ctx = document.getElementById('accuracyTrendChart');
-  if (!ctx) return;
+  if (!ctx) {return;}
 
   try {
     const accuracyData = await apiWithFallback('/api/stats/accuracy-trend', {
@@ -603,7 +603,7 @@ async function initializeAccuracyTrendChart() {
  */
 async function initializeDeckProgressChart() {
   const ctx = document.getElementById('deckProgressChart');
-  if (!ctx) return;
+  if (!ctx) {return;}
 
   try {
     const deckData = await apiWithFallback('/api/stats/deck-progress', {
@@ -678,10 +678,10 @@ async function initializeDeckProgressChart() {
  * @returns {number} - Porcentaje de consistencia
  */
 function calculateConsistency(accuracyData) {
-  if (accuracyData.length < 2) return 100;
+  if (accuracyData.length < 2) {return 100;}
   
   const variance = accuracyData.reduce((acc, val, i, arr) => {
-    if (i === 0) return 0;
+    if (i === 0) {return 0;}
     return acc + Math.pow(val - arr[i-1], 2);
   }, 0) / (accuracyData.length - 1);
   
@@ -695,7 +695,7 @@ function calculateConsistency(accuracyData) {
  * @returns {number} - Porcentaje de mejora
  */
 function calculateImprovement(accuracyData) {
-  if (accuracyData.length < 2) return 50;
+  if (accuracyData.length < 2) {return 50;}
   
   const first = accuracyData[0];
   const last = accuracyData[accuracyData.length - 1];
@@ -835,7 +835,7 @@ export function destroyAllCharts() {
  * @param {string} newTheme - Nuevo tema
  */
 export function updateChartsTheme(newTheme) {
-  if (!isChartJsLoaded) return;
+  if (!isChartJsLoaded) {return;}
 
   // Reconfigurar defaults
   configureChartJsDefaults(newTheme);

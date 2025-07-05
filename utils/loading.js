@@ -3,6 +3,8 @@
  * Mejora la experiencia de usuario durante operaciones asíncronas
  */
 
+import { showNotification } from './helpers.js';
+
 /**
  * Muestra un indicador de carga en un botón
  * @param {string|HTMLElement} buttonSelector - Selector o elemento del botón
@@ -14,7 +16,7 @@ export function showButtonLoading(buttonSelector, loadingText = 'Cargando...') {
     ? document.querySelector(buttonSelector) 
     : buttonSelector;
     
-  if (!button) return () => {};
+  if (!button) {return () => {};}
   
   // Guardar estado original
   const originalText = button.textContent;
@@ -46,7 +48,7 @@ export function showLoadingOverlay(containerSelector, message = 'Cargando...') {
     ? document.querySelector(containerSelector) 
     : containerSelector;
     
-  if (!container) return () => {};
+  if (!container) {return () => {};}
   
   // Crear overlay
   const overlay = document.createElement('div');
@@ -119,7 +121,7 @@ export function showFieldValidation(fieldSelector, isValid, message = '') {
     ? document.querySelector(fieldSelector) 
     : fieldSelector;
     
-  if (!field) return;
+  if (!field) {return;}
   
   // Remover clases de validación anteriores
   field.classList.remove('field-valid', 'field-invalid');
@@ -228,9 +230,9 @@ export function showProgressToast(message, steps = 1) {
       const progressText = toast.querySelector('.progress-text');
       const messageElement = toast.querySelector('.progress-message');
       
-      if (progressBar) progressBar.style.width = `${percentage}%`;
-      if (progressText) progressText.textContent = `Paso ${step} de ${steps}`;
-      if (newMessage && messageElement) messageElement.textContent = newMessage;
+      if (progressBar) {progressBar.style.width = `${percentage}%`;}
+      if (progressText) {progressText.textContent = `Paso ${step} de ${steps}`;}
+      if (newMessage && messageElement) {messageElement.textContent = newMessage;}
     },
     
     complete: (finalMessage = 'Completado') => {
@@ -243,9 +245,9 @@ export function showProgressToast(message, steps = 1) {
         progressBar.style.width = '100%';
         progressBar.style.background = 'linear-gradient(90deg, #10b981, #059669)';
       }
-      if (progressText) progressText.textContent = 'Completado';
-      if (messageElement) messageElement.textContent = finalMessage;
-      if (spinner) spinner.style.display = 'none';
+      if (progressText) {progressText.textContent = 'Completado';}
+      if (messageElement) {messageElement.textContent = finalMessage;}
+      if (spinner) {spinner.style.display = 'none';}
       
       // Auto-remove after 2 seconds
       setTimeout(() => {
@@ -269,9 +271,9 @@ export function showProgressToast(message, steps = 1) {
       if (progressBar) {
         progressBar.style.background = 'linear-gradient(90deg, #ef4444, #dc2626)';
       }
-      if (progressText) progressText.textContent = 'Error';
-      if (messageElement) messageElement.textContent = errorMessage;
-      if (spinner) spinner.style.display = 'none';
+      if (progressText) {progressText.textContent = 'Error';}
+      if (messageElement) {messageElement.textContent = errorMessage;}
+      if (spinner) {spinner.style.display = 'none';}
       
       // Auto-remove after 3 seconds
       setTimeout(() => {

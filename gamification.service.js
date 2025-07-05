@@ -1,3 +1,4 @@
+import { api } from './apiClient.js';
 import { store } from './store/store.js';
 import { apiWithFallback, performCrudOperation, FALLBACK_DATA } from './utils/apiHelpers.js';
 import { showNotification, formatDate } from './utils/helpers.js';
@@ -161,7 +162,7 @@ export function startStudySession() {
  * Finaliza la sesión de estudio actual
  */
 export async function endStudySession() {
-  if (!sessionStats.startTime) return;
+  if (!sessionStats.startTime) {return;}
   
   sessionStats.endTime = new Date();
   gamificationData.totalSessions++;
@@ -315,7 +316,7 @@ async function checkAchievements() {
  */
 async function grantAchievement(achievementId) {
   const achievement = GAMIFICATION_CONFIG.achievements[achievementId];
-  if (!achievement) return;
+  if (!achievement) {return;}
   
   gamificationData.achievements.push(achievementId);
   gamificationData.points += achievement.points;
@@ -417,12 +418,12 @@ function updatePointsDisplay(pointsGained) {
  */
 function updateLevelProgress() {
   const progressBar = document.getElementById('level-progress');
-  if (!progressBar) return;
+  if (!progressBar) {return;}
   
   const currentLevel = GAMIFICATION_CONFIG.levels[gamificationData.level];
   const nextLevel = GAMIFICATION_CONFIG.levels[gamificationData.level + 1];
   
-  if (!currentLevel || !nextLevel) return;
+  if (!currentLevel || !nextLevel) {return;}
   
   const progress = ((gamificationData.points - currentLevel.min) / (nextLevel.min - currentLevel.min)) * 100;
   progressBar.style.width = `${Math.min(100, Math.max(0, progress))}%`;
@@ -442,7 +443,7 @@ function updateLevelProgress() {
  */
 function updateAchievementsDisplay() {
   const achievementsContainer = document.getElementById('achievements-list');
-  if (!achievementsContainer) return;
+  if (!achievementsContainer) {return;}
   
   const achievementsHTML = Object.entries(GAMIFICATION_CONFIG.achievements).map(([id, achievement]) => {
     const unlocked = gamificationData.achievements.includes(id);
@@ -465,7 +466,7 @@ function updateAchievementsDisplay() {
  * Muestra el resumen de la sesión
  */
 function showSessionSummary() {
-  if (sessionStats.total === 0) return;
+  if (sessionStats.total === 0) {return;}
   
   const accuracy = Math.round((sessionStats.correct / sessionStats.total) * 100);
   const duration = sessionStats.endTime - sessionStats.startTime;
