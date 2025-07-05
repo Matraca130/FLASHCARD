@@ -9,6 +9,8 @@ from backend_app.models import User, Deck, Flashcard, StudySession, CardReview
 from backend_app.services import StudyService
 from backend_app.utils import calculate_fsrs, calculate_sm2, get_next_review_date
 from backend_app.extensions import db
+from backend_app.validation.schemas import StudyAnswerSchema, StudySessionSchema
+from backend_app.validation.validators import validate_json
 from datetime import datetime
 import logging
 
@@ -60,7 +62,8 @@ def start_study_session():
 
 @study_bp.route('/card/answer', methods=['POST'])
 @jwt_required()
-def answer_card():
+@validate_json(StudyAnswerSchema)
+def answer_card(validated_data):
     """
     CRÍTICO: Responder carta y calcular próxima revisión
     Esta es la función más importante para la conexión frontend-backend
@@ -68,20 +71,11 @@ def answer_card():
     """
     try:
         user_id = get_jwt_identity()
-        data = request.get_json()
         
-        if not data:
-            return jsonify({'error': 'No se proporcionaron datos'}), 400
-        
-        # Validar datos requeridos
-        required_fields = ['card_id', 'quality', 'session_id']
-        for field in required_fields:
-            if field not in data:
-                return jsonify({'error': f'{field} es requerido'}), 400
-        
-        card_id = data['card_id']
-        quality = data['quality']  # 1-5 (1=Again, 2=Hard, 3=Good, 4=Easy, 5=Perfect)
-        session_id = data['session_id']
+        # Extraer datos validados
+        card_id = validated_data['card_id']
+        quality = validated_data['quality']  # 1-4 (1=Again, 2=Hard, 3=Good, 4=Easy)
+        session_id = validated_data['session_id']
         
         # Verificar que la carta existe y pertenece al usuario
         card = db.session.query(Flashcard).join(Deck).filter(
@@ -140,7 +134,7 @@ def answer_card():
             rating=quality,                    # Use 'rating' field, not 'quality'
             previous_interval=card.interval_days,  # Use correct field name
             new_interval=result['interval'],
-            response_time=data.get('response_time', 0)
+            response_time=validated_data.get('response_time', 0)
         )
         
         db.session.add(review)

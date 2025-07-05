@@ -8,33 +8,26 @@ from flask_jwt_extended import jwt_required, create_access_token, get_jwt_identi
 from backend_app.models import User
 from backend_app.services import UserService
 from backend_app.extensions import db
+from backend_app.validation.schemas import UserRegistrationSchema, UserLoginSchema
+from backend_app.validation.validators import validate_json
 import logging
 
 logger = logging.getLogger(__name__)
 auth_bp = Blueprint('auth', __name__)
 user_service = UserService()
-
 @auth_bp.route('/login', methods=['POST'])
-def login():
+@validate_json(UserLoginSchema)
+def login(validated_data):
     """
     Autenticación de usuario - Compatible con frontend
     POST /api/auth/login
     """
     try:
-        data = request.get_json()
-        
-        if not data:
-            return jsonify({'error': 'No se proporcionaron datos'}), 400
-        
-        email = data.get('email')
-        password = data.get('password')
-        
-        if not email or not password:
-            return jsonify({'error': 'Email y password son requeridos'}), 400
-        
-        # Usar servicio para autenticar
-        result = user_service.authenticate_user(email, password)
-        
+        # Usar servicio para autenticar con datos validados
+        result = user_service.authenticate_user(
+            validated_data['email'], 
+            validated_data['password']
+        )        
         if not result['success']:
             return jsonify({'error': result['error']}), 401
         
@@ -57,24 +50,15 @@ def login():
         return jsonify({'error': 'Error interno del servidor'}), 500
 
 @auth_bp.route('/register', methods=['POST'])
-def register():
+@validate_json(UserRegistrationSchema)
+def register(validated_data):
     """
     Registro de usuario - Compatible con frontend
     POST /api/auth/register
     """
     try:
-        data = request.get_json()
-        
-        if not data:
-            return jsonify({'error': 'No se proporcionaron datos'}), 400
-        
-        required_fields = ['email', 'password', 'username', 'first_name', 'last_name']
-        for field in required_fields:
-            if not data.get(field):
-                return jsonify({'error': f'{field} es requerido'}), 400
-        
-        # Usar servicio para registrar
-        result = user_service.register_user(data)
+        # Usar servicio para registrar con datos validados
+        result = user_service.register_user(validated_data)
         
         if not result['success']:
             return jsonify({'error': result['error']}), 400

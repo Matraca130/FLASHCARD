@@ -8,6 +8,8 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from backend_app.models import User, Deck, Flashcard
 from backend_app.services import FlashcardService
 from backend_app.extensions import db
+from backend_app.validation.schemas import FlashcardCreationSchema
+from backend_app.validation.validators import validate_json
 from datetime import datetime
 import logging
 
@@ -17,31 +19,17 @@ flashcard_service = FlashcardService()
 
 @flashcards_bp.route('/', methods=['POST'])
 @jwt_required()
-def create_flashcard():
+@validate_json(FlashcardCreationSchema)
+def create_flashcard(validated_data):
     """
     Crear nueva flashcard - Compatible con frontend
     POST /api/flashcards/
     """
     try:
         user_id = get_jwt_identity()
-        data = request.get_json()
         
-        if not data:
-            return jsonify({'error': 'No se proporcionaron datos'}), 400
-        
-        # Validar campos requeridos
-        required_fields = ['front', 'back', 'deck_id']
-        for field in required_fields:
-            if not data.get(field):
-                return jsonify({'error': f'{field} es requerido'}), 400
-        
-        # Verificar que el deck pertenece al usuario
-        deck = Deck.query.filter_by(id=data['deck_id'], user_id=user_id).first()
-        if not deck:
-            return jsonify({'error': 'Deck no encontrado'}), 404
-        
-        # Usar servicio para crear flashcard
-        result = flashcard_service.create_flashcard(data)
+        # Usar servicio para crear flashcard con datos validados
+        result = flashcard_service.create_flashcard(user_id, validated_data)
         
         if not result['success']:
             return jsonify({'error': result['error']}), 400

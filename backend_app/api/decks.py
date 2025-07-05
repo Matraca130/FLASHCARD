@@ -8,6 +8,8 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from backend_app.models import User, Deck, Flashcard
 from backend_app.services import DeckService
 from backend_app.extensions import db
+from backend_app.validation.schemas import DeckCreationSchema
+from backend_app.validation.validators import validate_json
 from datetime import datetime
 import logging
 
@@ -50,24 +52,17 @@ def get_decks():
 
 @decks_bp.route('/', methods=['POST'])
 @jwt_required()
-def create_deck():
+@validate_json(DeckCreationSchema)
+def create_deck(validated_data):
     """
     Crear nuevo deck - Compatible con frontend
     POST /api/decks/
     """
     try:
         user_id = get_jwt_identity()
-        data = request.get_json()
         
-        if not data:
-            return jsonify({'error': 'No se proporcionaron datos'}), 400
-        
-        name = data.get('name')
-        if not name:
-            return jsonify({'error': 'El nombre del deck es requerido'}), 400
-        
-        # Usar servicio para crear deck
-        result = deck_service.create_deck(user_id, data)
+        # Usar servicio para crear deck con datos validados
+        result = deck_service.create_deck(user_id, validated_data)
         
         if not result['success']:
             return jsonify({'error': result['error']}), 400
