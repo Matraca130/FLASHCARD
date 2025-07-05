@@ -7,6 +7,7 @@ from flask import Flask
 from flask_cors import CORS
 from backend_app.extensions import db, jwt, bcrypt, limiter
 from backend_app.config import get_config
+from backend_app.utils.monitoring import init_sentry, setup_structured_logging
 import logging
 import os
 
@@ -36,19 +37,14 @@ def create_app(config_class=None):
     bcrypt.init_app(app)
     limiter.init_app(app)
     
-    # Configurar logging
-    if not app.debug and not app.testing:
-        if not os.path.exists('logs'):
-            os.mkdir('logs')
-        
-        file_handler = logging.FileHandler('logs/flashcards.log')
-        file_handler.setFormatter(logging.Formatter(
-            '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
-        ))
-        file_handler.setLevel(logging.INFO)
-        app.logger.addHandler(file_handler)
-        app.logger.setLevel(logging.INFO)
-        app.logger.info('StudyingFlash backend startup')
+    # Configurar monitoreo y logging
+    init_sentry(app)
+    setup_structured_logging(app)
+    
+    # Registrar manejadores de errores
+    from backend_app.api.error_handlers import register_error_handlers, log_slow_requests
+    register_error_handlers(app)
+    log_slow_requests(app)
     
     # Registrar blueprints
     from backend_app.api.routes import api_bp

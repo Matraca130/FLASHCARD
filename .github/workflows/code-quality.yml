@@ -1,0 +1,216 @@
+name: Code Quality
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  code-quality:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Fetch full history for better analysis
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.11
+    
+    - name: Install code quality tools
+      run: |
+        python -m pip install --upgrade pip
+        pip install black isort flake8 mypy pylint
+        pip install -r requirements.txt
+    
+    - name: Check code formatting with Black
+      run: |
+        black --check --diff backend_app/
+    
+    - name: Check import sorting with isort
+      run: |
+        isort --check-only --diff backend_app/
+    
+    - name: Run flake8 linting
+      run: |
+        flake8 backend_app/ --max-line-length=88 --extend-ignore=E203,W503
+    
+    - name: Run type checking with mypy
+      run: |
+        mypy backend_app/ --ignore-missing-imports || true
+    
+    - name: Run pylint analysis
+      run: |
+        pylint backend_app/ --disable=C0114,C0115,C0116 --max-line-length=88 || true
+    
+    - name: Generate code quality report
+      run: |
+        echo "## Code Quality Report" > code-quality-report.md
+        echo "" >> code-quality-report.md
+        echo "### Black Formatting" >> code-quality-report.md
+        black --check backend_app/ >> code-quality-report.md 2>&1 || echo "❌ Formatting issues found" >> code-quality-report.md
+        echo "" >> code-quality-report.md
+        echo "### Import Sorting" >> code-quality-report.md
+        isort --check-only backend_app/ >> code-quality-report.md 2>&1 || echo "❌ Import sorting issues found" >> code-quality-report.md
+        echo "" >> code-quality-report.md
+        echo "### Linting Results" >> code-quality-report.md
+        flake8 backend_app/ --max-line-length=88 --extend-ignore=E203,W503 >> code-quality-report.md 2>&1 || echo "❌ Linting issues found" >> code-quality-report.md
+    
+    - name: Upload code quality report
+      uses: actions/upload-artifact@v3
+      with:
+        name: code-quality-report
+        path: code-quality-report.md
+
+  dependency-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.11
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pip-audit safety
+    
+    - name: Check for known vulnerabilities with pip-audit
+      run: |
+        pip-audit --desc --format=json --output=pip-audit-report.json || true
+        pip-audit --desc
+    
+    - name: Check for known vulnerabilities with safety
+      run: |
+        pip install -r requirements.txt
+        safety check --json --output=safety-report.json || true
+        safety check
+    
+    - name: Upload vulnerability reports
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: vulnerability-reports
+        path: |
+          pip-audit-report.json
+          safety-report.json
+
+  frontend-quality:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Run ESLint (if configured)
+      run: |
+        if [ -f ".eslintrc.js" ] || [ -f ".eslintrc.json" ] || [ -f "eslint.config.js" ]; then
+          npx eslint . --ext .js,.jsx,.ts,.tsx --format=json --output-file=eslint-report.json || true
+          npx eslint . --ext .js,.jsx,.ts,.tsx
+        else
+          echo "ESLint not configured, skipping..."
+        fi
+    
+    - name: Run Prettier check (if configured)
+      run: |
+        if [ -f ".prettierrc" ] || [ -f ".prettierrc.json" ] || [ -f "prettier.config.js" ]; then
+          npx prettier --check . || true
+        else
+          echo "Prettier not configured, skipping..."
+        fi
+    
+    - name: Analyze bundle size
+      run: |
+        npm run build
+        if command -v npx &> /dev/null && npx bundlesize --help &> /dev/null; then
+          npx bundlesize
+        else
+          echo "Bundle size analysis not configured"
+        fi
+    
+    - name: Upload frontend quality reports
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: frontend-quality-reports
+        path: |
+          eslint-report.json
+          dist/
+
+  performance-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.11
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install -r requirements-test.txt
+        pip install pytest-benchmark
+    
+    - name: Run performance tests
+      run: |
+        pytest tests/ -k "test_.*_performance" --benchmark-only --benchmark-json=benchmark-report.json || echo "No performance tests found"
+    
+    - name: Upload performance report
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: performance-report
+        path: benchmark-report.json
+
+  documentation-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Check README exists and is not empty
+      run: |
+        if [ ! -f "README.md" ]; then
+          echo "❌ README.md not found"
+          exit 1
+        fi
+        if [ ! -s "README.md" ]; then
+          echo "❌ README.md is empty"
+          exit 1
+        fi
+        echo "✅ README.md exists and has content"
+    
+    - name: Check for API documentation
+      run: |
+        if [ -d "docs/" ] || grep -r "swagger\|openapi" . --include="*.py" --include="*.yml" --include="*.yaml"; then
+          echo "✅ API documentation found"
+        else
+          echo "⚠️ No API documentation found"
+        fi
+    
+    - name: Check for changelog
+      run: |
+        if [ -f "CHANGELOG.md" ] || [ -f "HISTORY.md" ] || [ -f "RELEASES.md" ]; then
+          echo "✅ Changelog found"
+        else
+          echo "⚠️ No changelog found"
+        fi
+

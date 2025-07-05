@@ -1,0 +1,8 @@
+# Monitoring and error tracking dependencies
+sentry-sdk[flask]==1.38.0
+psutil==5.9.6
+
+# Additional logging utilities
+structlog==23.2.0
+python-json-logger==2.0.7
+
