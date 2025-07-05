@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes, viewport-fit=cover">
   <meta name="description" content="StudyingFlash - Aplicación de flashcards con repetición espaciada para optimizar tu aprendizaje">
   <meta name="theme-color" content="#2563eb">
-  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="StudyingFlash">
   
@@ -158,7 +158,7 @@
   
   <!-- PWA Meta Tags -->
   <meta name="theme-color" content="#6366f1">
-  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   
   <!-- Preload Critical Resources -->
@@ -1274,7 +1274,17 @@
               <span class="deck-stat-label">Pendientes</span>
             </div>
             <div class="deck-stat">
-              <span class="deck-stat-value">${Math.round(d    // ===== CHARTS ====="assets/icons/achievements/first-session.png" },
+              <span class="deck-stat-value">${Math.round((deck.accuracy || 0) * 100)}%</span>
+              <span class="deck-stat-label">Precisión</span>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      // ===== CHARTS =====
+      
+      const levels = [
+        { level: 1, points: 0, title: "Principiante", icon: "assets/icons/achievements/first-session.png" },
         { level: 5, points: 1000, title: "Experto", icon: "assets/icons/achievements/first-session.png" },
         { level: 6, points: 1500, title: "Maestro", icon: "assets/icons/achievements/crown-achievement.png" },
         { level: 7, points: 2100, title: "Sabio", icon: "assets/icons/achievements/perfect-session.png" },
