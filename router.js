@@ -389,13 +389,13 @@ export function isActiveRoute(route) {
  * @param {string} route - Nueva ruta
  * @param {boolean} protected - Si la ruta está protegida
  */
-export function registerRoute(route, protected = false) {
+export function registerRoute(route, isProtected = false) {
   if (!ROUTER_CONFIG.validRoutes.includes(route)) {
     ROUTER_CONFIG.validRoutes.push(route);
     console.log(`📝 Ruta registrada: ${route}`);
   }
 
-  if (protected && !ROUTER_CONFIG.protectedRoutes.includes(route)) {
+  if (isProtected && !ROUTER_CONFIG.protectedRoutes.includes(route)) {
     ROUTER_CONFIG.protectedRoutes.push(route);
     console.log(`🔒 Ruta protegida: ${route}`);
   }

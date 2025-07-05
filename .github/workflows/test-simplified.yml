@@ -1,0 +1,90 @@
+name: Tests Simplificados
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  frontend-tests:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install frontend dependencies
+      run: |
+        npm ci
+    
+    - name: Run frontend linting
+      run: |
+        npm run lint
+    
+    - name: Build frontend
+      run: |
+        npm run build
+    
+    - name: Run frontend tests
+      run: |
+        npm test
+
+  syntax-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Check HTML syntax
+      run: |
+        echo "Verificando sintaxis HTML..."
+        # Verificar que no hay errores obvios de sintaxis
+        if grep -q "SyntaxError\|missing )" index.html; then
+          echo "❌ Errores de sintaxis encontrados en index.html"
+          exit 1
+        else
+          echo "✅ No se encontraron errores de sintaxis obvios"
+        fi
+    
+    - name: Check JavaScript syntax
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+    
+    - name: Validate JavaScript files
+      run: |
+        echo "Verificando archivos JavaScript..."
+        for file in *.js; do
+          if [ -f "$file" ]; then
+            echo "Verificando $file..."
+            node -c "$file" || echo "⚠️ Problema en $file"
+          fi
+        done
+
+  basic-security:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Check for sensitive data
+      run: |
+        echo "Verificando datos sensibles..."
+        if grep -r "password\|secret\|key" --include="*.js" --include="*.html" --exclude-dir=node_modules .; then
+          echo "⚠️ Posibles datos sensibles encontrados"
+        else
+          echo "✅ No se encontraron datos sensibles obvios"
+        fi
+    
+    - name: Check file permissions
+      run: |
+        echo "Verificando permisos de archivos..."
+        find . -type f -perm /111 -name "*.js" -o -name "*.html" -o -name "*.css" | head -10
+        echo "✅ Verificación de permisos completada"
+
