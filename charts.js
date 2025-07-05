@@ -963,3 +963,441 @@ window.destroyChart = destroyChart;
 window.destroyAllCharts = destroyAllCharts;
 window.updateChartsTheme = updateChartsTheme;
 window.getChartsInfo = getChartsInfo;
+
+
+/**
+ * FUNCIONES FALTANTES IMPLEMENTADAS
+ * =================================
+ * Implementación de las funciones que estaban siendo llamadas
+ * pero no existían en el código original
+ */
+
+/**
+ * Actualiza el gráfico de progreso con nuevos datos
+ * @param {Object} data - Datos de progreso
+ * @param {string} period - Período de tiempo (7d, 30d, 90d)
+ * @returns {Promise<boolean>} - Éxito de la actualización
+ */
+export async function updateProgressChart(data = null, period = '7d') {
+  try {
+    console.log(`🔄 Actualizando gráfico de progreso (período: ${period})`);
+    
+    // Si no se proporcionan datos, obtenerlos de la API
+    if (!data) {
+      const endpoint = `/api/stats/progress?period=${period}`;
+      data = await apiWithFallback(endpoint, {
+        labels: generateDateLabels(period),
+        progress: generateMockProgressData(period),
+        target: 85
+      });
+    }
+    
+    // Buscar el gráfico de progreso existente
+    const progressChart = chartInstances.get('studyProgress') || 
+                         chartInstances.get('progressChart') ||
+                         chartInstances.get('progress');
+    
+    if (progressChart) {
+      // Actualizar datos existentes
+      progressChart.data.labels = data.labels;
+      progressChart.data.datasets[0].data = data.progress;
+      
+      if (data.target && progressChart.data.datasets[1]) {
+        progressChart.data.datasets[1].data = Array(data.labels.length).fill(data.target);
+      }
+      
+      progressChart.update('active');
+      console.log('✅ Gráfico de progreso actualizado exitosamente');
+      return true;
+    } else {
+      // Si no existe, crear uno nuevo
+      console.log('📊 Creando nuevo gráfico de progreso');
+      await createProgressChart(data, period);
+      return true;
+    }
+    
+  } catch (error) {
+    console.error('❌ Error actualizando gráfico de progreso:', error);
+    return false;
+  }
+}
+
+/**
+ * Actualiza el gráfico de precisión con nuevos datos
+ * @param {Object} data - Datos de precisión
+ * @param {string} period - Período de tiempo (7d, 30d, 90d)
+ * @returns {Promise<boolean>} - Éxito de la actualización
+ */
+export async function updateAccuracyChart(data = null, period = '7d') {
+  try {
+    console.log(`🔄 Actualizando gráfico de precisión (período: ${period})`);
+    
+    // Si no se proporcionan datos, obtenerlos de la API
+    if (!data) {
+      const endpoint = `/api/stats/accuracy?period=${period}`;
+      data = await apiWithFallback(endpoint, {
+        labels: generateDateLabels(period),
+        accuracy: generateMockAccuracyData(period),
+        target: 85
+      });
+    }
+    
+    // Buscar el gráfico de precisión existente
+    const accuracyChart = chartInstances.get('accuracyTrend') || 
+                         chartInstances.get('accuracyChart') ||
+                         chartInstances.get('accuracy');
+    
+    if (accuracyChart) {
+      // Actualizar datos existentes
+      accuracyChart.data.labels = data.labels;
+      accuracyChart.data.datasets[0].data = data.accuracy;
+      
+      if (data.target && accuracyChart.data.datasets[1]) {
+        accuracyChart.data.datasets[1].data = Array(data.labels.length).fill(data.target);
+      }
+      
+      accuracyChart.update('active');
+      console.log('✅ Gráfico de precisión actualizado exitosamente');
+      return true;
+    } else {
+      // Si no existe, crear uno nuevo
+      console.log('📊 Creando nuevo gráfico de precisión');
+      await createAccuracyChart(data, period);
+      return true;
+    }
+    
+  } catch (error) {
+    console.error('❌ Error actualizando gráfico de precisión:', error);
+    return false;
+  }
+}
+
+/**
+ * Cambia el período de tiempo para todos los gráficos
+ * @param {string} period - Nuevo período (7d, 30d, 90d)
+ * @returns {Promise<boolean>} - Éxito del cambio
+ */
+export async function updateChartPeriod(period = '7d') {
+  try {
+    console.log(`🔄 Cambiando período de gráficos a: ${period}`);
+    
+    // Validar período
+    const validPeriods = ['7d', '30d', '90d'];
+    if (!validPeriods.includes(period)) {
+      console.warn(`Período inválido: ${period}. Usando 7d por defecto.`);
+      period = '7d';
+    }
+    
+    // Actualizar todos los gráficos con el nuevo período
+    const updatePromises = [];
+    
+    // Actualizar gráfico de progreso
+    updatePromises.push(updateProgressChart(null, period));
+    
+    // Actualizar gráfico de precisión
+    updatePromises.push(updateAccuracyChart(null, period));
+    
+    // Actualizar otros gráficos si existen
+    if (chartInstances.has('studyStreak')) {
+      updatePromises.push(updateStreakChart(period));
+    }
+    
+    if (chartInstances.has('deckProgress')) {
+      updatePromises.push(updateDeckProgressChart(period));
+    }
+    
+    // Esperar a que todas las actualizaciones terminen
+    const results = await Promise.allSettled(updatePromises);
+    
+    // Verificar resultados
+    const successful = results.filter(result => result.status === 'fulfilled' && result.value === true).length;
+    const total = results.length;
+    
+    console.log(`✅ Período actualizado: ${successful}/${total} gráficos actualizados exitosamente`);
+    
+    // Actualizar UI para reflejar el período actual
+    updatePeriodButtons(period);
+    
+    return successful > 0;
+    
+  } catch (error) {
+    console.error('❌ Error cambiando período de gráficos:', error);
+    return false;
+  }
+}
+
+/**
+ * FUNCIONES AUXILIARES PARA LAS NUEVAS IMPLEMENTACIONES
+ */
+
+/**
+ * Genera etiquetas de fecha basadas en el período
+ * @param {string} period - Período de tiempo
+ * @returns {Array} - Array de etiquetas de fecha
+ */
+function generateDateLabels(period) {
+  const days = period === '7d' ? 7 : period === '30d' ? 30 : 90;
+  const labels = [];
+  
+  for (let i = days - 1; i >= 0; i--) {
+    const date = new Date(Date.now() - i * 24 * 60 * 60 * 1000);
+    labels.push(formatDate(date, 'DD/MM'));
+  }
+  
+  return labels;
+}
+
+/**
+ * Genera datos de progreso simulados
+ * @param {string} period - Período de tiempo
+ * @returns {Array} - Array de datos de progreso
+ */
+function generateMockProgressData(period) {
+  const days = period === '7d' ? 7 : period === '30d' ? 30 : 90;
+  const data = [];
+  let baseValue = 60;
+  
+  for (let i = 0; i < days; i++) {
+    // Simular progreso gradual con variación
+    baseValue += Math.random() * 4 - 1; // Variación de -1 a +3
+    baseValue = Math.max(0, Math.min(100, baseValue)); // Mantener entre 0-100
+    data.push(Math.round(baseValue));
+  }
+  
+  return data;
+}
+
+/**
+ * Genera datos de precisión simulados
+ * @param {string} period - Período de tiempo
+ * @returns {Array} - Array de datos de precisión
+ */
+function generateMockAccuracyData(period) {
+  const days = period === '7d' ? 7 : period === '30d' ? 30 : 90;
+  const data = [];
+  let baseValue = 75;
+  
+  for (let i = 0; i < days; i++) {
+    // Simular precisión con variación más estable
+    baseValue += Math.random() * 6 - 2; // Variación de -2 a +4
+    baseValue = Math.max(50, Math.min(100, baseValue)); // Mantener entre 50-100
+    data.push(Math.round(baseValue));
+  }
+  
+  return data;
+}
+
+/**
+ * Crea un nuevo gráfico de progreso
+ * @param {Object} data - Datos del gráfico
+ * @param {string} period - Período de tiempo
+ */
+async function createProgressChart(data, period) {
+  const ctx = document.getElementById('progressChart') || 
+             document.getElementById('studyProgressChart');
+  
+  if (!ctx) {
+    console.warn('Elemento canvas para gráfico de progreso no encontrado');
+    return;
+  }
+  
+  const chart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: data.labels,
+      datasets: [
+        {
+          label: 'Progreso de Estudio',
+          data: data.progress,
+          borderColor: CHARTS_CONFIG.defaultColors.primary,
+          backgroundColor: CHARTS_CONFIG.defaultColors.primary + '20',
+          tension: 0.3,
+          fill: true,
+        },
+        {
+          label: 'Objetivo',
+          data: Array(data.labels.length).fill(data.target || 85),
+          borderColor: CHARTS_CONFIG.defaultColors.warning,
+          borderDash: [5, 5],
+          fill: false,
+          pointRadius: 0,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        title: {
+          display: true,
+          text: `Progreso de Estudio (${period})`,
+          font: { size: 16, weight: 'bold' },
+        },
+      },
+      scales: {
+        x: {
+          title: {
+            display: true,
+            text: 'Fecha',
+          },
+        },
+        y: {
+          min: 0,
+          max: 100,
+          title: {
+            display: true,
+            text: 'Progreso (%)',
+          },
+        },
+      },
+      animation: CHARTS_CONFIG.animations,
+    },
+  });
+  
+  chartInstances.set('progressChart', chart);
+}
+
+/**
+ * Crea un nuevo gráfico de precisión
+ * @param {Object} data - Datos del gráfico
+ * @param {string} period - Período de tiempo
+ */
+async function createAccuracyChart(data, period) {
+  const ctx = document.getElementById('accuracyChart') || 
+             document.getElementById('accuracyTrendChart');
+  
+  if (!ctx) {
+    console.warn('Elemento canvas para gráfico de precisión no encontrado');
+    return;
+  }
+  
+  const chart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: data.labels,
+      datasets: [
+        {
+          label: 'Precisión',
+          data: data.accuracy,
+          borderColor: CHARTS_CONFIG.defaultColors.success,
+          backgroundColor: CHARTS_CONFIG.defaultColors.success + '20',
+          tension: 0.3,
+          fill: true,
+        },
+        {
+          label: 'Objetivo',
+          data: Array(data.labels.length).fill(data.target || 85),
+          borderColor: CHARTS_CONFIG.defaultColors.warning,
+          borderDash: [5, 5],
+          fill: false,
+          pointRadius: 0,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        title: {
+          display: true,
+          text: `Precisión de Respuestas (${period})`,
+          font: { size: 16, weight: 'bold' },
+        },
+      },
+      scales: {
+        x: {
+          title: {
+            display: true,
+            text: 'Fecha',
+          },
+        },
+        y: {
+          min: 0,
+          max: 100,
+          title: {
+            display: true,
+            text: 'Precisión (%)',
+          },
+        },
+      },
+      animation: CHARTS_CONFIG.animations,
+    },
+  });
+  
+  chartInstances.set('accuracyChart', chart);
+}
+
+/**
+ * Actualiza los botones de período en la UI
+ * @param {string} activePeriod - Período activo
+ */
+function updatePeriodButtons(activePeriod) {
+  const periodButtons = document.querySelectorAll('[data-period]');
+  
+  periodButtons.forEach(button => {
+    const buttonPeriod = button.getAttribute('data-period');
+    if (buttonPeriod === activePeriod) {
+      button.classList.add('active');
+    } else {
+      button.classList.remove('active');
+    }
+  });
+}
+
+/**
+ * Actualiza gráfico de racha de estudio
+ * @param {string} period - Período de tiempo
+ */
+async function updateStreakChart(period) {
+  try {
+    const data = await apiWithFallback(`/api/stats/streak?period=${period}`, {
+      current: Math.floor(Math.random() * 30) + 1,
+      best: Math.floor(Math.random() * 50) + 20,
+      history: generateMockProgressData(period)
+    });
+    
+    return updateChart('studyStreak', {
+      labels: generateDateLabels(period),
+      datasets: [{
+        label: 'Racha de Estudio',
+        data: data.history,
+        borderColor: CHARTS_CONFIG.defaultColors.accent,
+        backgroundColor: CHARTS_CONFIG.defaultColors.accent + '20',
+      }]
+    });
+  } catch (error) {
+    console.error('Error actualizando gráfico de racha:', error);
+    return false;
+  }
+}
+
+/**
+ * Actualiza gráfico de progreso de decks
+ * @param {string} period - Período de tiempo
+ */
+async function updateDeckProgressChart(period) {
+  try {
+    const data = await apiWithFallback(`/api/stats/deck-progress?period=${period}`, {
+      labels: ['Inglés Básico', 'Matemáticas', 'Historia', 'Química', 'Literatura'],
+      progress: [85, 92, 67, 78, 45]
+    });
+    
+    return updateChart('deckProgress', {
+      labels: data.labels,
+      datasets: [{
+        label: 'Progreso (%)',
+        data: data.progress,
+        backgroundColor: CHARTS_CONFIG.colorPalettes.purple,
+      }]
+    });
+  } catch (error) {
+    console.error('Error actualizando gráfico de progreso de decks:', error);
+    return false;
+  }
+}
+
+// Exponer las nuevas funciones globalmente para compatibilidad
+window.updateProgressChart = updateProgressChart;
+window.updateAccuracyChart = updateAccuracyChart;
+window.updateChartPeriod = updateChartPeriod;
+

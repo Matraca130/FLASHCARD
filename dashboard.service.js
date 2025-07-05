@@ -1,5 +1,11 @@
 import { api } from './apiClient.js';
-import { initializeCharts, updateChart } from './charts.js';
+import { 
+  initializeCharts, 
+  updateChart, 
+  updateProgressChart, 
+  updateAccuracyChart, 
+  updateChartPeriod 
+} from './charts.js';
 import {
   generateActivityHeatmap,
   updateHeatmapWithData,
@@ -92,15 +98,21 @@ export async function loadWeeklyStats() {
       totalStudyTime: 420, // minutos
     });
 
-    // Actualizar gráficos con datos semanales
+    // Atualizar gráficos com dados semanais
     if (weeklyStats.weeklyProgress) {
-      // TODO: Implementar updateProgressChart
-      // updateProgressChart(weeklyStats.weeklyProgress);
+      updateProgressChart({
+        labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
+        progress: weeklyStats.weeklyProgress,
+        target: 85
+      }, '7d');
     }
 
     if (weeklyStats.weeklyAccuracy) {
-      // TODO: Implementar updateAccuracyChart
-      // updateAccuracyChart(weeklyStats.weeklyAccuracy);
+      updateAccuracyChart({
+        labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
+        accuracy: weeklyStats.weeklyAccuracy,
+        target: 85
+      }, '7d');
     }
 
     return weeklyStats;
@@ -251,13 +263,19 @@ function initializeChartsWithData(stats) {
 
     // Actualizar con datos reales
     if (stats.weeklyProgress) {
-      // TODO: Implementar updateProgressChart
-      // updateProgressChart(stats.weeklyProgress);
+      updateProgressChart({
+        labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
+        progress: stats.weeklyProgress,
+        target: 85
+      }, '7d');
     }
 
     if (stats.weeklyAccuracy) {
-      // TODO: Implementar updateAccuracyChart
-      // updateAccuracyChart(stats.weeklyAccuracy);
+      updateAccuracyChart({
+        labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
+        accuracy: stats.weeklyAccuracy,
+        target: 85
+      }, '7d');
     }
 
     // Cargar estadísticas semanales adicionales
@@ -320,10 +338,9 @@ function generateMockActivityData() {
 export async function updateDashboardPeriod(period) {
   try {
     // Actualizar gráficos con nuevo período
-    // TODO: Implementar updateChartPeriod
-    // if (updateChartPeriod) {
-    //   updateChartPeriod(period);
-    // }
+    if (updateChartPeriod) {
+      updateChartPeriod(period);
+    }
 
     // Cargar datos específicos del período
     const periodStats = await apiWithFallback(
