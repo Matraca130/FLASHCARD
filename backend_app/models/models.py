@@ -394,6 +394,123 @@ class Flashcard(BaseModel):
         else:
             self.tags = None
     
+    # ========== PROPIEDADES HÍBRIDAS PARA UNIFICAR NOMBRES DE CAMPOS ==========
+    
+    @hybrid_property
+    def front(self):
+        """Alias para front_text - unifica nomenclatura con frontend"""
+        return self.front_text
+    
+    @front.setter
+    def front(self, value):
+        self.front_text = value
+    
+    @front.expression
+    def front(cls):
+        return cls.front_text
+    
+    @hybrid_property
+    def back(self):
+        """Alias para back_text - unifica nomenclatura con frontend"""
+        return self.back_text
+    
+    @back.setter
+    def back(self, value):
+        self.back_text = value
+    
+    @back.expression
+    def back(cls):
+        return cls.back_text
+    
+    @hybrid_property
+    def front_image(self):
+        """Alias para front_image_url - unifica nomenclatura con frontend"""
+        return self.front_image_url
+    
+    @front_image.setter
+    def front_image(self, value):
+        self.front_image_url = value
+    
+    @front_image.expression
+    def front_image(cls):
+        return cls.front_image_url
+    
+    @hybrid_property
+    def back_image(self):
+        """Alias para back_image_url - unifica nomenclatura con frontend"""
+        return self.back_image_url
+    
+    @back_image.setter
+    def back_image(self, value):
+        self.back_image_url = value
+    
+    @back_image.expression
+    def back_image(cls):
+        return cls.back_image_url
+    
+    @hybrid_property
+    def front_audio(self):
+        """Alias para front_audio_url - unifica nomenclatura con frontend"""
+        return self.front_audio_url
+    
+    @front_audio.setter
+    def front_audio(self, value):
+        self.front_audio_url = value
+    
+    @front_audio.expression
+    def front_audio(cls):
+        return cls.front_audio_url
+    
+    @hybrid_property
+    def back_audio(self):
+        """Alias para back_audio_url - unifica nomenclatura con frontend"""
+        return self.back_audio_url
+    
+    @back_audio.setter
+    def back_audio(self, value):
+        self.back_audio_url = value
+    
+    @back_audio.expression
+    def back_audio(cls):
+        return cls.back_audio_url
+    
+    @property
+    def easiness_factor(self):
+        """Alias para ease_factor - terminología alternativa"""
+        return self.ease_factor
+    
+    @easiness_factor.setter
+    def easiness_factor(self, value):
+        self.ease_factor = value
+    
+    @hybrid_property
+    def interval(self):
+        """Alias para interval_days - unifica nomenclatura con frontend"""
+        return self.interval_days
+    
+    @interval.setter
+    def interval(self, value):
+        self.interval_days = value
+    
+    @interval.expression
+    def interval(cls):
+        return cls.interval_days
+    
+    @hybrid_property
+    def last_review(self):
+        """Alias para last_reviewed - unifica nomenclatura con frontend"""
+        return self.last_reviewed
+    
+    @last_review.setter
+    def last_review(self, value):
+        self.last_reviewed = value
+    
+    @last_review.expression
+    def last_review(cls):
+        return cls.last_reviewed
+    
+    # ========== FIN PROPIEDADES HÍBRIDAS ==========
+    
     @hybrid_property
     def accuracy_rate(self):
         """Calcular tasa de acierto"""
