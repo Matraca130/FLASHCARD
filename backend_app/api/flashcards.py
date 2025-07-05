@@ -6,7 +6,7 @@ Compatible con frontend existente
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from backend_app.models import User, Deck, Flashcard
-from backend_app.services import FlashcardService
+from backend_app.services_new import FlashcardService
 from backend_app.extensions import db
 from backend_app.validation.schemas import FlashcardCreationSchema
 from backend_app.validation.validators import validate_json
@@ -15,7 +15,9 @@ import logging
 
 logger = logging.getLogger(__name__)
 flashcards_bp = Blueprint('flashcards', __name__)
-flashcard_service = FlashcardService()
+
+# Usar servicio refactorizado con inyección de dependencias
+flashcard_service = FlashcardService(db=db)
 
 @flashcards_bp.route('/', methods=['POST'])
 @jwt_required()

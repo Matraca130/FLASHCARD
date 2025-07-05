@@ -7,6 +7,7 @@ from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from backend_app.extensions import db
 from backend_app.models import User, Deck, Flashcard, StudySession, CardReview
+from backend_app.services_new import UserService, DeckService, FlashcardService, StudyService, StatsService
 from backend_app.utils import get_current_user_id
 from backend_app.utils.statistics import calculate_study_streak
 from datetime import datetime, timedelta
@@ -15,6 +16,13 @@ import logging
 # Blueprint para APIs frontend
 frontend_api = Blueprint('frontend_api', __name__, url_prefix='/api/v1')
 logger = logging.getLogger('app.frontend_api')
+
+# Instanciar servicios refactorizados con inyección de dependencias
+user_service = UserService(db=db)
+deck_service = DeckService(db=db)
+flashcard_service = FlashcardService(db=db)
+study_service = StudyService(db=db)
+stats_service = StatsService(db=db)
 
 @frontend_api.route('/health', methods=['GET'])
 def health_check():

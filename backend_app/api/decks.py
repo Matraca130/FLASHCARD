@@ -6,7 +6,7 @@ Compatible con frontend existente
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from backend_app.models import User, Deck, Flashcard
-from backend_app.services import DeckService
+from backend_app.services_new import DeckService
 from backend_app.extensions import db
 from backend_app.validation.schemas import DeckCreationSchema
 from backend_app.validation.validators import validate_json
@@ -15,7 +15,9 @@ import logging
 
 logger = logging.getLogger(__name__)
 decks_bp = Blueprint('decks', __name__)
-deck_service = DeckService()
+
+# Usar servicio refactorizado con inyección de dependencias
+deck_service = DeckService(db=db)
 
 @decks_bp.route('/', methods=['GET'])
 @jwt_required()

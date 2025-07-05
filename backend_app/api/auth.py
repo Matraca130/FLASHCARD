@@ -6,7 +6,7 @@ Compatible con frontend existente
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, create_access_token, get_jwt_identity
 from backend_app.models import User
-from backend_app.services import UserService
+from backend_app.services_new import UserService
 from backend_app.extensions import db
 from backend_app.validation.schemas import UserRegistrationSchema, UserLoginSchema
 from backend_app.validation.validators import validate_json
@@ -14,7 +14,9 @@ import logging
 
 logger = logging.getLogger(__name__)
 auth_bp = Blueprint('auth', __name__)
-user_service = UserService()
+
+# Usar servicio refactorizado con inyección de dependencias
+user_service = UserService(db=db)
 @auth_bp.route('/login', methods=['POST'])
 @validate_json(UserLoginSchema)
 def login(validated_data):

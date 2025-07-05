@@ -6,7 +6,7 @@ Compatible con frontend existente - CRÍTICO para conexión frontend-backend
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from backend_app.models import User, Deck, Flashcard, StudySession, CardReview
-from backend_app.services import StudyService
+from backend_app.services_new import StudyService
 from backend_app.utils import calculate_fsrs, calculate_sm2, get_next_review_date
 from backend_app.extensions import db
 from backend_app.validation.schemas import StudyAnswerSchema, StudySessionSchema
@@ -16,7 +16,9 @@ import logging
 
 logger = logging.getLogger(__name__)
 study_bp = Blueprint('study', __name__)
-study_service = StudyService()
+
+# Usar servicio refactorizado con inyección de dependencias
+study_service = StudyService(db=db)
 
 @study_bp.route('/session', methods=['POST'])
 @jwt_required()
