@@ -1,14 +1,13 @@
 /**
- * CORE NAVIGATION SYSTEM - SOLUCIÓN ESTRUCTURAL ROBUSTA
- * =====================================================
+ * CORE NAVIGATION SYSTEM - REFACTORIZADO
+ * =====================================
  * 
- * Este sistema está diseñado para ser:
- * 1. A prueba de errores futuros
- * 2. Independiente de otros scripts
- * 3. Auto-diagnóstico y auto-reparación
- * 4. Completamente documentado
- * 5. Resistente a cambios en el código
+ * Sistema de navegación robusto y refactorizado que utiliza
+ * las utilidades comunes para eliminar duplicación de código
  */
+
+import { showNotification, formatDate } from './utils/helpers.js';
+import { validateRequiredFields } from './utils/validation.js';
 
 class NavigationSystem {
   constructor() {
@@ -16,9 +15,14 @@ class NavigationSystem {
     this.sections = new Map();
     this.navLinks = new Map();
     this.currentSection = null;
-    this.debugMode = true;
+    this.debugMode = window.APP_CONFIG?.features?.debugging || false;
+    this.animations = {
+      enabled: true,
+      duration: 300,
+      easing: 'ease-in-out'
+    };
     
-    this.log('🚀 NavigationSystem constructor called');
+    this.log('🚀 NavigationSystem refactorizado inicializado');
     this.init();
   }
 
@@ -26,7 +30,7 @@ class NavigationSystem {
    * Inicialización del sistema
    */
   init() {
-    this.log('🔧 Initializing NavigationSystem...');
+    this.log('🔧 Inicializando NavigationSystem refactorizado...');
     
     try {
       // Esperar a que el DOM esté completamente cargado
@@ -36,7 +40,7 @@ class NavigationSystem {
         this.setup();
       }
     } catch (error) {
-      this.error('❌ Error in init:', error);
+      this.error('❌ Error en init:', error);
     }
   }
 
@@ -44,450 +48,556 @@ class NavigationSystem {
    * Configuración principal del sistema
    */
   setup() {
-    this.log('⚙️ Setting up navigation system...');
+    this.log('⚙️ Configurando sistema de navegación...');
     
     try {
       // 1. Descubrir y mapear todas las secciones
       this.discoverSections();
       
-      // 2. Descubrir y mapear todos los enlaces de navegación
+      // 2. Descubrir y configurar enlaces de navegación
       this.discoverNavLinks();
       
-      // 3. Validar la integridad del sistema
-      this.validateSystem();
+      // 3. Configurar eventos
+      this.setupEvents();
       
-      // 4. Configurar event listeners
-      this.setupEventListeners();
+      // 4. Configurar observadores de mutación
+      this.setupMutationObserver();
       
-      // 5. Configurar navegación por URL hash
-      this.setupHashNavigation();
-      
-      // 6. Mostrar sección inicial
-      this.showInitialSection();
-      
-      // 7. Marcar como inicializado
+      // 5. Marcar como inicializado
       this.isInitialized = true;
       
-      this.log('✅ NavigationSystem setup completed successfully');
-      this.logSystemStatus();
+      this.log('✅ NavigationSystem configurado exitosamente');
+      this.log(`📊 Secciones encontradas: ${this.sections.size}`);
+      this.log(`🔗 Enlaces encontrados: ${this.navLinks.size}`);
+      
+      // Mostrar notificación si está en modo debug
+      if (this.debugMode) {
+        showNotification(`Navigation: ${this.sections.size} secciones, ${this.navLinks.size} enlaces`, 'info', 2000);
+      }
       
     } catch (error) {
-      this.error('❌ Error in setup:', error);
-      this.attemptRecovery();
+      this.error('❌ Error en setup:', error);
+      showNotification('Error configurando navegación', 'error', 3000);
     }
   }
 
   /**
-   * Descubrir todas las secciones disponibles
+   * Descubre todas las secciones disponibles
    */
   discoverSections() {
-    this.log('🔍 Discovering sections...');
+    this.log('🔍 Descubriendo secciones...');
     
-    const sectionElements = document.querySelectorAll('.section[id]');
-    this.sections.clear();
+    // Selectores para encontrar secciones
+    const sectionSelectors = [
+      '[data-section]',
+      '.section',
+      '.page-section',
+      '.content-section',
+      'section[id]'
+    ];
     
-    sectionElements.forEach(section => {
-      const id = section.id;
-      this.sections.set(id, {
-        element: section,
-        id: id,
-        title: this.extractSectionTitle(section),
-        isVisible: !section.style.display || section.style.display !== 'none'
-      });
+    let sectionsFound = 0;
+    
+    sectionSelectors.forEach(selector => {
+      const elements = document.querySelectorAll(selector);
       
-      this.log(`📄 Found section: ${id}`);
+      elements.forEach(element => {
+        const sectionId = this.getSectionId(element);
+        
+        if (sectionId && !this.sections.has(sectionId)) {
+          this.sections.set(sectionId, {
+            element: element,
+            id: sectionId,
+            title: this.getSectionTitle(element),
+            visible: !element.hidden && element.style.display !== 'none',
+            lastShown: null,
+            showCount: 0
+          });
+          
+          sectionsFound++;
+          this.log(`  📄 Sección encontrada: ${sectionId}`);
+        }
+      });
     });
     
-    this.log(`📊 Total sections discovered: ${this.sections.size}`);
+    this.log(`✅ ${sectionsFound} secciones descubiertas`);
   }
 
   /**
-   * Descubrir todos los enlaces de navegación
+   * Descubre todos los enlaces de navegación
    */
   discoverNavLinks() {
-    this.log('🔗 Discovering navigation links...');
+    this.log('🔍 Descubriendo enlaces de navegación...');
     
-    const linkElements = document.querySelectorAll('.nav-link[data-section]');
-    this.navLinks.clear();
+    // Selectores para encontrar enlaces de navegación
+    const linkSelectors = [
+      '[data-section]',
+      '[data-target]',
+      '.nav-link',
+      '.navigation-link',
+      'a[href^="#"]'
+    ];
     
-    linkElements.forEach(link => {
-      const sectionId = link.getAttribute('data-section');
-      this.navLinks.set(sectionId, {
-        element: link,
-        sectionId: sectionId,
-        text: link.textContent.trim()
-      });
-      
-      this.log(`🔗 Found nav link: ${sectionId} -> "${link.textContent.trim()}"`);
-    });
+    let linksFound = 0;
     
-    this.log(`📊 Total nav links discovered: ${this.navLinks.size}`);
-  }
-
-  /**
-   * Validar la integridad del sistema
-   */
-  validateSystem() {
-    this.log('🔍 Validating system integrity...');
-    
-    const issues = [];
-    
-    // Verificar que cada enlace tenga su sección correspondiente
-    for (const [sectionId, linkData] of this.navLinks) {
-      if (!this.sections.has(sectionId)) {
-        issues.push(`Missing section for nav link: ${sectionId}`);
-      }
-    }
-    
-    // Verificar que cada sección tenga su enlace correspondiente
-    for (const [sectionId, sectionData] of this.sections) {
-      if (!this.navLinks.has(sectionId)) {
-        this.log(`⚠️ Warning: Section ${sectionId} has no navigation link`);
-      }
-    }
-    
-    if (issues.length > 0) {
-      this.error('❌ System validation failed:', issues);
-      throw new Error(`Navigation system validation failed: ${issues.join(', ')}`);
-    }
-    
-    this.log('✅ System validation passed');
-  }
-
-  /**
-   * Configurar event listeners
-   */
-  setupEventListeners() {
-    this.log('🎯 Setting up event listeners...');
-    
-    for (const [sectionId, linkData] of this.navLinks) {
-      const link = linkData.element;
+    linkSelectors.forEach(selector => {
+      const elements = document.querySelectorAll(selector);
       
-      // Remover listeners existentes
-      link.removeEventListener('click', this.handleNavClick.bind(this));
-      
-      // Agregar nuevo listener
-      link.addEventListener('click', (event) => this.handleNavClick(event, sectionId));
-      
-      // Marcar como configurado
-      link.setAttribute('data-nav-configured', 'true');
-      
-      this.log(`🎯 Event listener configured for: ${sectionId}`);
-    }
-  }
-
-  /**
-   * Configurar navegación por URL hash
-   */
-  setupHashNavigation() {
-    this.log('🔗 Setting up hash navigation...');
-    
-    window.addEventListener('hashchange', () => {
-      const hash = window.location.hash.substring(1);
-      if (hash && this.sections.has(hash)) {
-        this.showSection(hash);
-      }
-    });
-  }
-
-  /**
-   * Manejador de clicks en navegación
-   */
-  handleNavClick(event, sectionId) {
-    event.preventDefault();
-    
-    this.log(`🖱️ Navigation clicked: ${sectionId}`);
-    
-    try {
-      this.showSection(sectionId);
-      
-      // Actualizar URL hash
-      if (history.pushState) {
-        history.pushState(null, null, `#${sectionId}`);
-      } else {
-        window.location.hash = sectionId;
-      }
-      
-    } catch (error) {
-      this.error('❌ Error handling nav click:', error);
-    }
-  }
-
-  /**
-   * Mostrar una sección específica
-   */
-  showSection(sectionId) {
-    this.log(`📍 Showing section: ${sectionId}`);
-    
-    try {
-      // Verificar que la sección existe
-      if (!this.sections.has(sectionId)) {
-        throw new Error(`Section not found: ${sectionId}`);
-      }
-      
-      // Ocultar todas las secciones
-      this.hideAllSections();
-      
-      // Mostrar la sección seleccionada
-      const sectionData = this.sections.get(sectionId);
-      const sectionElement = sectionData.element;
-      
-      sectionElement.style.display = 'block';
-      sectionElement.classList.add('active');
-      
-      // Actualizar navegación activa
-      this.updateActiveNavigation(sectionId);
-      
-      // Actualizar estado interno
-      this.currentSection = sectionId;
-      
-      // Cargar contenido específico de la sección
-      this.loadSectionContent(sectionId);
-      
-      this.log(`✅ Section ${sectionId} shown successfully`);
-      
-    } catch (error) {
-      this.error('❌ Error showing section:', error);
-      this.attemptRecovery();
-    }
-  }
-
-  /**
-   * Ocultar todas las secciones
-   */
-  hideAllSections() {
-    for (const [sectionId, sectionData] of this.sections) {
-      const element = sectionData.element;
-      element.style.display = 'none';
-      element.classList.remove('active');
-    }
-  }
-
-  /**
-   * Actualizar navegación activa
-   */
-  updateActiveNavigation(activeSectionId) {
-    // Remover clase active de todos los enlaces
-    for (const [sectionId, linkData] of this.navLinks) {
-      linkData.element.classList.remove('active');
-    }
-    
-    // Agregar clase active al enlace correspondiente
-    if (this.navLinks.has(activeSectionId)) {
-      this.navLinks.get(activeSectionId).element.classList.add('active');
-    }
-  }
-
-  /**
-   * Cargar contenido específico de cada sección
-   */
-  loadSectionContent(sectionId) {
-    this.log(`📦 Loading content for section: ${sectionId}`);
-    
-    try {
-      // Agregar mensaje de confirmación visual
-      this.addSectionStatusMessage(sectionId);
-      
-      // Aquí se pueden agregar cargas específicas por sección
-      switch (sectionId) {
-        case 'dashboard':
-          this.log('📊 Dashboard content ready');
-          break;
-        case 'estudiar':
-          this.log('📚 Study section ready');
-          break;
-        case 'crear':
-          this.log('✏️ Create section ready');
-          break;
-        case 'gestionar':
-          this.log('⚙️ Manage section ready');
-          break;
-        case 'ranking':
-          this.log('🏆 Ranking section ready');
-          break;
-        default:
-          this.log(`❓ Unknown section: ${sectionId}`);
-      }
-      
-    } catch (error) {
-      this.error('❌ Error loading section content:', error);
-    }
-  }
-
-  /**
-   * Agregar mensaje de estado a una sección
-   */
-  addSectionStatusMessage(sectionId) {
-    const sectionData = this.sections.get(sectionId);
-    if (!sectionData) return;
-    
-    const section = sectionData.element;
-    const existingMessage = section.querySelector('.nav-status-message');
-    
-    if (!existingMessage) {
-      const messageDiv = document.createElement('div');
-      messageDiv.className = 'nav-status-message';
-      messageDiv.style.cssText = `
-        background: linear-gradient(135deg, #27ae60, #2ecc71);
-        color: white;
-        padding: 0.75rem 1.5rem;
-        margin: 1rem 0;
-        border-radius: 8px;
-        font-weight: 500;
-        text-align: center;
-        box-shadow: 0 2px 10px rgba(39, 174, 96, 0.3);
-        animation: slideInFromTop 0.5s ease-out;
-      `;
-      
-      messageDiv.innerHTML = `
-        <span style="margin-right: 0.5rem;">✅</span>
-        Sección "${sectionData.title || sectionId}" cargada correctamente
-      `;
-      
-      // Insertar al principio de la sección
-      section.insertBefore(messageDiv, section.firstChild);
-      
-      // Remover el mensaje después de 3 segundos
-      setTimeout(() => {
-        if (messageDiv.parentNode) {
-          messageDiv.style.animation = 'fadeOut 0.5s ease-out';
-          setTimeout(() => messageDiv.remove(), 500);
+      elements.forEach(element => {
+        const targetSection = this.getLinkTarget(element);
+        
+        if (targetSection && !this.navLinks.has(element)) {
+          this.navLinks.set(element, {
+            element: element,
+            target: targetSection,
+            clickCount: 0,
+            lastClicked: null
+          });
+          
+          // Configurar evento de click
+          element.addEventListener('click', (e) => this.handleNavClick(e, element));
+          
+          linksFound++;
+          this.log(`  🔗 Enlace encontrado: ${element.tagName} → ${targetSection}`);
         }
-      }, 3000);
-    }
+      });
+    });
+    
+    this.log(`✅ ${linksFound} enlaces configurados`);
   }
 
   /**
-   * Mostrar sección inicial
+   * Configura eventos del sistema
    */
-  showInitialSection() {
-    this.log('🏠 Showing initial section...');
+  setupEvents() {
+    this.log('⚙️ Configurando eventos...');
     
-    // Verificar si hay hash en la URL
-    const hash = window.location.hash.substring(1);
-    if (hash && this.sections.has(hash)) {
-      this.showSection(hash);
+    // Evento personalizado para mostrar secciones
+    document.addEventListener('showSection', (e) => {
+      this.showSection(e.detail.section, e.detail.options);
+    });
+    
+    // Evento de cambio de hash
+    window.addEventListener('hashchange', () => {
+      const section = window.location.hash.slice(1);
+      if (section) {
+        this.showSection(section);
+      }
+    });
+    
+    // Eventos de teclado para navegación
+    document.addEventListener('keydown', (e) => {
+      if (e.ctrlKey || e.metaKey) {
+        switch (e.key) {
+          case '1':
+          case '2':
+          case '3':
+          case '4':
+          case '5':
+            e.preventDefault();
+            const sectionIndex = parseInt(e.key) - 1;
+            const sections = Array.from(this.sections.keys());
+            if (sections[sectionIndex]) {
+              this.showSection(sections[sectionIndex]);
+            }
+            break;
+        }
+      }
+    });
+    
+    this.log('✅ Eventos configurados');
+  }
+
+  /**
+   * Configura observador de mutaciones para detectar cambios en el DOM
+   */
+  setupMutationObserver() {
+    if (!window.MutationObserver) {
+      this.log('⚠️ MutationObserver no disponible');
       return;
     }
     
-    // Mostrar dashboard por defecto
-    if (this.sections.has('dashboard')) {
-      this.showSection('dashboard');
-    } else {
-      // Mostrar la primera sección disponible
-      const firstSection = this.sections.keys().next().value;
-      if (firstSection) {
-        this.showSection(firstSection);
+    const observer = new MutationObserver((mutations) => {
+      let shouldRediscover = false;
+      
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'childList') {
+          mutation.addedNodes.forEach((node) => {
+            if (node.nodeType === Node.ELEMENT_NODE) {
+              // Verificar si se agregaron nuevas secciones o enlaces
+              if (node.matches('[data-section], .section, .nav-link') ||
+                  node.querySelector('[data-section], .section, .nav-link')) {
+                shouldRediscover = true;
+              }
+            }
+          });
+        }
+      });
+      
+      if (shouldRediscover) {
+        this.log('🔄 Cambios detectados en DOM, redescubriendo...');
+        this.discoverSections();
+        this.discoverNavLinks();
       }
-    }
-  }
-
-  /**
-   * Extraer título de una sección
-   */
-  extractSectionTitle(sectionElement) {
-    const titleElement = sectionElement.querySelector('h1, h2, h3, .section-title, .hero-title');
-    return titleElement ? titleElement.textContent.trim() : sectionElement.id;
-  }
-
-  /**
-   * Intentar recuperación del sistema
-   */
-  attemptRecovery() {
-    this.log('🔄 Attempting system recovery...');
+    });
     
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+    
+    this.log('✅ MutationObserver configurado');
+  }
+
+  /**
+   * Muestra una sección específica
+   */
+  showSection(sectionId, options = {}) {
     try {
-      // Reinicializar después de un breve delay
-      setTimeout(() => {
-        this.setup();
-      }, 1000);
+      this.log(`🎯 Mostrando sección: ${sectionId}`);
+      
+      // Validar parámetros
+      if (!validateRequiredFields({ sectionId })) {
+        return false;
+      }
+      
+      // Verificar si la sección existe
+      if (!this.sections.has(sectionId)) {
+        this.log(`⚠️ Sección no encontrada: ${sectionId}`);
+        
+        // Intentar redescubrir secciones
+        this.discoverSections();
+        
+        if (!this.sections.has(sectionId)) {
+          showNotification(`Sección "${sectionId}" no encontrada`, 'error', 3000);
+          return false;
+        }
+      }
+      
+      // Obtener información de la sección
+      const sectionInfo = this.sections.get(sectionId);
+      const sectionElement = sectionInfo.element;
+      
+      // Ocultar sección actual si existe
+      if (this.currentSection && this.currentSection !== sectionId) {
+        this.hideSection(this.currentSection);
+      }
+      
+      // Mostrar nueva sección
+      this.displaySection(sectionElement, options);
+      
+      // Actualizar estado
+      this.currentSection = sectionId;
+      sectionInfo.lastShown = Date.now();
+      sectionInfo.showCount++;
+      sectionInfo.visible = true;
+      
+      // Actualizar enlaces activos
+      this.updateActiveLinks(sectionId);
+      
+      // Disparar evento personalizado
+      this.dispatchSectionEvent('sectionShown', sectionId, options);
+      
+      this.log(`✅ Sección mostrada: ${sectionId}`);
+      return true;
       
     } catch (error) {
-      this.error('❌ Recovery failed:', error);
+      this.error(`❌ Error mostrando sección ${sectionId}:`, error);
+      showNotification(`Error mostrando sección ${sectionId}`, 'error', 3000);
+      return false;
     }
   }
 
   /**
-   * Logging del estado del sistema
+   * Oculta una sección específica
    */
-  logSystemStatus() {
-    this.log('📊 SYSTEM STATUS:');
-    this.log(`   - Sections: ${this.sections.size}`);
-    this.log(`   - Nav Links: ${this.navLinks.size}`);
-    this.log(`   - Current Section: ${this.currentSection}`);
-    this.log(`   - Initialized: ${this.isInitialized}`);
-  }
-
-  /**
-   * Método de logging
-   */
-  log(message) {
-    if (this.debugMode) {
-      console.log(`[NavigationSystem] ${message}`);
+  hideSection(sectionId) {
+    try {
+      if (!this.sections.has(sectionId)) {
+        return false;
+      }
+      
+      const sectionInfo = this.sections.get(sectionId);
+      const sectionElement = sectionInfo.element;
+      
+      // Aplicar animación de salida si está habilitada
+      if (this.animations.enabled) {
+        sectionElement.style.transition = `opacity ${this.animations.duration}ms ${this.animations.easing}`;
+        sectionElement.style.opacity = '0';
+        
+        setTimeout(() => {
+          sectionElement.style.display = 'none';
+          sectionElement.classList.remove('active', 'visible');
+        }, this.animations.duration);
+      } else {
+        sectionElement.style.display = 'none';
+        sectionElement.classList.remove('active', 'visible');
+      }
+      
+      // Actualizar estado
+      sectionInfo.visible = false;
+      
+      // Disparar evento
+      this.dispatchSectionEvent('sectionHidden', sectionId);
+      
+      this.log(`👁️ Sección oculta: ${sectionId}`);
+      return true;
+      
+    } catch (error) {
+      this.error(`❌ Error ocultando sección ${sectionId}:`, error);
+      return false;
     }
   }
 
   /**
-   * Método de logging de errores
+   * Muestra físicamente una sección en el DOM
    */
-  error(message, error = null) {
-    console.error(`[NavigationSystem] ${message}`, error);
+  displaySection(sectionElement, options = {}) {
+    const { animated = this.animations.enabled, data = null } = options;
+    
+    // Configurar estilos iniciales
+    sectionElement.style.display = 'block';
+    sectionElement.classList.add('active', 'visible');
+    
+    // Aplicar animación de entrada si está habilitada
+    if (animated) {
+      sectionElement.style.opacity = '0';
+      sectionElement.style.transition = `opacity ${this.animations.duration}ms ${this.animations.easing}`;
+      
+      // Forzar reflow
+      sectionElement.offsetHeight;
+      
+      // Animar entrada
+      sectionElement.style.opacity = '1';
+    } else {
+      sectionElement.style.opacity = '1';
+    }
+    
+    // Scroll al inicio de la sección
+    if (options.scroll !== false) {
+      sectionElement.scrollIntoView({ 
+        behavior: animated ? 'smooth' : 'auto',
+        block: 'start'
+      });
+    }
+    
+    // Pasar datos si están disponibles
+    if (data && typeof sectionElement.setData === 'function') {
+      sectionElement.setData(data);
+    }
   }
 
   /**
-   * API pública para debugging
+   * Actualiza enlaces activos
    */
-  getStatus() {
-    return {
-      isInitialized: this.isInitialized,
-      sectionsCount: this.sections.size,
-      navLinksCount: this.navLinks.size,
+  updateActiveLinks(activeSectionId) {
+    this.navLinks.forEach((linkInfo, linkElement) => {
+      if (linkInfo.target === activeSectionId) {
+        linkElement.classList.add('active', 'current');
+      } else {
+        linkElement.classList.remove('active', 'current');
+      }
+    });
+  }
+
+  /**
+   * Maneja clicks en enlaces de navegación
+   */
+  handleNavClick(event, linkElement) {
+    try {
+      event.preventDefault();
+      
+      const linkInfo = this.navLinks.get(linkElement);
+      if (!linkInfo) {
+        this.log('⚠️ Información de enlace no encontrada');
+        return;
+      }
+      
+      const targetSection = linkInfo.target;
+      
+      // Actualizar estadísticas del enlace
+      linkInfo.clickCount++;
+      linkInfo.lastClicked = Date.now();
+      
+      // Mostrar sección
+      const success = this.showSection(targetSection);
+      
+      if (success) {
+        this.log(`🔗 Navegación exitosa: ${linkElement.tagName} → ${targetSection}`);
+      }
+      
+    } catch (error) {
+      this.error('❌ Error en handleNavClick:', error);
+      showNotification('Error en navegación', 'error', 2000);
+    }
+  }
+
+  /**
+   * Obtiene el ID de una sección
+   */
+  getSectionId(element) {
+    return element.dataset.section || 
+           element.id || 
+           element.getAttribute('data-section') ||
+           element.className.match(/section-(\w+)/)?.[1];
+  }
+
+  /**
+   * Obtiene el título de una sección
+   */
+  getSectionTitle(element) {
+    return element.dataset.title ||
+           element.getAttribute('title') ||
+           element.querySelector('h1, h2, h3')?.textContent ||
+           this.getSectionId(element);
+  }
+
+  /**
+   * Obtiene el target de un enlace
+   */
+  getLinkTarget(element) {
+    return element.dataset.section ||
+           element.dataset.target ||
+           element.getAttribute('href')?.slice(1) ||
+           element.getAttribute('data-section');
+  }
+
+  /**
+   * Dispara evento personalizado de sección
+   */
+  dispatchSectionEvent(eventType, sectionId, data = null) {
+    const event = new CustomEvent(eventType, {
+      detail: {
+        sectionId,
+        timestamp: Date.now(),
+        data
+      }
+    });
+    
+    document.dispatchEvent(event);
+  }
+
+  /**
+   * Obtiene estadísticas del sistema
+   */
+  getStats() {
+    const stats = {
+      sectionsTotal: this.sections.size,
+      linksTotal: this.navLinks.size,
       currentSection: this.currentSection,
-      sections: Array.from(this.sections.keys()),
-      navLinks: Array.from(this.navLinks.keys())
+      isInitialized: this.isInitialized,
+      sections: {},
+      links: {}
     };
+    
+    // Estadísticas de secciones
+    this.sections.forEach((info, id) => {
+      stats.sections[id] = {
+        showCount: info.showCount,
+        lastShown: info.lastShown ? formatDate(new Date(info.lastShown)) : null,
+        visible: info.visible,
+        title: info.title
+      };
+    });
+    
+    // Estadísticas de enlaces
+    this.navLinks.forEach((info, element) => {
+      const key = `${element.tagName}-${info.target}`;
+      stats.links[key] = {
+        target: info.target,
+        clickCount: info.clickCount,
+        lastClicked: info.lastClicked ? formatDate(new Date(info.lastClicked)) : null
+      };
+    });
+    
+    return stats;
   }
 
   /**
-   * Forzar navegación (para debugging)
+   * Reinicia el sistema
    */
-  forceShowSection(sectionId) {
-    this.log(`🔧 Force showing section: ${sectionId}`);
-    this.showSection(sectionId);
+  reset() {
+    this.log('🔄 Reiniciando NavigationSystem...');
+    
+    // Limpiar mapas
+    this.sections.clear();
+    this.navLinks.clear();
+    
+    // Resetear estado
+    this.currentSection = null;
+    this.isInitialized = false;
+    
+    // Reinicializar
+    this.setup();
+    
+    this.log('✅ NavigationSystem reiniciado');
+  }
+
+  /**
+   * Configura el sistema
+   */
+  configure(options = {}) {
+    Object.assign(this.animations, options.animations || {});
+    this.debugMode = options.debugMode !== undefined ? options.debugMode : this.debugMode;
+    
+    this.log('⚙️ NavigationSystem reconfigurado:', options);
+  }
+
+  /**
+   * Log de depuración
+   */
+  log(message, ...args) {
+    if (this.debugMode) {
+      console.log(`[NavigationSystem] ${message}`, ...args);
+    }
+  }
+
+  /**
+   * Log de errores
+   */
+  error(message, ...args) {
+    console.error(`[NavigationSystem] ${message}`, ...args);
   }
 }
 
-// Agregar estilos CSS para animaciones
-const style = document.createElement('style');
-style.textContent = `
-  @keyframes slideInFromTop {
-    from {
-      opacity: 0;
-      transform: translateY(-20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  
-  @keyframes fadeOut {
-    from {
-      opacity: 1;
-    }
-    to {
-      opacity: 0;
-    }
-  }
-`;
-document.head.appendChild(style);
-
-// Inicializar el sistema de navegación
+// Crear instancia global
 const navigationSystem = new NavigationSystem();
 
-// Hacer disponible globalmente para debugging
-window.NavigationSystem = NavigationSystem;
-window.navigationSystem = navigationSystem;
+// Función de compatibilidad para código legacy
+export function showSection(sectionId, options = {}) {
+  return navigationSystem.showSection(sectionId, options);
+}
 
-console.log('✅ Core Navigation System loaded successfully');
+// Exportar funciones adicionales
+export function hideSection(sectionId) {
+  return navigationSystem.hideSection(sectionId);
+}
+
+export function getCurrentSection() {
+  return navigationSystem.currentSection;
+}
+
+export function getNavigationStats() {
+  return navigationSystem.getStats();
+}
+
+export function resetNavigation() {
+  return navigationSystem.reset();
+}
+
+export function configureNavigation(options) {
+  return navigationSystem.configure(options);
+}
+
+// Exponer globalmente para compatibilidad
+window.showSection = showSection;
+window.hideSection = hideSection;
+window.getCurrentSection = getCurrentSection;
+
+// Exponer para depuración
+if (window.APP_CONFIG?.features?.debugging) {
+  window.NavigationSystem = navigationSystem;
+}
+
+console.log('🧭 Core Navigation System refactorizado inicializado');
 
