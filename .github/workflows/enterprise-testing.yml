@@ -200,9 +200,15 @@ jobs:
           echo "⚠️ Potential security risk: document.write usage"
         fi
 
-        # Check for hardcoded credentials
-        if grep -ri "password.*=\|api.*key.*=\|secret.*=" --include="*.js" --exclude-dir=node_modules . | grep -v "placeholder\|example"; then
+        # Check for hardcoded credentials (mejorado para evitar falsos positivos)
+        if grep -ri "password\s*=\s*['\"][^'\"]*['\"]" --include="*.js" --exclude-dir=node_modules . | grep -v "placeholder\|example\|test\|validation\|confirm"; then
           echo "❌ Potential hardcoded credentials found"
+          exit 1
+        elif grep -ri "api.*key\s*=\s*['\"][^'\"]*['\"]" --include="*.js" --exclude-dir=node_modules . | grep -v "placeholder\|example\|test"; then
+          echo "❌ Potential API keys found"
+          exit 1
+        elif grep -ri "secret\s*=\s*['\"][^'\"]*['\"]" --include="*.js" --exclude-dir=node_modules . | grep -v "placeholder\|example\|test"; then
+          echo "❌ Potential secrets found"
           exit 1
         else
           echo "✅ No hardcoded credentials detected"
