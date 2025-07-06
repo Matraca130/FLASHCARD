@@ -28,7 +28,8 @@ class StudyService(BaseService):
         
         Args:
             user_id: ID del usuario
-            deck_id: ID del deck a e            algorithm: Algoritmo de repetición ('fsrs', 'sm2', 'anki', 'ultra_sm2')
+            deck_id: ID del deck a estudiar
+            algorithm: Algoritmo de repetición ('fsrs', 'sm2', 'anki', 'ultra_sm2')
             
         Returns:
             dict: Respuesta con sesión creada
@@ -37,7 +38,8 @@ class StudyService(BaseService):
             # Verificar que el deck existe y pertenece al usuario
             deck, error = self._get_resource_if_owned(Deck, deck_id, user_id, "deck")
             if error:
-                return error            
+                return error
+                
             # Verificar que hay cartas disponibles para estudiar
             available_cards = self._get_cards_for_study(deck_id)
             if not available_cards:
@@ -244,8 +246,6 @@ class StudyService(BaseService):
             dict: Respuesta con estadísticas finales
         """
         try:
-
-try:
             # Verificar sesión activa
             session = self.db.session.query(StudySession).filter_by(
                 id=session_id,
@@ -297,8 +297,6 @@ try:
             dict: Respuesta con cartas vencidas
         """
         try:
-
-try:
             # Query base
             query = self.db.session.query(Flashcard).join(Deck).filter(
                 and_(
@@ -354,8 +352,6 @@ try:
     def _get_cards_for_study(self, deck_id, limit=20):
         """Obtener cartas disponibles para estudiar en un deck"""
         try:
-
-try:
             # Priorizar cartas vencidas
             due_cards = self.db.session.query(Flashcard).filter(
                 and_(
@@ -408,8 +404,6 @@ try:
     def _apply_spaced_repetition(self, card, quality, algorithm):
         """Aplicar algoritmo de repetición espaciada"""
         try:
-
-try:
             if algorithm == 'fsrs':
                 return self._apply_fsrs(card, quality)
             elif algorithm == 'sm2':
@@ -427,8 +421,6 @@ try:
     def _apply_fsrs(self, card, quality):
         """Aplicar algoritmo FSRS"""
         try:
-
-try:
             stability = getattr(card, 'stability', 2.5)
             difficulty = getattr(card, 'difficulty_fsrs', 5.0)
             
@@ -449,8 +441,6 @@ try:
     def _apply_sm2(self, card, quality):
         """Aplicar algoritmo SM-2 clásico"""
         try:
-
-try:
             ease_factor = card.ease_factor or 2.5
             repetitions = card.repetitions or 0
             
@@ -468,8 +458,6 @@ try:
     def _apply_ultra_sm2(self, card, quality):
         """Aplicar algoritmo Ultra SM-2 con límites dinámicos"""
         try:
-
-try:
             ease_factor = card.ease_factor or 2.5
             repetitions = card.repetitions or 0
             
@@ -497,8 +485,6 @@ try:
     def _apply_anki(self, card, quality):
         """Aplicar algoritmo estilo Anki con pasos de aprendizaje"""
         try:
-
-try:
             repetitions = card.repetitions or 0
             ease_factor = card.ease_factor or 2.5
             
