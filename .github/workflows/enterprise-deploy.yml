@@ -69,8 +69,18 @@ jobs:
       run: |
         echo "🔒 Security pre-deployment scan..."
         
-        # Check for secrets
-        if grep -ri "password.*=\|api.*key.*=\|secret.*=" --include="*.js" --exclude-dir=node_modules . | grep -v "placeholder\|example\|test"; then
+        # Check for secrets (excluding comparisons and validations)
+        if grep -ri "password\s*=\s*['\"][^'\"]*['\"]" --include="*.js" --exclude-dir=node_modules . | grep -v "placeholder\|example\|test\|validation"; then
+          echo "❌ Potential hardcoded passwords found in code"
+          exit 1
+        fi
+        
+        if grep -ri "api.*key\s*=\s*['\"][^'\"]*['\"]" --include="*.js" --exclude-dir=node_modules . | grep -v "placeholder\|example\|test"; then
+          echo "❌ Potential API keys found in code"
+          exit 1
+        fi
+        
+        if grep -ri "secret\s*=\s*['\"][^'\"]*['\"]" --include="*.js" --exclude-dir=node_modules . | grep -v "placeholder\|example\|test"; then
           echo "❌ Potential secrets found in code"
           exit 1
         fi
