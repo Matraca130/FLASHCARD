@@ -7,8 +7,7 @@ from .base_service import BaseService
 try:
     from ..models import User
 except ImportError:
-    try:
-    from ..models import User
+    from backend_app.models import User
 
 from flask_jwt_extended import create_access_token
 from datetime import datetime

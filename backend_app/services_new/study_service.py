@@ -18,8 +18,6 @@ try:
 except ImportError:
     from backend_app.utils.algorithms import calculate_fsrs, calculate_sm2
 
-try:
-    from ..utils.algorithms import calculate_fsrs, calculate_sm2
 from sqlalchemy import and_, or_, func
 from datetime import datetime, timedelta
 import random
@@ -34,23 +32,16 @@ class StudyService(BaseService):
         
         Args:
             user_id: ID del usuario
-            deck_id: ID del deck a estudiar
-            algorithm: Algoritmo de repetición ('fsrs', 'sm2', 'anki', 'ultra_sm2')
+            deck_id: ID del deck a e            algorithm: Algoritmo de repetición ('fsrs', 'sm2', 'anki', 'ultra_sm2')
             
         Returns:
             dict: Respuesta con sesión creada
         """
         try:
-    from ..utils.algorithms import calculate_fsrs, calculate_sm2
-except ImportError:
-    from backend_app.utils.algorithms import calculate_fsrs, calculate_sm2
-
-try:
             # Verificar que el deck existe y pertenece al usuario
             deck, error = self._get_resource_if_owned(Deck, deck_id, user_id, "deck")
             if error:
-                return error
-            
+                return error            
             # Verificar que hay cartas disponibles para estudiar
             available_cards = self._get_cards_for_study(deck_id)
             if not available_cards:

@@ -1,8 +1,10 @@
 """
+"""
 APIs v2 optimizadas con cache inteligente y mejoras de rendimiento
 Versión mejorada de las APIs v2 con optimizaciones específicas para frontend
 """
 
+from typing import List, Dict
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from .models import User, Deck, Flashcard, StudySession, CardReview

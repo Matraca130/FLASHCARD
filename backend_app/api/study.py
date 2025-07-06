@@ -206,7 +206,7 @@ def answer_card(validated_data):
             'review': {
                 'id': review.id,
                 'quality': quality,
-                'new_interval': result['interval'],
+                'new_interval': card.interval_days,
                 'algorithm': algorithm
             },
             'session_stats': {
