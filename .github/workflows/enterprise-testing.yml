@@ -316,22 +316,31 @@ jobs:
         pip install -r requirements.txt
         pip install -r requirements-test.txt
         pip install -r requirements-monitoring.txt
+        
+    - name: Install PostgreSQL client
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y postgresql-client
 
     - name: Set up environment variables
       run: |
         echo "FLASK_ENV=testing" >> $GITHUB_ENV
-        echo "DATABASE_URL=postgresql://postgres:postgres@postgres:5432/flashcards_test" >> $GITHUB_ENV
+        echo "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/flashcards_test" >> $GITHUB_ENV
         echo "JWT_SECRET_KEY=test-secret-key" >> $GITHUB_ENV
         echo "SECRET_KEY=test-secret-key" >> $GITHUB_ENV
         echo "TESTING=true" >> $GITHUB_ENV
 
     - name: Wait for PostgreSQL
       run: |
-        until pg_isready -h postgres -p 5432 -U postgres; do
+        until pg_isready -h localhost -p 5432 -U postgres; do
           echo "Waiting for PostgreSQL..."
           sleep 2
         done
         echo "PostgreSQL is ready!"
+        
+    - name: Create test database
+      run: |
+        PGPASSWORD=postgres createdb -h localhost -U postgres flashcards_test || echo "Database already exists"
 
     - name: Run backend linting
       run: |
