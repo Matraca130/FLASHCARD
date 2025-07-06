@@ -1,5 +1,4 @@
 """
-"""
 APIs v2 optimizadas con cache inteligente y mejoras de rendimiento
 Versión mejorada de las APIs v2 con optimizaciones específicas para frontend
 """

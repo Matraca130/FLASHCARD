@@ -13,10 +13,6 @@ try:
     from ..models import Deck, Flashcard, StudySession, CardReview
 except ImportError:
     from backend_app.models import Deck, Flashcard, StudySession, CardReview
-try:
-    from ..utils.algorithms import calculate_fsrs, calculate_sm2
-except ImportError:
-    from backend_app.utils.algorithms import calculate_fsrs, calculate_sm2
 
 from sqlalchemy import and_, or_, func
 from datetime import datetime, timedelta
@@ -86,11 +82,6 @@ class StudyService(BaseService):
             dict: Respuesta con carta para estudiar
         """
         try:
-    from ..utils.algorithms import calculate_fsrs, calculate_sm2
-except ImportError:
-    from backend_app.utils.algorithms import calculate_fsrs, calculate_sm2
-
-try:
             # Verificar que la sesión existe y pertenece al usuario
             session = self.db.session.query(StudySession).filter_by(
                 id=session_id,
@@ -142,11 +133,6 @@ try:
             dict: Respuesta con resultado del algoritmo
         """
         try:
-    from ..utils.algorithms import calculate_fsrs, calculate_sm2
-except ImportError:
-    from backend_app.utils.algorithms import calculate_fsrs, calculate_sm2
-
-try:
             # Verificar sesión activa
             session = self.db.session.query(StudySession).filter_by(
                 id=session_id,
@@ -258,9 +244,6 @@ try:
             dict: Respuesta con estadísticas finales
         """
         try:
-    from ..utils.algorithms import calculate_fsrs, calculate_sm2
-except ImportError:
-    from backend_app.utils.algorithms import calculate_fsrs, calculate_sm2
 
 try:
             # Verificar sesión activa
@@ -314,9 +297,6 @@ try:
             dict: Respuesta con cartas vencidas
         """
         try:
-    from ..utils.algorithms import calculate_fsrs, calculate_sm2
-except ImportError:
-    from backend_app.utils.algorithms import calculate_fsrs, calculate_sm2
 
 try:
             # Query base
@@ -374,9 +354,6 @@ try:
     def _get_cards_for_study(self, deck_id, limit=20):
         """Obtener cartas disponibles para estudiar en un deck"""
         try:
-    from ..utils.algorithms import calculate_fsrs, calculate_sm2
-except ImportError:
-    from backend_app.utils.algorithms import calculate_fsrs, calculate_sm2
 
 try:
             # Priorizar cartas vencidas
@@ -431,9 +408,6 @@ try:
     def _apply_spaced_repetition(self, card, quality, algorithm):
         """Aplicar algoritmo de repetición espaciada"""
         try:
-    from ..utils.algorithms import calculate_fsrs, calculate_sm2
-except ImportError:
-    from backend_app.utils.algorithms import calculate_fsrs, calculate_sm2
 
 try:
             if algorithm == 'fsrs':
@@ -453,9 +427,6 @@ try:
     def _apply_fsrs(self, card, quality):
         """Aplicar algoritmo FSRS"""
         try:
-    from ..utils.algorithms import calculate_fsrs, calculate_sm2
-except ImportError:
-    from backend_app.utils.algorithms import calculate_fsrs, calculate_sm2
 
 try:
             stability = getattr(card, 'stability', 2.5)
@@ -478,9 +449,6 @@ try:
     def _apply_sm2(self, card, quality):
         """Aplicar algoritmo SM-2 clásico"""
         try:
-    from ..utils.algorithms import calculate_fsrs, calculate_sm2
-except ImportError:
-    from backend_app.utils.algorithms import calculate_fsrs, calculate_sm2
 
 try:
             ease_factor = card.ease_factor or 2.5
@@ -500,9 +468,6 @@ try:
     def _apply_ultra_sm2(self, card, quality):
         """Aplicar algoritmo Ultra SM-2 con límites dinámicos"""
         try:
-    from ..utils.algorithms import calculate_fsrs, calculate_sm2
-except ImportError:
-    from backend_app.utils.algorithms import calculate_fsrs, calculate_sm2
 
 try:
             ease_factor = card.ease_factor or 2.5
@@ -532,9 +497,6 @@ try:
     def _apply_anki(self, card, quality):
         """Aplicar algoritmo estilo Anki con pasos de aprendizaje"""
         try:
-    from ..utils.algorithms import calculate_fsrs, calculate_sm2
-except ImportError:
-    from backend_app.utils.algorithms import calculate_fsrs, calculate_sm2
 
 try:
             repetitions = card.repetitions or 0
