@@ -25,7 +25,7 @@ export default [
   },
   {
     languageOptions: {
-      ecmaVersion: 2022,
+      ecmaVersion: 2023,
       sourceType: 'module',
       globals: {
         ...globals.browser,
@@ -42,6 +42,7 @@ export default [
         Headers: 'readonly',
         URL: 'readonly',
         URLSearchParams: 'readonly',
+        structuredClone: 'readonly',
         // Third-party libraries
         Chart: 'readonly',
         particlesJS: 'readonly',
