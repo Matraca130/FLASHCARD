@@ -60,7 +60,7 @@ jobs:
         done
         
         # Linting (allow warnings but not errors)
-        npx eslint . --ext .js --max-warnings 20 || exit 1
+        npm run lint || exit 1
         
         echo "✅ All critical tests passed"
         echo "tests-passed=true" >> $GITHUB_OUTPUT

@@ -113,9 +113,9 @@ function createAlgorithmModal() {
         </div>
         <div class="modal-body">
           <div class="algorithms-grid">
-            ${Object.entries(ALGORITHM_CONFIGS)
-    .map(
-      ([id, config]) => `
+    ${Object.entries(ALGORITHM_CONFIGS)
+      .map(
+        ([id, config]) => `
               <div class="algorithm-option" data-algorithm="${id}" onclick="selectModalAlgorithm('${id}')">
                 <div class="algorithm-header">
                   <h4>${config.name}</h4>
@@ -128,8 +128,8 @@ function createAlgorithmModal() {
                 <div class="algorithm-check">✓</div>
               </div>
             `
-    )
-    .join('')}
+      )
+      .join('')}
           </div>
           <div class="algorithm-details" id="algorithm-details">
             <h4>Configuración del Algoritmo</h4>
