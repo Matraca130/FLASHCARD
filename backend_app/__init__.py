@@ -7,7 +7,7 @@ from flask import Flask
 from flask_cors import CORS
 from backend_app.extensions import db, jwt, bcrypt, limiter
 from backend_app.config import get_config
-from backend_app.utils.monitoring import init_sentry, setup_structured_logging
+from backend_app.utils.monitoring import init_sentry, setup_logging
 import logging
 import os
 
@@ -39,7 +39,7 @@ def create_app(config_class=None):
     
     # Configurar monitoreo y logging
     init_sentry(app)
-    setup_structured_logging(app)
+    setup_logging(app)
     
     # Registrar manejadores de errores
     from backend_app.api.error_handlers import register_error_handlers, log_slow_requests
