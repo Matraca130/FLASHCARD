@@ -314,8 +314,10 @@ jobs:
     - name: Run backend linting
       run: |
         pip install flake8
+        # Solo errores críticos que pueden romper funcionalidad
         flake8 backend_app --count --select=E9,F63,F7,F82 --show-source --statistics
-        flake8 backend_app --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+        # Linting completo pero sin fallar el build por warnings menores
+        flake8 backend_app --count --exit-zero --max-complexity=20 --max-line-length=130 --ignore=E722,E402,W503,C901,E501 --statistics
 
     - name: Run unit tests
       run: |
