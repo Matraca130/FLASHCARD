@@ -14,14 +14,15 @@ on:
         - production
         - staging
 
+# Evitar deployments concurrentes
+concurrency:
+  group: enterprise-deployment-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
   pages: write
   id-token: write
-
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
 
 jobs:
   pre-deployment-checks:
