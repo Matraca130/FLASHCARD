@@ -8,15 +8,14 @@ from .services import (
     DeckService,
     FlashcardService,
     StudyService,
-    StatsService
+    StatsService,
 )
 
 __all__ = [
-    'BaseService',
-    'UserService',
-    'DeckService', 
-    'FlashcardService',
-    'StudyService',
-    'StatsService'
+    "BaseService",
+    "UserService",
+    "DeckService",
+    "FlashcardService",
+    "StudyService",
+    "StatsService",
 ]
-

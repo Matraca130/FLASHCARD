@@ -12,8 +12,4 @@ bcrypt = Bcrypt()
 jwt = JWTManager()
 
 # Rate limiter simplificado
-limiter = Limiter(
-    key_func=get_remote_address,
-    default_limits=["1000 per hour", "100 per minute"]
-)
-
+limiter = Limiter(key_func=get_remote_address, default_limits=["1000 per hour", "100 per minute"])
