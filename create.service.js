@@ -166,15 +166,30 @@ export async function createDeck(deckData = {}) {
         }
       }
     }
-
+    
     // Recargar decks en el dropdown
     await loadDecksForCreation();
-
-    // Refresh dashboard decks if user is there
-    if (window.loadDashboardData) {
-      window.loadDashboardData();
+    
+    // Recargar la gestión de decks
+    try {
+      const { loadManageDecks } = await import('./manage.service.js');
+      if (typeof loadManageDecks === 'function') {
+        await loadManageDecks();
+      }
+    } catch (error) {
+      console.log('No se pudo recargar la gestión de decks:', error);
     }
-
+    
+    // Refresh dashboard decks if user is there
+    try {
+      const { loadDashboardData } = await import('./dashboard.service.js');
+      if (typeof loadDashboardData === 'function') {
+        await loadDashboardData();
+      }
+    } catch (error) {
+      console.log('No se pudo recargar el dashboard:', error);
+    }
+    
     return deck;
   } catch (error) {
     console.error('Error creando deck:', error);
@@ -239,15 +254,24 @@ export async function createFlashcard() {
       'Flashcard creada exitosamente 🎉',
       'Error al crear la flashcard'
     );
-
+    
     // Limpiar formulario usando utilidad común
     clearForm('#flashcard-form');
-
+    
     // Recargar datos si estamos en la sección de gestión
-    if (window.loadManageData) {
-      window.loadManageData();
+    try {
+      // Intentar recargar la gestión de decks
+      const { loadManageDecks } = await import('./manage.service.js');
+      if (typeof loadManageDecks === 'function') {
+        await loadManageDecks();
+      }
+    } catch (error) {
+      console.log('No se pudo recargar la gestión de decks:', error);
     }
-
+    
+    // También recargar el dropdown de decks
+    await loadDecksForCreation();
+    
     return flashcard;
   } catch (error) {
     console.error('Error creating flashcard:', error);

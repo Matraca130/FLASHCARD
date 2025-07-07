@@ -18,6 +18,7 @@ import {
   sanitizeFilename,
   parseCSV,
   formatFileSize,
+  downloadFile,
   isValidEmail,
   isValidPassword,
   truncateText,

@@ -240,21 +240,21 @@ async function initializeServiceWorker() {
   }
 
   try {
-    console.log('📱 Registrando Service Worker...');
+    console.log('📱 Service Worker ya registrado en pwa-installer.js');
 
-    const registration = await navigator.serviceWorker.register('./sw.js');
+    // const registration = await navigator.serviceWorker.register('./sw.js');
 
-    console.log('✅ Service Worker registrado:', registration);
-
+    // console.log('✅ Service Worker registrado:', registration);
+    
     // Escuchar actualizaciones
-    registration.addEventListener('updatefound', () => {
-      console.log('🔄 Nueva versión de la aplicación disponible');
-      showNotification(
-        'Nueva versión disponible. Recarga la página para actualizar.',
-        'info',
-        10000
-      );
-    });
+    // registration.addEventListener('updatefound', () => {
+    //   console.log('🔄 Nueva versión de la aplicación disponible');
+    //   showNotification(
+    //     'Nueva versión disponible. Recarga la página para actualizar.',
+    //     'info',
+    //     10000
+    //   );
+    // });
   } catch (error) {
     console.error('❌ Error registrando Service Worker:', error);
     appState.errors.push({ type: 'serviceWorker', error: error.message });
