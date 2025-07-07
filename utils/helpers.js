@@ -459,3 +459,27 @@ export function renderEmptyStatsState(container, options = {}) {
   const finalOptions = { ...defaultOptions, ...options };
   renderEmptyState(container, finalOptions);
 }
+
+
+/**
+ * Descarga un archivo con el contenido especificado
+ * @param {string} content - Contenido del archivo
+ * @param {string} filename - Nombre del archivo
+ * @param {string} mimeType - Tipo MIME del archivo
+ */
+export function downloadFile(content, filename, mimeType) {
+  const blob = new Blob([content], { type: mimeType });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  
+  a.href = url;
+  a.download = filename;
+  a.style.display = 'none';
+  
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  
+  window.URL.revokeObjectURL(url);
+}
+
