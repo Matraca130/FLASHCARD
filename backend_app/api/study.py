@@ -98,10 +98,14 @@ def answer_card(validated_data):
         if not session:
             return jsonify({"error": "Sesión no encontrada"}), 404
 
-        # Calcular próxima revisión usando algoritmo FSRS
+        # Calcular próxima revisión usando algoritmo FSRS o SM-2
         algorithm = session.algorithm or "fsrs"
+        
+        # Capturar intervalo previo antes de actualizar
+        previous_interval = card.interval_days
 
         if algorithm == "fsrs":
+            # === ALGORITMO FSRS ===
             # Calculate elapsed days since last review
             elapsed_days = 0
             if card.last_reviewed:
@@ -122,7 +126,7 @@ def answer_card(validated_data):
             card.repetitions = card.repetitions + 1
 
         elif algorithm in ("sm2", "ultra_sm2", "anki"):
-            # SM-2 and variants
+            # === ALGORITMO SM-2 Y VARIANTES ===
             new_ease_factor, new_interval, new_repetitions = calculate_sm2(
                 quality,  # rating (1-4)
                 card.ease_factor,  # ease_factor (correct field name)
@@ -156,7 +160,7 @@ def answer_card(validated_data):
             card.repetitions = new_repetitions
 
         else:
-            # Fallback to SM-2 for unknown algorithms
+            # === FALLBACK A SM-2 ===
             new_ease_factor, new_interval, new_repetitions = calculate_sm2(
                 quality, card.ease_factor, card.interval_days, card.repetitions
             )
@@ -164,17 +168,17 @@ def answer_card(validated_data):
             card.interval_days = new_interval
             card.repetitions = new_repetitions
 
-        # Common updates for both algorithms
+        # === ACTUALIZACIONES COMUNES ===
         card.last_reviewed = datetime.utcnow()
         card.next_review = get_next_review_date(card.interval_days)
 
-        # Crear registro de revisión
+        # Crear registro de revisión con valores correctos
         review = CardReview(
             flashcard_id=card_id,
             session_id=session_id,
             rating=quality,  # Use 'rating' field, not 'quality'
-            previous_interval=card.interval_days,  # Use correct field name
-            new_interval=card.interval_days,  # Use updated interval from card
+            previous_interval=previous_interval,  # Valor previo capturado antes de actualizar
+            new_interval=card.interval_days,  # Valor actualizado después del algoritmo
             response_time=validated_data.get("response_time", 0),
         )
 
