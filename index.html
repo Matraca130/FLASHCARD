@@ -420,7 +420,62 @@
             <p class="hero-subtitle">Tu plataforma de aprendizaje inteligente con repetición espaciada</p>
             
             <div class="hero-stats" id="dashboard-stats">
-              <!-- Stats will be loaded dynamically -->
+              <!-- Estadísticas principales -->
+              <div class="stats-grid">
+                <div class="stat-card">
+                  <div class="stat-icon">📚</div>
+                  <div class="stat-content">
+                    <div class="stat-value" id="total-cards" data-stat="total-cards">0</div>
+                    <div class="stat-label">Total Flashcards</div>
+                    <div class="stat-change" id="total-cards-change">+0 esta semana</div>
+                  </div>
+                </div>
+                
+                <div class="stat-card">
+                  <div class="stat-icon">🎯</div>
+                  <div class="stat-content">
+                    <div class="stat-value" id="studied-today" data-stat="studied-today">0</div>
+                    <div class="stat-label">Estudiadas Hoy</div>
+                    <div class="stat-change" id="studied-today-change">Meta: 20</div>
+                  </div>
+                </div>
+                
+                <div class="stat-card">
+                  <div class="stat-icon">📊</div>
+                  <div class="stat-content">
+                    <div class="stat-value" id="accuracy" data-stat="accuracy">0%</div>
+                    <div class="stat-label">Precisión</div>
+                    <div class="stat-change" id="accuracy-change">+0% vs ayer</div>
+                  </div>
+                </div>
+                
+                <div class="stat-card">
+                  <div class="stat-icon">🔥</div>
+                  <div class="stat-content">
+                    <div class="stat-value" id="streak" data-stat="streak">0</div>
+                    <div class="stat-label">Racha de Estudio</div>
+                    <div class="stat-change" id="streak-change">días consecutivos</div>
+                  </div>
+                </div>
+                
+                <div class="stat-card">
+                  <div class="stat-icon">⏱️</div>
+                  <div class="stat-content">
+                    <div class="stat-value" id="study-time" data-stat="study-time">0m</div>
+                    <div class="stat-label">Tiempo de Estudio</div>
+                    <div class="stat-change" id="study-time-change">hoy</div>
+                  </div>
+                </div>
+                
+                <div class="stat-card">
+                  <div class="stat-icon">📈</div>
+                  <div class="stat-content">
+                    <div class="stat-value" id="total-progress" data-stat="total-progress">0%</div>
+                    <div class="stat-label">Progreso Total</div>
+                    <div class="stat-change" id="total-progress-change">completado</div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
           
@@ -430,13 +485,13 @@
               <div class="chart-header">
                 <h3 class="chart-title">Progreso Semanal</h3>
                 <div class="chart-actions">
-                  <button class="chart-action">7D</button>
-                  <button class="chart-action">30D</button>
-                  <button class="chart-action">90D</button>
+                  <button class="chart-action" onclick="updateChartPeriod('7d')">7D</button>
+                  <button class="chart-action" onclick="updateChartPeriod('30d')">30D</button>
+                  <button class="chart-action" onclick="updateChartPeriod('90d')">90D</button>
                 </div>
               </div>
               <div class="chart-canvas">
-                <canvas id="progressChart"></canvas>
+                <canvas id="weeklyProgressChart" width="400" height="200"></canvas>
               </div>
             </div>
             
@@ -445,7 +500,25 @@
                 <h3 class="chart-title">Precisión</h3>
               </div>
               <div class="chart-canvas">
-                <canvas id="accuracyChart"></canvas>
+                <canvas id="accuracyTrendChart" width="400" height="200"></canvas>
+              </div>
+            </div>
+            
+            <div class="chart-container">
+              <div class="chart-header">
+                <h3 class="chart-title">Distribución por Categoría</h3>
+              </div>
+              <div class="chart-canvas">
+                <canvas id="categoryDistributionChart" width="400" height="200"></canvas>
+              </div>
+            </div>
+            
+            <div class="chart-container">
+              <div class="chart-header">
+                <h3 class="chart-title">Rendimiento</h3>
+              </div>
+              <div class="chart-canvas">
+                <canvas id="performanceChart" width="400" height="200"></canvas>
               </div>
             </div>
           </div>
@@ -481,6 +554,9 @@
             </div>
             <div class="deck-grid" id="dashboard-decks">
               <!-- Decks will be loaded dynamically -->
+            </div>
+            <div class="decks-list" id="dashboard-decks-list" data-section="decks">
+              <!-- Alternative container for decks list -->
             </div>
           </div>
         </section>

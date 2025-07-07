@@ -213,12 +213,22 @@ class NavigationSystem {
    * Configura observador de mutaciones para detectar cambios en el DOM
    */
   setupMutationObserver() {
+    // Temporalmente deshabilitado para evitar bucle infinito
+    this.log('⚠️ MutationObserver temporalmente deshabilitado');
+    return;
+    
     if (!window.MutationObserver) {
       this.log('⚠️ MutationObserver no disponible');
       return;
     }
     
+    let isRediscovering = false; // Flag para evitar bucles infinitos
+    
     const observer = new MutationObserver((mutations) => {
+      if (isRediscovering) {
+        return; // Evitar bucle infinito
+      }
+      
       let shouldRediscover = false;
       
       mutations.forEach((mutation) => {
@@ -237,8 +247,14 @@ class NavigationSystem {
       
       if (shouldRediscover) {
         this.log('🔄 Cambios detectados en DOM, redescubriendo...');
-        this.discoverSections();
-        this.discoverNavLinks();
+        isRediscovering = true;
+        
+        // Usar setTimeout para evitar problemas de sincronización
+        setTimeout(() => {
+          this.discoverSections();
+          this.discoverNavLinks();
+          isRediscovering = false;
+        }, 100);
       }
     });
     

@@ -11,6 +11,13 @@ import './bindings.js';
 import { loadGamificationData } from './gamification.service.js';
 import { initializeActivityHeatmap } from './activity-heatmap.service.js';
 import { initializeCharts } from './charts.js';
+import { initializeDashboard } from './dashboard-init.js';
+import './dashboard-fixes.js';
+
+// Importar testing en modo desarrollo
+if (window.location.hostname === 'localhost') {
+  import('./dashboard-test.js');
+}
 
 // Importar utilidades comunes
 import { showNotification } from './utils/helpers.js';
@@ -139,6 +146,7 @@ async function initializeServices() {
   console.log('🔧 Inicializando servicios...');
 
   const services = [
+    { name: 'dashboard', init: initializeDashboard, critical: true },
     { name: 'gamification', init: loadGamificationData, critical: false },
     // { name: 'algorithms', init: initializeAlgorithmModal, critical: false },
     // { name: 'flashcards', init: initializeFlashcardEvents, critical: true },
