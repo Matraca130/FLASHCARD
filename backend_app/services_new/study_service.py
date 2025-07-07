@@ -40,9 +40,14 @@ class StudyService(BaseService):
             deck, error = self._get_resource_if_owned(
                 Deck, deck_id, user_id, "deck")
             if error:
+<<<<<<< HEAD
                 return error
             
             # Verificar que hay cartas disponibles para estudiar
+=======
+                return err
+            or  # Verificar que hay cartas disponibles para estudiar
+>>>>>>> 4a64f0c0b7272a924fb9959c73278447c3324b3f
             available_cards = self._get_cards_for_study(deck_id)
             if not available_cards:
                 return self._error_response(

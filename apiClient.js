@@ -40,8 +40,6 @@ export class ApiClient {
    */
   static getAuthToken() {
     return localStorage.getItem(API_CONFIG.authTokenKey);
-  }
-
   /**
    * Estabelece o token de autenticação
    * @param {string} token - Token de autenticação
@@ -62,8 +60,6 @@ export class ApiClient {
   static removeAuthToken() {
     localStorage.removeItem(API_CONFIG.authTokenKey);
     localStorage.removeItem(API_CONFIG.refreshTokenKey);
-  }
-
   /**
    * Verifica se o usuário está autenticado
    * @returns {boolean} - Estado de autenticação
@@ -72,8 +68,6 @@ export class ApiClient {
     const token = this.getAuthToken();
     if (!token) {
       return false;
-    }
-
     try {
       // Verificar se o token não expirou
       const payload = JSON.parse(atob(token.split('.')[1]));
@@ -82,8 +76,6 @@ export class ApiClient {
     } catch (error) {
       console.warn('Error verificando token:', error);
       return false;
-    }
-  }
 
   /**
    * Obtém headers de autenticação
@@ -100,11 +92,7 @@ export class ApiClient {
 
     if (token) {
       baseHeaders.Authorization = `Bearer ${token}`;
-    }
-
     return baseHeaders;
-  }
-
   // MÉTODOS HTTP PRINCIPAIS
 
   /**
@@ -120,8 +108,6 @@ export class ApiClient {
       if (cachedData) {
         console.log(`📦 Usando dados em cache para ${endpoint}`);
         return cachedData;
-      }
-    }
 
     const response = await this.request(endpoint, {
       method: 'GET',
@@ -131,11 +117,7 @@ export class ApiClient {
     // Armazenar em cache se a resposta for bem-sucedida e o cache estiver habilitado
     if (API_CONFIG.cacheEnabled && !response.error && options.useCache !== false) {
       this.saveToCache(endpoint, response);
-    }
-
     return response;
-  }
-
   /**
    * Realiza uma petição POST
    * @param {string} endpoint - Endpoint da API
@@ -147,15 +129,11 @@ export class ApiClient {
     // Invalidar cache relacionado se necessário
     if (API_CONFIG.cacheEnabled && options.invalidateCache) {
       this.invalidateRelatedCache(endpoint, options.invalidateCache);
-    }
-
     return this.request(endpoint, {
       method: 'POST',
       body: data ? JSON.stringify(data) : null,
       ...options,
     });
-  }
-
   /**
    * Realiza uma petição PUT
    * @param {string} endpoint - Endpoint da API
@@ -167,15 +145,11 @@ export class ApiClient {
     // Invalidar cache relacionado se necessário
     if (API_CONFIG.cacheEnabled && options.invalidateCache) {
       this.invalidateRelatedCache(endpoint, options.invalidateCache);
-    }
-
     return this.request(endpoint, {
       method: 'PUT',
       body: data ? JSON.stringify(data) : null,
       ...options,
     });
-  }
-
   /**
    * Realiza uma petição PATCH
    * @param {string} endpoint - Endpoint da API
@@ -187,15 +161,11 @@ export class ApiClient {
     // Invalidar cache relacionado se necessário
     if (API_CONFIG.cacheEnabled && options.invalidateCache) {
       this.invalidateRelatedCache(endpoint, options.invalidateCache);
-    }
-
     return this.request(endpoint, {
       method: 'PATCH',
       body: data ? JSON.stringify(data) : null,
       ...options,
     });
-  }
-
   /**
    * Realiza uma petição DELETE
    * @param {string} endpoint - Endpoint da API
@@ -206,14 +176,10 @@ export class ApiClient {
     // Invalidar cache relacionado se necessário
     if (API_CONFIG.cacheEnabled && options.invalidateCache) {
       this.invalidateRelatedCache(endpoint, options.invalidateCache);
-    }
-
     return this.request(endpoint, {
       method: 'DELETE',
       ...options,
     });
-  }
-
   // MÉTODO PRINCIPAL DE REQUEST
 
   /**
@@ -223,16 +189,14 @@ export class ApiClient {
    * @returns {Promise<Object>} - Resposta da API
    */
   static async request(endpoint, options = {}) {
-    // Se estamos em modo offline e não é uma verificação de conectividade
+    // Se estamos en modo offline y no es una verificación de conectividad
     if (isOfflineMode && !endpoint.includes('/health') && API_CONFIG.offlineMode) {
-      console.log(`🔌 Modo offline: usando dados em cache para ${endpoint}`);
+      console.log(`🔌 Modo offline: usando datos en cache para ${endpoint}`);
       
       // Tentar obter do cache
       const cachedData = this.getFromCache(endpoint);
       if (cachedData) {
         return cachedData;
-      }
-      
       // Se não há cache, retornar erro de conectividade
       return {
         error: true,
@@ -240,8 +204,6 @@ export class ApiClient {
         networkError: true,
         offlineMode: true
       };
-    }
-
     const {
       method = 'GET',
       body = null,
@@ -288,12 +250,8 @@ export class ApiClient {
         // Notificar reconexão se estava offline antes
         if (showNotifications && connectionStatus === 'offline') {
           showNotification('Conexão restaurada', 'success', 3000);
-        }
-        
         // Disparar evento de reconexão
         window.dispatchEvent(new CustomEvent('api:reconnected'));
-      }
-
       // Manejar respuestas según status
       return await this.handleResponse(response, endpoint, showNotifications);
     } catch (error) {
@@ -312,11 +270,7 @@ export class ApiClient {
         
         // Disparar evento de desconexão
         window.dispatchEvent(new CustomEvent('api:disconnected'));
-      }
-      
       return this.handleError(error, endpoint, showNotifications);
-    }
-  }
 
   /**
    * Executa uma petição com reintentos automáticos
@@ -335,8 +289,6 @@ export class ApiClient {
         // Se a resposta é exitosa ou é um erro do cliente (4xx), não reintentar
         if (response.ok || (response.status >= 400 && response.status < 500)) {
           return response;
-        }
-
         // Error del servidor (5xx), reintentar
         throw new Error(`Server error: ${response.status}`);
       } catch (error) {
@@ -345,17 +297,11 @@ export class ApiClient {
         // Se é o último intento, lançar erro
         if (attempt === retries) {
           throw error;
-        }
-
         // Esperar antes do próximo intento
         await this.delay(API_CONFIG.retryDelay * (attempt + 1));
         console.log(`Reintentando petição (${attempt + 1}/${retries}):`, url);
-      }
-    }
 
     throw lastError;
-  }
-
   /**
    * Maneja a resposta da API
    * @param {Response} response - Resposta de fetch
@@ -367,8 +313,6 @@ export class ApiClient {
     // Manejar autenticação
     if (response.status === 401) {
       return this.handleUnauthorized(endpoint);
-    }
-
     // Manejar errores del cliente
     if (response.status >= 400 && response.status < 500) {
       const errorData = await this.safeJsonParse(response);
@@ -376,31 +320,23 @@ export class ApiClient {
 
       if (showNotifications) {
         showNotification(errorMessage, 'error');
-      }
-
       return {
         error: true,
         status: response.status,
         message: errorMessage,
         data: errorData,
       };
-    }
-
     // Manejar errores del servidor
     if (response.status >= 500) {
       const errorMessage = `Error del servidor (${response.status})`;
 
       if (showNotifications) {
         showNotification(errorMessage, 'error');
-      }
-
       return {
         error: true,
         status: response.status,
         message: errorMessage,
       };
-    }
-
     // Respuesta exitosa
     const data = await this.safeJsonParse(response);
     return {
@@ -409,8 +345,6 @@ export class ApiClient {
       data: data,
       timestamp: Date.now()
     };
-  }
-
   /**
    * Maneja errores de red y otros errores
    * @param {Error} error - Error capturado
@@ -433,25 +367,17 @@ export class ApiClient {
         
         if (showNotifications) {
           showNotification('Modo offline ativado', 'warning', 5000);
-        }
-      }
     } else {
       errorMessage = error.message || 'Error desconocido';
-    }
-
     console.error(`API Error [${endpoint}]:`, error);
 
     if (showNotifications) {
       showNotification(errorMessage, 'error');
-    }
-
     return {
       error: true,
       message: errorMessage,
       networkError: true,
     };
-  }
-
   /**
    * Maneja respuestas no autorizadas (401)
    * @param {string} endpoint - Endpoint original
@@ -463,15 +389,11 @@ export class ApiClient {
       return new Promise((resolve) => {
         failedQueue.push({ resolve, endpoint });
       });
-    }
-
     const refreshToken = localStorage.getItem(API_CONFIG.refreshTokenKey);
 
     if (!refreshToken) {
       this.logout();
       return { error: true, message: 'Sesión expirada', unauthorized: true };
-    }
-
     // Intentar renovar el token
     isRefreshingToken = true;
 
@@ -499,15 +421,12 @@ export class ApiClient {
         return this.request(endpoint);
       } else {
         throw new Error('Token refresh failed');
-      }
     } catch (error) {
       console.error('Error renovando token:', error);
       this.logout();
       return { error: true, message: 'Sesión expirada', unauthorized: true };
     } finally {
       isRefreshingToken = false;
-    }
-  }
 
   /**
    * Cierra sesión del usuario
@@ -525,12 +444,10 @@ export class ApiClient {
     );
 
     // Redirigir al login si no estamos ya ahí
-    if (!window.location.pathname.includes('login'){ ) {
+    if (!window.location.pathname.includes('login')) {
       setTimeout(() => {
-        window.location.href = '/login.html'; }
+        window.location.href = '/login.html';
       }, 2000);
-    }
-  }
 
   // MÉTODOS DE CACHE
 
@@ -540,22 +457,18 @@ export class ApiClient {
    * @returns {Object|null} - Dados em cache ou null
    */
   static getFromCache(endpoint) {
-    if (!API_CONFIG.cacheEnabled) return null;
-    
+    if (!API_CONFIG.cacheEnabled) { return null;
     try {
       const cacheKey = `${API_CONFIG.cachePrefix}${endpoint}`;
       const cachedItem = localStorage.getItem(cacheKey);
       
-      if (!cachedItem) return null;
-      
+      if (!cachedItem) { return null;
       const { data, timestamp, ttl = API_CONFIG.cacheTTL } = JSON.parse(cachedItem);
       
       // Verificar se o cache expirou
       if (Date.now() - timestamp > ttl) {
         localStorage.removeItem(cacheKey);
         return null;
-      }
-      
       return {
         error: false,
         data,
@@ -565,8 +478,6 @@ export class ApiClient {
     } catch (error) {
       console.warn('Erro ao ler cache:', error);
       return null;
-    }
-  }
   
   /**
    * Salva dados no cache
@@ -575,8 +486,7 @@ export class ApiClient {
    * @param {number} ttl - Tempo de vida do cache em ms (opcional)
    */
   static saveToCache(endpoint, response, ttl = API_CONFIG.cacheTTL) {
-    if (!API_CONFIG.cacheEnabled || response.error) return;
-    
+    if (!API_CONFIG.cacheEnabled || response.error) { return;
     try {
       const cacheKey = `${API_CONFIG.cachePrefix}${endpoint}`;
       const cacheData = {
@@ -588,8 +498,6 @@ export class ApiClient {
       localStorage.setItem(cacheKey, JSON.stringify(cacheData));
     } catch (error) {
       console.warn('Erro ao salvar cache:', error);
-    }
-  }
   
   /**
    * Invalida cache relacionado a um endpoint
@@ -597,8 +505,7 @@ export class ApiClient {
    * @param {string|Array} patterns - Padrões de endpoints a invalidar
    */
   static invalidateRelatedCache(endpoint, patterns) {
-    if (!API_CONFIG.cacheEnabled) return;
-    
+    if (!API_CONFIG.cacheEnabled) { return;
     try {
       const patternsArray = Array.isArray(patterns) ? patterns : [patterns];
       
@@ -607,16 +514,12 @@ export class ApiClient {
         // Exemplo: POST /api/decks deve invalidar GET /api/decks
         const basePath = endpoint.split('/').slice(0, -1).join('/');
         patternsArray.push(basePath);
-      }
-      
       // Buscar todas as chaves de cache
       const cacheKeys = [];
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
         if (key && key.startsWith(API_CONFIG.cachePrefix)) {
           cacheKeys.push(key);
-        }
-      }
       
       // Invalidar chaves que correspondem aos padrões
       let invalidatedCount = 0;
@@ -628,45 +531,36 @@ export class ApiClient {
             return endpointPath.includes(pattern);
           } else if (pattern instanceof RegExp) {
             return pattern.test(endpointPath);
-          }
           return false;
         });
         
         if (shouldInvalidate) {
           localStorage.removeItem(key);
           invalidatedCount++;
-        }
       });
       
       if (invalidatedCount > 0) {
         console.log(`🧹 Invalidados ${invalidatedCount} itens de cache relacionados a ${endpoint}`);
-      }
     } catch (error) {
       console.warn('Erro ao invalidar cache:', error);
-    }
-  }
   
   /**
    * Limpa todo o cache
    */
   static clearCache() {
-    if (!API_CONFIG.cacheEnabled) return;
-    
+    if (!API_CONFIG.cacheEnabled) { return;
     try {
       const cacheKeys = [];
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
-        if (key && key.startsWith(API_CONFIG.cachePrefix)) {
+        if (key && key.startsWith(API_CONFIG.cachePrefix) {
           cacheKeys.push(key);
-        }
       }
       
       cacheKeys.forEach(key => localStorage.removeItem(key));
       console.log(`🧹 Cache limpo: ${cacheKeys.length} itens removidos`);
     } catch (error) {
       console.warn('Erro ao limpar cache:', error);
-    }
-  }
 
   // MÉTODOS DE UTILIDADE
 
@@ -682,8 +576,6 @@ export class ApiClient {
     } catch (error) {
       console.warn('Error parsing JSON:', error);
       return {};
-    }
-  }
 
   /**
    * Crea un delay asíncrono
@@ -692,8 +584,6 @@ export class ApiClient {
    */
   static delay(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
-  }
-
   /**
    * Verifica el estado de la conexión con la API
    * @returns {Promise<boolean>} - Estado de la conexión
@@ -721,8 +611,6 @@ export class ApiClient {
       connectionStatus = 'offline';
       isOfflineMode = API_CONFIG.offlineMode;
       return false;
-    }
-  }
 
   /**
    * Obtiene información de la API
@@ -734,8 +622,6 @@ export class ApiClient {
       useCache: true,
       ttl: 24 * 60 * 60 * 1000 // 24 horas
     });
-  }
-
   /**
    * Configura la URL base de la API
    * @param {string} baseUrl - Nueva URL base
@@ -751,8 +637,6 @@ export class ApiClient {
    */
   static getConfig() {
     return { ...API_CONFIG };
-  }
-  
   /**
    * Ativa ou desativa o modo offline
    * @param {boolean} enabled - Se o modo offline deve ser ativado
@@ -766,8 +650,6 @@ export class ApiClient {
     }
     
     console.log(`🔌 Modo offline ${enabled ? 'ativado' : 'desativado'}`);
-  }
-  
   /**
    * Obtém o estado atual de conectividade
    * @returns {Object} - Estado de conectividade
@@ -778,8 +660,6 @@ export class ApiClient {
       offlineMode: isOfflineMode,
       offlineModeEnabled: API_CONFIG.offlineMode
     };
-  }
-}
 
 // Função de conveniência para compatibilidade com código existente
 export async function api(endpoint, options = {}) {
@@ -810,8 +690,6 @@ export async function api(endpoint, options = {}) {
       return ApiClient.delete(endpoint, options);
     default:
       return ApiClient.request(endpoint, options);
-  }
-}
 
 // Configurar eventos de conectividade
 window.addEventListener('online', () => {
@@ -831,7 +709,6 @@ window.addEventListener('offline', () => {
     showNotification('Modo offline ativado', 'warning', 5000);
   } else {
     showNotification('Sem conexão a internet', 'error', 5000);
-  }
 });
 
 // Verificar conexão inicial

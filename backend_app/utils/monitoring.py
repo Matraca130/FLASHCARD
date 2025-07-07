@@ -181,7 +181,11 @@ def monitor_performance(operation_name: str = None):
     return decorator
 
 
+<<<<<<< HEAD
 def monitor_api_endpoint(func):
+=======
+or def monitor_api_endpoint(func):
+>>>>>>> 4a64f0c0b7272a924fb9959c73278447c3324b3f
     """Decorador específico para monitorear endpoints de API"""
 
     @wraps(func)
@@ -317,7 +321,11 @@ def monitor_database_query(query_name: str = None):
     return decorator
 
 
+<<<<<<< HEAD
 class HealthMonitor:
+=======
+or class HealthMonitor:
+>>>>>>> 4a64f0c0b7272a924fb9959c73278447c3324b3f
     """Monitor de salud del sistema"""
 
     @staticmethod

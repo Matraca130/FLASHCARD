@@ -213,7 +213,11 @@ def validate_json(required_fields=None):
     return decorator
 
 
+<<<<<<< HEAD
 def handle_api_errors(f):
+=======
+or def handle_api_errors(f):
+>>>>>>> 4a64f0c0b7272a924fb9959c73278447c3324b3f
     """Decorator para manejo consistente de errores en APIs"""
 
     @wraps(f)

@@ -1,74 +1,58 @@
 import { defineConfig } from 'vite';
+import { resolve } from 'path';
 
 export default defineConfig({
-  // Base path para GitHub Pages
-  base: '/FLASHCARD/',
-
-  // Configuración de build simplificada
+  // Configuración de build optimizada
   build: {
     outDir: 'dist',
     emptyOutDir: true,
-    sourcemap: true,
-
-    // Configuración simplificada de rollup
-    rollupOptions: {
-      output: {
-        // Nombres de archivos con hash para cache busting
-        chunkFileNames: 'assets/[name]-[hash].js',
-        entryFileNames: 'assets/[name]-[hash].js',
-        assetFileNames: 'assets/[name]-[hash].[ext]',
-      },
-    },
-
-    // Minificación básica
+    sourcemap: false,
     minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: false, // Mantener console.log para debugging
-        drop_debugger: true,
+    rollupOptions: {
+      input: {
+        main: resolve(__dirname, 'index.html'),
+      },
+      output: {
+        // Mantener nombres de archivos para compatibilidad
+        entryFileNames: '[name].js',
+        chunkFileNames: '[name].js',
+        assetFileNames: '[name].[ext]',
       },
     },
-
-    // Target para compatibilidad
+    // Optimizaciones para GitHub Pages
+    assetsDir: 'assets',
     target: 'es2020',
-
-    // Límite de warning para chunks
-    chunkSizeWarningLimit: 1000,
   },
 
-  // Configuración de desarrollo
+  // Configuración de servidor de desarrollo
   server: {
-    port: 5173,
-    host: true,
-    open: false,
-
-    // Proxy para API backend
-    proxy: {
-      '/api': {
-        target: 'http://localhost:5000',
-        changeOrigin: true,
-        secure: false,
-      },
-    },
+    port: 3000,
+    open: true,
+    cors: true,
   },
 
   // Configuración de preview
   preview: {
     port: 4173,
-    host: true,
-    open: false,
+    open: true,
   },
 
-  // Directorio público
-  publicDir: 'public',
+  // Optimizaciones de dependencias
+  optimizeDeps: {
+    include: ['chart.js'],
+  },
+
+  // Configuración de base para GitHub Pages
+  base: process.env.NODE_ENV === 'production' ? '/FLASHCARD/' : '/',
+
+  // Plugins y configuraciones adicionales
+  define: {
+    __APP_VERSION__: JSON.stringify(process.env.npm_package_version || '1.0.0'),
+    __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
+  },
 
   // Configuración de CSS
   css: {
     devSourcemap: true,
-  },
-
-  // Optimización de dependencias
-  optimizeDeps: {
-    exclude: ['sw.js'],
   },
 });

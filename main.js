@@ -8,15 +8,32 @@ import './core-navigation.js';
 import './bindings.js';
 import './sync-manager.js';
 
+// Importar funciones de navegación específicas
+import { showSection } from './core-navigation.js';
+
 // Importar servicios refactorizados
 import { loadGamificationData } from './gamification.service.js';
 import { loadDashboardData } from './dashboard.service.js';
+<<<<<<< HEAD
 import { initializeCreateEvents } from './create.service.js';
+=======
+import { generateActivityHeatmap } from './activity-heatmap.service.js';
+>>>>>>> 4a64f0c0b7272a924fb9959c73278447c3324b3f
 
 import { initializeCharts } from './charts.js';
+import { initializeDashboard } from './dashboard-init.js';
+import './dashboard-fixes.js';
+
+// Hacer showSection disponible globalmente
+window.showSection = showSection;
+
+// Importar testing en modo desarrollo
+if (window.location.hostname === 'localhost') {
+  import('./dashboard-test.js');
+}
 
 // Importar utilidades comunes
-import { showNotification } from './utils/helpers.js';
+import { showNotification, downloadFile, debounce } from './utils/helpers.js';
 import { ApiClient } from './apiClient.js';
 
 // Importar servicios empresariales
@@ -151,6 +168,7 @@ async function initializeServices() {
   console.log('🔧 Inicializando servicios...');
 
   const services = [
+    { name: 'dashboard', init: initializeDashboard, critical: true },
     { name: 'gamification', init: loadGamificationData, critical: false },
     // { name: 'algorithms', init: initializeAlgorithmModal, critical: false },
     // { name: 'flashcards', init: initializeFlashcardEvents, critical: true },
