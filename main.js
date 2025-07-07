@@ -6,6 +6,7 @@
 import './router.js';
 import './core-navigation.js';
 import './bindings.js';
+import './sync-manager.js';
 
 // Importar servicios refactorizados
 import { loadGamificationData } from './gamification.service.js';
