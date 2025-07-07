@@ -457,8 +457,7 @@ export function renderEmptyStatsState(container, options = {}) {
   };
 
   const finalOptions = { ...defaultOptions, ...options };
-  renderEmptyState(container, finalOptions);
-}
+  renderEmptyState(container, finalOptions);}
 
 /**
  * Descarga un archivo con el contenido especificado
@@ -480,20 +479,30 @@ export function downloadFile(content, filename, mimeType = 'text/plain') {
     link.click();
     document.body.removeChild(link);
     
-    // Limpiar el URL del blob
-    setTimeout(() => URL.revokeObjectURL(url), 100);
-    
-    showNotification(`Archivo "${filename}" descargado exitosamente`, 'success');
+    URL.revokeObjectURL(url);
   } catch (error) {
-    console.error('Error al descargar archivo:', error);
-    showNotification('Error al descargar el archivo', 'error');
+    console.error('Error downloading file:', error);
+    throw error;
   }
 }
 
 /**
- * Sanitiza un nombre de archivo removiendo caracteres no válidos
- * @param {string} filename - Nombre del archivo a sanitizar
- * @returns {string} - Nombre del archivo sanitizado
+ * Capitaliza la primera letra de cada palabra en una cadena
+ * @param {string} str - Cadena a capitalizar
+ * @returns {string} - Cadena capitalizada
+ */
+export function capitalizeWords(str) {
+  if (!str || typeof str !== 'string') {
+    return '';
+  }
+  
+  return str.replace(/\b\w/g, l => l.toUpperCase());
+}
+
+/**
+ * Sanitiza un nombre de archivo
+ * @param {string} filename - Nombre original
+ * @returns {string} - Nombre de archivo sanitizado
  */
 export function sanitizeFilename(filename) {
   if (!filename || typeof filename !== 'string') {
@@ -567,16 +576,4 @@ export function isValidPassword(password) {
   return password.length >= 6;
 }
 
-/**
- * Capitaliza la primera letra de cada palabra
- * @param {string} str - Cadena a capitalizar
- * @returns {string} - Cadena con primera letra de cada palabra capitalizada
- */
-export function capitalizeFirst(str) {
-  if (!str || typeof str !== 'string') {
-    return '';
-  }
-  
-  return str.replace(/\b\w/g, l => l.toUpperCase());
-}
 
