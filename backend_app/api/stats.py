@@ -157,9 +157,9 @@ def get_chart_data():
             chart_data = []
             for row in accuracy_data:
                 accuracy = (
-                    row.correct_reviews /
-                    row.total_reviews *
-                    100) if row.total_reviews > 0 else 0
+                    row.correct_reviews
+                    / row.total_reviews
+                    * 100) if row.total_reviews > 0 else 0
                 chart_data.append(
                     {
                         "deck_name": row.name,

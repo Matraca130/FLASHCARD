@@ -260,8 +260,8 @@ def end_study_session(session_id):
         # Finalizar sesión
         session.ended_at = datetime.utcnow()
         session.total_time = (
-            session.ended_at -
-            session.started_at).total_seconds()
+            session.ended_at
+            - session.started_at).total_seconds()
 
         # Actualizar tiempo total de estudio del usuario
         user = User.query.get(user_id)

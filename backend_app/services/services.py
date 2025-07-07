@@ -851,12 +851,12 @@ class StudyService(BaseService):
                     "session_id": session_id,
                     "cards_studied": session.cards_studied,
                     "duration": (
-                        session.completed_at -
-                        session.created_at).total_seconds(),
+                        session.completed_at
+                        - session.created_at).total_seconds(),
                     "completion_rate": (
-                        session.cards_studied /
-                        session.max_cards) *
-                    100,
+                        session.cards_studied
+                        / session.max_cards)
+                    * 100,
                 })
 
         except Exception as e:
@@ -1080,9 +1080,9 @@ class StatsService(BaseService):
                 )
 
                 progress_rate = (
-                    mastered_cards /
-                    total_cards *
-                    100) if total_cards > 0 else 0
+                    mastered_cards
+                    / total_cards
+                    * 100) if total_cards > 0 else 0
 
                 decks_progress.append(
                     {
@@ -1161,7 +1161,7 @@ class StatsService(BaseService):
                 if date_key in daily_data:
                     daily_data[date_key]["reviews"] += 1
                     if review.rating >= 3:
-            daily_data[date_key]["correct"] += 1
+                        daily_data[date_key]["correct"] += 1
 
             # Calcular accuracy
             for day_data in daily_data.values():

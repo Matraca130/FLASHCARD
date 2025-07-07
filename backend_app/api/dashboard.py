@@ -236,9 +236,9 @@ def get_performance_stats():
         performance_data = []
         for row in deck_performance:
             accuracy = (
-                row.correct_reviews /
-                row.total_reviews *
-                100) if row.total_reviews > 0 else 0
+                row.correct_reviews
+                / row.total_reviews
+                * 100) if row.total_reviews > 0 else 0
             performance_data.append(
                 {
                     "deck_id": row.id,

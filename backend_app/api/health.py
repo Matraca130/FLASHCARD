@@ -162,8 +162,8 @@ def liveness_check():
                 "status": "alive",
                 "timestamp": datetime.utcnow().isoformat(),
                 "uptime_seconds": (
-                    time.time() -
-                    start_time if "start_time" in globals() else 0),
+                    time.time()
+                    - start_time if "start_time" in globals() else 0),
             }),
         200,
     )
