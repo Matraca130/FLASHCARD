@@ -179,6 +179,7 @@ def get_dashboard_data():
         logger.error(f"Error getting dashboard data: {str(e)}")
         return jsonify({"error": "Error interno del servidor"}), 500
 
+
 @frontend_api.route('/deck/<int:deck_id>/study-session', methods=['POST'])
 @jwt_required()
 def start_study_session(deck_id):
@@ -236,6 +237,7 @@ def start_study_session(deck_id):
     except Exception as e:
         logger.error(f"Error starting study session: {str(e)}")
         return jsonify({'error': 'Error interno del servidor'}), 500
+
 
 @frontend_api.route('/study-session/<int:session_id>/review', methods=['POST'])
 @jwt_required()
