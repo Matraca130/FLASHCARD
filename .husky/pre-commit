@@ -3,6 +3,15 @@
 
 echo "🔍 Ejecutando validaciones pre-commit..."
 
+# 0. Detectar merge conflicts (CRÍTICO)
+echo "🚨 Detectando merge conflicts..."
+node scripts/merge-conflict-detector.js
+if [ $? -ne 0 ]; then
+  echo "❌ COMMIT BLOQUEADO: Merge conflicts detectados"
+  echo "💡 Ejecuta: node scripts/merge-conflict-detector.js --auto-fix"
+  exit 1
+fi
+
 # 1. Validar integridad de nombres
 echo "📝 Validando convenciones de nombres..."
 node scripts/naming-validator.js
