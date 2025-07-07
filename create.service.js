@@ -118,9 +118,12 @@ export async function createDeck(deckData = {}) {
     const deck = await withLoadingFeedback(
       async () => {
         try {
-          // Intentar crear en API primero
-          const response = await api('/api/decks', {
+          // Intentar crear en API primero usando apiWithFallback
+          const response = await apiWithFallback('/api/decks', null, {
             method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
             body: JSON.stringify(data),
           });
 
@@ -128,7 +131,7 @@ export async function createDeck(deckData = {}) {
             throw new Error(response.message || 'Error al crear deck');
           }
 
-          return response.data;
+          return response.data || response;
         } catch (error) {
           console.log('API no disponible, usando almacenamiento local');
           return (

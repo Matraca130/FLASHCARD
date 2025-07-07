@@ -11,6 +11,7 @@ import './sync-manager.js';
 // Importar servicios refactorizados
 import { loadGamificationData } from './gamification.service.js';
 import { loadDashboardData } from './dashboard.service.js';
+import { initializeCreateEvents } from './create.service.js';
 
 import { initializeCharts } from './charts.js';
 
@@ -154,7 +155,7 @@ async function initializeServices() {
     // { name: 'algorithms', init: initializeAlgorithmModal, critical: false },
     // { name: 'flashcards', init: initializeFlashcardEvents, critical: true },
     // { name: 'importExport', init: initializeImportExportEvents, critical: false },
-    // { name: 'create', init: initializeCreateEvents, critical: true },
+    { name: 'create', init: initializeCreateEvents, critical: true },
     // { name: 'activityHeatmap', init: initializeActivityHeatmap, critical: false }
   ];
 
