@@ -30,7 +30,7 @@ class StudyService(BaseService):
         Args:
             user_id: ID del usuario
             deck_id: ID del deck a estudiar
-            algorithm: Algoritmo de repetición ('fsrs', 'sm2', 'anki', 'ultra_sm2')
+            algorithm: Algoritmo de repetición ("fsrs", "sm2", "anki", "ultra_sm2")
 
         Returns:
             dict: Respuesta con sesión creada
@@ -124,6 +124,62 @@ class StudyService(BaseService):
         except Exception as e:
             return self._handle_exception(e, "obtención de siguiente carta")
 
+    def _update_card_review_data(self, card, new_interval, new_ease_factor, new_repetitions, algorithm_result, session_algorithm):
+        card.interval_days = new_interval
+        card.ease_factor = new_ease_factor or card.ease_factor
+        card.repetitions = new_repetitions or (card.repetitions or 0) + 1
+        card.last_reviewed = datetime.utcnow()
+        card.next_review = datetime.utcnow() + timedelta(days=new_interval)
+
+        if session_algorithm == "fsrs":
+            if hasattr(card, "stability"):
+                card.stability = algorithm_result.get("stability", card.stability)
+            if hasattr(card, "difficulty_fsrs"):
+                card.difficulty_fsrs = algorithm_result.get("difficulty", card.difficulty_fsrs)
+        self._update_timestamps(card)
+
+    def _create_card_review_record(self, card_id, session_id, quality, response_time, session_algorithm, new_interval, new_ease_factor):
+        review = CardReview(
+            flashcard_id=card_id,
+            session_id=session_id,
+            quality=quality,
+            response_time=response_time or 0,
+            algorithm=session_algorithm,
+            interval_before=card.interval_days,
+            interval_after=new_interval,
+            ease_factor=new_ease_factor or card.ease_factor,
+            reviewed_at=datetime.utcnow(),
+        )
+        self.db.session.add(review)
+        return review
+
+    def _update_session_stats(self, session, quality, response_time):
+        session.cards_studied += 1
+        if quality >= 3:
+            session.cards_correct += 1
+        if response_time:
+            session.total_time += response_time
+        self._update_timestamps(session)
+
+    def _build_review_response(self, card, quality, new_interval, session):
+        return self._success_response({
+            "card_id": card.id,
+            "quality": quality,
+            "new_interval": new_interval,
+            "next_review": card.next_review.isoformat(),
+            "is_correct": quality >= 3,
+            "back_text": card.back_text,
+            "back_image_url": card.back_image_url,
+            "back_audio_url": card.back_audio_url,
+            "session_stats": {
+                "cards_studied": session.cards_studied,
+                "cards_correct": session.cards_correct,
+                "accuracy": (
+                    (session.cards_correct / session.cards_studied * 100) if session.cards_studied > 0 else 0
+                ),
+            },
+        }, "Carta revisada exitosamente")
+
     def review_card(self, session_id, user_id, card_id, quality, response_time=None):
         """
         Registrar respuesta a una carta y aplicar algoritmo de repetición
@@ -139,101 +195,37 @@ class StudyService(BaseService):
             dict: Respuesta con resultado del algoritmo
         """
         try:
-            # Verificar sesión activa
             session = (
                 self.db.session.query(StudySession).filter_by(id=session_id, user_id=user_id, completed_at=None).first()
             )
-
             if not session:
                 return self._error_response("Sesión de estudio no encontrada o completada", code=404)
 
-            # Verificar que la carta pertenece al deck de la sesión
             card = (
                 self.db.session.query(Flashcard)
                 .filter_by(id=card_id, deck_id=session.deck_id, is_deleted=False)
                 .first()
             )
-
             if not card:
                 return self._error_response("Carta no encontrada", code=404)
 
-            # Validar calidad de respuesta
             if not isinstance(quality, (int, float)) or quality < 0 or quality > 5:
                 return self._error_response("La calidad debe ser un número entre 0 y 5", code=400)
 
-            # Aplicar algoritmo de repetición espaciada
             algorithm_result = self._apply_spaced_repetition(card, quality, session.algorithm)
-
             if not algorithm_result["success"]:
                 return algorithm_result
 
-            # Actualizar carta con nuevos valores
             new_interval, new_ease_factor, new_repetitions = algorithm_result["data"]
 
-            card.interval_days = new_interval
-            card.ease_factor = new_ease_factor or card.ease_factor
-            card.repetitions = new_repetitions or (card.repetitions or 0) + 1
-            card.last_reviewed = datetime.utcnow()
-            card.next_review = datetime.utcnow() + timedelta(days=new_interval)
-
-            # Actualizar campos específicos según algoritmo
-            if session.algorithm == "fsrs":
-                # Para FSRS, también actualizar estabilidad y dificultad
-                if hasattr(card, "stability"):
-                    card.stability = algorithm_result.get("stability", card.stability)
-                if hasattr(card, "difficulty_fsrs"):
-                    card.difficulty_fsrs = algorithm_result.get("difficulty", card.difficulty_fsrs)
-
-            self._update_timestamps(card)
-
-            # Crear registro de revisión
-            review = CardReview(
-                flashcard_id=card_id,
-                session_id=session_id,
-                quality=quality,
-                response_time=response_time or 0,
-                algorithm=session.algorithm,
-                interval_before=card.interval_days,
-                interval_after=new_interval,
-                ease_factor=new_ease_factor or card.ease_factor,
-                reviewed_at=datetime.utcnow(),
-            )
-
-            self.db.session.add(review)
-
-            # Actualizar estadísticas de la sesión
-            session.cards_studied += 1
-            if quality >= 3:  # Consideramos correcto si quality >= 3
-                session.cards_correct += 1
-
-            if response_time:
-                session.total_time += response_time
-
-            self._update_timestamps(session)
+            self._update_card_review_data(card, new_interval, new_ease_factor, new_repetitions, algorithm_result, session.algorithm)
+            self._create_card_review_record(card_id, session_id, quality, response_time, session.algorithm, new_interval, new_ease_factor)
+            self._update_session_stats(session, quality, response_time)
 
             if not self._commit_or_rollback():
                 return self._error_response("Error al guardar revisión", code=500)
 
-            # Preparar respuesta con información de la carta
-            result = {
-                "card_id": card_id,
-                "quality": quality,
-                "new_interval": new_interval,
-                "next_review": card.next_review.isoformat(),
-                "is_correct": quality >= 3,
-                "back_text": card.back_text,
-                "back_image_url": card.back_image_url,
-                "back_audio_url": card.back_audio_url,
-                "session_stats": {
-                    "cards_studied": session.cards_studied,
-                    "cards_correct": session.cards_correct,
-                    "accuracy": (
-                        (session.cards_correct / session.cards_studied * 100) if session.cards_studied > 0 else 0
-                    ),
-                },
-            }
-
-            return self._success_response(result, "Carta revisada exitosamente")
+            return self._build_review_response(card, quality, new_interval, session)
 
         except Exception as e:
             return self._handle_exception(e, "revisión de carta")
@@ -354,7 +346,9 @@ class StudyService(BaseService):
             return self._handle_exception(e, "obtención de cartas vencidas")
 
     def _get_cards_for_study(self, deck_id, limit=20):
-        """Obtener cartas disponibles para estudiar en un deck"""
+        """
+        Obtener cartas disponibles para estudiar en un deck
+        """
         try:
             # Priorizar cartas vencidas
             due_cards = (
@@ -396,7 +390,9 @@ class StudyService(BaseService):
             return []
 
     def _select_next_card(self, available_cards):
-        """Seleccionar la siguiente carta según prioridad"""
+        """
+        Seleccionar la siguiente carta según prioridad
+        """
         if not available_cards:
             return None
 
@@ -418,7 +414,9 @@ class StudyService(BaseService):
         return random.choice(available_cards)
 
     def _apply_spaced_repetition(self, card, quality, algorithm):
-        """Aplicar algoritmo de repetición espaciada"""
+        """
+        Aplicar algoritmo de repetición espaciada
+        """
         try:
             if algorithm == "fsrs":
                 return self._apply_fsrs(card, quality)
@@ -435,7 +433,9 @@ class StudyService(BaseService):
             return self._handle_exception(e, f"aplicación de algoritmo {algorithm}")
 
     def _apply_fsrs(self, card, quality):
-        """Aplicar algoritmo FSRS"""
+        """
+        Aplicar algoritmo FSRS
+        """
         try:
             stability = getattr(card, "stability", 2.5)
             difficulty = getattr(card, "difficulty_fsrs", 5.0)
@@ -455,7 +455,9 @@ class StudyService(BaseService):
             return self._apply_sm2(card, quality)
 
     def _apply_sm2(self, card, quality):
-        """Aplicar algoritmo SM-2 clásico"""
+        """
+        Aplicar algoritmo SM-2 clásico
+        """
         try:
             ease_factor = card.ease_factor or 2.5
             repetitions = card.repetitions or 0
@@ -470,7 +472,9 @@ class StudyService(BaseService):
             return self._success_response((1, 2.5, 1))
 
     def _apply_ultra_sm2(self, card, quality):
-        """Aplicar algoritmo Ultra SM-2 con límites dinámicos"""
+        """
+        Aplicar algoritmo Ultra SM-2 con límites dinámicos
+        """
         try:
             ease_factor = card.ease_factor or 2.5
             repetitions = card.repetitions or 0
@@ -495,7 +499,9 @@ class StudyService(BaseService):
             return self._apply_sm2(card, quality)
 
     def _apply_anki(self, card, quality):
-        """Aplicar algoritmo estilo Anki con pasos de aprendizaje"""
+        """
+        Aplicar algoritmo estilo Anki con pasos de aprendizaje
+        """
         try:
             repetitions = card.repetitions or 0
             ease_factor = card.ease_factor or 2.5
@@ -525,3 +531,5 @@ class StudyService(BaseService):
         except Exception as e:
             self.logger.error(f"Error en Anki: {str(e)}")
             return self._apply_sm2(card, quality)
+
+

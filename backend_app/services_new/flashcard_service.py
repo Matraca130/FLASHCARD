@@ -29,7 +29,7 @@ class FlashcardService(BaseService):
 
         Returns:
             dict: Respuesta con flashcards paginadas
-        """
+        ""
         try:
             # Cache key
             cache_key = f"user_flashcards:{user_id}:{deck_id}:{page}:{per_page}:{search}"
@@ -311,6 +311,29 @@ class FlashcardService(BaseService):
         except Exception as e:
             return self._handle_exception(e, "eliminación de flashcard")
 
+    def _validate_single_flashcard_input(self, card_data, index):
+        front_text = card_data.get("front_text", "").strip()
+        back_text = card_data.get("back_text", "").strip()
+
+        if not front_text and not card_data.get("front_image_url"):
+            return f"Carta {index+1}: El frente debe tener texto o imagen"
+        if not back_text and not card_data.get("back_image_url"):
+            return f"Carta {index+1}: El reverso debe tener texto o imagen"
+        return None
+
+    def _create_single_flashcard_object(self, deck_id, card_data):
+        return Flashcard(
+            deck_id=deck_id,
+            front_text=card_data.get("front_text", "").strip(),
+            back_text=card_data.get("back_text", "").strip(),
+            front_image_url=card_data.get("front_image_url", ""),
+            back_image_url=card_data.get("back_image_url", ""),
+            front_audio_url=card_data.get("front_audio_url", ""),
+            back_audio_url=card_data.get("back_audio_url", ""),
+            difficulty=card_data.get("difficulty", "medium"),
+            tags=card_data.get("tags", ""),
+        )
+
     def create_multiple_flashcards(self, user_id, deck_id, flashcards_data):
         """
         Crear múltiples flashcards en lote
@@ -324,7 +347,6 @@ class FlashcardService(BaseService):
             dict: Respuesta con flashcards creadas
         """
         try:
-            # Verificar que el deck existe y pertenece al usuario
             deck, error = self._get_resource_if_owned(Deck, deck_id, user_id, "deck")
             if error:
                 return error
@@ -336,35 +358,14 @@ class FlashcardService(BaseService):
             errors = []
 
             for i, card_data in enumerate(flashcards_data):
+                validation_error = self._validate_single_flashcard_input(card_data, i)
+                if validation_error:
+                    errors.append(validation_error)
+                    continue
                 try:
-                    # Validar contenido mínimo
-                    front_text = card_data.get("front_text", "").strip()
-                    back_text = card_data.get("back_text", "").strip()
-
-                    if not front_text and not card_data.get("front_image_url"):
-                        errors.append(f"Carta {i+1}: El frente debe tener texto o imagen")
-                        continue
-
-                    if not back_text and not card_data.get("back_image_url"):
-                        errors.append(f"Carta {i+1}: El reverso debe tener texto o imagen")
-                        continue
-
-                    # Crear flashcard
-                    flashcard = Flashcard(
-                        deck_id=deck_id,
-                        front_text=front_text,
-                        back_text=back_text,
-                        front_image_url=card_data.get("front_image_url", ""),
-                        back_image_url=card_data.get("back_image_url", ""),
-                        front_audio_url=card_data.get("front_audio_url", ""),
-                        back_audio_url=card_data.get("back_audio_url", ""),
-                        difficulty=card_data.get("difficulty", "medium"),
-                        tags=card_data.get("tags", ""),
-                    )
-
+                    flashcard = self._create_single_flashcard_object(deck_id, card_data)
                     self.db.session.add(flashcard)
                     created_cards.append(flashcard)
-
                 except Exception as e:
                     errors.append(f"Carta {i+1}: {str(e)}")
 
@@ -377,12 +378,10 @@ class FlashcardService(BaseService):
             if not self._commit_or_rollback():
                 return self._error_response("Error al guardar flashcards", code=500)
 
-            # Actualizar contador de cartas en el deck
             deck.total_cards = self.db.session.query(Flashcard).filter_by(deck_id=deck_id, is_deleted=False).count()
             self._update_timestamps(deck)
             self._commit_or_rollback()
 
-            # Invalidar cache
             self._invalidate_cache_pattern(f"user_flashcards:{user_id}:*")
             self._invalidate_cache_pattern(f"user_decks:{user_id}:*")
 
@@ -461,3 +460,5 @@ class FlashcardService(BaseService):
 
         except Exception as e:
             return self._handle_exception(e, "obtención de flashcards para estudio")
+
+
