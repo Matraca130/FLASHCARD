@@ -332,7 +332,7 @@ class StorageService {
 
     if (this.save('decks', decks)) {
       console.log('✅ Deck creado:', newDeck.name);
-      showNotification(`Deck "${newDeck.name}" creado exitosamente`, 'success');
+      showNotification(`Deck '${newDeck.name}' creado exitosamente`, 'success');
       return newDeck;
     }
 
@@ -405,7 +405,7 @@ class StorageService {
 
     if (this.save('decks', decks)) {
       console.log('✅ Deck eliminado:', deckName);
-      showNotification(`Deck "${deckName}" eliminado`, 'success');
+      showNotification(`Deck '${deckName}' eliminado`, 'success');
       return true;
     }
 

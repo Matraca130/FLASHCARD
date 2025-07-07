@@ -1,6 +1,6 @@
 /**
- * main.js - Punto de entrada principal refactorizado
- * Gestiona la inicialización de la aplicación StudyingFlash
+ * main.js - Punto de entrada principal refactorizado con arquitectura empresarial
+ * Gestiona la inicialización de la aplicación StudyingFlash con servicios avanzados
  */
 
 import './router.js';
@@ -15,6 +15,12 @@ import { initializeCharts } from './charts.js';
 // Importar utilidades comunes
 import { showNotification } from './utils/helpers.js';
 import { ApiClient } from './apiClient.js';
+
+// Importar servicios empresariales
+import configManager, { getConfig, isFeatureEnabled } from './services/ConfigManager.js';
+import errorHandler from './services/ErrorHandler.js';
+import cacheManager from './services/CacheManager.js';
+import navigationService from './services/NavigationService.js';
 
 // Configuración de la aplicación
 const APP_CONFIG = {

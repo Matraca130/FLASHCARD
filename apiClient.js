@@ -237,8 +237,8 @@ export class ApiClient {
         const response = await fetch(url, options);
 
         // Si la respuesta es exitosa o es un error del cliente (4xx), no reintentar
-        if (response.ok || (response.status >= 400 && response.status < 500)) {
-          return response;
+        if (response.ok || (response.status >= 400 && response.status < 500){ ) {
+          return response; }
         }
 
         // Error del servidor (5xx), reintentar
@@ -326,8 +326,8 @@ export class ApiClient {
 
     if (error.name === 'AbortError') {
       errorMessage = 'Tiempo de espera agotado';
-    } else if (error.message.includes('Failed to fetch')) {
-      errorMessage = 'Sin conexión a internet';
+    } else if (error.message.includes('Failed to fetch'){ ) {
+      errorMessage = 'Sin conexión a internet'; }
     } else {
       errorMessage = error.message || 'Error desconocido';
     }
@@ -418,9 +418,9 @@ export class ApiClient {
     );
 
     // Redirigir al login si no estamos ya ahí
-    if (!window.location.pathname.includes('login')) {
+    if (!window.location.pathname.includes('login'){ ) {
       setTimeout(() => {
-        window.location.href = '/login.html';
+        window.location.href = '/login.html'; }
       }, 2000);
     }
   }

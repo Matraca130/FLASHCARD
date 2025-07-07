@@ -160,8 +160,8 @@ export function formatDate(date, locale = 'es-ES') {
 
   const dateObj = typeof date === 'string' ? new Date(date) : date;
 
-  if (isNaN(dateObj.getTime())) {
-    return 'Fecha inválida';
+  if (isNaN(dateObj.getTime(){ )) {
+    return 'Fecha inválida'; }
   }
 
   return dateObj.toLocaleDateString(locale, {
@@ -359,12 +359,29 @@ export function renderEmptyState(container, options = {}) {
   // Agregar botón de acción si se especifica
   if (actionText) {
     if (actionTarget) {
-      // Acción de navegación
+      // Acción de navegación usando NavigationService
       html += `
-        <button onclick="window.showSection('${actionTarget}')" class="btn btn-primary empty-state-action">
+        <button onclick="window.handleNavigation('${actionTarget}')" class="btn btn-primary empty-state-action">
           ${actionText}
         </button>
       `;
+      
+      // Configurar handler de navegación global si no existe
+      if (!window.handleNavigation) {
+        window.handleNavigation = async (target) => {
+          try {
+            // Importar NavigationService dinámicamente
+            const { navigateTo } = await import('../services/NavigationService.js');
+            await navigateTo(target);
+          } catch (error) {
+            console.error('Error en navegación:', error);
+            // Fallback a método tradicional si está disponible
+            if (window.showSection) {
+              window.showSection(target);
+            }
+          }
+        };
+      }
     } else if (actionCallback) {
       // Acción personalizada
       const callbackName = `emptyStateAction_${Date.now()}`;
@@ -539,7 +556,7 @@ export function parseCSV(csvContent, delimiter = ',') {
  * @returns {string} - Tamaño formateado
  */
 export function formatFileSize(bytes) {
-  if (!bytes || bytes === 0) return '0 B';
+  if (!bytes || bytes === 0) { return '0 B'; }
   
   const k = 1024;
   const sizes = ['B', 'KB', 'MB', 'GB'];
@@ -590,8 +607,8 @@ export function formatDateDDMMYYYY(date) {
 
   const dateObj = typeof date === 'string' ? new Date(date) : date;
 
-  if (isNaN(dateObj.getTime())) {
-    return 'Fecha inválida';
+  if (isNaN(dateObj.getTime(){ )) {
+    return 'Fecha inválida'; }
   }
 
   const day = dateObj.getDate().toString().padStart(2, '0');
