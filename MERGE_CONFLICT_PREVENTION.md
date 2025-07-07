@@ -5,7 +5,7 @@
 ### **Error Detectado:**
 ```
 backend_app/api/frontend_api.py:313:1: E999 SyntaxError: invalid syntax
->>>>>>> ae94649 (Fix: Corregido uso de campo interval_days en frontend_api.py)
+[MERGE CONFLICT MARKER] ae94649 (Fix: Corregido uso de campo interval_days en frontend_api.py)
 ```
 
 ### **Causa Raíz:**
