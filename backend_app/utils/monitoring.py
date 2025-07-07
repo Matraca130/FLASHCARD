@@ -98,7 +98,7 @@ def filter_sensitive_transactions(event, hint):
 
 
 def setup_logging(app):
-    """Configurar logging estructurado"""
+    """Configurar logging estructurado con filtrado inteligente"""
     # Crear directorio de logs si no existe
     log_dir = os.path.dirname(MonitoringConfig.LOG_FILE)
     if log_dir and not os.path.exists(log_dir):
@@ -112,22 +112,23 @@ def setup_logging(app):
     # Handler para archivo
     file_handler = logging.FileHandler(MonitoringConfig.LOG_FILE)
     file_handler.setFormatter(formatter)
-    file_handler.setLevel(getattr(logging, MonitoringConfig.LOG_LEVEL))
+    # Usar WARNING como nivel mínimo para reducir ruido
+    file_handler.setLevel(logging.WARNING)
 
     # Handler para consola
     console_handler = logging.StreamHandler()
     console_handler.setFormatter(formatter)
-    console_handler.setLevel(logging.INFO)
+    # Solo mostrar WARNING y superiores en consola
+    console_handler.setLevel(logging.WARNING)
 
     # Configurar logger de la aplicación
-    app.logger.setLevel(getattr(logging, MonitoringConfig.LOG_LEVEL))
+    app.logger.setLevel(logging.WARNING)  # Cambiar de INFO a WARNING
     app.logger.addHandler(file_handler)
     app.logger.addHandler(console_handler)
 
-    # Configurar logger de SQLAlchemy (opcional)
-    if MonitoringConfig.LOG_LEVEL == "DEBUG":
-        logging.getLogger("sqlalchemy.engine").setLevel(logging.INFO)
-        logging.getLogger("sqlalchemy.engine").addHandler(file_handler)
+    # Configurar logger de SQLAlchemy (solo errores)
+    logging.getLogger("sqlalchemy.engine").setLevel(logging.ERROR)
+    logging.getLogger("sqlalchemy.engine").addHandler(file_handler)
 
 
 def monitor_performance(operation_name: str = None):

@@ -28,9 +28,9 @@ class TestStudyService:
         from backend_app.models.models import Flashcard
         future_card = Flashcard(
             deck_id=test_deck.id,
-            user_id=test_user.id,
             front_text='Future card',
             back_text='Future answer',
+            difficulty='normal',
             next_review=datetime.utcnow() + timedelta(days=7)
         )
         db_session.add(future_card)
@@ -124,9 +124,10 @@ class TestAlgorithmsFSRS:
     def test_fsrs_excellent_response(self):
         """Test FSRS con respuesta excelente"""
         stability, difficulty, interval = calculate_fsrs(
-            quality=5,  # Excelente
-            current_stability=1.0,
-            current_difficulty=5.0,
+            rating=4,  # Easy
+            stability=1.0,
+            difficulty=5.0,
+            elapsed_days=1,
             retrievability=0.9
         )
         
@@ -138,9 +139,10 @@ class TestAlgorithmsFSRS:
     def test_fsrs_poor_response(self):
         """Test FSRS con respuesta pobre"""
         stability, difficulty, interval = calculate_fsrs(
-            quality=1,  # Pobre
-            current_stability=5.0,
-            current_difficulty=3.0,
+            rating=1,  # Again
+            stability=5.0,
+            difficulty=3.0,
+            elapsed_days=1,
             retrievability=0.5
         )
         
@@ -153,9 +155,9 @@ class TestAlgorithmsFSRS:
         """Test FSRS con valores límite"""
         # Calidad mínima
         stability, difficulty, interval = calculate_fsrs(
-            quality=1,
-            current_stability=0.1,
-            current_difficulty=10.0,
+            rating=1,
+            stability=0.1,
+            difficulty=10.0,
             retrievability=0.1
         )
         
@@ -171,9 +173,9 @@ class TestAlgorithmsFSRS:
         # Ejecutar 1000 cálculos
         for _ in range(1000):
             calculate_fsrs(
-                quality=3,
-                current_stability=2.0,
-                current_difficulty=5.0,
+                rating=3,
+                stability=2.0,
+                difficulty=5.0,
                 retrievability=0.8
             )
         
@@ -191,10 +193,10 @@ class TestAlgorithmsSM2:
     def test_sm2_good_response(self):
         """Test SM-2 con respuesta buena"""
         ease_factor, interval, repetitions = calculate_sm2(
-            quality=4,  # Buena
-            current_ease_factor=2.5,
-            current_interval=1,
-            current_repetitions=0
+            rating=4,  # Easy
+            ease_factor=2.5,
+            interval=1,
+            repetitions=0
         )
         
         assert ease_factor >= 2.5  # Factor de facilidad debe mantenerse o aumentar
@@ -205,10 +207,10 @@ class TestAlgorithmsSM2:
     def test_sm2_poor_response(self):
         """Test SM-2 con respuesta pobre"""
         ease_factor, interval, repetitions = calculate_sm2(
-            quality=1,  # Pobre
-            current_ease_factor=2.5,
-            current_interval=7,
-            current_repetitions=3
+            rating=1,  # Again
+            ease_factor=2.5,
+            interval=7,
+            repetitions=3
         )
         
         assert ease_factor < 2.5  # Factor debe disminuir
@@ -220,10 +222,10 @@ class TestAlgorithmsSM2:
         """Test secuencia normal de SM-2"""
         # Primera revisión (calidad 4)
         ease_factor, interval, repetitions = calculate_sm2(
-            quality=4,
-            current_ease_factor=2.5,
-            current_interval=1,
-            current_repetitions=0
+            rating=4,
+            ease_factor=2.5,
+            interval=1,
+            repetitions=0
         )
         
         assert repetitions == 1
@@ -231,10 +233,10 @@ class TestAlgorithmsSM2:
         
         # Segunda revisión (calidad 4)
         ease_factor, interval, repetitions = calculate_sm2(
-            quality=4,
-            current_ease_factor=ease_factor,
-            current_interval=interval,
-            current_repetitions=repetitions
+            rating=4,
+            ease_factor=ease_factor,
+            interval=interval,
+            repetitions=repetitions
         )
         
         assert repetitions == 2
@@ -242,10 +244,10 @@ class TestAlgorithmsSM2:
         
         # Tercera revisión (calidad 4)
         ease_factor, interval, repetitions = calculate_sm2(
-            quality=4,
-            current_ease_factor=ease_factor,
-            current_interval=interval,
-            current_repetitions=repetitions
+            rating=4,
+            ease_factor=ease_factor,
+            interval=interval,
+            repetitions=repetitions
         )
         
         assert repetitions == 3
@@ -256,20 +258,20 @@ class TestAlgorithmsSM2:
         """Test límites del factor de facilidad en SM-2"""
         # Factor muy bajo
         ease_factor, _, _ = calculate_sm2(
-            quality=1,
-            current_ease_factor=1.3,  # Cerca del mínimo
-            current_interval=1,
-            current_repetitions=0
+            rating=1,
+            ease_factor=1.3,  # Cerca del mínimo
+            interval=1,
+            repetitions=0
         )
         
         assert ease_factor >= 1.3  # No debe bajar del mínimo
         
         # Factor muy alto con respuesta excelente
         ease_factor, _, _ = calculate_sm2(
-            quality=5,
-            current_ease_factor=3.0,
-            current_interval=1,
-            current_repetitions=0
+            rating=5,
+            ease_factor=3.0,
+            interval=1,
+            repetitions=0
         )
         
         assert ease_factor > 3.0  # Debe aumentar
@@ -282,10 +284,10 @@ class TestAlgorithmsSM2:
         # Ejecutar 1000 cálculos
         for _ in range(1000):
             calculate_sm2(
-                quality=3,
-                current_ease_factor=2.5,
-                current_interval=3,
-                current_repetitions=1
+                rating=3,
+                ease_factor=2.5,
+                interval=3,
+                repetitions=1
             )
         
         end_time = time.time()
@@ -303,17 +305,17 @@ class TestAlgorithmsComparison:
         """Test consistencia entre algoritmos"""
         # Misma respuesta buena en ambos algoritmos
         fsrs_stability, fsrs_difficulty, fsrs_interval = calculate_fsrs(
-            quality=4,
-            current_stability=2.0,
-            current_difficulty=5.0,
+            rating=4,
+            stability=2.0,
+            difficulty=5.0,
             retrievability=0.8
         )
         
         sm2_ease, sm2_interval, sm2_reps = calculate_sm2(
-            quality=4,
-            current_ease_factor=2.5,
-            current_interval=2,
-            current_repetitions=1
+            rating=4,
+            ease_factor=2.5,
+            interval=2,
+            repetitions=1
         )
         
         # Ambos deben aumentar el intervalo para respuesta buena
@@ -325,18 +327,18 @@ class TestAlgorithmsComparison:
         """Test manejo de respuestas pobres en ambos algoritmos"""
         # Respuesta pobre en FSRS
         fsrs_stability, fsrs_difficulty, fsrs_interval = calculate_fsrs(
-            quality=1,
-            current_stability=5.0,
-            current_difficulty=3.0,
+            rating=1,
+            stability=5.0,
+            difficulty=3.0,
             retrievability=0.5
         )
         
         # Respuesta pobre en SM-2
         sm2_ease, sm2_interval, sm2_reps = calculate_sm2(
-            quality=1,
-            current_ease_factor=2.5,
-            current_interval=7,
-            current_repetitions=3
+            rating=1,
+            ease_factor=2.5,
+            interval=7,
+            repetitions=3
         )
         
         # Ambos deben resetear el intervalo
