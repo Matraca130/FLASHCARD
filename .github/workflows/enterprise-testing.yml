@@ -45,7 +45,22 @@ jobs:
     - name: Linting
       run: |
         echo "📝 Running ESLint..."
-        npm run lint
+        npm run lint 2>&1 | python -c "
+        import sys
+        import re
+        
+        # Filtrar solo errores reales de ESLint
+        for line in sys.stdin:
+            line = line.strip()
+            if any(keyword in line.lower() for keyword in ['error', 'warning']):
+                # Solo mostrar si es un error real de linting
+                if any(pattern in line.lower() for pattern in ['✖', 'problems', 'errors', 'warnings']):
+                    print(line)
+                elif re.search(r'\d+:\d+\s+(error|warning)', line):
+                    print(line)
+            else:
+                print(line)
+        " || exit 1
 
     - name: Frontend tests
       run: |

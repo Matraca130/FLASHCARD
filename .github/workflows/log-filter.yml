@@ -1,0 +1,80 @@
+name: Intelligent Log Filter
+
+on:
+  workflow_run:
+    workflows: ["Enterprise Testing Suite", "Basic CI/CD", "Enterprise Deployment"]
+    types:
+      - completed
+
+jobs:
+  filter-logs:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Download workflow logs
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          
+          // Get workflow run logs
+          const logs = await github.rest.actions.downloadWorkflowRunLogs({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            run_id: ${{ github.event.workflow_run.id }}
+          });
+          
+          // Save logs to file
+          fs.writeFileSync('workflow-logs.zip', Buffer.from(logs.data));
+    
+    - name: Extract and filter logs
+      run: |
+        # Extract logs
+        unzip -q workflow-logs.zip
+        
+        # Find all log files
+        find . -name "*.txt" -type f > log_files.txt
+        
+        echo "=== FILTERING LOGS FOR REAL ERRORS ==="
+        
+        # Process each log file
+        while read -r log_file; do
+          if [ -f "$log_file" ]; then
+            echo "Processing: $log_file"
+            python backend_app/utils/log_filter.py "$log_file" || true
+          fi
+        done < log_files.txt
+        
+        echo "=== LOG FILTERING COMPLETE ==="
+    
+    - name: Create filtered log summary
+      run: |
+        echo "# 🔍 Filtered Log Analysis" > filtered_summary.md
+        echo "" >> filtered_summary.md
+        echo "This analysis shows only **real errors**, filtering out:" >> filtered_summary.md
+        echo "- Test names containing 'error'" >> filtered_summary.md
+        echo "- Comments mentioning 'error'" >> filtered_summary.md
+        echo "- Error handling code (not actual errors)" >> filtered_summary.md
+        echo "" >> filtered_summary.md
+        echo "## Real Errors Found:" >> filtered_summary.md
+        echo "" >> filtered_summary.md
+        
+        # Add filtered results
+        find . -name "*.txt" -type f -exec python backend_app/utils/log_filter.py {} \; >> filtered_summary.md 2>/dev/null || true
+    
+    - name: Upload filtered summary
+      uses: actions/upload-artifact@v4
+      with:
+        name: filtered-log-analysis
+        path: filtered_summary.md
+        retention-days: 30
+

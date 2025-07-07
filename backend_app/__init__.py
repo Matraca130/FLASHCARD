@@ -7,7 +7,8 @@ from flask import Flask
 from flask_cors import CORS
 from backend_app.extensions import db, jwt, bcrypt, limiter
 from backend_app.config import get_config
-from backend_app.utils.monitoring import init_sentry, setup_logging
+from backend_app.utils.monitoring import init_sentry
+from backend_app.utils.log_filter import setup_intelligent_logging
 
 
 def create_app(config_class=None):
@@ -44,9 +45,9 @@ def create_app(config_class=None):
     bcrypt.init_app(app)
     limiter.init_app(app)
 
-    # Configurar monitoreo y logging
+    # Configurar monitoreo y logging inteligente
     init_sentry(app)
-    setup_logging(app)
+    setup_intelligent_logging()
 
     # Registrar manejadores de errores
     from backend_app.api.error_handlers import register_error_handlers
