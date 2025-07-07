@@ -1,0 +1,39 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "🔍 Ejecutando validaciones pre-commit..."
+
+# 1. Validar integridad de nombres
+echo "📝 Validando convenciones de nombres..."
+node scripts/naming-validator.js
+if [ $? -ne 0 ]; then
+  echo "❌ COMMIT BLOQUEADO: Problemas de convenciones de nombres"
+  exit 1
+fi
+
+# 2. Validar build
+echo "🔨 Validando integridad del build..."
+node scripts/build-validator.js
+if [ $? -ne 0 ]; then
+  echo "❌ COMMIT BLOQUEADO: Problemas de integridad del build"
+  exit 1
+fi
+
+# 3. Ejecutar linter
+echo "🧹 Ejecutando ESLint..."
+npm run lint
+if [ $? -ne 0 ]; then
+  echo "❌ COMMIT BLOQUEADO: Errores de ESLint"
+  exit 1
+fi
+
+# 4. Ejecutar tests
+echo "🧪 Ejecutando tests..."
+npm run test
+if [ $? -ne 0 ]; then
+  echo "❌ COMMIT BLOQUEADO: Tests fallando"
+  exit 1
+fi
+
+echo "✅ Todas las validaciones pasaron. Commit permitido."
+
