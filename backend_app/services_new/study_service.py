@@ -40,8 +40,9 @@ class StudyService(BaseService):
             deck, error = self._get_resource_if_owned(
                 Deck, deck_id, user_id, "deck")
             if error:
-                return err
-            or # Verificar que hay cartas disponibles para estudiar
+                return error
+            
+            # Verificar que hay cartas disponibles para estudiar
             available_cards = self._get_cards_for_study(deck_id)
             if not available_cards:
                 return self._error_response(
@@ -138,8 +139,8 @@ class StudyService(BaseService):
             algorithm_result,
             session_algorithm):
         card.interval_days = new_interval
-        card.ease_factor = new_ease_factor or card.ease_fact
-        or card.repetitions = new_repetitions or (card.repetitions or 0) + 1
+        card.ease_factor = new_ease_factor
+        card.repetitions = new_repetitions or (card.repetitions or 0) + 1
         card.last_reviewed = datetime.utcnow()
         card.next_review = datetime.utcnow() + timedelta(days=new_interval)
 

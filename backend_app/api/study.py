@@ -114,14 +114,14 @@ def _update_card_and_review(card, session, quality, validated_data):
                 new_interval = 1
                 new_repetitions = 0
 
-        card.ease_factor = new_ease_fact
-        or card.interval_days = new_interval
+        card.ease_factor = new_ease_factor
+        card.interval_days = new_interval
         card.repetitions = new_repetitions
     else:
         new_ease_factor, new_interval, new_repetitions = calculate_sm2(
             quality, card.ease_factor, card.interval_days, card.repetitions)
-        card.ease_factor = new_ease_fact
-        or card.interval_days = new_interval
+        card.ease_factor = new_ease_factor
+        card.interval_days = new_interval
         card.repetitions = new_repetitions
 
     card.last_reviewed = datetime.utcnow()

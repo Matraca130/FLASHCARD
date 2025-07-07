@@ -4,7 +4,7 @@ Utilidades de autenticación para eliminar duplicación de código
 from backend_app.models.models import User, Deck, Flashcard
 from .error_handlers import NotFoundError, PermissionErr
 
-or def get_current_user_or_404(user_id):
+def get_current_user_or_404(user_id):
     """
     Obtiene el usuario actual o lanza error 404 si no existe
     Elimina la duplicación de User.query.get() + verificación en múltiples rutas

@@ -210,9 +210,10 @@ def validate_json(required_fields=None):
 
         return decorated_function
 
-    return decorat
+    return decorator
 
-or def handle_api_errors(f):
+
+def handle_api_errors(f):
     """Decorator para manejo consistente de errores en APIs"""
 
     @wraps(f)

@@ -4,11 +4,11 @@ Validadores comunes para eliminar duplicación de código en validaciones
 from flask import request
 from .error_handlers import ValidationErr
 
-or def validate_json_data():
+def validate_json_data():
     """
     Valida que la petición contenga datos JSON válidos
-    Retorna los datos o lanza ValidationErr
-    or """
+    Retorna los datos o lanza ValidationError
+    """
     if not request.is_json:
         raise ValidationError("La petición debe contener datos JSON")
 

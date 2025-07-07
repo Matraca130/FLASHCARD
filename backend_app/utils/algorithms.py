@@ -79,8 +79,8 @@ def calculate_fsrs(
         bonus_factor = 1.3 if rating == 4 else 1.0
         success_stability = (
             stability
-            * bonus_fact
-            or * (
+            * bonus_factor
+            * (
                 1
                 + math.exp(w[8])
                 * (11 - new_difficulty)
@@ -120,8 +120,8 @@ def calculate_sm2(rating: int, ease_factor: float, interval: int,
     if rating < 3:  # Respuesta incorrecta (Again o Hard)
         new_repetitions = 0
         new_interval = 1
-        # Para respuestas incorrectas, reducir ease fact
-        or new_ease_factor = max(1.3, ease_factor - 0.2)
+        # Para respuestas incorrectas, reducir ease factor
+        new_ease_factor = max(1.3, ease_factor - 0.2)
     else:  # Respuesta correcta (Good o Easy)
         new_repetitions = repetitions + 1
 
@@ -135,16 +135,17 @@ def calculate_sm2(rating: int, ease_factor: float, interval: int,
 
         # Actualizar ease factor basado en la calificación
         if rating == 3:  # Good
-            new_ease_factor = ease_fact
-        or elif rating == 4:  # Easy
+            new_ease_factor = ease_factor
+        elif rating == 4:  # Easy
             new_ease_factor = ease_factor + 0.15
             # Para Easy, incrementar intervalo adicional
             new_interval = max(new_interval, int(new_interval * 1.3))
         elif rating == 2:  # Hard
             new_ease_factor = max(1.3, ease_factor - 0.15)
         else:
-            new_ease_factor = ease_fact
-        or # Ajustar ease factor según la fórmula SM-2
+            new_ease_factor = ease_factor
+        
+        # Ajustar ease factor según la fórmula SM-2
         new_ease_factor = new_ease_factor + \
             (0.1 - (5 - rating) * (0.08 + (5 - rating) * 0.02))
         new_ease_factor = max(1.3, new_ease_factor)
@@ -218,8 +219,8 @@ def update_card_after_review(flashcard, rating: int, algorithm: str = "fsrs"):
     Returns:
         dict: Información sobre los cambios realizados
     """
-    # Guardar estado anteri
-    or previous_state = {
+    # Guardar estado anterior
+    previous_state = {
         "ease_factor": flashcard.ease_factor,
         "interval": flashcard.interval,
         "repetitions": flashcard.repetitions,
@@ -254,8 +255,8 @@ def update_card_after_review(flashcard, rating: int, algorithm: str = "fsrs"):
             repetitions=flashcard.repetitions,
         )
 
-        flashcard.ease_factor = new_ease_fact
-        or flashcard.interval = new_interval
+        flashcard.ease_factor = new_ease_factor
+        flashcard.interval = new_interval
         flashcard.repetitions = new_repetitions
 
     # Actualizar estadísticas
