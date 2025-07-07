@@ -13,7 +13,7 @@ import { loadGamificationData } from './gamification.service.js';
 // import { initializeFlashcardEvents } from './flashcards.service.js';
 // import { initializeImportExportEvents } from './import-export.service.js';
 // import { initializeCreateEvents } from './create.service.js';
-// import { initializeActivityHeatmap } from './activity-heatmap.service.js';
+import { initializeActivityHeatmap } from './activity-heatmap.service.js';
 // import { initializeParticlesOnReady } from './particles.service.js';
 import { initializeCharts } from './charts.js';
 

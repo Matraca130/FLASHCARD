@@ -450,3 +450,124 @@ export function renderEmptyStatsState(container, options = {}) {
   const finalOptions = { ...defaultOptions, ...options };
   renderEmptyState(container, finalOptions);
 }
+
+/**
+ * Descarga un archivo con el contenido especificado
+ * @param {string} content - Contenido del archivo
+ * @param {string} filename - Nombre del archivo
+ * @param {string} mimeType - Tipo MIME del archivo (default: 'text/plain')
+ */
+export function downloadFile(content, filename, mimeType = 'text/plain') {
+  try {
+    const blob = new Blob([content], { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    link.style.display = 'none';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    // Limpiar el URL del blob
+    setTimeout(() => URL.revokeObjectURL(url), 100);
+    
+    showNotification(`Archivo "${filename}" descargado exitosamente`, 'success');
+  } catch (error) {
+    console.error('Error al descargar archivo:', error);
+    showNotification('Error al descargar el archivo', 'error');
+  }
+}
+
+/**
+ * Sanitiza un nombre de archivo removiendo caracteres no válidos
+ * @param {string} filename - Nombre del archivo a sanitizar
+ * @returns {string} - Nombre del archivo sanitizado
+ */
+export function sanitizeFilename(filename) {
+  if (!filename || typeof filename !== 'string') {
+    return 'archivo';
+  }
+  
+  // Remover caracteres no válidos para nombres de archivo
+  return filename
+    .replace(/[<>:"/\\|?*]/g, '')
+    .replace(/\s+/g, '_')
+    .trim();
+}
+
+/**
+ * Parsea contenido CSV simple
+ * @param {string} csvContent - Contenido CSV
+ * @param {string} delimiter - Delimitador (default: ',')
+ * @returns {Array<Array<string>>} - Array de filas parseadas
+ */
+export function parseCSV(csvContent, delimiter = ',') {
+  if (!csvContent || typeof csvContent !== 'string') {
+    return [];
+  }
+  
+  const lines = csvContent.trim().split('\n');
+  return lines.map(line => 
+    line.split(delimiter).map(cell => cell.trim().replace(/^"|"$/g, ''))
+  );
+}
+
+/**
+ * Formatea el tamaño de un archivo en bytes a formato legible
+ * @param {number} bytes - Tamaño en bytes
+ * @returns {string} - Tamaño formateado
+ */
+export function formatFileSize(bytes) {
+  if (!bytes || bytes === 0) return '0 B';
+  
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+/**
+ * Valida si un email tiene formato válido
+ * @param {string} email - Email a validar
+ * @returns {boolean} - true si es válido
+ */
+export function isValidEmail(email) {
+  if (!email || typeof email !== 'string') {
+    return false;
+  }
+  
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
+/**
+ * Valida si una contraseña cumple los requisitos mínimos
+ * @param {string} password - Contraseña a validar
+ * @returns {boolean} - true si es válida
+ */
+export function isValidPassword(password) {
+  if (!password || typeof password !== 'string') {
+    return false;
+  }
+  
+  // Mínimo 6 caracteres
+  return password.length >= 6;
+}
+
+/**
+ * Capitaliza la primera letra de cada palabra
+ * @param {string} str - Cadena a capitalizar
+ * @returns {string} - Cadena con primera letra de cada palabra capitalizada
+ */
+export function capitalizeFirst(str) {
+  if (!str || typeof str !== 'string') {
+    return '';
+  }
+  
+  return str.replace(/\b\w/g, l => l.toUpperCase());
+}
+
