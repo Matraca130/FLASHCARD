@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎨 Icon Uploader - FLASHCARD</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+        }
+
+        .upload-section {
+            background: #f8fafc;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 2px dashed #cbd5e0;
+            transition: all 0.3s ease;
+        }
+
+        .upload-section:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .upload-area {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .upload-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: #667eea;
+        }
+
+        .upload-text {
+            font-size: 1.2rem;
+            color: #4a5568;
+            margin-bottom: 20px;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .upload-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .upload-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .icon-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .icon-item {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease;
+        }
+
+        .icon-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .icon-display {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f7fafc;
+            border-radius: 8px;
+        }
+
+        .icon-display img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .icon-name {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+
+        .icon-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .btn-small {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-copy {
+            background: #48bb78;
+            color: white;
+        }
+
+        .btn-delete {
+            background: #f56565;
+            color: white;
+        }
+
+        .btn-small:hover {
+            transform: scale(1.05);
+        }
+
+        .generate-section {
+            background: #fff5f5;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 2px solid #fed7d7;
+        }
+
+        .generate-form {
+            display: flex;
+            gap: 15px;
+            align-items: end;
+            flex-wrap: wrap;
+        }
+
+        .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.2s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .generate-btn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s ease;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .status-message {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-weight: 500;
+        }
+
+        .status-success {
+            background: #c6f6d5;
+            color: #22543d;
+            border: 1px solid #9ae6b4;
+        }
+
+        .status-error {
+            background: #fed7d7;
+            color: #742a2a;
+            border: 1px solid #fc8181;
+        }
+
+        .status-info {
+            background: #bee3f8;
+            color: #2a4365;
+            border: 1px solid #90cdf4;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Icon Manager</h1>
+        
+        <!-- Sección de Subida -->
+        <div class="upload-section">
+            <h2>📤 Subir Iconos</h2>
+            <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                <div class="upload-icon">📁</div>
+                <div class="upload-text">
+                    Haz clic aquí o arrastra imágenes<br>
+                    <small>Formatos: PNG, JPG, SVG (máx. 2MB cada uno)</small>
+                </div>
+                <button class="upload-btn" type="button">Seleccionar Archivos</button>
+            </div>
+            <input type="file" id="fileInput" class="file-input" multiple accept=".png,.jpg,.jpeg,.svg">
+        </div>
+
+        <!-- Sección de Generación con IA -->
+        <div class="generate-section">
+            <h2>🤖 Generar Iconos con IA</h2>
+            <div class="generate-form">
+                <div class="form-group">
+                    <label class="form-label">Descripción del Icono</label>
+                    <input type="text" class="form-input" id="iconDescription" 
+                           placeholder="Ej: Un libro abierto con una estrella">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Estilo</label>
+                    <select class="form-input" id="iconStyle">
+                        <option value="modern">Moderno</option>
+                        <option value="minimal">Minimalista</option>
+                        <option value="outline">Contorno</option>
+                        <option value="filled">Relleno</option>
+                        <option value="3d">3D</option>
+                    </select>
+                </div>
+                <button class="generate-btn" onclick="generateIcon()">Generar</button>
+            </div>
+        </div>
+
+        <!-- Mensajes de Estado -->
+        <div id="statusMessage"></div>
+
+        <!-- Vista Previa de Iconos -->
+        <div id="iconPreview" class="icon-preview"></div>
+    </div>
+
+    <script type="module">
+        import { IconManager } from '../utils/icon-manager.js';
+
+        let uploadedIcons = [];
+
+        // Configurar drag & drop
+        const uploadArea = document.querySelector('.upload-area');
+        
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = '#667eea';
+            uploadArea.style.background = '#f0f4ff';
+        });
+
+        uploadArea.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = '#cbd5e0';
+            uploadArea.style.background = '#f8fafc';
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = '#cbd5e0';
+            uploadArea.style.background = '#f8fafc';
+            
+            const files = Array.from(e.dataTransfer.files);
+            handleFiles(files);
+        });
+
+        // Configurar input de archivo
+        document.getElementById('fileInput').addEventListener('change', (e) => {
+            const files = Array.from(e.target.files);
+            handleFiles(files);
+        });
+
+        // Manejar archivos subidos
+        function handleFiles(files) {
+            const validFiles = files.filter(file => {
+                const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/svg+xml'];
+                const maxSize = 2 * 1024 * 1024; // 2MB
+                
+                if (!validTypes.includes(file.type)) {
+                    showStatus(`❌ ${file.name}: Formato no válido`, 'error');
+                    return false;
+                }
+                
+                if (file.size > maxSize) {
+                    showStatus(`❌ ${file.name}: Archivo muy grande (máx. 2MB)`, 'error');
+                    return false;
+                }
+                
+                return true;
+            });
+
+            if (validFiles.length === 0) return;
+
+            validFiles.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const iconData = {
+                        name: file.name.replace(/\.[^/.]+$/, ''),
+                        filename: file.name,
+                        data: e.target.result,
+                        type: file.type.includes('svg') ? 'svg' : 'image'
+                    };
+                    
+                    uploadedIcons.push(iconData);
+                    updateIconPreview();
+                    showStatus(`✅ ${file.name} subido exitosamente`, 'success');
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // Actualizar vista previa
+        function updateIconPreview() {
+            const preview = document.getElementById('iconPreview');
+            preview.innerHTML = '';
+
+            uploadedIcons.forEach((icon, index) => {
+                const iconItem = document.createElement('div');
+                iconItem.className = 'icon-item';
+                iconItem.innerHTML = `
+                    <div class="icon-display">
+                        <img src="${icon.data}" alt="${icon.name}">
+                    </div>
+                    <div class="icon-name">${icon.name}</div>
+                    <div class="icon-actions">
+                        <button class="btn-small btn-copy" onclick="copyIconCode('${icon.name}')">
+                            Copiar Código
+                        </button>
+                        <button class="btn-small btn-delete" onclick="removeIcon(${index})">
+                            Eliminar
+                        </button>
+                    </div>
+                `;
+                preview.appendChild(iconItem);
+            });
+        }
+
+        // Copiar código del icono
+        window.copyIconCode = function(iconName) {
+            const code = `IconManager.renderIcon('${iconName}')`;
+            navigator.clipboard.writeText(code).then(() => {
+                showStatus(`📋 Código copiado: ${code}`, 'info');
+            });
+        };
+
+        // Eliminar icono
+        window.removeIcon = function(index) {
+            uploadedIcons.splice(index, 1);
+            updateIconPreview();
+            showStatus('🗑️ Icono eliminado', 'info');
+        };
+
+        // Generar icono con IA
+        window.generateIcon = async function() {
+            const description = document.getElementById('iconDescription').value;
+            const style = document.getElementById('iconStyle').value;
+            
+            if (!description.trim()) {
+                showStatus('❌ Por favor describe el icono que quieres generar', 'error');
+                return;
+            }
+
+            showStatus('🤖 Generando icono con IA...', 'info');
+            
+            try {
+                const result = await IconManager.generateIcon(description, style);
+                
+                if (result.success) {
+                    const iconData = {
+                        name: result.name,
+                        filename: `${result.name}.svg`,
+                        data: `data:image/svg+xml;base64,${btoa(result.svg)}`,
+                        type: 'svg'
+                    };
+                    
+                    uploadedIcons.push(iconData);
+                    updateIconPreview();
+                    showStatus(`✅ Icono "${description}" generado exitosamente`, 'success');
+                } else {
+                    showStatus(`⚠️ ${result.message}`, 'error');
+                }
+            } catch (error) {
+                showStatus(`❌ Error generando icono: ${error.message}`, 'error');
+            }
+        };
+
+        // Mostrar mensaje de estado
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('statusMessage');
+            statusDiv.className = `status-message status-${type}`;
+            statusDiv.textContent = message;
+            
+            setTimeout(() => {
+                statusDiv.textContent = '';
+                statusDiv.className = '';
+            }, 5000);
+        }
+
+        // Guardar iconos al cerrar
+        window.addEventListener('beforeunload', () => {
+            if (uploadedIcons.length > 0) {
+                // Aquí se guardarían los iconos en el sistema
+                console.log('💾 Guardando iconos...', uploadedIcons);
+            }
+        });
+    </script>
+</body>
+</html>
+
