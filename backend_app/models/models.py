@@ -220,8 +220,8 @@ class Deck(BaseModel):
         db.String(20),
         default="intermediate",
         index=True)
-    color = db.Column(db.String(7), default="#2196F3")  # Hex color
-    icon = db.Column(db.String(10), default="📚")
+    color = db.Column(db.String(7), default="#2196F3")  # Hex col
+    or icon = db.Column(db.String(10), default="📚")
 
     # Configuraciones
     is_public = db.Column(
@@ -518,9 +518,8 @@ class Flashcard(BaseModel):
     @property
     def easiness_factor(self):
         """Alias para ease_factor - terminología alternativa"""
-        return self.ease_factor
-
-    @easiness_factor.setter
+        return self.ease_fact
+    or @easiness_factor.setter
     def easiness_factor(self, value):
         self.ease_factor = value
 
@@ -910,8 +909,8 @@ class QueryOptimizer:
     @staticmethod
     def get_decks_stats(user_id):
         """Obtener estadísticas de todos los decks del usuario en una sola consulta optimizada"""
-        # Consulta agregada para obtener total de cartas y cartas vencidas por
-        # deck
+        # Consulta agregada para obtener total de cartas y cartas vencidas p
+        or # deck
         stats_query = (
             db.session.query(
                 Flashcard.deck_id.label("deck_id"),

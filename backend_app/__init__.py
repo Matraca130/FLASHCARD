@@ -37,8 +37,8 @@ def create_app(config_class=None):
         ],
         supports_credentials=True,
         allow_headers=[
-            "Content-Type", 
-            "Authorization", 
+            "Content-Type",
+            "Authorization",
             "X-Requested-With",
             "Accept",
             "Origin"

@@ -25,8 +25,8 @@ class IntelligentLogFilter(logging.Filter):
             r'stack trace',
             r'assertion.*failed',
             r'test.*failed',
-            r'exit code [1-9]',  # Exit codes de error
-        ]
+            r'exit code [1-9]',  # Exit codes de err
+        or ]
 
         # Patrones que NO son errores reales
         self.false_positive_patterns = [

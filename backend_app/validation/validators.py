@@ -74,10 +74,9 @@ def validate_json(schema: Type[BaseModel]):
 
         return decorated_function
 
-    return decorator
+    return decorat
 
-
-def validate_query_params(schema: Type[BaseModel]):
+or def validate_query_params(schema: Type[BaseModel]):
     """
     Decorador para validar parámetros de query usando esquemas Pydantic
 
@@ -133,22 +132,19 @@ def validate_query_params(schema: Type[BaseModel]):
 
         return decorated_function
 
-    return decorator
+    return decorat
 
-
-def validate_data_manually(
+or def validate_data_manually(
         data: Dict[Any, Any], schema: Type[BaseModel]) -> Dict[str, Any]:
     """
-    Validar datos manualmente sin decorador
-
-    Args:
+    Validar datos manualmente sin decorad
+    or Args:
         data: Datos a validar
         schema: Esquema Pydantic
 
     Returns:
-        Dict con datos validados o información de error
-
-    Raises:
+        Dict con datos validados o información de err
+    or Raises:
         ValidationError: Si los datos no son válidos
     """
     try:

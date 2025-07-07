@@ -411,11 +411,15 @@ self.addEventListener('sync', (event) => {
  */
 async function doBackgroundSync() {
   try {
-    // Aquí puedes implementar lógica para sincronizar datos
-    // cuando se recupere la conexión
     console.log('[SW] Performing background sync...');
 
-    // Ejemplo: revalidar cache de API críticas
+    // 1. Sincronizar flashcards pendientes offline
+    await syncPendingFlashcards();
+
+    // 2. Sincronizar decks pendientes offline
+    await syncPendingDecks();
+
+    // 3. Revalidar cache de API críticas
     const criticalAPIs = ['/api/decks/', '/api/dashboard/stats'];
 
     for (const apiUrl of criticalAPIs) {
@@ -429,8 +433,144 @@ async function doBackgroundSync() {
         console.log('[SW] Failed to sync:', apiUrl);
       }
     }
+
+    console.log('[SW] Background sync completed successfully');
   } catch (error) {
     console.error('[SW] Background sync failed:', error);
+  }
+}
+
+/**
+ * Sincronizar flashcards creados offline
+ */
+async function syncPendingFlashcards() {
+  try {
+    // Obtener flashcards pendientes del localStorage
+    const pendingFlashcards = JSON.parse(localStorage.getItem('studyingflash_pending_flashcards') || '[]');
+    
+    if (pendingFlashcards.length === 0) {
+      console.log('[SW] No pending flashcards to sync');
+      return;
+    }
+
+    console.log(`[SW] Syncing ${pendingFlashcards.length} pending flashcards...`);
+
+    const syncedIds = [];
+    const failedSyncs = [];
+
+    for (const flashcard of pendingFlashcards) {
+      try {
+        const response = await fetch('/api/flashcards', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('studyingflash_auth_token')}`
+          },
+          body: JSON.stringify({
+            deck_id: flashcard.deck_id,
+            front: flashcard.front,
+            back: flashcard.back
+          })
+        });
+
+        if (response.ok) {
+          syncedIds.push(flashcard.tempId);
+          console.log(`[SW] Flashcard synced successfully: ${flashcard.tempId}`);
+        } else {
+          failedSyncs.push(flashcard);
+          console.log(`[SW] Failed to sync flashcard: ${flashcard.tempId}, status: ${response.status}`);
+        }
+      } catch (error) {
+        failedSyncs.push(flashcard);
+        console.log(`[SW] Error syncing flashcard: ${flashcard.tempId}`, error);
+      }
+    }
+
+    // Remover flashcards sincronizados exitosamente
+    if (syncedIds.length > 0) {
+      const remainingFlashcards = pendingFlashcards.filter(fc => !syncedIds.includes(fc.tempId));
+      localStorage.setItem('studyingflash_pending_flashcards', JSON.stringify(remainingFlashcards));
+      
+      // Notificar al cliente sobre la sincronización exitosa
+      const clients = await self.clients.matchAll();
+      clients.forEach(client => {
+        client.postMessage({
+          type: 'FLASHCARDS_SYNCED',
+          payload: { syncedCount: syncedIds.length, remainingCount: remainingFlashcards.length }
+        });
+      });
+    }
+
+    console.log(`[SW] Flashcard sync completed: ${syncedIds.length} synced, ${failedSyncs.length} failed`);
+  } catch (error) {
+    console.error('[SW] Error in syncPendingFlashcards:', error);
+  }
+}
+
+/**
+ * Sincronizar decks creados offline
+ */
+async function syncPendingDecks() {
+  try {
+    // Obtener decks pendientes del localStorage
+    const pendingDecks = JSON.parse(localStorage.getItem('studyingflash_pending_decks') || '[]');
+    
+    if (pendingDecks.length === 0) {
+      console.log('[SW] No pending decks to sync');
+      return;
+    }
+
+    console.log(`[SW] Syncing ${pendingDecks.length} pending decks...`);
+
+    const syncedIds = [];
+    const failedSyncs = [];
+
+    for (const deck of pendingDecks) {
+      try {
+        const response = await fetch('/api/decks', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('studyingflash_auth_token')}`
+          },
+          body: JSON.stringify({
+            name: deck.name,
+            description: deck.description,
+            is_public: deck.is_public
+          })
+        });
+
+        if (response.ok) {
+          syncedIds.push(deck.tempId);
+          console.log(`[SW] Deck synced successfully: ${deck.tempId}`);
+        } else {
+          failedSyncs.push(deck);
+          console.log(`[SW] Failed to sync deck: ${deck.tempId}, status: ${response.status}`);
+        }
+      } catch (error) {
+        failedSyncs.push(deck);
+        console.log(`[SW] Error syncing deck: ${deck.tempId}`, error);
+      }
+    }
+
+    // Remover decks sincronizados exitosamente
+    if (syncedIds.length > 0) {
+      const remainingDecks = pendingDecks.filter(deck => !syncedIds.includes(deck.tempId));
+      localStorage.setItem('studyingflash_pending_decks', JSON.stringify(remainingDecks));
+      
+      // Notificar al cliente sobre la sincronización exitosa
+      const clients = await self.clients.matchAll();
+      clients.forEach(client => {
+        client.postMessage({
+          type: 'DECKS_SYNCED',
+          payload: { syncedCount: syncedIds.length, remainingCount: remainingDecks.length }
+        });
+      });
+    }
+
+    console.log(`[SW] Deck sync completed: ${syncedIds.length} synced, ${failedSyncs.length} failed`);
+  } catch (error) {
+    console.error('[SW] Error in syncPendingDecks:', error);
   }
 }
 

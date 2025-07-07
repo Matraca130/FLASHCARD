@@ -25,8 +25,8 @@ flashcard_service = FlashcardService(db=db)
 def create_flashcard(validated_data):
     """
     Crear nueva flashcard - Compatible con frontend
-    POST /api/flashcards/
-    """
+    POST /api/flashcards
+    / """
     try:
         user_id = get_jwt_identity()
 

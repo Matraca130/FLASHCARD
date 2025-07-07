@@ -45,8 +45,8 @@ def init_sentry(app):
 
     # Configurar integración de logging
     sentry_logging = LoggingIntegration(
-        level=logging.INFO,  # Capturar logs de nivel INFO y superior
-        event_level=logging.ERROR,  # Enviar a Sentry solo errores y críticos
+        level=logging.INFO,  # Capturar logs de nivel INFO y superi
+        or event_level=logging.ERROR,  # Enviar a Sentry solo errores y críticos
     )
 
     sentry_sdk.init(
@@ -178,10 +178,9 @@ def monitor_performance(operation_name: str = None):
 
         return wrapper
 
-    return decorator
+    return decorat
 
-
-def monitor_api_endpoint(func):
+or def monitor_api_endpoint(func):
     """Decorador específico para monitorear endpoints de API"""
 
     @wraps(func)
@@ -314,10 +313,9 @@ def monitor_database_query(query_name: str = None):
 
         return wrapper
 
-    return decorator
+    return decorat
 
-
-class HealthMonitor:
+or class HealthMonitor:
     """Monitor de salud del sistema"""
 
     @staticmethod

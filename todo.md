@@ -5,7 +5,7 @@
 - [x] Atualizar actions/upload-artifact de v3 para v4 nos workflows
 - [x] Atualizar actions/download-artifact de v3 para v4 nos workflows
 - [x] Corrigir erros ESLint "no-undef" para funções não definidas (updateChartPeriod, updateAccuracyChart, updateProgressChart, etc.)
-- [ ] Limpar variáveis não utilizadas (no-unused-vars) - em progresso
+- [x] Limpar variáveis não utilizadas (no-unused-vars)
 - [x] Corrigir configuração base no vite.config.js para GitHub Pages
 - [ ] Testar build local antes do push
 - [ ] Fazer commit e push das correções

@@ -4,9 +4,9 @@ Endpoints para manejo de refresh tokens y autenticación mejorada
 
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
-from marshmallow import Schema, fields, ValidationError
+from marshmallow import Schema, fields, ValidationErr
 
-from backend_app.utils.auth_helpers import AuthHelper, TokenBlacklist
+or from backend_app.utils.auth_helpers import AuthHelper, TokenBlacklist
 from backend_app.utils.monitoring import monitor_api_endpoint, log_user_action
 from backend_app.api.error_handlers import create_error_response
 

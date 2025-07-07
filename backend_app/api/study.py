@@ -69,171 +69,142 @@ def start_study_session():
         return jsonify({"error": "Error interno del servidor"}), 500
 
 
+def _validate_answer(user_id, card_id, session_id):
+    card = db.session.query(Flashcard).join(Deck).filter(
+        Flashcard.id == card_id, Deck.user_id == user_id).first()
+    if not card:
+        return None, None, jsonify({"error": "Carta no encontrada"}), 404
+
+    session = StudySession.query.filter_by(
+        id=session_id, user_id=user_id).first()
+    if not session:
+        return None, None, jsonify({"error": "Sesión no encontrada"}), 404
+
+    return card, session, None, None
+
+
+def _update_card_and_review(card, session, quality, validated_data):
+    algorithm = session.algorithm or "fsrs"
+    previous_interval = card.interval_days
+
+    if algorithm == "fsrs":
+        elapsed_days = 0
+        if card.last_reviewed:
+            elapsed_days = (datetime.utcnow() - card.last_reviewed).days
+        new_stability, new_difficulty, new_interval = calculate_fsrs(
+            quality, card.stability, card.difficulty_fsrs, elapsed_days)
+        card.stability = new_stability
+        card.difficulty_fsrs = new_difficulty
+        card.interval_days = new_interval
+        card.repetitions += 1
+    elif algorithm in ("sm2", "ultra_sm2", "anki"):
+        new_ease_factor, new_interval, new_repetitions = calculate_sm2(
+            quality, card.ease_factor, card.interval_days, card.repetitions)
+
+        if algorithm == "ultra_sm2":
+            min_factor = 1.3
+            max_factor = 3.0
+            new_ease_factor = max(min_factor, min(max_factor, new_ease_factor))
+        elif algorithm == "anki":
+            if card.repetitions == 0 and quality >= 3:
+                new_interval = 1
+            elif card.repetitions == 1 and quality >= 3:
+                new_interval = 4
+            elif quality < 3:
+                new_interval = 1
+                new_repetitions = 0
+
+        card.ease_factor = new_ease_fact
+        or card.interval_days = new_interval
+        card.repetitions = new_repetitions
+    else:
+        new_ease_factor, new_interval, new_repetitions = calculate_sm2(
+            quality, card.ease_factor, card.interval_days, card.repetitions)
+        card.ease_factor = new_ease_fact
+        or card.interval_days = new_interval
+        card.repetitions = new_repetitions
+
+    card.last_reviewed = datetime.utcnow()
+    card.next_review = get_next_review_date(card.interval_days)
+
+    review = CardReview(
+        flashcard_id=card.id,
+        session_id=session.id,
+        rating=quality,
+        previous_interval=previous_interval,
+        new_interval=card.interval_days,
+        response_time=validated_data.get("response_time", 0),
+    )
+    db.session.add(review)
+    return review, algorithm
+
+
+def _update_session_and_user_stats(session, user, quality):
+    session.cards_studied += 1
+    if quality >= 3:
+        session.cards_correct += 1
+
+    user.total_cards_studied += 1
+    if quality >= 3:
+        user.total_cards_correct += 1
+
+
+def _build_response(card, review, session, algorithm, quality):
+    return (
+        jsonify(
+            {
+                "success": True,
+                "card": {
+                    "id": card.id,
+                    "interval": card.interval_days,
+                    "next_review": card.next_review.isoformat(),
+                    "difficulty": card.difficulty,
+                    "stability": card.stability,
+                    "repetitions": card.repetitions,
+                },
+                "review": {
+                    "id": review.id,
+                    "quality": quality,
+                    "new_interval": card.interval_days,
+                    "algorithm": algorithm,
+                },
+                "session_stats": {
+                    "cards_studied": session.cards_studied,
+                    "cards_correct": session.cards_correct,
+                    "accuracy": (
+                        round(
+                            (session.cards_correct / session.cards_studied) * 100,
+                            1) if session.cards_studied > 0 else 0),
+                },
+            }),
+        200,
+    )
+
+
 @study_bp.route("/card/answer", methods=["POST"])
 @jwt_required()
 @validate_json(StudyAnswerSchema)
 def answer_card(validated_data):
-    """
-    CRÍTICO: Responder carta y calcular próxima revisión
-    Esta es la función más importante para la conexión frontend-backend
-    POST /api/study/card/answer
-    """
     try:
         user_id = get_jwt_identity()
-
-        # Extraer datos validados
         card_id = validated_data["card_id"]
-        # 1-4 (1=Again, 2=Hard, 3=Good, 4=Easy)
         quality = validated_data["quality"]
         session_id = validated_data["session_id"]
 
-        # Verificar que la carta existe y pertenece al usuario
-        card = db.session.query(Flashcard).join(Deck).filter(
-            Flashcard.id == card_id, Deck.user_id == user_id).first()
+        card, session, error_response, status_code = _validate_answer(
+            user_id, card_id, session_id)
+        if error_response:
+            return error_response, status_code
 
-        if not card:
-            return jsonify({"error": "Carta no encontrada"}), 404
+        review, algorithm = _update_card_and_review(
+            card, session, quality, validated_data)
 
-        # Verificar sesión
-        session = StudySession.query.filter_by(
-            id=session_id, user_id=user_id).first()
-
-        if not session:
-            return jsonify({"error": "Sesión no encontrada"}), 404
-
-        # Calcular próxima revisión usando algoritmo FSRS o SM-2
-        algorithm = session.algorithm or "fsrs"
-
-        # Capturar intervalo previo antes de actualizar
-        previous_interval = card.interval_days
-
-        if algorithm == "fsrs":
-            # === ALGORITMO FSRS ===
-            # Calculate elapsed days since last review
-            elapsed_days = 0
-            if card.last_reviewed:
-                elapsed_days = (datetime.utcnow() - card.last_reviewed).days
-
-            # FSRS returns: (new_stability, new_difficulty, new_interval)
-            new_stability, new_difficulty, new_interval = calculate_fsrs(
-                quality,  # rating (1-4)
-                card.stability,  # stability (float)
-                card.difficulty_fsrs,  # difficulty_fsrs (float)
-                elapsed_days,  # elapsed_days (int)
-            )
-
-            # Update card with FSRS results
-            card.stability = new_stability
-            card.difficulty_fsrs = new_difficulty
-            card.interval_days = new_interval
-            card.repetitions = card.repetitions + 1
-
-        elif algorithm in ("sm2", "ultra_sm2", "anki"):
-            # === ALGORITMO SM-2 Y VARIANTES ===
-            new_ease_factor, new_interval, new_repetitions = calculate_sm2(
-                quality,  # rating (1-4)
-                card.ease_factor,  # ease_factor (correct field name)
-                card.interval_days,  # interval_days (correct field name)
-                card.repetitions,
-            )
-
-            # Apply algorithm-specific modifications
-            if algorithm == "ultra_sm2":
-                # Ultra SM-2: Apply factor limits (more dynamic than standard
-                # SM-2)
-                min_factor = 1.3
-                max_factor = 3.0
-                new_ease_factor = max(
-                    min_factor, min(
-                        max_factor, new_ease_factor))
-
-            elif algorithm == "anki":
-                # Anki-style: Handle learning steps for new cards
-                if card.repetitions == 0 and quality >= 3:
-                    # First successful review - use graduating interval
-                    new_interval = 1  # Anki default graduating interval
-                elif card.repetitions == 1 and quality >= 3:
-                    # Second successful review - use easy interval
-                    new_interval = 4  # Anki default easy interval
-                elif quality < 3:
-                    # Failed review - reset to learning
-                    new_interval = 1
-                    new_repetitions = 0
-
-            # Update card with SM-2/variant results
-            card.ease_factor = new_ease_factor
-            card.interval_days = new_interval
-            card.repetitions = new_repetitions
-
-        else:
-            # === FALLBACK A SM-2 ===
-            new_ease_factor, new_interval, new_repetitions = calculate_sm2(
-                quality, card.ease_factor, card.interval_days, card.repetitions
-            )
-            card.ease_factor = new_ease_factor
-            card.interval_days = new_interval
-            card.repetitions = new_repetitions
-
-        # === ACTUALIZACIONES COMUNES ===
-        card.last_reviewed = datetime.utcnow()
-        card.next_review = get_next_review_date(card.interval_days)
-
-        # Crear registro de revisión con valores correctos
-        review = CardReview(
-            flashcard_id=card_id,
-            session_id=session_id,
-            rating=quality,  # Use 'rating' field, not 'quality'
-            previous_interval=previous_interval,
-            # Valor previo capturado antes de actualizar
-            new_interval=card.interval_days,  # Valor actualizado después del algoritmo
-            response_time=validated_data.get("response_time", 0),
-        )
-
-        db.session.add(review)
-
-        # Actualizar estadísticas de sesión
-        session.cards_studied += 1
-        if quality >= 3:  # Good, Easy, Perfect
-            session.cards_correct += 1
-
-        # Actualizar estadísticas de usuario
         user = User.query.get(user_id)
-        user.total_cards_studied += 1
-        if quality >= 3:
-            user.total_cards_correct += 1
+        _update_session_and_user_stats(session, user, quality)
 
         db.session.commit()
 
-        # Respuesta compatible con frontend
-        return (
-            jsonify(
-                {
-                    "success": True,
-                    "card": {
-                        "id": card.id,
-                        "interval": card.interval_days,
-                        "next_review": card.next_review.isoformat(),
-                        "difficulty": card.difficulty,
-                        "stability": card.stability,
-                        "repetitions": card.repetitions,
-                    },
-                    "review": {
-                        "id": review.id,
-                        "quality": quality,
-                        "new_interval": card.interval_days,
-                        "algorithm": algorithm,
-                    },
-                    "session_stats": {
-                        "cards_studied": session.cards_studied,
-                        "cards_correct": session.cards_correct,
-                        "accuracy": (
-                            round(
-                                (session.cards_correct / session.cards_studied) * 100,
-                                1) if session.cards_studied > 0 else 0),
-                    },
-                }),
-            200,
-        )
+        return _build_response(card, review, session, algorithm, quality)
 
     except Exception as e:
         logger.error(f"Error procesando respuesta de carta: {str(e)}")

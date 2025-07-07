@@ -24,8 +24,8 @@ stats_service = StatsService(db=db)
 def get_dashboard():
     """
     Obtener datos del dashboard - Compatible con frontend
-    GET /api/dashboard/
-    """
+    GET /api/dashboard
+    / """
     try:
         user_id = get_jwt_identity()
         user = User.query.get(user_id)

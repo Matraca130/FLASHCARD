@@ -24,8 +24,8 @@ stats_service = StatsService(db=db)
 def get_general_stats():
     """
     Obtener estadísticas generales del usuario
-    GET /api/stats/
-    """
+    GET /api/stats
+    / """
     try:
         user_id = get_jwt_identity()
 
