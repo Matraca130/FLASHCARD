@@ -601,3 +601,9 @@ export function formatDateDDMMYYYY(date) {
   return `${day}/${month}/${year}`;
 }
 
+
+
+// Exponer funciones clave globalmente para compatibilidad con código HTML
+
+
+
