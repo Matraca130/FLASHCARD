@@ -100,7 +100,7 @@ def answer_card(validated_data):
 
         # Calcular próxima revisión usando algoritmo FSRS o SM-2
         algorithm = session.algorithm or "fsrs"
-        
+
         # Capturar intervalo previo antes de actualizar
         previous_interval = card.interval_days
 
