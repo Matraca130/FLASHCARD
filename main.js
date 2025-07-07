@@ -7,12 +7,18 @@ import './router.js';
 import './core-navigation.js';
 import './bindings.js';
 
+// Importar funciones de navegación específicas
+import { showSection } from './core-navigation.js';
+
 // Importar servicios refactorizados
 import { loadGamificationData } from './gamification.service.js';
 import { initializeActivityHeatmap } from './activity-heatmap.service.js';
 import { initializeCharts } from './charts.js';
 import { initializeDashboard } from './dashboard-init.js';
 import './dashboard-fixes.js';
+
+// Hacer showSection disponible globalmente
+window.showSection = showSection;
 
 // Importar testing en modo desarrollo
 if (window.location.hostname === 'localhost') {

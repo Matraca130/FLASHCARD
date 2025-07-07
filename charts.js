@@ -330,18 +330,21 @@ async function initializeCategoryDistributionChart() {
 
   try {
     // Cargar datos reales con fallback
-    const categoryData = await apiWithFallback('/api/dashboard/stats/performance', {
-      labels: [
-        'Idiomas',
-        'Matemáticas',
-        'Historia',
-        'Ciencias',
-        'Literatura',
-        'Otros',
-      ],
-      data: [30, 25, 20, 15, 8, 2],
-      colors: CHARTS_CONFIG.colorPalettes.blue,
-    });
+    const categoryData = await apiWithFallback(
+      '/api/dashboard/stats/performance',
+      {
+        labels: [
+          'Idiomas',
+          'Matemáticas',
+          'Historia',
+          'Ciencias',
+          'Literatura',
+          'Otros',
+        ],
+        data: [30, 25, 20, 15, 8, 2],
+        colors: CHARTS_CONFIG.colorPalettes.blue,
+      }
+    );
 
     const chart = new Chart(ctx, {
       type: 'doughnut',
@@ -435,12 +438,15 @@ async function initializePerformanceChart() {
 
   try {
     // Cargar datos reales con fallback
-    const performanceData = await apiWithFallback('/api/dashboard/stats/performance', {
-      labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
-      accuracy: [75, 82, 88, 85, 92, 89],
-      speed: [45, 42, 38, 40, 35, 37], // segundos promedio
-      retention: [60, 65, 70, 75, 80, 85], // porcentaje
-    });
+    const performanceData = await apiWithFallback(
+      '/api/dashboard/stats/performance',
+      {
+        labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
+        accuracy: [75, 82, 88, 85, 92, 89],
+        speed: [45, 42, 38, 40, 35, 37], // segundos promedio
+        retention: [60, 65, 70, 75, 80, 85], // porcentaje
+      }
+    );
 
     const chart = new Chart(ctx, {
       type: 'radar',
@@ -597,19 +603,22 @@ async function initializeAccuracyTrendChart() {
   }
 
   try {
-    const accuracyData = await apiWithFallback('/api/dashboard/stats/performance', {
-      labels: Array.from({ length: 30 }, (_, i) =>
-        formatDate(
-          new Date(Date.now() - (29 - i) * 24 * 60 * 60 * 1000),
-          'DD/MM'
-        )
-      ),
-      accuracy: Array.from(
-        { length: 30 },
-        () => Math.floor(Math.random() * 20) + 75
-      ),
-      target: 85,
-    });
+    const accuracyData = await apiWithFallback(
+      '/api/dashboard/stats/performance',
+      {
+        labels: Array.from({ length: 30 }, (_, i) =>
+          formatDate(
+            new Date(Date.now() - (29 - i) * 24 * 60 * 60 * 1000),
+            'DD/MM'
+          )
+        ),
+        accuracy: Array.from(
+          { length: 30 },
+          () => Math.floor(Math.random() * 20) + 75
+        ),
+        target: 85,
+      }
+    );
 
     const chart = new Chart(ctx, {
       type: 'line',
@@ -1358,11 +1367,14 @@ function updatePeriodButtons(activePeriod) {
  */
 async function updateStreakChart(period) {
   try {
-    const data = await apiWithFallback(`/api/dashboard/stats/performance?period=${period}`, {
-      current: Math.floor(Math.random() * 30) + 1,
-      best: Math.floor(Math.random() * 50) + 20,
-      history: generateMockProgressData(period),
-    });
+    const data = await apiWithFallback(
+      `/api/dashboard/stats/performance?period=${period}`,
+      {
+        current: Math.floor(Math.random() * 30) + 1,
+        best: Math.floor(Math.random() * 50) + 20,
+        history: generateMockProgressData(period),
+      }
+    );
 
     return updateChart('studyStreak', {
       labels: generateDateLabels(period),

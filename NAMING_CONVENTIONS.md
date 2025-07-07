@@ -3,6 +3,7 @@
 ## 📋 **Reglas del "Lenguaje Común"**
 
 ### **Principio Fundamental:**
+
 > **"Si existe una función `createDeck()`, debe estar en un archivo llamado `create-deck.service.js` o similar"**
 
 ---
@@ -10,31 +11,37 @@
 ## 📁 **Estructura de Archivos**
 
 ### **Servicios (Lógica de Negocio)**
+
 ```
 [accion]-[entidad].service.js
 ```
 
 **Ejemplos:**
+
 - `create-deck.service.js` → funciones: `createDeck()`, `validateDeckData()`
 - `study-flashcard.service.js` → funciones: `startStudySession()`, `calculateNextReview()`
 - `manage-user.service.js` → funciones: `getUserProfile()`, `updateUserSettings()`
 
 ### **Utilidades (Helpers)**
+
 ```
 [categoria].utils.js
 ```
 
 **Ejemplos:**
+
 - `date.utils.js` → funciones: `formatDate()`, `calculateDaysDiff()`
 - `validation.utils.js` → funciones: `validateEmail()`, `sanitizeInput()`
 - `storage.utils.js` → funciones: `saveToLocal()`, `getFromLocal()`
 
 ### **Componentes UI**
+
 ```
 [nombre-componente].component.js
 ```
 
 **Ejemplos:**
+
 - `deck-card.component.js` → clase: `DeckCard`
 - `study-modal.component.js` → clase: `StudyModal`
 
@@ -43,44 +50,47 @@
 ## 🔧 **Convenciones de Funciones**
 
 ### **Acciones CRUD**
+
 ```javascript
 // Crear
-createDeck()
-addFlashcard()
-generateReport()
+createDeck();
+addFlashcard();
+generateReport();
 
 // Leer
-getDeck()
-fetchUserData()
-loadStudySession()
+getDeck();
+fetchUserData();
+loadStudySession();
 
 // Actualizar
-updateDeck()
-modifyFlashcard()
-saveProgress()
+updateDeck();
+modifyFlashcard();
+saveProgress();
 
 // Eliminar
-deleteDeck()
-removeFlashcard()
-clearData()
+deleteDeck();
+removeFlashcard();
+clearData();
 ```
 
 ### **Validaciones**
+
 ```javascript
 // Siempre empezar con "validate" o "is"
-validateDeckData()
-validateEmail()
-isValidUser()
-isSessionActive()
+validateDeckData();
+validateEmail();
+isValidUser();
+isSessionActive();
 ```
 
 ### **Utilidades**
+
 ```javascript
 // Formato: [verbo][Sustantivo]
-formatDate()
-parseJSON()
-calculateScore()
-generateId()
+formatDate();
+parseJSON();
+calculateScore();
+generateId();
 ```
 
 ---
@@ -88,19 +98,21 @@ generateId()
 ## 📦 **Convenciones de Exports/Imports**
 
 ### **Exports Nombrados (Preferido)**
+
 ```javascript
 // ✅ CORRECTO
-export function createDeck() { }
-export function validateDeck() { }
+export function createDeck() {}
+export function validateDeck() {}
 
 // Import
 import { createDeck, validateDeck } from './create-deck.service.js';
 ```
 
 ### **Export Default (Solo para clases principales)**
+
 ```javascript
 // ✅ CORRECTO para clases
-export default class DeckManager { }
+export default class DeckManager {}
 
 // Import
 import DeckManager from './deck-manager.service.js';
@@ -111,23 +123,26 @@ import DeckManager from './deck-manager.service.js';
 ## 🎯 **Mapeo Función → Archivo**
 
 ### **Funciones de Creación**
-| Función | Archivo | Ubicación |
-|---------|---------|-----------|
-| `createDeck()` | `create-deck.service.js` | `/services/` |
+
+| Función             | Archivo                       | Ubicación    |
+| ------------------- | ----------------------------- | ------------ |
+| `createDeck()`      | `create-deck.service.js`      | `/services/` |
 | `createFlashcard()` | `create-flashcard.service.js` | `/services/` |
-| `createUser()` | `create-user.service.js` | `/services/` |
+| `createUser()`      | `create-user.service.js`      | `/services/` |
 
 ### **Funciones de Estudio**
-| Función | Archivo | Ubicación |
-|---------|---------|-----------|
-| `startStudySession()` | `study-session.service.js` | `/services/` |
+
+| Función                 | Archivo                      | Ubicación    |
+| ----------------------- | ---------------------------- | ------------ |
+| `startStudySession()`   | `study-session.service.js`   | `/services/` |
 | `calculateNextReview()` | `study-algorithm.service.js` | `/services/` |
-| `trackProgress()` | `study-progress.service.js` | `/services/` |
+| `trackProgress()`       | `study-progress.service.js`  | `/services/` |
 
 ### **Funciones de Gestión**
-| Función | Archivo | Ubicación |
-|---------|---------|-----------|
-| `manageDeck()` | `manage-deck.service.js` | `/services/` |
+
+| Función           | Archivo                     | Ubicación    |
+| ----------------- | --------------------------- | ------------ |
+| `manageDeck()`    | `manage-deck.service.js`    | `/services/` |
 | `editFlashcard()` | `edit-flashcard.service.js` | `/services/` |
 | `deleteContent()` | `delete-content.service.js` | `/services/` |
 
@@ -136,6 +151,7 @@ import DeckManager from './deck-manager.service.js';
 ## 🔍 **Convenciones de Variables**
 
 ### **Constantes**
+
 ```javascript
 // SCREAMING_SNAKE_CASE
 const API_BASE_URL = 'https://api.example.com';
@@ -144,19 +160,21 @@ const DEFAULT_STUDY_INTERVAL = 24; // horas
 ```
 
 ### **Variables de Configuración**
+
 ```javascript
 // camelCase con prefijo config
-const configDatabase = { };
-const configAuth = { };
-const configUI = { };
+const configDatabase = {};
+const configAuth = {};
+const configUI = {};
 ```
 
 ### **Variables de Estado**
+
 ```javascript
 // camelCase descriptivo
 const isStudySessionActive = false;
 const currentDeckId = null;
-const userProgressData = { };
+const userProgressData = {};
 ```
 
 ---
@@ -181,16 +199,19 @@ const userProgressData = { };
 ## ✅ **Checklist de Convenciones**
 
 ### **Antes de crear un archivo:**
+
 - [ ] ¿El nombre del archivo refleja su función principal?
 - [ ] ¿Está en el directorio correcto?
 - [ ] ¿Sigue la convención de nomenclatura?
 
 ### **Antes de crear una función:**
+
 - [ ] ¿El nombre es descriptivo y claro?
 - [ ] ¿Sigue las convenciones de verbos (create, get, update, delete)?
 - [ ] ¿Está en el archivo correcto según su propósito?
 
 ### **Antes de hacer import/export:**
+
 - [ ] ¿El import coincide con el export?
 - [ ] ¿La ruta del archivo es correcta?
 - [ ] ¿Está usando exports nombrados cuando es apropiado?
@@ -200,18 +221,20 @@ const userProgressData = { };
 ## 🚨 **Errores Comunes a Evitar**
 
 ### **❌ INCORRECTO**
+
 ```javascript
 // Archivo: helpers.js (muy genérico)
-export function doSomething() { } // nombre poco descriptivo
+export function doSomething() {} // nombre poco descriptivo
 
 // Import confuso
 import { thing } from './stuff.js';
 ```
 
 ### **✅ CORRECTO**
+
 ```javascript
 // Archivo: deck-validation.utils.js (específico)
-export function validateDeckData() { } // nombre claro
+export function validateDeckData() {} // nombre claro
 
 // Import claro
 import { validateDeckData } from './deck-validation.utils.js';
@@ -240,4 +263,3 @@ npm run validate:naming
 ---
 
 **Recuerda: La consistencia es más importante que la perfección. Es mejor seguir una convención "buena" de manera consistente que tener múltiples convenciones "perfectas".**
-

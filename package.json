@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "vite",
     "build": "node build-script.js",
+    "build:vite": "vite build",
     "preview": "vite preview",
     "lint": "eslint . --max-warnings=150",
     "lint:fix": "eslint . --fix",
@@ -23,6 +24,7 @@
     "quality:check": "npm run lint:check && npm run format:check && npm run test",
     "quality:fix": "npm run lint:fix && npm run format",
     "ci:test": "npm run lint && npm run test && npm run build",
+    "ci:fix": "node scripts/ci-fix.js",
     "validate:naming": "node scripts/naming-validator.js",
     "validate:build": "node scripts/build-validator.js",
     "validate:all": "npm run validate:naming && npm run validate:build",
