@@ -5,7 +5,7 @@ import {
   performCrudOperation,
   FALLBACK_DATA,
 } from './utils/apiHelpers.js';
-import { showNotification, formatDate } from './utils/helpers.js';
+import { showNotification } from './utils/helpers.js';
 
 // Configuración de gamificación
 const GAMIFICATION_CONFIG = {
@@ -647,9 +647,9 @@ export function getGamificationStats() {
     accuracy:
       gamificationData.totalCards > 0
         ? Math.round(
-          (gamificationData.correctAnswers / gamificationData.totalCards) *
-            100
-        )
+            (gamificationData.correctAnswers / gamificationData.totalCards) *
+              100
+          )
         : 0,
   };
 }

@@ -692,10 +692,10 @@ class StudyingFlashStore {
       lastUpdate: this.history[this.history.length - 1]?.timestamp,
       memoryUsage: performance.memory
         ? {
-          used: Math.round(performance.memory.usedJSHeapSize / 1024 / 1024),
-          total: Math.round(performance.memory.totalJSHeapSize / 1024 / 1024),
-          limit: Math.round(performance.memory.jsHeapSizeLimit / 1024 / 1024),
-        }
+            used: Math.round(performance.memory.usedJSHeapSize / 1024 / 1024),
+            total: Math.round(performance.memory.totalJSHeapSize / 1024 / 1024),
+            limit: Math.round(performance.memory.jsHeapSizeLimit / 1024 / 1024),
+          }
         : 'No disponible',
     };
   }

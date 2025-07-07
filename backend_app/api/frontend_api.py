@@ -185,23 +185,23 @@ def start_study_session(deck_id):
     """Iniciar sesión de estudio optimizada para frontend"""
     try:
         user_id = get_current_user_id()
-        
+
         # Verificar que el deck pertenece al usuario
         deck = Deck.query.filter_by(id=deck_id, user_id=user_id).first()
         if not deck:
             return jsonify({'error': 'Deck no encontrado'}), 404
-        
+
         # Obtener cartas pendientes de revisión
         due_cards = Flashcard.query.filter_by(deck_id=deck_id)\
             .filter(Flashcard.next_review <= datetime.utcnow())\
             .order_by(Flashcard.next_review.asc()).limit(20).all()
-        
+
         if not due_cards:
             return jsonify({
                 'message': 'No hay cartas pendientes de revisión',
                 'cards': []
             })
-        
+
         # Crear sesión de estudio
         session = StudySession(
             user_id=user_id,
@@ -210,7 +210,7 @@ def start_study_session(deck_id):
         )
         db.session.add(session)
         db.session.commit()
-        
+
         # Formatear cartas para el frontend
         cards_data = []
         for card in due_cards:
@@ -223,7 +223,7 @@ def start_study_session(deck_id):
                 'ease_factor': card.ease_factor,
                 'next_review': card.next_review.isoformat()
             })
-        
+
         return jsonify({
             'session_id': session.id,
             'deck': {
@@ -244,42 +244,42 @@ def review_card_frontend(session_id):
     try:
         user_id = get_current_user_id()
         data = request.get_json()
-        
+
         if not data or 'card_id' not in data or 'rating' not in data:
             return jsonify({'error': 'Datos requeridos: card_id, rating'}), 400
-        
+
         card_id = data['card_id']
         rating = data['rating']
-        
+
         # Validar rating
         if rating not in [1, 2, 3, 4]:
             return jsonify({'error': 'Rating debe ser 1-4 (Again, Hard, Good, Easy)'}), 400
-        
+
         # Verificar sesión
         session = StudySession.query.filter_by(id=session_id, user_id=user_id).first()
         if not session:
             return jsonify({'error': 'Sesión no encontrada'}), 404
-        
+
         # Obtener carta
         card = Flashcard.query.get(card_id)
         if not card:
             return jsonify({'error': 'Carta no encontrada'}), 404
-        
+
         # NOTA: Esta lógica duplica la funcionalidad de study.py
         # Se recomienda usar el endpoint principal /api/study/card/answer
         # Por ahora, aplicamos una corrección mínima para evitar errores
-        
+
         # Incrementar intervalo de forma simple (sin algoritmo complejo)
         if rating >= 3:  # Good o Easy
             new_interval = max(1, (card.interval_days or 1) * 1.5)
         else:  # Again o Hard
             new_interval = 1
-        
+
         # Actualizar carta con campos que existen en el modelo
         card.interval_days = int(new_interval)
         card.next_review = datetime.utcnow() + timedelta(days=new_interval)
         card.last_reviewed = datetime.utcnow()
-        
+
         # Crear registro de revisión
         review = CardReview(
             user_id=user_id,
@@ -287,14 +287,14 @@ def review_card_frontend(session_id):
             rating=rating,
             response_time=data.get('response_time', 0)
         )
-        
+
         # Actualizar sesión
         session.cards_studied += 1
         session.updated_at = datetime.utcnow()
-        
+
         db.session.add(review)
         db.session.commit()
-        
+
         return jsonify({
             'success': True,
             'card_updated': {
@@ -310,9 +310,8 @@ def review_card_frontend(session_id):
     except Exception as e:
         logger.error(f"Error reviewing card: {str(e)}")
         return jsonify({'error': 'Error interno del servidor'}), 500
->>>>>>> ae94649 (Fix: Corregido uso de campo interval_days en frontend_api.py)
 
-# @frontend_api.route('/study-session/<int:session_id>/review', methods=['POST'])
+# @frontend_api.route('/study-session/<int:session_id>/review', methods=['POST']))
 # @jwt_required()
 # def review_card_frontend(session_id):
 #     """DEPRECATED: Use /api/study/card/answer instead"""

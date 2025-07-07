@@ -75,7 +75,6 @@ export default [
       // Case declarations - require braces
       'no-case-declarations': 'error',
 
-      // Style (basic)
       indent: ['warn', 2, { SwitchCase: 1 }],
       quotes: ['warn', 'single', { avoidEscape: true }],
       semi: ['warn', 'always'],
