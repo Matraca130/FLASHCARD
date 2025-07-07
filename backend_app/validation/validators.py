@@ -76,6 +76,7 @@ def validate_json(schema: Type[BaseModel]):
 
     return decorat
 
+
 or def validate_query_params(schema: Type[BaseModel]):
     """
     Decorador para validar parámetros de query usando esquemas Pydantic

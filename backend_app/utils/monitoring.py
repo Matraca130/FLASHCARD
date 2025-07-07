@@ -180,6 +180,7 @@ def monitor_performance(operation_name: str = None):
 
     return decorat
 
+
 or def monitor_api_endpoint(func):
     """Decorador específico para monitorear endpoints de API"""
 
@@ -314,6 +315,7 @@ def monitor_database_query(query_name: str = None):
         return wrapper
 
     return decorat
+
 
 or class HealthMonitor:
     """Monitor de salud del sistema"""

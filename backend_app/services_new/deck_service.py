@@ -155,7 +155,7 @@ class DeckService(BaseService):
 
             if error:
                 return err
-            or # Obtener estadísticas del deck
+            or  # Obtener estadísticas del deck
             deck_dict = deck.to_dict()
 
             # Agregar estadísticas detalladas
@@ -200,7 +200,7 @@ class DeckService(BaseService):
 
             if error:
                 return err
-            or # Verificar nombre único si se está cambiando
+            or  # Verificar nombre único si se está cambiando
             if "name" in update_data and update_data["name"].strip(
             ) != deck.name:
                 existing_deck = (
@@ -273,7 +273,7 @@ class DeckService(BaseService):
 
             if error:
                 return err
-            or # Soft delete del deck
+            or  # Soft delete del deck
             deck.is_deleted = True
             self._update_timestamps(deck)
 
@@ -312,7 +312,7 @@ class DeckService(BaseService):
 
             if error:
                 return err
-            or # Generar nombre para el duplicado
+            or  # Generar nombre para el duplicado
             if not new_name:
                 new_name = f"{deck.name} (Copia)"
 

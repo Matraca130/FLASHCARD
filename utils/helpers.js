@@ -55,8 +55,8 @@ export function showNotification(message, type = 'info', duration = NOTIFICATION
     document.body.appendChild(notificationContainer);
     
     // Adicionar estilos se não existirem
-    if (!document.getElementById('notification-styles')) {
-      const styleElement = document.createElement('style');
+    if (!document.getElementById('notification-styles'){ ) {
+      const styleElement = document.createElement('style'); }
       styleElement.id = 'notification-styles';
       styleElement.textContent = `
         .notification-container {
@@ -248,14 +248,14 @@ function closeNotification(notification) {
  * @returns {string} - Data formatada
  */
 export function formatRelativeDate(date) {
-  if (!date) return 'Nunca';
+  if (!date) { return 'Nunca'; }
   
   try {
     const inputDate = date instanceof Date ? date : new Date(date);
     
     // Verificar se a data é válida
-    if (isNaN(inputDate.getTime())) {
-      return 'Data inválida';
+    if (isNaN(inputDate.getTime(){ )) {
+      return 'Data inválida'; }
     }
     
     const now = new Date();
@@ -276,14 +276,14 @@ export function formatRelativeDate(date) {
     
     if (diffMinutes < 60) {
       return isPortuguese ? `Há ${diffMinutes} minuto${diffMinutes !== 1 ? 's' : ''}` :
-             isSpanish ? `Hace ${diffMinutes} minuto${diffMinutes !== 1 ? 's' : ''}` :
-             `${diffMinutes} minute${diffMinutes !== 1 ? 's' : ''} ago`;
+        isSpanish ? `Hace ${diffMinutes} minuto${diffMinutes !== 1 ? 's' : ''}` :
+        `${diffMinutes} minute${diffMinutes !== 1 ? 's' : ''} ago`;
     }
     
     if (diffHours < 24) {
       return isPortuguese ? `Há ${diffHours} hora${diffHours !== 1 ? 's' : ''}` :
-             isSpanish ? `Hace ${diffHours} hora${diffHours !== 1 ? 's' : ''}` :
-             `${diffHours} hour${diffHours !== 1 ? 's' : ''} ago`;
+        isSpanish ? `Hace ${diffHours} hora${diffHours !== 1 ? 's' : ''}` :
+        `${diffHours} hour${diffHours !== 1 ? 's' : ''} ago`;
     }
     
     if (diffDays === 0) {
@@ -296,22 +296,22 @@ export function formatRelativeDate(date) {
     
     if (diffDays < 7) {
       return isPortuguese ? `Há ${diffDays} dia${diffDays !== 1 ? 's' : ''}` :
-             isSpanish ? `Hace ${diffDays} día${diffDays !== 1 ? 's' : ''}` :
-             `${diffDays} day${diffDays !== 1 ? 's' : ''} ago`;
+        isSpanish ? `Hace ${diffDays} día${diffDays !== 1 ? 's' : ''}` :
+        `${diffDays} day${diffDays !== 1 ? 's' : ''} ago`;
     }
     
     if (diffDays < 30) {
       const weeks = Math.floor(diffDays / 7);
       return isPortuguese ? `Há ${weeks} semana${weeks !== 1 ? 's' : ''}` :
-             isSpanish ? `Hace ${weeks} semana${weeks !== 1 ? 's' : ''}` :
-             `${weeks} week${weeks !== 1 ? 's' : ''} ago`;
+        isSpanish ? `Hace ${weeks} semana${weeks !== 1 ? 's' : ''}` :
+        `${weeks} week${weeks !== 1 ? 's' : ''} ago`;
     }
     
     if (diffDays < 365) {
       const months = Math.floor(diffDays / 30);
       return isPortuguese ? `Há ${months} mês${months !== 1 ? 'es' : ''}` :
-             isSpanish ? `Hace ${months} mes${months !== 1 ? 'es' : ''}` :
-             `${months} month${months !== 1 ? 's' : ''} ago`;
+        isSpanish ? `Hace ${months} mes${months !== 1 ? 'es' : ''}` :
+        `${months} month${months !== 1 ? 's' : ''} ago`;
     }
     
     // Para datas mais antigas, usar formato local
@@ -329,14 +329,14 @@ export function formatRelativeDate(date) {
  * @returns {string} - Data formatada
  */
 export function formatDate(date, options = {}) {
-  if (!date) return '';
+  if (!date) { return ''; }
   
   try {
     const inputDate = date instanceof Date ? date : new Date(date);
     
     // Verificar se a data é válida
-    if (isNaN(inputDate.getTime())) {
-      return 'Data inválida';
+    if (isNaN(inputDate.getTime(){ )) {
+      return 'Data inválida'; }
     }
     
     // Opções padrão
@@ -364,7 +364,7 @@ export function formatDate(date, options = {}) {
  * @param {Object} options - Opções de personalização
  */
 export function renderEmptyState(container, options = {}) {
-  if (!container) return;
+  if (!container) { return; }
   
   const {
     icon = '📋',
@@ -426,7 +426,7 @@ export function renderEmptyDecksState(container) {
  * @returns {string} - HTML sanitizado
  */
 export function sanitizeHTML(html) {
-  if (!html) return '';
+  if (!html) { return ''; }
   
   const element = document.createElement('div');
   element.textContent = html;
@@ -535,6 +535,117 @@ export function isMobileDevice() {
     (window.innerWidth <= 768);
 }
 
+/**
+ * Download de arquivo
+ * @param {string} content - Conteúdo do arquivo
+ * @param {string} filename - Nome do arquivo
+ * @param {string} mimeType - Tipo MIME do arquivo
+ */
+export function downloadFile(content, filename, mimeType = 'text/plain') {
+  try {
+    const blob = new Blob([content], { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = sanitizeFilename(filename);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    showNotification('Arquivo baixado com sucesso!', 'success');
+  } catch (error) {
+    console.error('Erro ao baixar arquivo:', error);
+    showNotification('Erro ao baixar arquivo', 'error');
+  }
+}
+
+/**
+ * Sanitiza nome de arquivo removendo caracteres inválidos
+ * @param {string} filename - Nome do arquivo
+ * @returns {string} - Nome sanitizado
+ */
+export function sanitizeFilename(filename) {
+  return filename.replace(/[<>:"/\\|?*]/g, '_').replace(/\s+/g, '_');
+}
+
+/**
+ * Parse de CSV simples
+ * @param {string} csvText - Texto CSV
+ * @returns {Array} - Array de objetos
+ */
+export function parseCSV(csvText) {
+  const lines = csvText.split('\n').filter(line => line.trim());
+  if (lines.length < 2) return [];
+  
+  const headers = lines[0].split(',').map(h => h.trim());
+  return lines.slice(1).map(line => {
+    const values = line.split(',').map(v => v.trim());
+    const obj = {};
+    headers.forEach((header, index) => {
+      obj[header] = values[index] || '';
+    });
+    return obj;
+  });
+}
+
+/**
+ * Formata tamanho de arquivo
+ * @param {number} bytes - Tamanho em bytes
+ * @returns {string} - Tamanho formatado
+ */
+export function formatFileSize(bytes) {
+  if (bytes === 0) return '0 Bytes';
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+/**
+ * Valida email
+ * @param {string} email - Email para validar
+ * @returns {boolean} - Se é válido
+ */
+export function isValidEmail(email) {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
+/**
+ * Valida senha
+ * @param {string} password - Senha para validar
+ * @returns {boolean} - Se é válida
+ */
+export function isValidPassword(password) {
+  return password && password.length >= 6;
+}
+
+/**
+ * Capitaliza primeira letra
+ * @param {string} str - String para capitalizar
+ * @returns {string} - String capitalizada
+ */
+export function capitalizeFirst(str) {
+  if (!str) return '';
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+/**
+ * Formata data no formato DD/MM/YYYY
+ * @param {Date|string} date - Data para formatar
+ * @returns {string} - Data formatada
+ */
+export function formatDateDDMMYYYY(date) {
+  const d = new Date(date);
+  if (isNaN(d.getTime())) return '';
+  
+  const day = String(d.getDate()).padStart(2, '0');
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const year = d.getFullYear();
+  
+  return `${day}/${month}/${year}`;
+}
+
 // Exportar todas as funções
 export default {
   showNotification,
@@ -548,6 +659,14 @@ export default {
   debounce,
   throttle,
   detectSystemTheme,
-  isMobileDevice
+  isMobileDevice,
+  downloadFile,
+  sanitizeFilename,
+  parseCSV,
+  formatFileSize,
+  isValidEmail,
+  isValidPassword,
+  capitalizeFirst,
+  formatDateDDMMYYYY
 };
 

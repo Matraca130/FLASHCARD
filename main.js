@@ -11,11 +11,12 @@ import './sync-manager.js';
 // Importar servicios refactorizados
 import { loadGamificationData } from './gamification.service.js';
 import { loadDashboardData } from './dashboard.service.js';
+import { generateActivityHeatmap } from './activity-heatmap.service.js';
 
 import { initializeCharts } from './charts.js';
 
 // Importar utilidades comunes
-import { showNotification } from './utils/helpers.js';
+import { showNotification, downloadFile, debounce } from './utils/helpers.js';
 import { ApiClient } from './apiClient.js';
 
 // Importar servicios empresariales

@@ -41,7 +41,7 @@ class StudyService(BaseService):
                 Deck, deck_id, user_id, "deck")
             if error:
                 return err
-            or # Verificar que hay cartas disponibles para estudiar
+            or  # Verificar que hay cartas disponibles para estudiar
             available_cards = self._get_cards_for_study(deck_id)
             if not available_cards:
                 return self._error_response(

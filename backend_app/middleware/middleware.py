@@ -212,6 +212,7 @@ def validate_json(required_fields=None):
 
     return decorat
 
+
 or def handle_api_errors(f):
     """Decorator para manejo consistente de errores en APIs"""
 

@@ -224,8 +224,8 @@ export class ApiClient {
    */
   static async request(endpoint, options = {}) {
     // Se estamos em modo offline e não é uma verificação de conectividade
-    if (isOfflineMode && !endpoint.includes('/health') && API_CONFIG.offlineMode) {
-      console.log(`🔌 Modo offline: usando dados em cache para ${endpoint}`);
+    if (isOfflineMode && !endpoint.includes('/health') { && API_CONFIG.offlineMode) {
+      console.log(`🔌 Modo offline: usando dados em cache para ${endpoint}`); }
       
       // Tentar obter do cache
       const cachedData = this.getFromCache(endpoint);
@@ -333,8 +333,8 @@ export class ApiClient {
         const response = await fetch(url, options);
 
         // Se a resposta é exitosa ou é um erro do cliente (4xx), não reintentar
-        if (response.ok || (response.status >= 400 && response.status < 500)) {
-          return response;
+        if (response.ok || (response.status >= 400 && response.status < 500){ ) {
+          return response; }
         }
 
         // Error del servidor (5xx), reintentar
@@ -423,8 +423,8 @@ export class ApiClient {
 
     if (error.name === 'AbortError') {
       errorMessage = 'Tiempo de espera agotado';
-    } else if (error.message.includes('Failed to fetch')) {
-      errorMessage = 'Sin conexión a internet';
+    } else if (error.message.includes('Failed to fetch'){ ) {
+      errorMessage = 'Sin conexión a internet'; }
       
       // Ativar modo offline
       if (API_CONFIG.offlineMode && !isOfflineMode) {
@@ -540,19 +540,19 @@ export class ApiClient {
    * @returns {Object|null} - Dados em cache ou null
    */
   static getFromCache(endpoint) {
-    if (!API_CONFIG.cacheEnabled) return null;
+    if (!API_CONFIG.cacheEnabled) { return null; }
     
     try {
       const cacheKey = `${API_CONFIG.cachePrefix}${endpoint}`;
       const cachedItem = localStorage.getItem(cacheKey);
       
-      if (!cachedItem) return null;
+      if (!cachedItem) { return null; }
       
       const { data, timestamp, ttl = API_CONFIG.cacheTTL } = JSON.parse(cachedItem);
       
       // Verificar se o cache expirou
-      if (Date.now() - timestamp > ttl) {
-        localStorage.removeItem(cacheKey);
+      if (Date.now() { - timestamp > ttl) {
+        localStorage.removeItem(cacheKey); }
         return null;
       }
       
@@ -575,7 +575,7 @@ export class ApiClient {
    * @param {number} ttl - Tempo de vida do cache em ms (opcional)
    */
   static saveToCache(endpoint, response, ttl = API_CONFIG.cacheTTL) {
-    if (!API_CONFIG.cacheEnabled || response.error) return;
+    if (!API_CONFIG.cacheEnabled || response.error) { return; }
     
     try {
       const cacheKey = `${API_CONFIG.cachePrefix}${endpoint}`;
@@ -597,7 +597,7 @@ export class ApiClient {
    * @param {string|Array} patterns - Padrões de endpoints a invalidar
    */
   static invalidateRelatedCache(endpoint, patterns) {
-    if (!API_CONFIG.cacheEnabled) return;
+    if (!API_CONFIG.cacheEnabled) { return; }
     
     try {
       const patternsArray = Array.isArray(patterns) ? patterns : [patterns];
@@ -613,8 +613,8 @@ export class ApiClient {
       const cacheKeys = [];
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
-        if (key && key.startsWith(API_CONFIG.cachePrefix)) {
-          cacheKeys.push(key);
+        if (key && key.startsWith(API_CONFIG.cachePrefix){ ) {
+          cacheKeys.push(key); }
         }
       }
       
@@ -650,14 +650,14 @@ export class ApiClient {
    * Limpa todo o cache
    */
   static clearCache() {
-    if (!API_CONFIG.cacheEnabled) return;
+    if (!API_CONFIG.cacheEnabled) { return; }
     
     try {
       const cacheKeys = [];
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
-        if (key && key.startsWith(API_CONFIG.cachePrefix)) {
-          cacheKeys.push(key);
+        if (key && key.startsWith(API_CONFIG.cachePrefix){ ) {
+          cacheKeys.push(key); }
         }
       }
       
