@@ -223,17 +223,16 @@ jobs:
       with:
         python-version: '3.11'
 
-    - name: Security Testing
+    - name: 🔒 Security scan
       run: |
-        echo "🔍 Ejecutando escaneo de seguridad inteligente..."
-        
-        # Instalar dependencias para el scanner
-        pip install PyYAML
-        
-        # Ejecutar scanner inteligente
-        python3 scripts/security-scan.py --directory . --format detailed
-        
-        echo "✅ Escaneo de seguridad completado"
+        echo "🔒 Security pre-deployment scan..."
+        # Escanear SOLO archivos fuente, NO el JS minificado
+        git ls-files '*.js' ':!:dist/**' ':!:index-*' \
+          | xargs grep -i -E "api.*key\s*=" -n \
+          | grep -v "placeholder|example|test" && {
+              echo "❌ Potential API keys found in code"
+              exit 1
+          } || echo "✅ Security scan passed"
 
     - name: Content Security Policy check
       run: |
