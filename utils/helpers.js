@@ -218,6 +218,15 @@ export function capitalize(str) {
 }
 
 /**
+ * Capitaliza solo la primera letra de un string (alias para capitalize)
+ * @param {string} str - String a capitalizar
+ * @returns {string} - String con primera letra capitalizada
+ */
+export function capitalizeFirst(str) {
+  return capitalize(str);
+}
+
+/**
  * Trunca un texto a una longitud específica
  * @param {string} text - Texto a truncar
  * @param {number} maxLength - Longitud máxima

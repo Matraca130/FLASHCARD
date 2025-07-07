@@ -40,8 +40,8 @@ class PWAInstaller {
     try {
       console.log('[PWA] Registrando Service Worker...');
       
-      this.swRegistration = await navigator.serviceWorker.register('/sw.js', {
-        scope: '/'
+      this.swRegistration = await navigator.serviceWorker.register('./sw.js', {
+        scope: './'
       });
       
       console.log('[PWA] Service Worker registrado:', this.swRegistration.scope);
