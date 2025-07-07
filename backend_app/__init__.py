@@ -22,6 +22,9 @@ def create_app(config_class=None):
 
     app.config.from_object(config_class)
 
+    # Asegurar que siempre haya una base de datos disponible para tests
+    app.config.setdefault("SQLALCHEMY_DATABASE_URI", "sqlite:///:memory:")
+
     # Configurar CORS para permitir conexiones desde frontend
     CORS(
         app,
@@ -34,8 +37,9 @@ def create_app(config_class=None):
         supports_credentials=True,
     )
 
-    # Inicializar extensiones
-    db.init_app(app)
+    # Inicializar extensiones (evitar doble inicialización)
+    if "sqlalchemy" not in app.extensions:
+        db.init_app(app)
     jwt.init_app(app)
     bcrypt.init_app(app)
     limiter.init_app(app)
@@ -45,13 +49,9 @@ def create_app(config_class=None):
     setup_logging(app)
 
     # Registrar manejadores de errores
-    from backend_app.api.error_handlers import (
-        register_error_handlers,
-        log_slow_requests,
-    )
+    from backend_app.api.error_handlers import register_error_handlers
 
     register_error_handlers(app)
-    log_slow_requests(app)
 
     # Registrar blueprints
     from backend_app.api.routes import api_bp
