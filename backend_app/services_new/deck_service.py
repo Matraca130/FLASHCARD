@@ -516,4 +516,3 @@ class DeckService(BaseService):
             )
         except Exception:
             return 0
-
