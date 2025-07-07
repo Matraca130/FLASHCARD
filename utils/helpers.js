@@ -580,3 +580,27 @@ export function capitalizeFirst(str) {
   return str.replace(/\b\w/g, l => l.toUpperCase());
 }
 
+
+/**
+ * Formatea una fecha en formato DD/MM/YYYY
+ * @param {string|Date} date - Fecha a formatear
+ * @returns {string} - Fecha en formato DD/MM/YYYY
+ */
+export function formatDateDDMMYYYY(date) {
+  if (!date) {
+    return 'N/A';
+  }
+
+  const dateObj = typeof date === 'string' ? new Date(date) : date;
+
+  if (isNaN(dateObj.getTime())) {
+    return 'Fecha inválida';
+  }
+
+  const day = dateObj.getDate().toString().padStart(2, '0');
+  const month = (dateObj.getMonth() + 1).toString().padStart(2, '0');
+  const year = dateObj.getFullYear();
+
+  return `${day}/${month}/${year}`;
+}
+

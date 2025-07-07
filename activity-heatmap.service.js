@@ -1,5 +1,5 @@
 import { apiWithFallback } from './utils/apiHelpers.js';
-import { showNotification, formatDate } from './utils/helpers.js';
+import { showNotification, formatDate, formatDateDDMMYYYY } from './utils/helpers.js';
 
 /**
  * Servicio de heatmap de actividad refactorizado
@@ -342,10 +342,10 @@ function organizeDataByWeeks(activityData) {
  */
 function generateTooltipText(day) {
   if (!day || day.activity === 0) {
-    return `${formatDate(new Date(day?.date || Date.now()), 'DD/MM/YYYY')} - Sin actividad`;
+    return `${formatDateDDMMYYYY(new Date(day?.date || Date.now()))} - Sin actividad`;
   }
   
-  const date = formatDate(new Date(day.date), 'DD/MM/YYYY');
+  const date = formatDateDDMMYYYY(new Date(day.date));
   const message = HEATMAP_CONFIG.tooltipMessages[day.activity];
   const cards = day.cards_studied || 0;
   const time = day.study_time || 0;
@@ -453,7 +453,7 @@ function handleDayClick(event) {
  * @param {Object} data - Datos del día
  */
 function showDayDetails(date, data) {
-  const formattedDate = formatDate(new Date(date), 'DD/MM/YYYY');
+  const formattedDate = formatDateDDMMYYYY(new Date(date));
   const message = `
     📅 ${formattedDate}
     📚 ${data.cards} tarjetas estudiadas

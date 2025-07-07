@@ -237,7 +237,7 @@ async function initializeServiceWorker() {
   try {
     console.log('📱 Registrando Service Worker...');
 
-    const registration = await navigator.serviceWorker.register('/sw.js');
+    const registration = await navigator.serviceWorker.register('./sw.js');
 
     console.log('✅ Service Worker registrado:', registration);
 

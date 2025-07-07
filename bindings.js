@@ -367,7 +367,7 @@ async function handleCreateFlashcard(el) {
     return;
   }
 
-  const deckId = form.querySelector('#flashcard-deck-id')?.value;
+  const deckId = form.querySelector('#flashcard-deck')?.value;
   const front = form.querySelector('#flashcard-front')?.value?.trim();
   const back = form.querySelector('#flashcard-back')?.value?.trim();
   const difficulty =
