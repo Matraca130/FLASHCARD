@@ -153,8 +153,8 @@ function renderStudyDecks(container, decks, options = {}) {
         </div>
         
         ${
-          showStats
-            ? `
+  showStats
+    ? `
       <div class="deck-stats">
         <div class="stat-item ${dueCards > 0 ? 'highlight' : ''}">              <span class="stat-value">${dueCards}</span>
               <span class="stat-label">Pendientes</span>
@@ -173,12 +173,12 @@ function renderStudyDecks(container, decks, options = {}) {
             <span class="last-studied">Último estudio: ${lastStudied}</span>
           </div>
         `
-            : `
+    : `
       <div class="deck-simple-stats">
         <span class="card-count">${deck.card_count || 0} cartas</span>
       </div>
     `
-        }
+}
         
         <div class="deck-actions">
           <button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); startStudySession(${deck.id})">
@@ -587,10 +587,10 @@ function showSessionResults(sessionState, sessionData) {
   const accuracy =
     sessionState.answeredCards.length > 0
       ? Math.round(
-          (sessionState.sessionStats.correct /
+        (sessionState.sessionStats.correct /
             sessionState.answeredCards.length) *
             100
-        )
+      )
       : 0;
 
   const avgTimeSeconds = Math.round(

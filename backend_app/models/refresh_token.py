@@ -12,8 +12,16 @@ class RefreshToken(BaseModel):
     __tablename__ = "refresh_tokens"
 
     # Campos principales
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False, index=True)
-    token_hash = db.Column(db.String(255), nullable=False, unique=True, index=True)
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey("users.id"),
+        nullable=False,
+        index=True)
+    token_hash = db.Column(
+        db.String(255),
+        nullable=False,
+        unique=True,
+        index=True)
     expires_at = db.Column(db.DateTime, nullable=False, index=True)
 
     # Metadatos de seguridad
@@ -22,18 +30,32 @@ class RefreshToken(BaseModel):
     last_used = db.Column(db.DateTime, default=datetime.utcnow)
 
     # Estado del token
-    is_revoked = db.Column(db.Boolean, default=False, nullable=False, index=True)
+    is_revoked = db.Column(
+        db.Boolean,
+        default=False,
+        nullable=False,
+        index=True)
     revoked_at = db.Column(db.DateTime)
-    revoked_reason = db.Column(db.String(100))  # 'logout', 'security', 'expired', etc.
+    # 'logout', 'security', 'expired', etc.
+    revoked_reason = db.Column(db.String(100))
 
     # Relaciones
-    user = db.relationship("User", backref=db.backref("refresh_tokens", lazy="dynamic"))
+    user = db.relationship(
+        "User", backref=db.backref(
+            "refresh_tokens", lazy="dynamic"))
 
-    def __init__(self, user_id, token_hash, expires_at=None, device_info=None, ip_address=None):
+    def __init__(
+            self,
+            user_id,
+            token_hash,
+            expires_at=None,
+            device_info=None,
+            ip_address=None):
         super().__init__()
         self.user_id = user_id
         self.token_hash = token_hash
-        self.expires_at = expires_at or (datetime.utcnow() + timedelta(days=30))
+        self.expires_at = expires_at or (
+            datetime.utcnow() + timedelta(days=30))
         self.device_info = device_info
         self.ip_address = ip_address
 
@@ -67,7 +89,8 @@ class RefreshToken(BaseModel):
     @classmethod
     def cleanup_expired(cls):
         """Limpiar tokens expirados (tarea de mantenimiento)"""
-        expired_tokens = cls.query.filter(cls.expires_at < datetime.utcnow(), not cls.is_deleted).all()
+        expired_tokens = cls.query.filter(
+            cls.expires_at < datetime.utcnow(), not cls.is_deleted).all()
 
         for token in expired_tokens:
             token.soft_delete()
@@ -78,7 +101,10 @@ class RefreshToken(BaseModel):
     @classmethod
     def revoke_all_for_user(cls, user_id, reason="logout_all"):
         """Revocar todos los tokens de un usuario"""
-        tokens = cls.query.filter(cls.user_id == user_id, not cls.is_revoked, not cls.is_deleted).all()
+        tokens = cls.query.filter(
+            cls.user_id == user_id,
+            not cls.is_revoked,
+            not cls.is_deleted).all()
 
         for token in tokens:
             token.revoke(reason)
@@ -102,7 +128,8 @@ class RefreshToken(BaseModel):
         query = cls.query.filter(cls.user_id == user_id, not cls.is_deleted)
 
         if active_only:
-            query = query.filter(not cls.is_revoked, cls.expires_at > datetime.utcnow())
+            query = query.filter(
+                not cls.is_revoked, cls.expires_at > datetime.utcnow())
 
         return query.order_by(cls.last_used.desc()).all()
 

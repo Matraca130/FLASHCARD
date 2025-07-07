@@ -29,14 +29,18 @@ class MonitoringConfig:
     LOG_FILE = os.getenv("LOG_FILE", "logs/app.log")
 
     # Performance Monitoring
-    ENABLE_PERFORMANCE_MONITORING = os.getenv("ENABLE_PERFORMANCE_MONITORING", "true").lower() == "true"
-    PERFORMANCE_SAMPLE_RATE = float(os.getenv("PERFORMANCE_SAMPLE_RATE", "0.1"))
+    ENABLE_PERFORMANCE_MONITORING = os.getenv(
+        "ENABLE_PERFORMANCE_MONITORING",
+        "true").lower() == "true"
+    PERFORMANCE_SAMPLE_RATE = float(
+        os.getenv("PERFORMANCE_SAMPLE_RATE", "0.1"))
 
 
 def init_sentry(app):
     """Inicializar Sentry para monitoreo de errores"""
     if not MonitoringConfig.SENTRY_DSN:
-        app.logger.warning("SENTRY_DSN no configurado. Monitoreo de errores deshabilitado.")
+        app.logger.warning(
+            "SENTRY_DSN no configurado. Monitoreo de errores deshabilitado.")
         return
 
     # Configurar integración de logging
@@ -62,7 +66,8 @@ def init_sentry(app):
         before_send_transaction=filter_sensitive_transactions,
     )
 
-    app.logger.info(f"Sentry inicializado para entorno: {MonitoringConfig.SENTRY_ENVIRONMENT}")
+    app.logger.info(
+        f"Sentry inicializado para entorno: {MonitoringConfig.SENTRY_ENVIRONMENT}")
 
 
 def filter_sensitive_data(event, hint):
@@ -148,13 +153,15 @@ def monitor_performance(operation_name: str = None):
 
                 # Log si la operación es lenta (>1 segundo)
                 if execution_time > 1.0:
-                    logging.warning(f"Operación lenta detectada: {operation} tomó {execution_time:.2f}s")
+                    logging.warning(
+                        f"Operación lenta detectada: {operation} tomó {execution_time:.2f}s")
 
                 return result
 
             except Exception as e:
                 execution_time = time.time() - start_time
-                logging.error(f"Error en {operation} después de {execution_time:.2f}s: {str(e)}")
+                logging.error(
+                    f"Error en {operation} después de {execution_time:.2f}s: {str(e)}")
 
                 # Agregar contexto adicional a Sentry
                 sentry_sdk.set_context(
@@ -202,7 +209,8 @@ def monitor_api_endpoint(func):
             execution_time = time.time() - start_time
 
             # Log request exitosa
-            logging.info(f"API {method} {endpoint} - Usuario: {user_id} - Tiempo: {execution_time:.3f}s")
+            logging.info(
+                f"API {method} {endpoint} - Usuario: {user_id} - Tiempo: {execution_time:.3f}s")
 
             return result
 
@@ -225,7 +233,10 @@ def monitor_api_endpoint(func):
     return wrapper
 
 
-def log_user_action(action: str, details: Dict[str, Any] = None, user_id: int = None):
+def log_user_action(action: str,
+                    details: Dict[str,
+                                  Any] = None,
+                    user_id: int = None):
     """Log de acciones de usuario para auditoría"""
     user_id = user_id or getattr(g, "current_user_id", None)
 
@@ -249,7 +260,8 @@ def log_user_action(action: str, details: Dict[str, Any] = None, user_id: int = 
     )
 
 
-def capture_exception_with_context(exception: Exception, context: Dict[str, Any] = None):
+def capture_exception_with_context(
+        exception: Exception, context: Dict[str, Any] = None):
     """Capturar excepción con contexto adicional"""
     if context:
         for key, value in context.items():
@@ -274,19 +286,20 @@ def monitor_database_query(query_name: str = None):
 
                 # Log consultas lentas (>1 segundo)
                 if execution_time > 1.0:
-                    logging.warning(f"Consulta DB lenta: {query} tomó {execution_time:.2f}s")
+                    logging.warning(
+                        f"Consulta DB lenta: {query} tomó {execution_time:.2f}s")
 
                     # Enviar métrica a Sentry
                     sentry_sdk.set_context(
-                        "slow_query",
-                        {"query_name": query, "execution_time": execution_time},
-                    )
+                        "slow_query", {
+                            "query_name": query, "execution_time": execution_time}, )
 
                 return result
 
             except Exception as e:
                 execution_time = time.time() - start_time
-                logging.error(f"Error en consulta DB {query} después de {execution_time:.2f}s: {str(e)}")
+                logging.error(
+                    f"Error en consulta DB {query} después de {execution_time:.2f}s: {str(e)}")
 
                 sentry_sdk.set_context(
                     "db_error",
@@ -359,7 +372,8 @@ def log_warning(message: str, extra: Dict[str, Any] = None):
         logging.warning(message)
 
 
-def log_error(message: str, exception: Exception = None, extra: Dict[str, Any] = None):
+def log_error(message: str, exception: Exception = None,
+              extra: Dict[str, Any] = None):
     """Log de error con contexto adicional"""
     context = extra or {}
     if exception:

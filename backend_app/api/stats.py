@@ -125,7 +125,8 @@ def get_chart_data():
                     {
                         "date": row.date.isoformat(),
                         "cards_studied": int(row.cards_studied or 0),
-                        "study_time": int((row.total_time or 0) / 60),  # en minutos
+                        # en minutos
+                        "study_time": int((row.total_time or 0) / 60),
                     }
                 )
 
@@ -140,19 +141,25 @@ def get_chart_data():
                 db.session.query(
                     Deck.id,
                     Deck.name,
-                    func.count(CardReview.id).label("total_reviews"),
-                    func.sum(func.case([(CardReview.quality >= 3, 1)], else_=0)).label("correct_reviews"),
-                )
-                .join(Flashcard)
-                .join(CardReview)
-                .filter(Deck.user_id == user_id)
-                .group_by(Deck.id, Deck.name)
-                .all()
-            )
+                    func.count(
+                        CardReview.id).label("total_reviews"),
+                    func.sum(
+                        func.case(
+                            [
+                                (CardReview.quality >= 3,
+                                 1)],
+                            else_=0)).label("correct_reviews"),
+                ) .join(Flashcard) .join(CardReview) .filter(
+                    Deck.user_id == user_id) .group_by(
+                    Deck.id,
+                    Deck.name) .all())
 
             chart_data = []
             for row in accuracy_data:
-                accuracy = (row.correct_reviews / row.total_reviews * 100) if row.total_reviews > 0 else 0
+                accuracy = (
+                    row.correct_reviews /
+                    row.total_reviews *
+                    100) if row.total_reviews > 0 else 0
                 chart_data.append(
                     {
                         "deck_name": row.name,
@@ -195,21 +202,19 @@ def get_progress_stats():
 
         # Cartas estudiadas hoy
         cards_today = (
-            db.session.query(func.sum(StudySession.cards_studied))
-            .join(Deck)
-            .filter(Deck.user_id == user_id, StudySession.started_at >= today_start)
-            .scalar()
-            or 0
-        )
+            db.session.query(
+                func.sum(
+                    StudySession.cards_studied)) .join(Deck) .filter(
+                Deck.user_id == user_id,
+                StudySession.started_at >= today_start) .scalar() or 0)
 
         # Tiempo de estudio hoy (en minutos)
         time_today = (
-            db.session.query(func.sum(StudySession.total_time))
-            .join(Deck)
-            .filter(Deck.user_id == user_id, StudySession.started_at >= today_start)
-            .scalar()
-            or 0
-        )
+            db.session.query(
+                func.sum(
+                    StudySession.total_time)) .join(Deck) .filter(
+                Deck.user_id == user_id,
+                StudySession.started_at >= today_start) .scalar() or 0)
 
         time_today_minutes = int(time_today / 60) if time_today else 0
 
@@ -224,13 +229,17 @@ def get_progress_stats():
 
         # Progreso hacia meta diaria
         daily_goal = user.daily_goal or 20
-        goal_progress = min((cards_today / daily_goal) * 100, 100) if daily_goal > 0 else 0
+        goal_progress = min(
+            (cards_today / daily_goal) * 100,
+            100) if daily_goal > 0 else 0
 
         progress_data = {
             "daily_progress": {
                 "cards_studied": int(cards_today),
                 "daily_goal": daily_goal,
-                "goal_progress": round(goal_progress, 1),
+                "goal_progress": round(
+                    goal_progress,
+                    1),
                 "study_time": time_today_minutes,
             },
             "overall_stats": {
@@ -243,10 +252,9 @@ def get_progress_stats():
             "accuracy": {
                 "total_correct": user.total_cards_correct,
                 "accuracy_rate": (
-                    round((user.total_cards_correct / user.total_cards_studied * 100), 1)
-                    if user.total_cards_studied > 0
-                    else 0
-                ),
+                    round(
+                        (user.total_cards_correct / user.total_cards_studied * 100),
+                        1) if user.total_cards_studied > 0 else 0),
             },
         }
 

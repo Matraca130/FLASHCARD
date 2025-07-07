@@ -30,8 +30,7 @@ def api_info():
                 },
                 "documentation": "https://github.com/matraca130/FLASHCARD/docs",
                 "version": "1.0.0",
-            }
-        ),
+            }),
         200,
     )
 

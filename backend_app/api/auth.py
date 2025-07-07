@@ -28,7 +28,8 @@ def login(validated_data):
     """
     try:
         # Usar servicio para autenticar con datos validados
-        result = user_service.authenticate_user(validated_data["email"], validated_data["password"])
+        result = user_service.authenticate_user(
+            validated_data["email"], validated_data["password"])
         if not result["success"]:
             return jsonify({"error": result["error"]}), 401
 
@@ -208,8 +209,8 @@ def verify_token():
         if not user:
             return jsonify({"error": "Token inválido"}), 401
 
-        return jsonify({"success": True, "valid": True, "user_id": user_id}), 200
-
+        return jsonify(
+            {"success": True, "valid": True, "user_id": user_id}), 200
     except Exception as e:
         logger.error(f"Error verificando token: {str(e)}")
         return jsonify({"error": "Token inválido"}), 401

@@ -36,8 +36,7 @@ def validate_json(schema: Type[BaseModel]):
                             {
                                 "error": "No se proporcionaron datos JSON",
                                 "details": "El cuerpo de la petición debe contener JSON válido",
-                            }
-                        ),
+                            }),
                         400,
                     )
 
@@ -52,14 +51,15 @@ def validate_json(schema: Type[BaseModel]):
                     # Formatear errores de validación
                     errors = []
                     for error in e.errors():
-                        field = ".".join(str(x) for x in error["loc"])
-                        message = error["msg"]
-                        errors.append({"field": field, "message": message, "type": error["type"]})
+            field = ".".join(str(x) for x in error["loc"])
+            message = error["msg"]
+            errors.append(
+                {"field": field, "message": message, "type": error["type"]})
 
-                    return (
-                        jsonify({"error": "Datos de entrada inválidos", "details": errors}),
-                        400,
-                    )
+            return (
+                jsonify({"error": "Datos de entrada inválidos", "details": errors}),
+                400,
+            )
 
             except Exception as e:
                 logger.error(f"Error en validación: {str(e)}")
@@ -68,8 +68,7 @@ def validate_json(schema: Type[BaseModel]):
                         {
                             "error": "Error interno de validación",
                             "details": "Contacte al administrador si el problema persiste",
-                        }
-                    ),
+                        }),
                     500,
                 )
 
@@ -106,19 +105,20 @@ def validate_query_params(schema: Type[BaseModel]):
                     # Formatear errores de validación
                     errors = []
                     for error in e.errors():
-                        field = ".".join(str(x) for x in error["loc"])
-                        message = error["msg"]
-                        errors.append({"field": field, "message": message, "type": error["type"]})
+            field = ".".join(str(x) for x in error["loc"])
+            message = error["msg"]
+            errors.append(
+                {"field": field, "message": message, "type": error["type"]})
 
-                    return (
-                        jsonify(
-                            {
-                                "error": "Parámetros de consulta inválidos",
-                                "details": errors,
-                            }
-                        ),
-                        400,
-                    )
+            return (
+                jsonify(
+                    {
+                        "error": "Parámetros de consulta inválidos",
+                        "details": errors,
+                    }
+                ),
+                400,
+            )
 
             except Exception as e:
                 logger.error(f"Error en validación de query params: {str(e)}")
@@ -127,8 +127,7 @@ def validate_query_params(schema: Type[BaseModel]):
                         {
                             "error": "Error interno de validación",
                             "details": "Contacte al administrador si el problema persiste",
-                        }
-                    ),
+                        }),
                     500,
                 )
 
@@ -137,7 +136,8 @@ def validate_query_params(schema: Type[BaseModel]):
     return decorator
 
 
-def validate_data_manually(data: Dict[Any, Any], schema: Type[BaseModel]) -> Dict[str, Any]:
+def validate_data_manually(
+        data: Dict[Any, Any], schema: Type[BaseModel]) -> Dict[str, Any]:
     """
     Validar datos manualmente sin decorador
 
@@ -159,7 +159,8 @@ def validate_data_manually(data: Dict[Any, Any], schema: Type[BaseModel]) -> Dic
         for error in e.errors():
             field = ".".join(str(x) for x in error["loc"])
             message = error["msg"]
-            errors.append({"field": field, "message": message, "type": error["type"]})
+            errors.append(
+                {"field": field, "message": message, "type": error["type"]})
 
         return {"success": False, "errors": errors}
 
@@ -188,7 +189,8 @@ def sanitize_string(value: str, max_length: int = None) -> str:
     return sanitized
 
 
-def validate_file_upload(file, allowed_extensions: set, max_size_mb: int = 5) -> Dict[str, Any]:
+def validate_file_upload(file, allowed_extensions: set,
+                         max_size_mb: int = 5) -> Dict[str, Any]:
     """
     Validar archivo subido
 
@@ -290,6 +292,8 @@ class ValidationHelper:
         sanitized = re.sub(r"[^\w\-_\.]", "_", filename)
         # Limitar longitud
         if len(sanitized) > 100:
-            name, ext = sanitized.rsplit(".", 1) if "." in sanitized else (sanitized, "")
+            name, ext = sanitized.rsplit(
+                ".", 1) if "." in sanitized else (
+                sanitized, "")
             sanitized = name[:95] + ("." + ext if ext else "")
         return sanitized

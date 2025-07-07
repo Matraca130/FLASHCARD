@@ -94,14 +94,16 @@ def calculate_fsrs(
     if rating == 1:  # Again
         new_interval = max(1, int(new_stability * w[15]))
     elif rating == 4:  # Easy
-        new_interval = max(2, int(new_stability * 1.5))  # Mínimo 2 días para Easy
+        new_interval = max(2, int(new_stability * 1.5)
+                           )  # Mínimo 2 días para Easy
     else:
         new_interval = max(1, int(new_stability * 0.9))
 
     return new_stability, new_difficulty, new_interval
 
 
-def calculate_sm2(rating: int, ease_factor: float, interval: int, repetitions: int) -> Tuple[float, int, int]:
+def calculate_sm2(rating: int, ease_factor: float, interval: int,
+                  repetitions: int) -> Tuple[float, int, int]:
     """
     Algoritmo SM-2 (SuperMemo 2)
 
@@ -124,7 +126,8 @@ def calculate_sm2(rating: int, ease_factor: float, interval: int, repetitions: i
         new_repetitions = repetitions + 1
 
         if new_repetitions == 1:
-            new_interval = 1 if rating < 4 else 2  # Easy en primera repetición da intervalo 2
+            # Easy en primera repetición da intervalo 2
+            new_interval = 1 if rating < 4 else 2
         elif new_repetitions == 2:
             new_interval = 6
         else:
@@ -143,7 +146,8 @@ def calculate_sm2(rating: int, ease_factor: float, interval: int, repetitions: i
             new_ease_factor = ease_factor
 
         # Ajustar ease factor según la fórmula SM-2
-        new_ease_factor = new_ease_factor + (0.1 - (5 - rating) * (0.08 + (5 - rating) * 0.02))
+        new_ease_factor = new_ease_factor + \
+            (0.1 - (5 - rating) * (0.08 + (5 - rating) * 0.02))
         new_ease_factor = max(1.3, new_ease_factor)
 
     return new_ease_factor, new_interval, new_repetitions
@@ -162,7 +166,9 @@ def get_next_review_date(interval_days: int) -> datetime:
     return datetime.utcnow() + timedelta(days=interval_days)
 
 
-def calculate_retention_rate(correct_reviews: int, total_reviews: int) -> float:
+def calculate_retention_rate(
+        correct_reviews: int,
+        total_reviews: int) -> float:
     """
     Calcular tasa de retención
 
@@ -178,7 +184,8 @@ def calculate_retention_rate(correct_reviews: int, total_reviews: int) -> float:
     return correct_reviews / total_reviews
 
 
-def get_cards_due_for_review(flashcards, current_time: datetime = None) -> list:
+def get_cards_due_for_review(flashcards,
+                             current_time: datetime = None) -> list:
     """
     Obtener cartas que necesitan revisión
 

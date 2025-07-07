@@ -121,10 +121,10 @@ def get_deck(deck_id):
                     "back": card.back,
                     "interval": card.interval,
                     "difficulty": card.difficulty,
-                    "next_review": (card.next_review.isoformat() if card.next_review else None),
+                    "next_review": (
+                        card.next_review.isoformat() if card.next_review else None),
                     "created_at": card.created_at.isoformat(),
-                }
-            )
+                })
 
         deck_data = {
             "id": deck.id,
@@ -209,8 +209,8 @@ def delete_deck(deck_id):
         if not result["success"]:
             return jsonify({"error": result["error"]}), 400
 
-        return jsonify({"success": True, "message": "Deck eliminado exitosamente"}), 200
-
+        return jsonify(
+            {"success": True, "message": "Deck eliminado exitosamente"}), 200
     except Exception as e:
         logger.error(f"Error eliminando deck: {str(e)}")
         return jsonify({"error": "Error interno del servidor"}), 500
@@ -284,8 +284,7 @@ def import_deck():
                     "deck": import_data["deck"],
                     "imported_cards": import_data["imported_cards"],
                     "message": f"Deck importado exitosamente con {import_data['imported_cards']} cartas",
-                }
-            ),
+                }),
             201,
         )
 
@@ -318,16 +317,13 @@ def get_public_decks():
             # Contar flashcards
             card_count = Flashcard.query.filter_by(deck_id=deck.id).count()
 
-            decks_data.append(
-                {
-                    "id": deck.id,
-                    "name": deck.name,
-                    "description": deck.description,
-                    "total_cards": card_count,
-                    "author": f"{deck.owner.first_name} {deck.owner.last_name}",
-                    "created_at": deck.created_at.isoformat(),
-                }
-            )
+            decks_data.append({"id": deck.id,
+                               "name": deck.name,
+                               "description": deck.description,
+                               "total_cards": card_count,
+                               "author": f"{deck.owner.first_name} {deck.owner.last_name}",
+                               "created_at": deck.created_at.isoformat(),
+                               })
 
         return (
             jsonify(

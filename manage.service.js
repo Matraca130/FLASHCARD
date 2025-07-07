@@ -325,8 +325,8 @@ function renderDeckFlashcards(flashcards, deckId) {
       </div>
       <div class="flashcards-grid">
         ${flashcards
-          .map(
-            (card) => `
+    .map(
+      (card) => `
           <div class="flashcard-manage-item" data-card-id="${card.id}">
             <div class="flashcard-content">
               <div class="flashcard-front">
@@ -346,8 +346,8 @@ function renderDeckFlashcards(flashcards, deckId) {
             </div>
           </div>
         `
-          )
-          .join('')}
+    )
+    .join('')}
       </div>
     </div>
   `;
