@@ -12,12 +12,9 @@ import sentry_sdk
 from backend_app.utils.monitoring import log_error, capture_exception_with_context
 
 
-def register_error_handlers(app):
-    """Registrar todos los manejadores de errores"""
-
+def _register_bad_request_error(app):
     @app.errorhandler(400)
     def bad_request(error):
-        """Manejo de errores 400 Bad Request"""
         log_error(
             f"Bad Request: {str(error)}",
             extra={
@@ -26,7 +23,6 @@ def register_error_handlers(app):
                 "url": request.url,
             },
         )
-
         return (
             jsonify(
                 {
@@ -39,9 +35,10 @@ def register_error_handlers(app):
             400,
         )
 
+
+def _register_unauthorized_error(app):
     @app.errorhandler(401)
     def unauthorized(error):
-        """Manejo de errores 401 Unauthorized"""
         log_error(
             f"Unauthorized access: {str(error)}",
             extra={
@@ -50,7 +47,6 @@ def register_error_handlers(app):
                 "ip_address": request.remote_addr,
             },
         )
-
         return (
             jsonify(
                 {
@@ -63,9 +59,10 @@ def register_error_handlers(app):
             401,
         )
 
+
+def _register_forbidden_error(app):
     @app.errorhandler(403)
     def forbidden(error):
-        """Manejo de errores 403 Forbidden"""
         log_error(
             f"Forbidden access: {str(error)}",
             extra={
@@ -74,7 +71,6 @@ def register_error_handlers(app):
                 "user_id": getattr(request, "current_user_id", None),
             },
         )
-
         return (jsonify({"success": False,
                          "error": "Acceso prohibido",
                          "message": "No tienes permisos para acceder a este recurso",
@@ -83,9 +79,10 @@ def register_error_handlers(app):
                 403,
                 )
 
+
+def _register_not_found_error(app):
     @app.errorhandler(404)
     def not_found(error):
-        """Manejo de errores 404 Not Found"""
         log_error(
             f"Resource not found: {str(error)}",
             extra={
@@ -94,7 +91,6 @@ def register_error_handlers(app):
                 "url": request.url,
             },
         )
-
         return (
             jsonify(
                 {
@@ -107,14 +103,14 @@ def register_error_handlers(app):
             404,
         )
 
+
+def _register_conflict_error(app):
     @app.errorhandler(409)
     def conflict(error):
-        """Manejo de errores 409 Conflict"""
         log_error(
             f"Conflict: {str(error)}",
             extra={"endpoint": request.endpoint, "method": request.method},
         )
-
         return (
             jsonify(
                 {
@@ -126,9 +122,10 @@ def register_error_handlers(app):
             409,
         )
 
+
+def _register_rate_limit_exceeded_error(app):
     @app.errorhandler(429)
     def rate_limit_exceeded(error):
-        """Manejo de errores 429 Too Many Requests"""
         log_error(
             f"Rate limit exceeded: {str(error)}",
             extra={
@@ -137,7 +134,6 @@ def register_error_handlers(app):
                 "ip_address": request.remote_addr,
             },
         )
-
         return (
             jsonify(
                 {
@@ -149,9 +145,10 @@ def register_error_handlers(app):
             429,
         )
 
+
+def _register_internal_server_error(app):
     @app.errorhandler(500)
     def internal_server_error(error):
-        """Manejo de errores 500 Internal Server Error"""
         log_error(
             f"Internal server error: {str(error)}",
             extra={
@@ -160,8 +157,6 @@ def register_error_handlers(app):
                 "url": request.url,
             },
         )
-
-        # Capturar en Sentry con contexto completo
         capture_exception_with_context(
             error,
             {
@@ -173,7 +168,6 @@ def register_error_handlers(app):
                 }
             },
         )
-
         return (
             jsonify(
                 {
@@ -185,13 +179,12 @@ def register_error_handlers(app):
             500,
         )
 
+
+def _register_database_error(app):
     @app.errorhandler(SQLAlchemyError)
     def handle_database_error(error):
-        """Manejo de errores de base de datos"""
         from backend_app.models.models import db
-
         db.session.rollback()
-
         log_error(
             f"Database error: {str(error)}",
             exception=error,
@@ -201,8 +194,6 @@ def register_error_handlers(app):
                 "error_type": type(error).__name__,
             },
         )
-
-        # Capturar en Sentry
         sentry_sdk.set_context(
             "database_error",
             {
@@ -212,7 +203,6 @@ def register_error_handlers(app):
             },
         )
         sentry_sdk.capture_exception(error)
-
         return (
             jsonify(
                 {
@@ -224,20 +214,17 @@ def register_error_handlers(app):
             500,
         )
 
+
+def _register_integrity_error(app):
     @app.errorhandler(IntegrityError)
     def handle_integrity_error(error):
-        """Manejo específico de errores de integridad de BD"""
         from backend_app.models.models import db
-
         db.session.rollback()
-
         log_error(
             f"Integrity error: {str(error)}",
             exception=error,
             extra={"endpoint": request.endpoint, "method": request.method},
         )
-
-        # Determinar el tipo de error de integridad
         error_message = str(
             error.orig) if hasattr(
             error,
@@ -265,9 +252,10 @@ def register_error_handlers(app):
             status_code,
         )
 
+
+def _register_validation_error(app):
     @app.errorhandler(ValidationError)
     def handle_validation_error(error):
-        """Manejo de errores de validación de Marshmallow"""
         log_error(
             f"Validation error: {str(error)}",
             extra={
@@ -276,7 +264,6 @@ def register_error_handlers(app):
                 "validation_errors": error.messages,
             },
         )
-
         return (
             jsonify(
                 {
@@ -290,9 +277,10 @@ def register_error_handlers(app):
             400,
         )
 
+
+def _register_jwt_error(app):
     @app.errorhandler(JWTExtendedException)
     def handle_jwt_error(error):
-        """Manejo de errores de JWT"""
         log_error(
             f"JWT error: {str(error)}",
             extra={
@@ -301,8 +289,6 @@ def register_error_handlers(app):
                 "jwt_error_type": type(error).__name__,
             },
         )
-
-        # Diferentes tipos de errores JWT
         error_messages = {
             "ExpiredSignatureError": "Token expirado",
             "InvalidTokenError": "Token inválido",
@@ -312,10 +298,8 @@ def register_error_handlers(app):
             "CSRFError": "Error de CSRF en token",
             "WrongTokenError": "Tipo de token incorrecto",
         }
-
         error_type = type(error).__name__
         message = error_messages.get(error_type, "Error de autenticación")
-
         return (
             jsonify(
                 {
@@ -328,9 +312,10 @@ def register_error_handlers(app):
             401,
         )
 
+
+def _register_generic_exception(app):
     @app.errorhandler(Exception)
     def handle_generic_exception(error):
-        """Manejo de excepciones genéricas no capturadas"""
         log_error(
             f"Unhandled exception: {str(error)}",
             exception=error,
@@ -340,8 +325,6 @@ def register_error_handlers(app):
                 "exception_type": type(error).__name__,
             },
         )
-
-        # Capturar en Sentry con contexto completo
         capture_exception_with_context(
             error,
             {
@@ -353,7 +336,6 @@ def register_error_handlers(app):
                 }
             },
         )
-
         return (
             jsonify(
                 {
@@ -365,10 +347,10 @@ def register_error_handlers(app):
             500,
         )
 
-    # Manejador para errores HTTP genéricos
+
+def _register_http_exception(app):
     @app.errorhandler(HTTPException)
     def handle_http_exception(error):
-        """Manejo de excepciones HTTP genéricas"""
         log_error(
             f"HTTP exception: {error.code} - {error.description}",
             extra={
@@ -377,7 +359,6 @@ def register_error_handlers(app):
                 "status_code": error.code,
             },
         )
-
         return (
             jsonify(
                 {
@@ -389,6 +370,23 @@ def register_error_handlers(app):
             ),
             error.code,
         )
+
+
+def register_error_handlers(app):
+    """Registrar todos los manejadores de errores"""
+    _register_bad_request_error(app)
+    _register_unauthorized_error(app)
+    _register_forbidden_error(app)
+    _register_not_found_error(app)
+    _register_conflict_error(app)
+    _register_rate_limit_exceeded_error(app)
+    _register_internal_server_error(app)
+    _register_database_error(app)
+    _register_integrity_error(app)
+    _register_validation_error(app)
+    _register_jwt_error(app)
+    _register_generic_exception(app)
+    _register_http_exception(app)
 
 
 def create_error_response(

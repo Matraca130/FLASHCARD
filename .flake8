@@ -1,0 +1,51 @@
+[flake8]
+# Configuración estricta de flake8 para prevenir errores
+max-line-length = 88
+max-complexity = 10
+
+# Errores que NO deben ignorarse (críticos)
+select = E,W,F,C
+
+# Errores específicos que queremos detectar
+# E999: SyntaxError
+# W504: line break after binary operator
+# E111, E112, E113, E114, E115, E116: indentation errors
+# F401: imported but unused
+# F841: local variable assigned but never used
+
+# Directorios a excluir
+exclude = 
+    .git,
+    __pycache__,
+    .venv,
+    venv,
+    env,
+    node_modules,
+    dist,
+    build,
+    .pytest_cache,
+    migrations
+
+# Archivos específicos a incluir en el linting
+filename = *.py
+
+# Configuración para prevenir errores específicos
+# W504: Preferir operador al inicio de línea
+# E999: Errores de sintaxis críticos
+ignore = 
+    # Permitir líneas largas en algunos casos específicos
+    E501,
+    # Ignorar espacios en blanco al final (se auto-corrige)
+    W291,W292,W293
+
+# Configuración de formato
+format = %(path)s:%(row)d:%(col)d: %(code)s %(text)s
+
+# Mostrar estadísticas
+statistics = True
+count = True
+
+# Configuración para CI/CD
+tee = True
+output-file = flake8-report.txt
+

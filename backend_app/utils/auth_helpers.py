@@ -16,10 +16,9 @@ from werkzeug.security import check_password_hash
 
 from backend_app.models.models import db, User
 from backend_app.models.refresh_token import RefreshToken
-from backend_app.utils.monitoring import log_user_action, log_error
+from backend_app.utils.monitoring import log_user_action, log_err
 
-
-class AuthHelper:
+or class AuthHelper:
     """Clase helper para operaciones de autenticación"""
 
     @staticmethod

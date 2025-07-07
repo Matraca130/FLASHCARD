@@ -24,8 +24,8 @@ stats_service = StatsService(db=db)
 def get_dashboard():
     """
     Obtener datos del dashboard - Compatible con frontend
-    GET /api/dashboard/
-    """
+    GET /api/dashboard
+    / """
     try:
         user_id = get_jwt_identity()
         user = User.query.get(user_id)
@@ -236,9 +236,9 @@ def get_performance_stats():
         performance_data = []
         for row in deck_performance:
             accuracy = (
-                row.correct_reviews /
-                row.total_reviews *
-                100) if row.total_reviews > 0 else 0
+                row.correct_reviews
+                / row.total_reviews
+                * 100) if row.total_reviews > 0 else 0
             performance_data.append(
                 {
                     "deck_id": row.id,

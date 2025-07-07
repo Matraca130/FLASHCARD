@@ -6,6 +6,9 @@ from backend_app.extensions import db
 from backend_app.models import User, Deck, Flashcard, StudySession, CardReview
 from backend_app.utils.algorithms import calculate_fsrs, calculate_sm2
 from backend_app.utils.cache import CacheManager
+from backend_app.utils.error_handlers import handle_service_errors
+from backend_app.utils.auth_utils import get_user_deck_or_404, get_user_flashcard_or_404
+from backend_app.utils.response_helpers import ServiceResponse
 from flask_jwt_extended import create_access_token
 from datetime import datetime, timedelta
 from sqlalchemy import or_, func, desc
@@ -16,19 +19,28 @@ cache_manager = CacheManager()
 
 
 class BaseService:
-    """Clase base para todos los servicios"""
+    """Clase base para todos los servicios con utilidades empresariales"""
 
     def __init__(self):
         self.logger = logging.getLogger(
             f"app.services.{self.__class__.__name__}")
 
     def _success_response(self, data, message=None):
-        """Respuesta exitosa estándar"""
+        """Respuesta exitosa estándar - mantiene compatibilidad"""
         return {"success": True, "data": data, "message": message}
 
     def _error_response(self, error, code=None):
-        """Respuesta de error estándar"""
+        """Respuesta de error estándar - mantiene compatibilidad"""
         return {"success": False, "error": error, "code": code}
+
+    # Nuevos métodos usando ServiceResponse para calidad empresarial
+    def success(self, data=None, message="Operación exitosa"):
+        """Respuesta de éxito con calidad empresarial"""
+        return ServiceResponse.success(data, message)
+
+    def error(self, message, error_code=None, details=None):
+        """Respuesta de error con calidad empresarial"""
+        return ServiceResponse.error(message, error_code, details)
 
 
 class UserService(BaseService):
@@ -851,12 +863,12 @@ class StudyService(BaseService):
                     "session_id": session_id,
                     "cards_studied": session.cards_studied,
                     "duration": (
-                        session.completed_at -
-                        session.created_at).total_seconds(),
+                        session.completed_at
+                        - session.created_at).total_seconds(),
                     "completion_rate": (
-                        session.cards_studied /
-                        session.max_cards) *
-                    100,
+                        session.cards_studied
+                        / session.max_cards)
+                    * 100,
                 })
 
         except Exception as e:
@@ -1080,9 +1092,9 @@ class StatsService(BaseService):
                 )
 
                 progress_rate = (
-                    mastered_cards /
-                    total_cards *
-                    100) if total_cards > 0 else 0
+                    mastered_cards
+                    / total_cards
+                    * 100) if total_cards > 0 else 0
 
                 decks_progress.append(
                     {
@@ -1161,7 +1173,7 @@ class StatsService(BaseService):
                 if date_key in daily_data:
                     daily_data[date_key]["reviews"] += 1
                     if review.rating >= 3:
-            daily_data[date_key]["correct"] += 1
+                        daily_data[date_key]["correct"] += 1
 
             # Calcular accuracy
             for day_data in daily_data.values():

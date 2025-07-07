@@ -40,7 +40,8 @@ class BaseService:
         """
         self.db = db or default_db
         self.cache = cache or CacheManager()
-        self.logger = logging.getLogger(f"app.services.{self.__class__.__name__}")
+        self.logger = logging.getLogger(
+            f"app.services.{self.__class__.__name__}")
 
     def _success_response(self, data, message=None):
         """
@@ -60,8 +61,8 @@ class BaseService:
         Respuesta de error estándar
 
         Args:
-            error: Mensaje de error
-            code: Código de error HTTP sugerido
+            error: Mensaje de err
+            or code: Código de error HTTP sugerido
 
         Returns:
             dict: Respuesta de error estructurada
@@ -91,7 +92,12 @@ class BaseService:
 
         return self._error_response(f"Error interno en {operation}", code=500)
 
-    def _get_resource_if_owned(self, model_class, resource_id, user_id, resource_name="recurso"):
+    def _get_resource_if_owned(
+            self,
+            model_class,
+            resource_id,
+            user_id,
+            resource_name="recurso"):
         """
         Obtener recurso verificando que pertenece al usuario
 
@@ -99,24 +105,27 @@ class BaseService:
             model_class: Clase del modelo (Deck, Flashcard, etc.)
             resource_id: ID del recurso
             user_id: ID del usuario propietario
-            resource_name: Nombre del recurso para mensajes de error
-
-        Returns:
+            resource_name: Nombre del recurso para mensajes de err
+        or Returns:
             tuple: (resource_object, error_response)
                    Si hay error, resource_object es None
         """
         try:
             resource = (
-                self.db.session.query(model_class).filter_by(id=resource_id, user_id=user_id, is_deleted=False).first()
-            )
+                self.db.session.query(model_class).filter_by(
+                    id=resource_id,
+                    user_id=user_id,
+                    is_deleted=False).first())
 
             if not resource:
-                return None, self._error_response(f"{resource_name.capitalize()} no encontrado", code=404)
+                return None, self._error_response(
+                    f"{resource_name.capitalize()} no encontrado", code=404)
 
             return resource, None
 
         except Exception as e:
-            return None, self._handle_exception(e, f"verificación de {resource_name}")
+            return None, self._handle_exception(
+                e, f"verificación de {resource_name}")
 
     def _apply_pagination(self, query, page=1, per_page=20):
         """
@@ -134,7 +143,8 @@ class BaseService:
             # Limitar per_page para evitar sobrecarga
             per_page = min(per_page, 100)
 
-            paginated = query.paginate(page=page, per_page=per_page, error_out=False)
+            paginated = query.paginate(
+                page=page, per_page=per_page, error_out=False)
 
             return {
                 "items": paginated.items,
@@ -207,11 +217,10 @@ class BaseService:
 
     def _commit_or_rollback(self):
         """
-        Hacer commit o rollback automático en caso de error
-
-        Returns:
-            bool: True si commit exitoso, False si hubo error
-        """
+        Hacer commit o rollback automático en caso de err
+        or Returns:
+            bool: True si commit exitoso, False si hubo err
+        or """
         try:
             self.db.session.commit()
             return True

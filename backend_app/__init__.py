@@ -36,6 +36,14 @@ def create_app(config_class=None):
             "https://*.github.io",  # Cualquier subdominio de GitHub Pages
         ],
         supports_credentials=True,
+        allow_headers=[
+            "Content-Type",
+            "Authorization",
+            "X-Requested-With",
+            "Accept",
+            "Origin"
+        ],
+        methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"]
     )
 
     # Inicializar extensiones (evitar doble inicialización)

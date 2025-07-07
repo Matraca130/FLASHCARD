@@ -35,7 +35,8 @@ class DeckService(BaseService):
 
             def fetch_decks():
                 # Query base
-                query = self.db.session.query(Deck).filter_by(user_id=user_id, is_deleted=False)
+                query = self.db.session.query(Deck).filter_by(
+                    user_id=user_id, is_deleted=False)
 
                 # Aplicar búsqueda si se proporciona
                 if search:
@@ -59,7 +60,8 @@ class DeckService(BaseService):
                     deck_dict = deck.to_dict()
 
                     # Agregar estadísticas básicas
-                    total_cards = self.db.session.query(Flashcard).filter_by(deck_id=deck.id, is_deleted=False).count()
+                    total_cards = self.db.session.query(Flashcard).filter_by(
+                        deck_id=deck.id, is_deleted=False).count()
 
                     deck_dict.update(
                         {
@@ -70,9 +72,12 @@ class DeckService(BaseService):
 
                     decks_data.append(deck_dict)
 
-                return {"decks": decks_data, "pagination": paginated_data["pagination"]}
+                return {
+                    "decks": decks_data,
+                    "pagination": paginated_data["pagination"]}
 
-            result = self._get_or_set_cache(cache_key, fetch_decks, timeout=300)
+            result = self._get_or_set_cache(
+                cache_key, fetch_decks, timeout=300)
 
             return self._success_response(result)
 
@@ -93,30 +98,31 @@ class DeckService(BaseService):
         try:
             # Verificar que el nombre no esté vacío
             if not deck_data.get("name", "").strip():
-                return self._error_response("El nombre del deck es requerido", code=400)
+                return self._error_response(
+                    "El nombre del deck es requerido", code=400)
 
-            # Verificar que no exista otro deck con el mismo nombre para este usuario
+            # Verificar que no exista otro deck con el mismo nombre para este
+            # usuario
             existing_deck = (
-                self.db.session.query(Deck)
-                .filter_by(user_id=user_id, name=deck_data["name"].strip(), is_deleted=False)
-                .first()
-            )
+                self.db.session.query(Deck) .filter_by(
+                    user_id=user_id,
+                    name=deck_data["name"].strip(),
+                    is_deleted=False) .first())
 
             if existing_deck:
-                return self._error_response("Ya existe un deck con ese nombre", code=409)
+                return self._error_response(
+                    "Ya existe un deck con ese nombre", code=409)
 
             # Crear deck
             deck = Deck(
-                user_id=user_id,
-                name=deck_data["name"].strip(),
-                description=deck_data.get("description", "").strip(),
-                difficulty_level=deck_data.get("difficulty_level", "intermediate"),
-                is_public=deck_data.get("is_public", False),
-                color=deck_data.get("color", "#2196F3"),
-                icon=deck_data.get("icon", "📚"),
-                category=deck_data.get("category", ""),
-                tags=deck_data.get("tags", ""),
-            )
+                user_id=user_id, name=deck_data["name"].strip(), description=deck_data.get(
+                    "description", "").strip(), difficulty_level=deck_data.get(
+                    "difficulty_level", "intermediate"), is_public=deck_data.get(
+                    "is_public", False), color=deck_data.get(
+                    "color", "#2196F3"), icon=deck_data.get(
+                        "icon", "📚"), category=deck_data.get(
+                            "category", ""), tags=deck_data.get(
+                                "tags", ""), )
 
             self.db.session.add(deck)
 
@@ -126,7 +132,8 @@ class DeckService(BaseService):
             # Invalidar cache de decks del usuario
             self._invalidate_cache_pattern(f"user_decks:{user_id}:*")
 
-            return self._success_response(deck.to_dict(), "Deck creado exitosamente")
+            return self._success_response(
+                deck.to_dict(), "Deck creado exitosamente")
 
         except Exception as e:
             return self._handle_exception(e, "creación de deck")
@@ -143,16 +150,17 @@ class DeckService(BaseService):
             dict: Respuesta con datos del deck
         """
         try:
-            deck, error = self._get_resource_if_owned(Deck, deck_id, user_id, "deck")
+            deck, error = self._get_resource_if_owned(
+                Deck, deck_id, user_id, "deck")
 
             if error:
-                return error
-
-            # Obtener estadísticas del deck
+                return err
+            or  # Obtener estadísticas del deck
             deck_dict = deck.to_dict()
 
             # Agregar estadísticas detalladas
-            total_cards = self.db.session.query(Flashcard).filter_by(deck_id=deck_id, is_deleted=False).count()
+            total_cards = self.db.session.query(Flashcard).filter_by(
+                deck_id=deck_id, is_deleted=False).count()
 
             cards_due = self._get_cards_due_count(deck_id)
             cards_new = self._get_cards_new_count(deck_id)
@@ -187,13 +195,14 @@ class DeckService(BaseService):
             dict: Respuesta con deck actualizado
         """
         try:
-            deck, error = self._get_resource_if_owned(Deck, deck_id, user_id, "deck")
+            deck, error = self._get_resource_if_owned(
+                Deck, deck_id, user_id, "deck")
 
             if error:
-                return error
-
-            # Verificar nombre único si se está cambiando
-            if "name" in update_data and update_data["name"].strip() != deck.name:
+                return err
+            or  # Verificar nombre único si se está cambiando
+            if "name" in update_data and update_data["name"].strip(
+            ) != deck.name:
                 existing_deck = (
                     self.db.session.query(Deck)
                     .filter_by(
@@ -206,7 +215,8 @@ class DeckService(BaseService):
                 )
 
                 if existing_deck:
-                    return self._error_response("Ya existe un deck con ese nombre", code=409)
+                    return self._error_response(
+                        "Ya existe un deck con ese nombre", code=409)
 
             # Actualizar campos permitidos
             allowed_fields = [
@@ -223,19 +233,25 @@ class DeckService(BaseService):
             for field in allowed_fields:
                 if field in update_data:
                     value = update_data[field]
-                    if field in ["name", "description"] and isinstance(value, str):
+                    if field in [
+                            "name",
+                            "description"] and isinstance(
+                            value,
+                            str):
                         value = value.strip()
                     setattr(deck, field, value)
 
             self._update_timestamps(deck)
 
             if not self._commit_or_rollback():
-                return self._error_response("Error al actualizar deck", code=500)
+                return self._error_response(
+                    "Error al actualizar deck", code=500)
 
             # Invalidar cache
             self._invalidate_cache_pattern(f"user_decks:{user_id}:*")
 
-            return self._success_response(deck.to_dict(), "Deck actualizado exitosamente")
+            return self._success_response(
+                deck.to_dict(), "Deck actualizado exitosamente")
 
         except Exception as e:
             return self._handle_exception(e, "actualización de deck")
@@ -252,12 +268,12 @@ class DeckService(BaseService):
             dict: Respuesta de confirmación
         """
         try:
-            deck, error = self._get_resource_if_owned(Deck, deck_id, user_id, "deck")
+            deck, error = self._get_resource_if_owned(
+                Deck, deck_id, user_id, "deck")
 
             if error:
-                return error
-
-            # Soft delete del deck
+                return err
+            or  # Soft delete del deck
             deck.is_deleted = True
             self._update_timestamps(deck)
 
@@ -272,7 +288,8 @@ class DeckService(BaseService):
             # Invalidar cache
             self._invalidate_cache_pattern(f"user_decks:{user_id}:*")
 
-            return self._success_response({"message": "Deck eliminado"}, "Deck eliminado exitosamente")
+            return self._success_response(
+                {"message": "Deck eliminado"}, "Deck eliminado exitosamente")
 
         except Exception as e:
             return self._handle_exception(e, "eliminación de deck")
@@ -290,19 +307,20 @@ class DeckService(BaseService):
             dict: Respuesta con deck duplicado
         """
         try:
-            deck, error = self._get_resource_if_owned(Deck, deck_id, user_id, "deck")
+            deck, error = self._get_resource_if_owned(
+                Deck, deck_id, user_id, "deck")
 
             if error:
-                return error
-
-            # Generar nombre para el duplicado
+                return err
+            or  # Generar nombre para el duplicado
             if not new_name:
                 new_name = f"{deck.name} (Copia)"
 
             # Verificar que el nuevo nombre no exista
             counter = 1
             original_new_name = new_name
-            while self.db.session.query(Deck).filter_by(user_id=user_id, name=new_name, is_deleted=False).first():
+            while self.db.session.query(Deck).filter_by(
+                    user_id=user_id, name=new_name, is_deleted=False).first():
                 new_name = f"{original_new_name} ({counter})"
                 counter += 1
 
@@ -323,7 +341,8 @@ class DeckService(BaseService):
             self.db.session.flush()  # Para obtener el ID del nuevo deck
 
             # Duplicar flashcards
-            flashcards = self.db.session.query(Flashcard).filter_by(deck_id=deck_id, is_deleted=False).all()
+            flashcards = self.db.session.query(Flashcard).filter_by(
+                deck_id=deck_id, is_deleted=False).all()
 
             for card in flashcards:
                 new_card = Flashcard(
@@ -336,7 +355,8 @@ class DeckService(BaseService):
                     back_audio_url=card.back_audio_url,
                     difficulty=card.difficulty,
                     tags=card.tags,
-                    # No copiamos estadísticas de estudio (interval, ease_factor, etc.)
+                    # No copiamos estadísticas de estudio (interval,
+                    # ease_factor, etc.)
                 )
                 self.db.session.add(new_card)
 
@@ -346,7 +366,8 @@ class DeckService(BaseService):
             # Invalidar cache
             self._invalidate_cache_pattern(f"user_decks:{user_id}:*")
 
-            return self._success_response(new_deck.to_dict(), f'Deck duplicado como "{new_name}"')
+            return self._success_response(
+                new_deck.to_dict(), f'Deck duplicado como "{new_name}"')
 
         except Exception as e:
             return self._handle_exception(e, "duplicación de deck")
@@ -434,7 +455,8 @@ class DeckService(BaseService):
         """
         try:
             # Query base para decks públicos
-            query = self.db.session.query(Deck).filter_by(is_public=True, is_deleted=False)
+            query = self.db.session.query(Deck).filter_by(
+                is_public=True, is_deleted=False)
 
             # Aplicar búsqueda si se proporciona
             if search:
@@ -493,10 +515,15 @@ class DeckService(BaseService):
         """
         try:
             if not query or len(query.strip()) < 2:
-                return self._error_response("El término de búsqueda debe tener al menos 2 caracteres")
+                return self._error_response(
+                    "El término de búsqueda debe tener al menos 2 caracteres")
 
             # Usar el método get_user_decks con búsqueda
-            return self.get_user_decks(user_id, page=page, per_page=per_page, search=query.strip())
+            return self.get_user_decks(
+                user_id,
+                page=page,
+                per_page=per_page,
+                search=query.strip())
 
         except Exception as e:
             return self._handle_exception(e, "búsqueda de decks")

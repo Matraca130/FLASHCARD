@@ -36,7 +36,8 @@ class StatsService(BaseService):
                     return None
 
                 # Estadísticas básicas
-                total_decks = self.db.session.query(Deck).filter_by(user_id=user_id, is_deleted=False).count()
+                total_decks = self.db.session.query(Deck).filter_by(
+                    user_id=user_id, is_deleted=False).count()
 
                 total_cards = (
                     self.db.session.query(Flashcard)
@@ -67,7 +68,8 @@ class StatsService(BaseService):
                 )
 
                 # Cartas estudiadas hoy
-                today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+                today_start = datetime.utcnow().replace(
+                    hour=0, minute=0, second=0, microsecond=0)
                 cards_studied_today = (
                     self.db.session.query(func.sum(StudySession.cards_studied))
                     .join(Deck)
@@ -122,7 +124,8 @@ class StatsService(BaseService):
             return self._success_response(stats)
 
         except Exception as e:
-            return self._handle_exception(e, "obtención de estadísticas del dashboard")
+            return self._handle_exception(
+                e, "obtención de estadísticas del dashboard")
 
     def get_weekly_stats(self, user_id):
         """
@@ -145,49 +148,44 @@ class StatsService(BaseService):
                 current_date = start_date
 
                 while current_date <= end_date:
-                    day_start = datetime.combine(current_date, datetime.min.time())
-                    day_end = datetime.combine(current_date, datetime.max.time())
+                    day_start = datetime.combine(
+                        current_date, datetime.min.time())
+                    day_end = datetime.combine(
+                        current_date, datetime.max.time())
 
                     # Cartas estudiadas en el día
                     cards_studied = (
-                        self.db.session.query(func.sum(StudySession.cards_studied))
-                        .join(Deck)
-                        .filter(
+                        self.db.session.query(
+                            func.sum(
+                                StudySession.cards_studied)) .join(Deck) .filter(
                             and_(
                                 Deck.user_id == user_id,
-                                StudySession.started_at.between(day_start, day_end),
-                            )
-                        )
-                        .scalar()
-                        or 0
-                    )
+                                StudySession.started_at.between(
+                                    day_start,
+                                    day_end),
+                            )) .scalar() or 0)
 
                     # Tiempo de estudio en el día (en minutos)
                     study_time = (
-                        self.db.session.query(func.sum(StudySession.total_time))
-                        .join(Deck)
-                        .filter(
+                        self.db.session.query(
+                            func.sum(
+                                StudySession.total_time)) .join(Deck) .filter(
                             and_(
                                 Deck.user_id == user_id,
-                                StudySession.started_at.between(day_start, day_end),
-                            )
-                        )
-                        .scalar()
-                        or 0
-                    )
+                                StudySession.started_at.between(
+                                    day_start,
+                                    day_end),
+                            )) .scalar() or 0)
 
                     # Número de sesiones
                     sessions_count = (
-                        self.db.session.query(StudySession)
-                        .join(Deck)
-                        .filter(
+                        self.db.session.query(StudySession) .join(Deck) .filter(
                             and_(
                                 Deck.user_id == user_id,
-                                StudySession.started_at.between(day_start, day_end),
-                            )
-                        )
-                        .count()
-                    )
+                                StudySession.started_at.between(
+                                    day_start,
+                                    day_end),
+                            )) .count())
 
                     weekly_data.append(
                         {
@@ -203,12 +201,14 @@ class StatsService(BaseService):
 
                 return {"weekly_data": weekly_data}
 
-            result = self._get_or_set_cache(cache_key, fetch_weekly, timeout=600)
+            result = self._get_or_set_cache(
+                cache_key, fetch_weekly, timeout=600)
 
             return self._success_response(result)
 
         except Exception as e:
-            return self._handle_exception(e, "obtención de estadísticas semanales")
+            return self._handle_exception(
+                e, "obtención de estadísticas semanales")
 
     def get_performance_analytics(self, user_id, days=30):
         """
@@ -230,17 +230,13 @@ class StatsService(BaseService):
 
                 # Estadísticas de revisiones
                 reviews = (
-                    self.db.session.query(CardReview)
-                    .join(StudySession)
-                    .join(Deck)
-                    .filter(
+                    self.db.session.query(CardReview) .join(StudySession) .join(Deck) .filter(
                         and_(
                             Deck.user_id == user_id,
-                            CardReview.reviewed_at.between(start_date, end_date),
-                        )
-                    )
-                    .all()
-                )
+                            CardReview.reviewed_at.between(
+                                start_date,
+                                end_date),
+                        )) .all())
 
                 if not reviews:
                     return {
@@ -254,16 +250,22 @@ class StatsService(BaseService):
                 # Calcular métricas
                 total_reviews = len(reviews)
                 correct_reviews = len([r for r in reviews if r.quality >= 3])
-                accuracy_rate = (correct_reviews / total_reviews * 100) if total_reviews > 0 else 0
+                accuracy_rate = (
+                    correct_reviews
+                    / total_reviews
+                    * 100) if total_reviews > 0 else 0
 
                 # Tiempo de respuesta promedio
-                response_times = [r.response_time for r in reviews if r.response_time and r.response_time > 0]
-                avg_response_time = sum(response_times) / len(response_times) if response_times else 0
+                response_times = [
+                    r.response_time for r in reviews if r.response_time and r.response_time > 0]
+                avg_response_time = sum(
+                    response_times) / len(response_times) if response_times else 0
 
                 # Distribución de calidad
                 quality_dist = {}
                 for i in range(6):  # 0-5
-                    quality_dist[str(i)] = len([r for r in reviews if r.quality == i])
+                    quality_dist[str(i)] = len(
+                        [r for r in reviews if r.quality == i])
 
                 # Rendimiento por algoritmo
                 algorithm_perf = {}
@@ -271,8 +273,12 @@ class StatsService(BaseService):
 
                 for algo in algorithms:
                     algo_reviews = [r for r in reviews if r.algorithm == algo]
-                    algo_correct = len([r for r in algo_reviews if r.quality >= 3])
-                    algo_accuracy = (algo_correct / len(algo_reviews) * 100) if algo_reviews else 0
+                    algo_correct = len(
+                        [r for r in algo_reviews if r.quality >= 3])
+                    algo_accuracy = (
+                        algo_correct
+                        / len(algo_reviews)
+                        * 100) if algo_reviews else 0
 
                     algorithm_perf[algo] = {
                         "total_reviews": len(algo_reviews),
@@ -288,12 +294,14 @@ class StatsService(BaseService):
                     "algorithm_performance": algorithm_perf,
                 }
 
-            result = self._get_or_set_cache(cache_key, fetch_performance, timeout=900)
+            result = self._get_or_set_cache(
+                cache_key, fetch_performance, timeout=900)
 
             return self._success_response(result)
 
         except Exception as e:
-            return self._handle_exception(e, "obtención de análisis de rendimiento")
+            return self._handle_exception(
+                e, "obtención de análisis de rendimiento")
 
     def get_retention_analysis(self, user_id):
         """
@@ -377,7 +385,8 @@ class StatsService(BaseService):
                 # Agregar porcentajes
                 for category in retention_data:
                     count = retention_data[category]
-                    percentage = (count / total_cards * 100) if total_cards > 0 else 0
+                    percentage = (
+                        count / total_cards * 100) if total_cards > 0 else 0
                     retention_data[category] = {
                         "count": count,
                         "percentage": round(percentage, 1),
@@ -388,12 +397,14 @@ class StatsService(BaseService):
                     "retention_breakdown": retention_data,
                 }
 
-            result = self._get_or_set_cache(cache_key, fetch_retention, timeout=1800)
+            result = self._get_or_set_cache(
+                cache_key, fetch_retention, timeout=1800)
 
             return self._success_response(result)
 
         except Exception as e:
-            return self._handle_exception(e, "obtención de análisis de retención")
+            return self._handle_exception(
+                e, "obtención de análisis de retención")
 
     def get_progress_tracking(self, user_id):
         """
@@ -410,13 +421,15 @@ class StatsService(BaseService):
 
             def fetch_progress():
                 # Obtener decks del usuario
-                decks = self.db.session.query(Deck).filter_by(user_id=user_id, is_deleted=False).all()
+                decks = self.db.session.query(Deck).filter_by(
+                    user_id=user_id, is_deleted=False).all()
 
                 progress_data = []
 
                 for deck in decks:
                     # Estadísticas del deck
-                    total_cards = self.db.session.query(Flashcard).filter_by(deck_id=deck.id, is_deleted=False).count()
+                    total_cards = self.db.session.query(Flashcard).filter_by(
+                        deck_id=deck.id, is_deleted=False).count()
 
                     if total_cards == 0:
                         continue
@@ -461,8 +474,12 @@ class StatsService(BaseService):
 
                     # Calcular progreso
                     studied_cards = total_cards - new_cards
-                    progress_percentage = (studied_cards / total_cards * 100) if total_cards > 0 else 0
-                    mastery_percentage = (mastered_cards / total_cards * 100) if total_cards > 0 else 0
+                    progress_percentage = (
+                        studied_cards / total_cards * 100) if total_cards > 0 else 0
+                    mastery_percentage = (
+                        mastered_cards
+                        / total_cards
+                        * 100) if total_cards > 0 else 0
 
                     progress_data.append(
                         {
@@ -472,23 +489,31 @@ class StatsService(BaseService):
                             "new_cards": new_cards,
                             "learning_cards": learning_cards,
                             "mastered_cards": mastered_cards,
-                            "progress_percentage": round(progress_percentage, 1),
-                            "mastery_percentage": round(mastery_percentage, 1),
-                            "last_studied": (deck.last_studied.isoformat() if deck.last_studied else None),
-                        }
-                    )
+                            "progress_percentage": round(
+                                progress_percentage,
+                                1),
+                            "mastery_percentage": round(
+                                mastery_percentage,
+                                1),
+                            "last_studied": (
+                                deck.last_studied.isoformat() if deck.last_studied else None),
+                        })
 
                 # Ordenar por progreso descendente
-                progress_data.sort(key=lambda x: x["progress_percentage"], reverse=True)
+                progress_data.sort(
+                    key=lambda x: x["progress_percentage"],
+                    reverse=True)
 
                 return {"decks_progress": progress_data}
 
-            result = self._get_or_set_cache(cache_key, fetch_progress, timeout=600)
+            result = self._get_or_set_cache(
+                cache_key, fetch_progress, timeout=600)
 
             return self._success_response(result)
 
         except Exception as e:
-            return self._handle_exception(e, "obtención de seguimiento de progreso")
+            return self._handle_exception(
+                e, "obtención de seguimiento de progreso")
 
     def get_activity_heatmap(self, user_id, year=None):
         """
@@ -550,7 +575,8 @@ class StatsService(BaseService):
 
                 while current_date <= end_date_only:
                     date_str = current_date.isoformat()
-                    activity = daily_activity.get(date_str, {"cards_studied": 0, "study_time": 0, "sessions": 0})
+                    activity = daily_activity.get(
+                        date_str, {"cards_studied": 0, "study_time": 0, "sessions": 0})
 
                     heatmap_data.append(
                         {
@@ -565,12 +591,14 @@ class StatsService(BaseService):
 
                 return {"year": year, "heatmap_data": heatmap_data}
 
-            result = self._get_or_set_cache(cache_key, fetch_heatmap, timeout=3600)
+            result = self._get_or_set_cache(
+                cache_key, fetch_heatmap, timeout=3600)
 
             return self._success_response(result)
 
         except Exception as e:
-            return self._handle_exception(e, "obtención de heatmap de actividad")
+            return self._handle_exception(
+                e, "obtención de heatmap de actividad")
 
     def _calculate_study_streak(self, user_id):
         """
@@ -585,13 +613,11 @@ class StatsService(BaseService):
         try:
             # Obtener fechas únicas de estudio en orden descendente
             study_dates = (
-                self.db.session.query(func.date(StudySession.started_at).label("study_date"))
-                .join(Deck)
-                .filter(Deck.user_id == user_id)
-                .distinct()
-                .order_by(desc("study_date"))
-                .all()
-            )
+                self.db.session.query(
+                    func.date(
+                        StudySession.started_at).label("study_date")) .join(Deck) .filter(
+                    Deck.user_id == user_id) .distinct() .order_by(
+                    desc("study_date")) .all())
 
             if not study_dates:
                 return 0

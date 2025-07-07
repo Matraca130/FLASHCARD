@@ -218,7 +218,7 @@ async function initializeWeeklyProgressChart() {
 
   try {
     // Cargar datos reales con fallback
-    const weeklyData = await apiWithFallback('/api/stats/weekly', {
+    const weeklyData = await apiWithFallback('/api/dashboard/stats/weekly', {
       labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
       cardsStudied: [12, 19, 3, 5, 2, 3, 9],
       studyTime: [45, 60, 15, 30, 10, 20, 35],
@@ -330,7 +330,7 @@ async function initializeCategoryDistributionChart() {
 
   try {
     // Cargar datos reales con fallback
-    const categoryData = await apiWithFallback('/api/stats/categories', {
+    const categoryData = await apiWithFallback('/api/dashboard/stats/performance', {
       labels: [
         'Idiomas',
         'Matemáticas',
@@ -435,7 +435,7 @@ async function initializePerformanceChart() {
 
   try {
     // Cargar datos reales con fallback
-    const performanceData = await apiWithFallback('/api/stats/performance', {
+    const performanceData = await apiWithFallback('/api/dashboard/stats/performance', {
       labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
       accuracy: [75, 82, 88, 85, 92, 89],
       speed: [45, 42, 38, 40, 35, 37], // segundos promedio
@@ -526,7 +526,7 @@ async function initializeStudyTimeChart() {
   }
 
   try {
-    const studyTimeData = await apiWithFallback('/api/stats/study-time', {
+    const studyTimeData = await apiWithFallback('/api/dashboard/stats/weekly', {
       labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'],
       data: [5, 2, 15, 25, 35, 18],
     });
@@ -597,7 +597,7 @@ async function initializeAccuracyTrendChart() {
   }
 
   try {
-    const accuracyData = await apiWithFallback('/api/stats/accuracy-trend', {
+    const accuracyData = await apiWithFallback('/api/dashboard/stats/performance', {
       labels: Array.from({ length: 30 }, (_, i) =>
         formatDate(
           new Date(Date.now() - (29 - i) * 24 * 60 * 60 * 1000),
@@ -682,7 +682,7 @@ async function initializeDeckProgressChart() {
   }
 
   try {
-    const deckData = await apiWithFallback('/api/stats/deck-progress', {
+    const deckData = await apiWithFallback('/api/dashboard/stats/performance', {
       labels: [
         'Inglés Básico',
         'Matemáticas',
@@ -983,7 +983,7 @@ export async function updateProgressChart(data = null, period = '7d') {
 
     // Si no se proporcionan datos, obtenerlos de la API
     if (!data) {
-      const endpoint = `/api/stats/progress?period=${period}`;
+      const endpoint = `/api/dashboard/stats/performance?period=${period}`;
       data = await apiWithFallback(endpoint, {
         labels: generateDateLabels(period),
         progress: generateMockProgressData(period),
@@ -1035,7 +1035,7 @@ export async function updateAccuracyChart(data = null, period = '7d') {
 
     // Si no se proporcionan datos, obtenerlos de la API
     if (!data) {
-      const endpoint = `/api/stats/accuracy?period=${period}`;
+      const endpoint = `/api/dashboard/stats/performance?period=${period}`;
       data = await apiWithFallback(endpoint, {
         labels: generateDateLabels(period),
         accuracy: generateMockAccuracyData(period),
@@ -1358,7 +1358,7 @@ function updatePeriodButtons(activePeriod) {
  */
 async function updateStreakChart(period) {
   try {
-    const data = await apiWithFallback(`/api/stats/streak?period=${period}`, {
+    const data = await apiWithFallback(`/api/dashboard/stats/performance?period=${period}`, {
       current: Math.floor(Math.random() * 30) + 1,
       best: Math.floor(Math.random() * 50) + 20,
       history: generateMockProgressData(period),
@@ -1388,7 +1388,7 @@ async function updateStreakChart(period) {
 async function updateDeckProgressChart(period) {
   try {
     const data = await apiWithFallback(
-      `/api/stats/deck-progress?period=${period}`,
+      `/api/dashboard/stats/performance?period=${period}`,
       {
         labels: [
           'Inglés Básico',

@@ -11,20 +11,23 @@ import {
   clearForm,
   getVisibleElement,
 } from './utils/helpers.js';
+// Importar utilidades unificadas para eliminar duplicación
+import { FlashcardFormUtils } from './utils/formValidation.js';
+import { FlashcardNotifications } from './utils/notifications.js';
 
 // Variable para el ID de flashcard en edición
 let editingFlashcardId = null;
 
 /**
- * Crea una nueva flashcard
+ * Crea una nueva flashcard usando utilidades unificadas
+ * REFACTORIZADO: Elimina duplicación con create.service.js
  */
 export async function createFlashcard() {
-  const deckId = document.getElementById('flashcard-deck')?.value;
-  const front = document.getElementById('flashcard-front')?.value?.trim();
-  const back = document.getElementById('flashcard-back')?.value?.trim();
-
-  // Validar datos usando utilidad común
-  if (!validateFlashcardData(deckId, front, back)) {
+  // Usar utilidades unificadas para validación y obtención de datos
+  const validation = FlashcardFormUtils.validateAndGetData();
+  
+  if (!validation.isValid) {
+    FlashcardNotifications.validationError();
     return;
   }
 
@@ -34,17 +37,20 @@ export async function createFlashcard() {
         api('/api/flashcards', {
           method: 'POST',
           body: JSON.stringify({
-            deck_id: deckId,
-            front: front,
-            back: back,
+            deck_id: validation.data.deckId,
+            front: validation.data.front,
+            back: validation.data.back,
           }),
         }),
-      'Flashcard creada exitosamente',
-      'Error al crear la flashcard'
+      null, // Usar notificación unificada
+      null  // Usar notificación unificada
     );
 
-    // Limpiar formulario usando utilidad común
-    clearForm('#flashcard-form');
+    // Usar notificación unificada
+    FlashcardNotifications.created();
+
+    // Limpiar formulario usando utilidad unificada
+    FlashcardFormUtils.clearCreateForm();
 
     // Recargar datos si estamos en la sección de gestión
     if (window.loadManageData) {

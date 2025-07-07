@@ -331,8 +331,17 @@ class StorageService {
     decks.push(newDeck);
 
     if (this.save('decks', decks)) {
+      // Agregar a la lista de decks pendientes para sincronización
+      this.addToPendingSync('deck', {
+        tempId: newDeck.id,
+        name: deckData.name,
+        description: deckData.description || '',
+        is_public: deckData.is_public || false,
+        created_at: newDeck.created_at
+      });
+
       console.log('✅ Deck creado:', newDeck.name);
-      showNotification(`Deck "${newDeck.name}" creado exitosamente`, 'success');
+      showNotification(`Deck '${newDeck.name}' creado exitosamente`, 'success');
       return newDeck;
     }
 
@@ -405,7 +414,7 @@ class StorageService {
 
     if (this.save('decks', decks)) {
       console.log('✅ Deck eliminado:', deckName);
-      showNotification(`Deck "${deckName}" eliminado`, 'success');
+      showNotification(`Deck '${deckName}' eliminado`, 'success');
       return true;
     }
 
@@ -433,9 +442,9 @@ class StorageService {
   }
 
   /**
-   * Crea una nueva flashcard
-   * @param {Object} cardData - Datos de la flashcard
-   * @returns {Object|null} - Flashcard creada
+   * Cria uma nova flashcard
+   * @param {Object} cardData - Dados da flashcard
+   * @returns {Object|null} - Flashcard criada
    */
   createFlashcard(cardData) {
     if (
@@ -453,7 +462,7 @@ class StorageService {
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
 
-      // Datos de repetición espaciada
+      // Dados de repetição espaciada
       interval: 1,
       ease_factor: 2.5,
       repetitions: 0,
@@ -468,6 +477,15 @@ class StorageService {
     if (this.save('flashcards', flashcards)) {
       // Actualizar contador del deck
       this.updateDeckCardCount(cardData.deck_id);
+
+      // Agregar a la lista de flashcards pendientes para sincronización
+      this.addToPendingSync('flashcard', {
+        tempId: newCard.id,
+        deck_id: cardData.deck_id,
+        front: cardData.front,
+        back: cardData.back,
+        created_at: newCard.created_at
+      });
 
       console.log('✅ Flashcard creada');
       return newCard;
@@ -673,12 +691,94 @@ class StorageService {
       },
     };
   }
+
+  // MÉTODOS PARA SINCRONIZACIÓN OFFLINE
+
+  /**
+   * Agrega un elemento a la lista de sincronización pendiente
+   * @param {string} type - Tipo de elemento ('deck' o 'flashcard')
+   * @param {Object} data - Datos del elemento
+   */
+  addToPendingSync(type, data) {
+    try {
+      const key = type === 'deck' ? 'pending_decks' : 'pending_flashcards';
+      const pendingItems = this.load(key, []);
+      
+      // Verificar si ya existe para evitar duplicados
+      const exists = pendingItems.some(item => item.tempId === data.tempId);
+      if (!exists) {
+        pendingItems.push(data);
+        this.save(key, pendingItems);
+        console.log(`✅ ${type} agregado a sincronización pendiente:`, data.tempId);
+      }
+    } catch (error) {
+      console.error(`❌ Error agregando ${type} a sincronización pendiente:`, error);
+    }
+  }
+
+  /**
+   * Obtiene elementos pendientes de sincronización
+   * @param {string} type - Tipo de elemento ('deck' o 'flashcard')
+   * @returns {Array} - Array de elementos pendientes
+   */
+  getPendingSync(type) {
+    const key = type === 'deck' ? 'pending_decks' : 'pending_flashcards';
+    return this.load(key, []);
+  }
+
+  /**
+   * Remueve un elemento de la lista de sincronización pendiente
+   * @param {string} type - Tipo de elemento ('deck' o 'flashcard')
+   * @param {string} tempId - ID temporal del elemento
+   */
+  removeFromPendingSync(type, tempId) {
+    try {
+      const key = type === 'deck' ? 'pending_decks' : 'pending_flashcards';
+      const pendingItems = this.load(key, []);
+      const filteredItems = pendingItems.filter(item => item.tempId !== tempId);
+      
+      this.save(key, filteredItems);
+      console.log(`✅ ${type} removido de sincronización pendiente:`, tempId);
+    } catch (error) {
+      console.error(`❌ Error removiendo ${type} de sincronización pendiente:`, error);
+    }
+  }
+
+  /**
+   * Limpia todos los elementos pendientes de sincronización
+   * @param {string} type - Tipo de elemento ('deck' o 'flashcard') o 'all' para todos
+   */
+  clearPendingSync(type = 'all') {
+    try {
+      if (type === 'all' || type === 'deck') {
+        this.remove('pending_decks');
+      }
+      if (type === 'all' || type === 'flashcard') {
+        this.remove('pending_flashcards');
+      }
+      console.log(`✅ Sincronización pendiente limpiada: ${type}`);
+    } catch (error) {
+      console.error(`❌ Error limpiando sincronización pendiente:`, error);
+    }
+  }
+
+  /**
+   * Obtiene estadísticas de sincronización pendiente
+   * @returns {Object} - Estadísticas de elementos pendientes
+   */
+  getPendingSyncStats() {
+    return {
+      pendingDecks: this.getPendingSync('deck').length,
+      pendingFlashcards: this.getPendingSync('flashcard').length,
+      totalPending: this.getPendingSync('deck').length + this.getPendingSync('flashcard').length
+    };
+  }
 }
 
 // Crear instancia singleton
 const storageService = new StorageService();
 
-// Exportar métodos principales
+/// Exportar métodos principais
 export const {
   save,
   load,
@@ -697,6 +797,11 @@ export const {
   importData,
   clearAllData,
   getStorageInfo,
+  addToPendingSync,
+  getPendingSync,
+  removeFromPendingSync,
+  clearPendingSync,
+  getPendingSyncStats,
 } = storageService;
 
 // Exportar la instancia completa

@@ -1,20 +1,29 @@
 /**
- * main.js - Punto de entrada principal refactorizado
- * Gestiona la inicialización de la aplicación StudyingFlash
+ * main.js - Punto de entrada principal refactorizado con arquitectura empresarial
+ * Gestiona la inicialización de la aplicación StudyingFlash con servicios avanzados
  */
 
 import './router.js';
 import './core-navigation.js';
 import './bindings.js';
+import './sync-manager.js';
 
 // Importar servicios refactorizados
 import { loadGamificationData } from './gamification.service.js';
-import { initializeActivityHeatmap } from './activity-heatmap.service.js';
+import { loadDashboardData } from './dashboard.service.js';
+import { generateActivityHeatmap } from './activity-heatmap.service.js';
+
 import { initializeCharts } from './charts.js';
 
 // Importar utilidades comunes
-import { showNotification } from './utils/helpers.js';
+import { showNotification, downloadFile, debounce } from './utils/helpers.js';
 import { ApiClient } from './apiClient.js';
+
+// Importar servicios empresariales
+import configManager, { getConfig, isFeatureEnabled } from './services/ConfigManager.js';
+import errorHandler from './services/ErrorHandler.js';
+import cacheManager from './services/CacheManager.js';
+import navigationService from './services/NavigationService.js';
 
 // Configuración de la aplicación
 const APP_CONFIG = {
@@ -66,6 +75,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Inicializar componentes visuales
     await initializeVisualComponents();
+
+    // Cargar datos del dashboard
+    await loadDashboardData();
 
     // Configurar PWA si está habilitado
     if (APP_CONFIG.features.serviceWorker) {
@@ -235,21 +247,21 @@ async function initializeServiceWorker() {
   }
 
   try {
-    console.log('📱 Registrando Service Worker...');
+    console.log('📱 Service Worker ya registrado en pwa-installer.js');
 
-    const registration = await navigator.serviceWorker.register('/sw.js');
+    // const registration = await navigator.serviceWorker.register('./sw.js');
 
-    console.log('✅ Service Worker registrado:', registration);
-
+    // console.log('✅ Service Worker registrado:', registration);
+    
     // Escuchar actualizaciones
-    registration.addEventListener('updatefound', () => {
-      console.log('🔄 Nueva versión de la aplicación disponible');
-      showNotification(
-        'Nueva versión disponible. Recarga la página para actualizar.',
-        'info',
-        10000
-      );
-    });
+    // registration.addEventListener('updatefound', () => {
+    //   console.log('🔄 Nueva versión de la aplicación disponible');
+    //   showNotification(
+    //     'Nueva versión disponible. Recarga la página para actualizar.',
+    //     'info',
+    //     10000
+    //   );
+    // });
   } catch (error) {
     console.error('❌ Error registrando Service Worker:', error);
     appState.errors.push({ type: 'serviceWorker', error: error.message });

@@ -25,8 +25,8 @@ deck_service = DeckService(db=db)
 def get_decks():
     """
     Obtener todos los decks del usuario - Compatible con frontend
-    GET /api/decks/
-    """
+    GET /api/decks
+    / """
     try:
         user_id = get_jwt_identity()
 
@@ -65,8 +65,8 @@ def get_decks():
 def create_deck(validated_data):
     """
     Crear nuevo deck - Compatible con frontend
-    POST /api/decks/
-    """
+    POST /api/decks
+    / """
     try:
         user_id = get_jwt_identity()
 
