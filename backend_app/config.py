@@ -6,7 +6,9 @@ class Config:
     """Configuración base para StudyingFlash"""
 
     # Flask Configuration
-    SECRET_KEY = os.environ.get("SECRET_KEY") or "dev-secret-key-change-in-production"
+    SECRET_KEY = os.environ.get("SECRET_KEY")
+    if not SECRET_KEY:
+        raise ValueError("SECRET_KEY environment variable is required")
 
     # Database Configuration
     if os.environ.get("DATABASE_URL"):
@@ -25,7 +27,9 @@ class Config:
     }
 
     # JWT Configuration
-    JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY") or "jwt-secret-change-in-production"
+    JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY")
+    if not JWT_SECRET_KEY:
+        raise ValueError("JWT_SECRET_KEY environment variable is required")
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(days=1)
     JWT_ALGORITHM = "HS256"
 
