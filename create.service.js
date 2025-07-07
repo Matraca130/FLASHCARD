@@ -17,6 +17,9 @@ import {
   showFieldValidation,
   withLoadingFeedback,
 } from './utils/loading.js';
+// Importar utilidades unificadas para eliminar duplicación
+import { FlashcardFormUtils, DeckFormUtils } from './utils/formValidation.js';
+import { FlashcardNotifications, DeckNotifications } from './utils/notifications.js';
 
 /**
  * Carga los decks disponibles en el dropdown
@@ -205,25 +208,16 @@ export async function createDeck(deckData = {}) {
 }
 
 /**
- * Crea una nueva flashcard
- * @returns {Promise<Object>} - Flashcard creada
+ * Crea una nueva flashcard usando utilidades unificadas
+ * REFACTORIZADO: Elimina duplicación con flashcards.service.js
+ * Mantiene funcionalidad offline específica de este módulo
  */
 export async function createFlashcard() {
-  const deckSelect = document.getElementById('flashcard-deck');
-  const frontInput = document.getElementById('flashcard-front');
-  const backInput = document.getElementById('flashcard-back');
-
-  if (!deckSelect || !frontInput || !backInput) {
-    showNotification('Formulario no encontrado', 'error');
-    return;
-  }
-
-  const deckId = deckSelect.value;
-  const front = frontInput.value.trim();
-  const back = backInput.value.trim();
-
-  // Validar datos usando utilidad común
-  if (!validateFlashcardData(deckId, front, back)) {
+  // Usar utilidades unificadas para validación y obtención de datos
+  const validation = FlashcardFormUtils.validateAndGetData();
+  
+  if (!validation.isValid) {
+    FlashcardNotifications.validationError();
     return;
   }
 
@@ -235,28 +229,36 @@ export async function createFlashcard() {
           return await api('/api/flashcards', {
             method: 'POST',
             body: JSON.stringify({
-              deck_id: deckId,
-              front: front,
-              back: back,
+              deck_id: validation.data.deckId,
+              front: validation.data.front,
+              back: validation.data.back,
             }),
           });
         } catch (error) {
           console.log('API no disponible, usando almacenamiento local');
           return (
             storageService?.createFlashcard({
-              deck_id: deckId,
-              front: front,
-              back: back,
-            }) || { deck_id: deckId, front, back, id: Date.now() }
+              deck_id: validation.data.deckId,
+              front: validation.data.front,
+              back: validation.data.back,
+            }) || { 
+              deck_id: validation.data.deckId, 
+              front: validation.data.front, 
+              back: validation.data.back, 
+              id: Date.now() 
+            }
           );
         }
       },
-      'Flashcard creada exitosamente 🎉',
-      'Error al crear la flashcard'
+      null, // Usar notificación unificada
+      null  // Usar notificación unificada
     );
     
-    // Limpiar formulario usando utilidad común
-    clearForm('#flashcard-form');
+    // Usar notificación unificada
+    FlashcardNotifications.created();
+    
+    // Limpiar formulario usando utilidad unificada
+    FlashcardFormUtils.clearCreateForm();
     
     // Recargar datos si estamos en la sección de gestión
     try {
@@ -275,7 +277,7 @@ export async function createFlashcard() {
     return flashcard;
   } catch (error) {
     console.error('Error creating flashcard:', error);
-    // El error ya fue manejado por performCrudOperation
+    FlashcardNotifications.createError();
   }
 }
 

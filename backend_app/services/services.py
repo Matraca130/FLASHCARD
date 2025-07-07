@@ -6,6 +6,9 @@ from backend_app.extensions import db
 from backend_app.models import User, Deck, Flashcard, StudySession, CardReview
 from backend_app.utils.algorithms import calculate_fsrs, calculate_sm2
 from backend_app.utils.cache import CacheManager
+from backend_app.utils.error_handlers import handle_service_errors
+from backend_app.utils.auth_utils import get_user_deck_or_404, get_user_flashcard_or_404
+from backend_app.utils.response_helpers import ServiceResponse
 from flask_jwt_extended import create_access_token
 from datetime import datetime, timedelta
 from sqlalchemy import or_, func, desc
@@ -16,19 +19,28 @@ cache_manager = CacheManager()
 
 
 class BaseService:
-    """Clase base para todos los servicios"""
+    """Clase base para todos los servicios con utilidades empresariales"""
 
     def __init__(self):
         self.logger = logging.getLogger(
             f"app.services.{self.__class__.__name__}")
 
     def _success_response(self, data, message=None):
-        """Respuesta exitosa estándar"""
+        """Respuesta exitosa estándar - mantiene compatibilidad"""
         return {"success": True, "data": data, "message": message}
 
     def _error_response(self, error, code=None):
-        """Respuesta de error estándar"""
+        """Respuesta de error estándar - mantiene compatibilidad"""
         return {"success": False, "error": error, "code": code}
+    
+    # Nuevos métodos usando ServiceResponse para calidad empresarial
+    def success(self, data=None, message="Operación exitosa"):
+        """Respuesta de éxito con calidad empresarial"""
+        return ServiceResponse.success(data, message)
+    
+    def error(self, message, error_code=None, details=None):
+        """Respuesta de error con calidad empresarial"""
+        return ServiceResponse.error(message, error_code, details)
 
 
 class UserService(BaseService):
