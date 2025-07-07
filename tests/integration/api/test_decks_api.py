@@ -101,6 +101,8 @@ class TestDecksAPI:
         other_user = User(
             username='otheruser',
             email='other@example.com',
+            first_name='Other',
+            last_name='User',
             password_hash='hashed'
         )
         db_session.add(other_user)
