@@ -5,7 +5,7 @@ import {
   performCrudOperation,
   FALLBACK_DATA,
 } from './utils/apiHelpers.js';
-import { showNotification, formatDate } from './utils/helpers.js';
+import { showNotification } from './utils/helpers.js';
 
 // Configuración de gamificación
 const GAMIFICATION_CONFIG = {

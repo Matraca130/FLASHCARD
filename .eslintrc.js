@@ -66,7 +66,6 @@ module.exports = {
     'no-eval': 'error',
     'no-implied-eval': 'error',
 
-    // Style (basic)
     indent: ['warn', 2, { SwitchCase: 1 }],
     quotes: ['warn', 'single', { avoidEscape: true }],
     semi: ['warn', 'always'],
