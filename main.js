@@ -9,7 +9,7 @@ import './bindings.js';
 
 // Importar servicios refactorizados
 import { loadGamificationData } from './gamification.service.js';
-import { initializeActivityHeatmap } from './activity-heatmap.service.js';
+
 import { initializeCharts } from './charts.js';
 
 // Importar utilidades comunes

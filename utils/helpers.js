@@ -539,7 +539,7 @@ export function parseCSV(csvContent, delimiter = ',') {
  * @returns {string} - Tamaño formateado
  */
 export function formatFileSize(bytes) {
-  if (!bytes || bytes === 0) return '0 B';
+  if (!bytes || bytes === 0) { return '0 B'; }
   
   const k = 1024;
   const sizes = ['B', 'KB', 'MB', 'GB'];
