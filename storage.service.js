@@ -1,5 +1,5 @@
 import { validateDeckData, validateFlashcardData } from './utils/validation.js';
-import { showNotification, generateId, formatDate } from './utils/helpers.js';
+import { showNotification, generateId } from './utils/helpers.js';
 
 /**
  * Servicio de almacenamiento refactorizado

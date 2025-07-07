@@ -163,7 +163,6 @@
   
   <!-- Preload Critical Resources -->
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" as="style">
-  <link rel="preload" href="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.js" as="script">
   
   <!-- External Libraries -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -980,7 +979,12 @@
     // ===== INITIALIZATION =====
     document.addEventListener("DOMContentLoaded", () => {
       initializeApp();
-      initializeParticles();
+      // Inicializar partículas de forma segura
+      if (typeof initializeParticles === 'function') {
+        initializeParticles();
+      } else {
+        console.log('initializeParticles not available');
+      }
       initializeEventListeners();
       loadGamificationData();
       checkAuthStatus();
@@ -1001,9 +1005,13 @@
         updateGamificationUI();
       }
       
-      // Initialize charts
+      // Initialize charts de forma segura
       setTimeout(() => {
-        initializeCharts();
+        if (typeof initializeCharts === 'function') {
+          initializeCharts();
+        } else {
+          console.log('initializeCharts not available');
+        }
         generateActivityHeatmap();
       }, 1000);
     }
@@ -2320,6 +2328,12 @@
     <!-- Sistema de Navegación Robusto - Solución Estructural Definitiva -->
     <script src="./navigation-robust.js" type="module"></script>
     <script src="./pwa-installer.js" type="module"></script>
+    
+    <!-- Helpers y utilidades -->
+    <script src="./utils/icon-manager.js" type="module"></script>
+    <script src="./utils/ai-icon-generator.js" type="module"></script>
+    <script src="./utils/icon-integration.js" type="module"></script>
+    <script src="./helpers.js" type="module"></script>
     
     <!-- Script principal de la aplicación -->
     <script src="./main.js" type="module"></script>

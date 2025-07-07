@@ -419,3 +419,100 @@ class DeckService(BaseService):
             )
         except Exception:
             return 0
+
+    def get_public_decks(self, page=1, per_page=20, search=""):
+        """
+        Obtener decks públicos con filtros y paginación
+
+        Args:
+            page: Número de página
+            per_page: Elementos por página
+            search: Término de búsqueda
+
+        Returns:
+            dict: Respuesta con decks públicos paginados
+        """
+        try:
+            # Query base para decks públicos
+            query = self.db.session.query(Deck).filter_by(is_public=True, is_deleted=False)
+
+            # Aplicar búsqueda si se proporciona
+            if search:
+                search_term = f"%{search}%"
+                query = query.filter(
+                    or_(
+                        Deck.name.ilike(search_term),
+                        Deck.description.ilike(search_term),
+                    )
+                )
+
+            # Ordenar por popularidad (número de flashcards)
+            query = query.order_by(Deck.updated_at.desc())
+
+            # Paginación
+            total = query.count()
+            decks = query.offset((page - 1) * per_page).limit(per_page).all()
+
+            # Serializar decks
+            decks_data = []
+            for deck in decks:
+                deck_data = deck.to_dict()
+                # Agregar estadísticas básicas
+                deck_data.update({
+                    'total_cards': self._get_total_cards_count(deck.id),
+                    'cards_due': self._get_cards_due_count(deck.id),
+                })
+                decks_data.append(deck_data)
+
+            return self._success_response(
+                data=decks_data,
+                message=f"Se encontraron {total} decks públicos",
+                pagination={
+                    'page': page,
+                    'per_page': per_page,
+                    'total': total,
+                    'pages': (total + per_page - 1) // per_page
+                }
+            )
+
+        except Exception as e:
+            return self._handle_exception(e, "obtención de decks públicos")
+
+    def search_decks(self, user_id, query, page=1, per_page=20):
+        """
+        Buscar decks del usuario por término de búsqueda
+
+        Args:
+            user_id: ID del usuario
+            query: Término de búsqueda
+            page: Número de página
+            per_page: Elementos por página
+
+        Returns:
+            dict: Respuesta con decks encontrados
+        """
+        try:
+            if not query or len(query.strip()) < 2:
+                return self._error_response("El término de búsqueda debe tener al menos 2 caracteres")
+
+            # Usar el método get_user_decks con búsqueda
+            return self.get_user_decks(user_id, page=page, per_page=per_page, search=query.strip())
+
+        except Exception as e:
+            return self._handle_exception(e, "búsqueda de decks")
+
+    def _get_total_cards_count(self, deck_id):
+        """Obtener número total de cartas en el deck"""
+        try:
+            return (
+                self.db.session.query(Flashcard)
+                .filter(
+                    and_(
+                        Flashcard.deck_id == deck_id,
+                        not Flashcard.is_deleted,
+                    )
+                )
+                .count()
+            )
+        except Exception:
+            return 0

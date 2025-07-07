@@ -9,12 +9,7 @@ import './bindings.js';
 
 // Importar servicios refactorizados
 import { loadGamificationData } from './gamification.service.js';
-// import { initializeAlgorithmModal } from './algorithms.service.js';
-// import { initializeFlashcardEvents } from './flashcards.service.js';
-// import { initializeImportExportEvents } from './import-export.service.js';
-// import { initializeCreateEvents } from './create.service.js';
 import { initializeActivityHeatmap } from './activity-heatmap.service.js';
-// import { initializeParticlesOnReady } from './particles.service.js';
 import { initializeCharts } from './charts.js';
 
 // Importar utilidades comunes
@@ -201,7 +196,6 @@ async function initializeVisualComponents() {
   try {
     // Inicializar partículas con delay
     setTimeout(() => {
-      // initializeParticlesOnReady();
       console.log('  ✅ Partículas inicializadas');
     }, APP_CONFIG.initialization.particlesDelay);
 

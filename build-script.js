@@ -31,7 +31,16 @@ const filesToCopy = [
   'create.service.js',
   'study.service.js',
   'storage.service.js',
-  'activity-heatmap.service.js'
+  'activity-heatmap.service.js',
+  'gamification.service.js',
+  'bindings.js',
+  'helpers.js',
+  'manage.service.js',
+  'import-export.service.js',
+  'auth.service.js',
+  'flashcards.service.js',
+  'data-generator.service.js',
+  'particles.service.js'
 ];
 
 const dirsToCopy = [

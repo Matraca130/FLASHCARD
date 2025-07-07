@@ -118,12 +118,13 @@ def calculate_sm2(rating: int, ease_factor: float, interval: int, repetitions: i
     if rating < 3:  # Respuesta incorrecta (Again o Hard)
         new_repetitions = 0
         new_interval = 1
-        new_ease_factor = ease_factor
+        # Para respuestas incorrectas, reducir ease factor
+        new_ease_factor = max(1.3, ease_factor - 0.2)
     else:  # Respuesta correcta (Good o Easy)
         new_repetitions = repetitions + 1
 
         if new_repetitions == 1:
-            new_interval = 1
+            new_interval = 1 if rating < 4 else 2  # Easy en primera repetición da intervalo 2
         elif new_repetitions == 2:
             new_interval = 6
         else:
@@ -134,6 +135,8 @@ def calculate_sm2(rating: int, ease_factor: float, interval: int, repetitions: i
             new_ease_factor = ease_factor
         elif rating == 4:  # Easy
             new_ease_factor = ease_factor + 0.15
+            # Para Easy, incrementar intervalo adicional
+            new_interval = max(new_interval, int(new_interval * 1.3))
         elif rating == 2:  # Hard
             new_ease_factor = max(1.3, ease_factor - 0.15)
         else:
