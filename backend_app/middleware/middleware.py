@@ -7,6 +7,7 @@ from flask import request, jsonify, g
 from flask_jwt_extended import verify_jwt_in_request, get_jwt_identity
 from functools import wraps
 import logging
+import time
 
 logger = logging.getLogger("app.middleware")
 
@@ -249,7 +250,3 @@ def handle_api_errors(f):
             )
 
     return decorated_function
-
-
-# Importar time para el timing de requests
-import time
