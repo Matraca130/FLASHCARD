@@ -41,13 +41,18 @@ def login():
         data = schema.load(request.get_json() or {})
 
     except ValidationError as e:
-        return create_error_response("Datos de login inválidos", 400, "validation_error", e.messages)
+        return create_error_response(
+            "Datos de login inválidos",
+            400,
+            "validation_error",
+            e.messages)
 
     # Autenticar usuario
     user = AuthHelper.authenticate_user(data["email"], data["password"])
 
     if not user:
-        return create_error_response("Credenciales inválidas", 401, "authentication_failed")
+        return create_error_response(
+            "Credenciales inválidas", 401, "authentication_failed")
 
     try:
         # Crear tokens
@@ -70,7 +75,8 @@ def login():
         )
 
     except Exception:
-        return create_error_response("Error interno durante login", 500, "internal_error")
+        return create_error_response(
+            "Error interno durante login", 500, "internal_error")
 
 
 @auth_refresh_bp.route("/refresh", methods=["POST"])
@@ -86,13 +92,20 @@ def refresh_token():
         data = schema.load(request.get_json() or {})
 
     except ValidationError as e:
-        return create_error_response("Refresh token requerido", 400, "validation_error", e.messages)
+        return create_error_response(
+            "Refresh token requerido",
+            400,
+            "validation_error",
+            e.messages)
 
     # Renovar token
     new_tokens = AuthHelper.refresh_access_token(data["refresh_token"])
 
     if not new_tokens:
-        return create_error_response("Refresh token inválido o expirado", 401, "invalid_refresh_token")
+        return create_error_response(
+            "Refresh token inválido o expirado",
+            401,
+            "invalid_refresh_token")
 
     return (
         jsonify(
@@ -134,7 +147,8 @@ def logout():
         return jsonify({"success": True, "message": "Logout exitoso"}), 200
 
     except Exception:
-        return create_error_response("Error durante logout", 500, "internal_error")
+        return create_error_response(
+            "Error durante logout", 500, "internal_error")
 
 
 @auth_refresh_bp.route("/logout-all", methods=["POST"])
@@ -153,9 +167,12 @@ def logout_all():
         TokenBlacklist.add_token(jti)
 
         # Revocar todos los refresh tokens del usuario
-        revoked_count = AuthHelper.revoke_all_user_tokens(user_id, "logout_all")
+        revoked_count = AuthHelper.revoke_all_user_tokens(
+            user_id, "logout_all")
 
-        log_user_action("logout_all", {"revoked_sessions": revoked_count}, user_id)
+        log_user_action(
+            "logout_all", {
+                "revoked_sessions": revoked_count}, user_id)
 
         return (
             jsonify(
@@ -169,7 +186,8 @@ def logout_all():
         )
 
     except Exception:
-        return create_error_response("Error durante logout completo", 500, "internal_error")
+        return create_error_response(
+            "Error durante logout completo", 500, "internal_error")
 
 
 @auth_refresh_bp.route("/sessions", methods=["GET"])
@@ -185,13 +203,12 @@ def get_user_sessions():
     try:
         sessions = AuthHelper.get_user_sessions(user_id)
 
-        return (
-            jsonify({"success": True, "sessions": sessions, "total_sessions": len(sessions)}),
-            200,
-        )
+        return (jsonify({"success": True, "sessions": sessions,
+                         "total_sessions": len(sessions)}), 200, )
 
     except Exception:
-        return create_error_response("Error obteniendo sesiones", 500, "internal_error")
+        return create_error_response(
+            "Error obteniendo sesiones", 500, "internal_error")
 
 
 @auth_refresh_bp.route("/revoke-session/<int:session_id>", methods=["DELETE"])
@@ -216,7 +233,8 @@ def revoke_session(session_id):
         ).first()
 
         if not token_record:
-            return create_error_response("Sesión no encontrada", 404, "session_not_found")
+            return create_error_response(
+                "Sesión no encontrada", 404, "session_not_found")
 
         # Revocar sesión
         token_record.revoke("manual_revocation")
@@ -236,7 +254,8 @@ def revoke_session(session_id):
         )
 
     except Exception:
-        return create_error_response("Error revocando sesión", 500, "internal_error")
+        return create_error_response(
+            "Error revocando sesión", 500, "internal_error")
 
 
 @auth_refresh_bp.route("/validate-token", methods=["POST"])
@@ -252,7 +271,8 @@ def validate_token():
 
     # Verificar si el token está en blacklist
     if TokenBlacklist.is_blacklisted(jti):
-        return create_error_response("Token revocado", 401, "token_blacklisted")
+        return create_error_response(
+            "Token revocado", 401, "token_blacklisted")
 
     try:
         from backend_app.models.models import User
@@ -260,7 +280,8 @@ def validate_token():
         user = User.query.get(user_id)
 
         if not user or user.is_deleted:
-            return create_error_response("Usuario no encontrado", 404, "user_not_found")
+            return create_error_response(
+                "Usuario no encontrado", 404, "user_not_found")
 
         return (
             jsonify(
@@ -283,7 +304,8 @@ def validate_token():
         )
 
     except Exception:
-        return create_error_response("Error validando token", 500, "internal_error")
+        return create_error_response(
+            "Error validando token", 500, "internal_error")
 
 
 # Middleware para verificar tokens en blacklist
@@ -300,7 +322,8 @@ def check_if_token_revoked():
             if get_jwt():  # Si hay JWT en el request
                 jti = get_jwt()["jti"]
                 if TokenBlacklist.is_blacklisted(jti):
-                    return create_error_response("Token revocado", 401, "token_blacklisted")
+                    return create_error_response(
+                        "Token revocado", 401, "token_blacklisted")
     except Exception:
         # Si hay error verificando JWT, continuar normalmente
         # El decorador @jwt_required() manejará el error apropiadamente

@@ -75,17 +75,13 @@ def register_error_handlers(app):
             },
         )
 
-        return (
-            jsonify(
-                {
-                    "success": False,
-                    "error": "Acceso prohibido",
-                    "message": "No tienes permisos para acceder a este recurso",
-                    "status_code": 403,
-                }
-            ),
-            403,
-        )
+        return (jsonify({"success": False,
+                         "error": "Acceso prohibido",
+                         "message": "No tienes permisos para acceder a este recurso",
+                         "status_code": 403,
+                         }),
+                403,
+                )
 
     @app.errorhandler(404)
     def not_found(error):
@@ -126,8 +122,7 @@ def register_error_handlers(app):
                     "error": "Conflicto",
                     "message": "El recurso ya existe o hay un conflicto con el estado actual",
                     "status_code": 409,
-                }
-            ),
+                }),
             409,
         )
 
@@ -150,8 +145,7 @@ def register_error_handlers(app):
                     "error": "Demasiadas solicitudes",
                     "message": "Has excedido el límite de solicitudes. Intenta de nuevo más tarde",
                     "status_code": 429,
-                }
-            ),
+                }),
             429,
         )
 
@@ -187,8 +181,7 @@ def register_error_handlers(app):
                     "error": "Error interno del servidor",
                     "message": "Ha ocurrido un error inesperado. Por favor intenta de nuevo",
                     "status_code": 500,
-                }
-            ),
+                }),
             500,
         )
 
@@ -227,8 +220,7 @@ def register_error_handlers(app):
                     "error": "Error de base de datos",
                     "message": "Ha ocurrido un error al acceder a la base de datos",
                     "status_code": 500,
-                }
-            ),
+                }),
             500,
         )
 
@@ -246,7 +238,10 @@ def register_error_handlers(app):
         )
 
         # Determinar el tipo de error de integridad
-        error_message = str(error.orig) if hasattr(error, "orig") else str(error)
+        error_message = str(
+            error.orig) if hasattr(
+            error,
+            "orig") else str(error)
 
         if "UNIQUE constraint failed" in error_message or "duplicate key" in error_message.lower():
             message = "El recurso ya existe"
@@ -366,8 +361,7 @@ def register_error_handlers(app):
                     "error": "Error inesperado",
                     "message": "Ha ocurrido un error inesperado. Por favor contacta al soporte",
                     "status_code": 500,
-                }
-            ),
+                }),
             500,
         )
 
@@ -397,7 +391,11 @@ def register_error_handlers(app):
         )
 
 
-def create_error_response(message: str, status_code: int = 400, error_type: str = None, details: dict = None):
+def create_error_response(
+        message: str,
+        status_code: int = 400,
+        error_type: str = None,
+        details: dict = None):
     """Crear respuesta de error estandarizada"""
     response = {
         "success": False,

@@ -19,7 +19,8 @@ class BaseService:
     """Clase base para todos los servicios"""
 
     def __init__(self):
-        self.logger = logging.getLogger(f"app.services.{self.__class__.__name__}")
+        self.logger = logging.getLogger(
+            f"app.services.{self.__class__.__name__}")
 
     def _success_response(self, data, message=None):
         """Respuesta exitosa estándar"""
@@ -42,7 +43,8 @@ class UserService(BaseService):
 
             # Verificar username único
             if User.query.filter_by(username=user_data["username"]).first():
-                return self._error_response("El nombre de usuario ya está en uso")
+                return self._error_response(
+                    "El nombre de usuario ya está en uso")
 
             # Crear usuario
             user = User(
@@ -150,7 +152,8 @@ class UserService(BaseService):
             user.updated_at = datetime.utcnow()
             db.session.commit()
 
-            return self._success_response({"message": "Contraseña actualizada"})
+            return self._success_response(
+                {"message": "Contraseña actualizada"})
 
         except Exception as e:
             db.session.rollback()
@@ -177,20 +180,23 @@ class DeckService(BaseService):
             if query_params.get("deck_id"):
                 query = query.filter(Deck.id == query_params["deck_id"])
             if query_params.get("difficulty"):
-                query = query.filter(Deck.difficulty_level == query_params["difficulty"])
+                query = query.filter(
+                    Deck.difficulty_level == query_params["difficulty"])
             if query_params.get("tags"):
                 # Implementar filtro por tags
                 tags_filter = query_params["tags"].split(",")
                 if len(tags_filter) == 1:
                     query = query.filter(Deck.tags.contains(tags_filter[0]))
                 else:
-                    query = query.filter(db.or_(*[Deck.tags.contains(tag.strip()) for tag in tags_filter]))
+                    query = query.filter(
+                        db.or_(*[Deck.tags.contains(tag.strip()) for tag in tags_filter]))
 
             # Paginación
             page = query_params.get("page", 1)
             per_page = min(query_params.get("per_page", 20), 100)
 
-            paginated = query.paginate(page=page, per_page=per_page, error_out=False)
+            paginated = query.paginate(
+                page=page, per_page=per_page, error_out=False)
 
             result = {
                 "decks": paginated.items,
@@ -215,13 +221,11 @@ class DeckService(BaseService):
         """Crear nuevo deck"""
         try:
             deck = Deck(
-                user_id=user_id,
-                name=deck_data["name"],
-                description=deck_data.get("description", ""),
-                difficulty_level=deck_data.get("difficulty_level", "intermediate"),
-                tags=deck_data.get("tags", []),
-                is_public=deck_data.get("is_public", False),
-            )
+                user_id=user_id, name=deck_data["name"], description=deck_data.get(
+                    "description", ""), difficulty_level=deck_data.get(
+                    "difficulty_level", "intermediate"), tags=deck_data.get(
+                    "tags", []), is_public=deck_data.get(
+                    "is_public", False), )
 
             db.session.add(deck)
             db.session.commit()
@@ -239,7 +243,8 @@ class DeckService(BaseService):
     def get_deck_by_id(self, deck_id, user_id):
         """Obtener deck por ID"""
         try:
-            deck = Deck.query.filter_by(id=deck_id, user_id=user_id, is_deleted=False).first()
+            deck = Deck.query.filter_by(
+                id=deck_id, user_id=user_id, is_deleted=False).first()
 
             if not deck:
                 return self._error_response("Deck no encontrado")
@@ -253,7 +258,8 @@ class DeckService(BaseService):
     def update_deck(self, deck_id, user_id, update_data):
         """Actualizar deck"""
         try:
-            deck = Deck.query.filter_by(id=deck_id, user_id=user_id, is_deleted=False).first()
+            deck = Deck.query.filter_by(
+                id=deck_id, user_id=user_id, is_deleted=False).first()
 
             if not deck:
                 return self._error_response("Deck no encontrado")
@@ -285,7 +291,8 @@ class DeckService(BaseService):
     def delete_deck(self, deck_id, user_id):
         """Eliminar deck (soft delete)"""
         try:
-            deck = Deck.query.filter_by(id=deck_id, user_id=user_id, is_deleted=False).first()
+            deck = Deck.query.filter_by(
+                id=deck_id, user_id=user_id, is_deleted=False).first()
 
             if not deck:
                 return self._error_response("Deck no encontrado")
@@ -307,7 +314,8 @@ class DeckService(BaseService):
     def get_deck_statistics(self, deck_id, user_id):
         """Obtener estadísticas del deck"""
         try:
-            deck = Deck.query.filter_by(id=deck_id, user_id=user_id, is_deleted=False).first()
+            deck = Deck.query.filter_by(
+                id=deck_id, user_id=user_id, is_deleted=False).first()
 
             if not deck:
                 return self._error_response("Deck no encontrado")
@@ -319,7 +327,8 @@ class DeckService(BaseService):
                 return self._success_response(cached_stats)
 
             # Calcular estadísticas
-            total_cards = Flashcard.query.filter_by(deck_id=deck_id, is_deleted=False).count()
+            total_cards = Flashcard.query.filter_by(
+                deck_id=deck_id, is_deleted=False).count()
 
             stats = {
                 "total_cards": total_cards,
@@ -341,7 +350,8 @@ class DeckService(BaseService):
     def duplicate_deck(self, deck_id, user_id):
         """Duplicar deck"""
         try:
-            original_deck = Deck.query.filter_by(id=deck_id, user_id=user_id, is_deleted=False).first()
+            original_deck = Deck.query.filter_by(
+                id=deck_id, user_id=user_id, is_deleted=False).first()
 
             if not original_deck:
                 return self._error_response("Deck no encontrado")
@@ -360,7 +370,8 @@ class DeckService(BaseService):
             db.session.flush()  # Para obtener el ID
 
             # Duplicar flashcards
-            original_cards = Flashcard.query.filter_by(deck_id=deck_id, is_deleted=False).all()
+            original_cards = Flashcard.query.filter_by(
+                deck_id=deck_id, is_deleted=False).all()
 
             for card in original_cards:
                 new_card = Flashcard(
@@ -404,15 +415,18 @@ class FlashcardService(BaseService):
 
             # Aplicar filtros
             if query_params.get("deck_id"):
-                query = query.filter(Flashcard.deck_id == query_params["deck_id"])
+                query = query.filter(
+                    Flashcard.deck_id == query_params["deck_id"])
             if query_params.get("difficulty"):
-                query = query.filter(Flashcard.difficulty == query_params["difficulty"])
+                query = query.filter(
+                    Flashcard.difficulty == query_params["difficulty"])
 
             # Paginación
             page = query_params.get("page", 1)
             per_page = min(query_params.get("per_page", 20), 100)
 
-            paginated = query.paginate(page=page, per_page=per_page, error_out=False)
+            paginated = query.paginate(
+                page=page, per_page=per_page, error_out=False)
 
             result = {
                 "flashcards": paginated.items,
@@ -434,10 +448,14 @@ class FlashcardService(BaseService):
         """Crear nueva flashcard"""
         try:
             # Verificar ownership del deck
-            deck = Deck.query.filter_by(id=flashcard_data["deck_id"], user_id=user_id, is_deleted=False).first()
+            deck = Deck.query.filter_by(
+                id=flashcard_data["deck_id"],
+                user_id=user_id,
+                is_deleted=False).first()
 
             if not deck:
-                return self._error_response("Deck no encontrado o no autorizado")
+                return self._error_response(
+                    "Deck no encontrado o no autorizado")
 
             flashcard = Flashcard(
                 deck_id=flashcard_data["deck_id"],
@@ -557,10 +575,14 @@ class FlashcardService(BaseService):
         """Crear flashcards en lote"""
         try:
             # Verificar ownership del deck
-            deck = Deck.query.filter_by(id=batch_data["deck_id"], user_id=user_id, is_deleted=False).first()
+            deck = Deck.query.filter_by(
+                id=batch_data["deck_id"],
+                user_id=user_id,
+                is_deleted=False).first()
 
             if not deck:
-                return self._error_response("Deck no encontrado o no autorizado")
+                return self._error_response(
+                    "Deck no encontrado o no autorizado")
 
             created_cards = []
             failed_cards = []
@@ -581,7 +603,8 @@ class FlashcardService(BaseService):
 
             db.session.commit()
 
-            return self._success_response({"created": created_cards, "failed": failed_cards})
+            return self._success_response(
+                {"created": created_cards, "failed": failed_cards})
 
         except Exception as e:
             db.session.rollback()
@@ -592,18 +615,21 @@ class FlashcardService(BaseService):
         """Obtener flashcards de un deck específico"""
         try:
             # Verificar ownership del deck
-            deck = Deck.query.filter_by(id=deck_id, user_id=user_id, is_deleted=False).first()
+            deck = Deck.query.filter_by(
+                id=deck_id, user_id=user_id, is_deleted=False).first()
 
             if not deck:
                 return self._error_response("Deck no encontrado")
 
-            query = Flashcard.query.filter_by(deck_id=deck_id, is_deleted=False)
+            query = Flashcard.query.filter_by(
+                deck_id=deck_id, is_deleted=False)
 
             # Paginación
             page = query_params.get("page", 1)
             per_page = min(query_params.get("per_page", 20), 100)
 
-            paginated = query.paginate(page=page, per_page=per_page, error_out=False)
+            paginated = query.paginate(
+                page=page, per_page=per_page, error_out=False)
 
             result = {
                 "flashcards": paginated.items,
@@ -646,7 +672,8 @@ class FlashcardService(BaseService):
             page = query_params.get("page", 1)
             per_page = min(query_params.get("per_page", 20), 100)
 
-            paginated = query.paginate(page=page, per_page=per_page, error_out=False)
+            paginated = query.paginate(
+                page=page, per_page=per_page, error_out=False)
 
             result = {
                 "flashcards": paginated.items,
@@ -676,7 +703,10 @@ class StudyService(BaseService):
         """Iniciar nueva sesión de estudio"""
         try:
             # Verificar ownership del deck
-            deck = Deck.query.filter_by(id=session_data["deck_id"], user_id=user_id, is_deleted=False).first()
+            deck = Deck.query.filter_by(
+                id=session_data["deck_id"],
+                user_id=user_id,
+                is_deleted=False).first()
 
             if not deck:
                 return self._error_response("Deck no encontrado")
@@ -701,7 +731,8 @@ class StudyService(BaseService):
     def get_next_card(self, session_id, user_id):
         """Obtener siguiente carta para revisar"""
         try:
-            session = StudySession.query.filter_by(id=session_id, user_id=user_id).first()
+            session = StudySession.query.filter_by(
+                id=session_id, user_id=user_id).first()
 
             if not session:
                 return self._error_response("Sesión no encontrada")
@@ -710,7 +741,8 @@ class StudyService(BaseService):
             # Implementar lógica de algoritmo de espaciado
 
             # Por ahora, obtener una carta aleatoria del deck
-            flashcard = Flashcard.query.filter_by(deck_id=session.deck_id, is_deleted=False).first()
+            flashcard = Flashcard.query.filter_by(
+                deck_id=session.deck_id, is_deleted=False).first()
 
             if not flashcard:
                 return self._error_response("No hay cartas disponibles")
@@ -732,7 +764,8 @@ class StudyService(BaseService):
     def review_card(self, session_id, user_id, review_data):
         """Revisar carta con algoritmos de espaciado"""
         try:
-            session = StudySession.query.filter_by(id=session_id, user_id=user_id).first()
+            session = StudySession.query.filter_by(
+                id=session_id, user_id=user_id).first()
 
             if not session:
                 return self._error_response("Sesión no encontrada")
@@ -803,7 +836,8 @@ class StudyService(BaseService):
     def complete_study_session(self, session_id, user_id):
         """Completar sesión de estudio"""
         try:
-            session = StudySession.query.filter_by(id=session_id, user_id=user_id).first()
+            session = StudySession.query.filter_by(
+                id=session_id, user_id=user_id).first()
 
             if not session:
                 return self._error_response("Sesión no encontrada")
@@ -816,10 +850,14 @@ class StudyService(BaseService):
                 {
                     "session_id": session_id,
                     "cards_studied": session.cards_studied,
-                    "duration": (session.completed_at - session.created_at).total_seconds(),
-                    "completion_rate": (session.cards_studied / session.max_cards) * 100,
-                }
-            )
+                    "duration": (
+                        session.completed_at -
+                        session.created_at).total_seconds(),
+                    "completion_rate": (
+                        session.cards_studied /
+                        session.max_cards) *
+                    100,
+                })
 
         except Exception as e:
             db.session.rollback()
@@ -886,7 +924,8 @@ class StatsService(BaseService):
                 return self._success_response(cached_stats)
 
             # Calcular estadísticas
-            total_decks = Deck.query.filter_by(user_id=user_id, is_deleted=False).count()
+            total_decks = Deck.query.filter_by(
+                user_id=user_id, is_deleted=False).count()
             total_cards = (
                 db.session.query(Flashcard)
                 .join(Deck)
@@ -941,10 +980,13 @@ class StatsService(BaseService):
                 start_date = end_date - timedelta(days=30)
 
             # Query base
-            query = CardReview.query.filter(CardReview.user_id == user_id, CardReview.reviewed_at >= start_date)
+            query = CardReview.query.filter(
+                CardReview.user_id == user_id,
+                CardReview.reviewed_at >= start_date)
 
             if deck_id:
-                query = query.join(Flashcard).filter(Flashcard.deck_id == deck_id)
+                query = query.join(
+                    Flashcard).filter(Flashcard.deck_id == deck_id)
 
             reviews = query.all()
 
@@ -963,10 +1005,12 @@ class StatsService(BaseService):
             correct_reviews = len([r for r in reviews if r.rating >= 3])
             accuracy_rate = (correct_reviews / total_reviews) * 100
 
-            avg_response_time = sum(r.response_time for r in reviews) / total_reviews
+            avg_response_time = sum(
+                r.response_time for r in reviews) / total_reviews
 
             # Breakdown diario
-            daily_breakdown = self._calculate_daily_breakdown(reviews, start_date, end_date)
+            daily_breakdown = self._calculate_daily_breakdown(
+                reviews, start_date, end_date)
 
             analytics = {
                 "total_reviews": total_reviews,
@@ -1007,17 +1051,20 @@ class StatsService(BaseService):
 
         except Exception as e:
             self.logger.error(f"Error getting retention analysis: {str(e)}")
-            return self._error_response("Error al obtener análisis de retención")
+            return self._error_response(
+                "Error al obtener análisis de retención")
 
     def get_progress_tracking(self, user_id):
         """Obtener seguimiento de progreso"""
         try:
             # Progreso por deck
             decks_progress = []
-            decks = Deck.query.filter_by(user_id=user_id, is_deleted=False).all()
+            decks = Deck.query.filter_by(
+                user_id=user_id, is_deleted=False).all()
 
             for deck in decks:
-                total_cards = Flashcard.query.filter_by(deck_id=deck.id, is_deleted=False).count()
+                total_cards = Flashcard.query.filter_by(
+                    deck_id=deck.id, is_deleted=False).count()
 
                 # Cartas con al menos una revisión exitosa
                 mastered_cards = (
@@ -1032,7 +1079,10 @@ class StatsService(BaseService):
                     .count()
                 )
 
-                progress_rate = (mastered_cards / total_cards * 100) if total_cards > 0 else 0
+                progress_rate = (
+                    mastered_cards /
+                    total_cards *
+                    100) if total_cards > 0 else 0
 
                 decks_progress.append(
                     {
@@ -1044,25 +1094,21 @@ class StatsService(BaseService):
                     }
                 )
 
-            return self._success_response(
-                {
-                    "decks_progress": decks_progress,
-                    "overall_progress": (
-                        sum(d["progress_rate"] for d in decks_progress) / len(decks_progress) if decks_progress else 0
-                    ),
-                }
-            )
+            return self._success_response({"decks_progress": decks_progress, "overall_progress": (sum(
+                d["progress_rate"] for d in decks_progress) / len(decks_progress) if decks_progress else 0), })
 
         except Exception as e:
             self.logger.error(f"Error getting progress tracking: {str(e)}")
-            return self._error_response("Error al obtener seguimiento de progreso")
+            return self._error_response(
+                "Error al obtener seguimiento de progreso")
 
     def _calculate_study_streak(self, user_id):
         """Calcular racha de estudio"""
         try:
             # Obtener días únicos con revisiones
             study_days = (
-                db.session.query(func.date(CardReview.reviewed_at).label("study_date"))
+                db.session.query(
+                    func.date(CardReview.reviewed_at).label("study_date"))
                 .filter(CardReview.user_id == user_id)
                 .distinct()
                 .order_by(desc("study_date"))
@@ -1115,12 +1161,13 @@ class StatsService(BaseService):
                 if date_key in daily_data:
                     daily_data[date_key]["reviews"] += 1
                     if review.rating >= 3:
-                        daily_data[date_key]["correct"] += 1
+            daily_data[date_key]["correct"] += 1
 
             # Calcular accuracy
             for day_data in daily_data.values():
                 if day_data["reviews"] > 0:
-                    day_data["accuracy"] = round((day_data["correct"] / day_data["reviews"]) * 100, 2)
+                    day_data["accuracy"] = round(
+                        (day_data["correct"] / day_data["reviews"]) * 100, 2)
 
             return list(daily_data.values())
 

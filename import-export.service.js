@@ -1,7 +1,7 @@
 import { api } from './apiClient.js';
 import { validateDeckData } from './utils/validation.js';
 import { performCrudOperation, apiWithFallback } from './utils/apiHelpers.js';
-import { showNotification } from './utils/helpers.js';
+import { showNotification, generateId, downloadFile } from './utils/helpers.js';
 
 // Variables globales para el proceso de importación
 let importFileContent = null;
@@ -627,28 +627,6 @@ function parseTXTImport(content) {
     }],
     totalCards: cards.length
   };
-}
-
-/**
- * Descarga un archivo
- * @param {string} content - Contenido del archivo
- * @param {string} filename - Nombre del archivo
- * @param {string} mimeType - Tipo MIME
- */
-function downloadFile(content, filename, mimeType) {
-  const blob = new Blob([content], { type: mimeType });
-  const url = window.URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  
-  a.href = url;
-  a.download = filename;
-  a.style.display = 'none';
-  
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  
-  window.URL.revokeObjectURL(url);
 }
 
 /**

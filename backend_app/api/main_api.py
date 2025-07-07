@@ -49,7 +49,10 @@ def get_dashboard_v2_optimized():
         user = User.query.get(user_id)
 
         if not user:
-            return frontend_error("Usuario no encontrado", "USER_NOT_FOUND", status_code=404)
+            return frontend_error(
+                "Usuario no encontrado",
+                "USER_NOT_FOUND",
+                status_code=404)
 
         # Usar consultas optimizadas con agregaciones eficientes
         now = datetime.utcnow()
@@ -58,34 +61,49 @@ def get_dashboard_v2_optimized():
         # Consulta única para estadísticas de decks y cards
         deck_stats = (
             db.session.query(
-                func.count(Deck.id).label("total_decks"),
-                func.count(Flashcard.id).label("total_cards"),
-                func.sum(func.case([(Flashcard.next_review <= now, 1)], else_=0)).label("cards_due"),
-                func.sum(func.case([(Flashcard.last_review.is_(None), 1)], else_=0)).label("new_cards"),
-                func.sum(func.case([(Flashcard.interval > 30, 1)], else_=0)).label("mastered_cards"),
-            )
-            .select_from(Deck)
-            .outerjoin(Flashcard)
-            .filter(Deck.user_id == user_id)
-            .first()
-        )
+                func.count(
+                    Deck.id).label("total_decks"),
+                func.count(
+                    Flashcard.id).label("total_cards"),
+                func.sum(
+                    func.case(
+                        [
+                            (Flashcard.next_review <= now,
+                             1)],
+                        else_=0)).label("cards_due"),
+                func.sum(
+                    func.case(
+                        [
+                            (Flashcard.last_review.is_(None),
+                             1)],
+                        else_=0)).label("new_cards"),
+                func.sum(
+                    func.case(
+                        [
+                            (Flashcard.interval > 30,
+                             1)],
+                        else_=0)).label("mastered_cards"),
+            ) .select_from(Deck) .outerjoin(Flashcard) .filter(
+                Deck.user_id == user_id) .first())
 
         # Consulta optimizada para sesiones de hoy
         today_stats = (
             db.session.query(
-                func.sum(StudySession.cards_studied).label("cards_studied"),
-                func.sum(StudySession.total_time).label("study_time"),
-            )
-            .join(Deck)
-            .filter(Deck.user_id == user_id, StudySession.started_at >= today_start)
-            .first()
-        )
+                func.sum(
+                    StudySession.cards_studied).label("cards_studied"),
+                func.sum(
+                    StudySession.total_time).label("study_time"),
+            ) .join(Deck) .filter(
+                Deck.user_id == user_id,
+                StudySession.started_at >= today_start) .first())
 
         # Calcular racha de estudio de manera eficiente
         study_streak = calculate_study_streak_optimized(user_id)
 
         # Decks recientes con consulta optimizada
-        recent_decks = Deck.query.filter_by(user_id=user_id).order_by(Deck.updated_at.desc()).limit(5).all()
+        recent_decks = Deck.query.filter_by(
+            user_id=user_id).order_by(
+            Deck.updated_at.desc()).limit(5).all()
 
         # Próximas revisiones con consulta agregada
         upcoming_reviews = get_upcoming_reviews_optimized(user_id, days=7)
@@ -106,11 +124,13 @@ def get_dashboard_v2_optimized():
                 "new_cards": deck_stats.new_cards or 0,
                 "mastered_cards": deck_stats.mastered_cards or 0,
                 "mastery_percentage": round(
-                    ((deck_stats.mastered_cards / deck_stats.total_cards * 100) if deck_stats.total_cards > 0 else 0),
+                    ((deck_stats.mastered_cards / deck_stats.total_cards * 100)
+                     if deck_stats.total_cards > 0 else 0),
                     1,
                 ),
                 "cards_studied_today": today_stats.cards_studied or 0,
-                "study_time_today": (today_stats.study_time or 0) // 60,  # convertir a minutos
+                # convertir a minutos
+                "study_time_today": (today_stats.study_time or 0) // 60,
                 "study_streak": study_streak,
             },
             "recent_decks": [format_deck_for_frontend(deck) for deck in recent_decks],
@@ -125,11 +145,16 @@ def get_dashboard_v2_optimized():
         # Optimizar respuesta JSON
         optimized_data = optimize_json_response(dashboard_data)
 
-        return frontend_response(optimized_data, "Dashboard cargado exitosamente")
+        return frontend_response(
+            optimized_data,
+            "Dashboard cargado exitosamente")
 
     except Exception as e:
         logger.error(f"Error en dashboard v2 optimizado: {str(e)}")
-        return frontend_error("Error interno del servidor", "INTERNAL_ERROR", status_code=500)
+        return frontend_error(
+            "Error interno del servidor",
+            "INTERNAL_ERROR",
+            status_code=500)
 
 
 @api_v2_opt.route("/decks", methods=["GET"])
@@ -152,10 +177,12 @@ def list_decks_v2_optimized():
         # Aplicar filtros de manera eficiente
         if "search" in filters:
             search_term = f"%{filters['search']}%"
-            query = query.filter(or_(Deck.name.ilike(search_term), Deck.description.ilike(search_term)))
+            query = query.filter(or_(Deck.name.ilike(
+                search_term), Deck.description.ilike(search_term)))
 
         # Usar optimizador de consultas
-        include_stats = request.args.get("include_stats", "true").lower() == "true"
+        include_stats = request.args.get(
+            "include_stats", "true").lower() == "true"
         query = QueryOptimizer.optimize_deck_query(query, include_stats)
 
         # Ordenamiento optimizado
@@ -181,7 +208,8 @@ def list_decks_v2_optimized():
         # Formatear para frontend de manera eficiente
         formatted_decks = []
         for deck in decks:
-            deck_data = format_deck_for_frontend(deck, include_stats=include_stats)
+            deck_data = format_deck_for_frontend(
+                deck, include_stats=include_stats)
             formatted_decks.append(deck_data)
 
         # Crear respuesta paginada optimizada
@@ -205,7 +233,10 @@ def list_decks_v2_optimized():
 
     except Exception as e:
         logger.error(f"Error listando decks v2 optimizado: {str(e)}")
-        return frontend_error("Error interno del servidor", "INTERNAL_ERROR", status_code=500)
+        return frontend_error(
+            "Error interno del servidor",
+            "INTERNAL_ERROR",
+            status_code=500)
 
 
 @api_v2_opt.route("/decks/<int:deck_id>/study", methods=["GET"])
@@ -223,7 +254,10 @@ def get_study_cards_v2_optimized(deck_id):
         # Verificar deck con consulta optimizada
         deck = Deck.query.filter_by(id=deck_id, user_id=user_id).first()
         if not deck:
-            return frontend_error("Deck no encontrado", "DECK_NOT_FOUND", status_code=404)
+            return frontend_error(
+                "Deck no encontrado",
+                "DECK_NOT_FOUND",
+                status_code=404)
 
         # Parámetros de estudio
         limit = int(request.args.get("limit", 20))
@@ -255,21 +289,24 @@ def get_study_cards_v2_optimized(deck_id):
             # Cards nuevas con consulta optimizada
             remaining_limit = limit - len(study_cards)
             new_cards = (
-                Flashcard.query.filter(and_(Flashcard.deck_id == deck_id, Flashcard.last_review.is_(None)))
-                .order_by(Flashcard.created_at.asc())
-                .limit(remaining_limit)
-                .all()
-            )
+                Flashcard.query.filter(
+                    and_(
+                        Flashcard.deck_id == deck_id,
+                        Flashcard.last_review.is_(None))) .order_by(
+                    Flashcard.created_at.asc()) .limit(remaining_limit) .all())
             study_cards.extend(new_cards)
 
         # Formatear cards de manera eficiente
         formatted_cards = []
         for card in study_cards:
-            card_data = format_flashcard_for_frontend(card, include_review_data=True)
+            card_data = format_flashcard_for_frontend(
+                card, include_review_data=True)
 
             # Agregar información de estudio optimizada
             is_due = card.next_review <= now if card.next_review else True
-            days_overdue = (now - card.next_review).days if card.next_review and card.next_review < now else 0
+            days_overdue = (
+                now -
+                card.next_review).days if card.next_review and card.next_review < now else 0
 
             card_data["study_info"] = {
                 "is_new": card.last_review is None,
@@ -282,8 +319,10 @@ def get_study_cards_v2_optimized(deck_id):
         # Estadísticas optimizadas
         session_stats = {
             "total_cards": len(formatted_cards),
-            "new_cards": sum(1 for card in formatted_cards if card["study_info"]["is_new"]),
-            "due_cards": sum(1 for card in formatted_cards if card["study_info"]["is_due"]),
+            "new_cards": sum(
+                1 for card in formatted_cards if card["study_info"]["is_new"]),
+            "due_cards": sum(
+                1 for card in formatted_cards if card["study_info"]["is_due"]),
             "estimated_time_minutes": len(formatted_cards) * 2,
         }
 
@@ -299,8 +338,12 @@ def get_study_cards_v2_optimized(deck_id):
         )
 
     except Exception as e:
-        logger.error(f"Error obteniendo cards para estudio v2 optimizado: {str(e)}")
-        return frontend_error("Error interno del servidor", "INTERNAL_ERROR", status_code=500)
+        logger.error(
+            f"Error obteniendo cards para estudio v2 optimizado: {str(e)}")
+        return frontend_error(
+            "Error interno del servidor",
+            "INTERNAL_ERROR",
+            status_code=500)
 
 
 @api_v2_opt.route("/stats/progress", methods=["GET"])
@@ -323,7 +366,8 @@ def get_progress_stats_v2_optimized():
         start_date = end_date - timedelta(days=days)
 
         # Consulta optimizada para estadísticas diarias
-        daily_stats_query = QueryOptimizer.optimize_study_stats_query(StudySession.query, user_id, days)
+        daily_stats_query = QueryOptimizer.optimize_study_stats_query(
+            StudySession.query, user_id, days)
 
         daily_results = daily_stats_query.all()
 
@@ -349,7 +393,8 @@ def get_progress_stats_v2_optimized():
                 func.sum(StudySession.total_time).label("total_time"),
             )
             .join(StudySession)
-            .filter(and_(Deck.user_id == user_id, StudySession.started_at >= start_date))
+            .filter(
+                and_(Deck.user_id == user_id, StudySession.started_at >= start_date))
             .group_by(Deck.id, Deck.name)
             .order_by(func.sum(StudySession.cards_studied).desc())
             .limit(10)
@@ -375,7 +420,8 @@ def get_progress_stats_v2_optimized():
                 func.sum(StudySession.total_time).label("total_time"),
             )
             .join(Deck)
-            .filter(and_(Deck.user_id == user_id, StudySession.started_at >= start_date))
+            .filter(
+                and_(Deck.user_id == user_id, StudySession.started_at >= start_date))
             .first()
         )
 
@@ -388,9 +434,14 @@ def get_progress_stats_v2_optimized():
             "summary": {
                 "total_sessions": summary_stats.total_sessions or 0,
                 "total_cards_studied": summary_stats.total_cards or 0,
-                "total_study_time_minutes": (summary_stats.total_time or 0) // 60,
-                "average_cards_per_day": round((summary_stats.total_cards or 0) / days, 1),
-                "average_study_time_per_day": round((summary_stats.total_time or 0) / days / 60, 1),
+                "total_study_time_minutes": (
+                    summary_stats.total_time or 0) // 60,
+                "average_cards_per_day": round(
+                    (summary_stats.total_cards or 0) / days,
+                    1),
+                "average_study_time_per_day": round(
+                    (summary_stats.total_time or 0) / days / 60,
+                    1),
             },
             "daily_stats": daily_stats,
             "deck_stats": formatted_deck_stats,
@@ -402,8 +453,12 @@ def get_progress_stats_v2_optimized():
         )
 
     except Exception as e:
-        logger.error(f"Error obteniendo estadísticas de progreso v2 optimizado: {str(e)}")
-        return frontend_error("Error interno del servidor", "INTERNAL_ERROR", status_code=500)
+        logger.error(
+            f"Error obteniendo estadísticas de progreso v2 optimizado: {str(e)}")
+        return frontend_error(
+            "Error interno del servidor",
+            "INTERNAL_ERROR",
+            status_code=500)
 
 
 def calculate_study_streak_optimized(user_id: int) -> int:
@@ -413,19 +468,18 @@ def calculate_study_streak_optimized(user_id: int) -> int:
     try:
         # Consulta optimizada para obtener días con estudio
         study_days = (
-            db.session.query(func.date(StudySession.started_at).label("study_date"))
-            .join(Deck)
-            .filter(
+            db.session.query(
+                func.date(
+                    StudySession.started_at).label("study_date")) .join(Deck) .filter(
                 and_(
                     Deck.user_id == user_id,
                     StudySession.cards_studied > 0,
-                    StudySession.started_at >= datetime.utcnow() - timedelta(days=365),
-                )
-            )
-            .distinct()
-            .order_by(func.date(StudySession.started_at).desc())
-            .all()
-        )
+                    StudySession.started_at >= datetime.utcnow() -
+                    timedelta(
+                        days=365),
+                )) .distinct() .order_by(
+                func.date(
+                    StudySession.started_at).desc()) .all())
 
         if not study_days:
             return 0
@@ -479,10 +533,12 @@ def get_upcoming_reviews_optimized(user_id: int, days: int = 7) -> List[Dict]:
         # Convertir a formato esperado
         upcoming_reviews = []
         for result in upcoming_query:
-            upcoming_reviews.append({"date": result.review_date.isoformat(), "count": result.card_count})
+            upcoming_reviews.append(
+                {"date": result.review_date.isoformat(), "count": result.card_count})
 
         return upcoming_reviews
 
     except Exception as e:
-        logger.error(f"Error obteniendo próximas revisiones optimizadas: {str(e)}")
+        logger.error(
+            f"Error obteniendo próximas revisiones optimizadas: {str(e)}")
         return []

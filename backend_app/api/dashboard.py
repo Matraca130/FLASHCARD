@@ -56,11 +56,16 @@ def get_dashboard():
                         "total_study_time": user.total_study_time,
                     },
                     "stats": dashboard_data["stats"],
-                    "recent_activity": dashboard_data.get("recent_activity", []),
-                    "upcoming_reviews": dashboard_data.get("upcoming_reviews", []),
-                    "weekly_progress": dashboard_data.get("weekly_progress", []),
-                }
-            ),
+                    "recent_activity": dashboard_data.get(
+                        "recent_activity",
+                        []),
+                    "upcoming_reviews": dashboard_data.get(
+                        "upcoming_reviews",
+                        []),
+                    "weekly_progress": dashboard_data.get(
+                        "weekly_progress",
+                        []),
+                }),
             200,
         )
 
@@ -174,7 +179,8 @@ def get_activity_heatmap():
                 {
                     "date": row.date.isoformat(),
                     "value": int(row.cards_studied or 0),
-                    "study_time": int((row.total_time or 0) / 60),  # en minutos
+                    # en minutos
+                    "study_time": int((row.total_time or 0) / 60),
                 }
             )
 
@@ -212,32 +218,43 @@ def get_performance_stats():
             db.session.query(
                 Deck.id,
                 Deck.name,
-                func.count(CardReview.id).label("total_reviews"),
-                func.avg(CardReview.quality).label("avg_quality"),
-                func.sum(func.case([(CardReview.quality >= 3, 1)], else_=0)).label("correct_reviews"),
-            )
-            .join(Flashcard)
-            .join(CardReview)
-            .filter(Deck.user_id == user_id)
-            .group_by(Deck.id, Deck.name)
-            .all()
-        )
+                func.count(
+                    CardReview.id).label("total_reviews"),
+                func.avg(
+                    CardReview.quality).label("avg_quality"),
+                func.sum(
+                    func.case(
+                        [
+                            (CardReview.quality >= 3,
+                             1)],
+                        else_=0)).label("correct_reviews"),
+            ) .join(Flashcard) .join(CardReview) .filter(
+                Deck.user_id == user_id) .group_by(
+                Deck.id,
+                Deck.name) .all())
 
         performance_data = []
         for row in deck_performance:
-            accuracy = (row.correct_reviews / row.total_reviews * 100) if row.total_reviews > 0 else 0
+            accuracy = (
+                row.correct_reviews /
+                row.total_reviews *
+                100) if row.total_reviews > 0 else 0
             performance_data.append(
                 {
                     "deck_id": row.id,
                     "deck_name": row.name,
                     "total_reviews": row.total_reviews,
-                    "average_quality": (round(row.avg_quality, 2) if row.avg_quality else 0),
-                    "accuracy": round(accuracy, 1),
-                }
-            )
+                    "average_quality": (
+                        round(
+                            row.avg_quality,
+                            2) if row.avg_quality else 0),
+                    "accuracy": round(
+                        accuracy,
+                        1),
+                })
 
-        return jsonify({"success": True, "performance_data": performance_data}), 200
-
+        return jsonify(
+            {"success": True, "performance_data": performance_data}), 200
     except Exception as e:
         logger.error(f"Error obteniendo estadísticas de rendimiento: {str(e)}")
         return jsonify({"error": "Error interno del servidor"}), 500
