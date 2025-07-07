@@ -27,6 +27,19 @@
   
   <!-- Cargar iconos SVG embebidos -->
   <style>
+    /* Estilos para accesibilidad - Screen Reader Only */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+    
     .icon {
       width: 20px;
       height: 20px;
@@ -613,12 +626,12 @@
             <!-- Create Deck Form -->
             <form id="deck-form" class="deck-form">
               <div class="form-group">
-                <label class="form-label">Nombre del Deck</label>
+                <label for="deck-name" class="form-label">Nombre del Deck</label>
                 <input type="text" id="deck-name" class="form-input" placeholder="Ej: Vocabulario Inglés" required>
               </div>
               
               <div class="form-group">
-                <label class="form-label">Descripción</label>
+                <label for="deck-description" class="form-label">Descripción</label>
                 <textarea id="deck-description" class="form-input form-textarea" placeholder="Describe el contenido de este deck..."></textarea>
               </div>
               
@@ -640,19 +653,19 @@
               <h3 class="card-title mb-3">Agregar Flashcard</h3>
               
               <div class="form-group">
-                <label class="form-label">Seleccionar Deck</label>
+                <label for="flashcard-deck" class="form-label">Seleccionar Deck</label>
                 <select id="flashcard-deck" class="form-input form-select" required>
                   <option value="">Selecciona un deck...</option>
                 </select>
               </div>
               
               <div class="form-group">
-                <label class="form-label">Frente (Pregunta)</label>
+                <label for="flashcard-front" class="form-label">Frente (Pregunta)</label>
                 <textarea id="flashcard-front" class="form-input form-textarea" placeholder="Escribe la pregunta o término..." required></textarea>
               </div>
               
               <div class="form-group">
-                <label class="form-label">Reverso (Respuesta)</label>
+                <label for="flashcard-back" class="form-label">Reverso (Respuesta)</label>
                 <textarea id="flashcard-back" class="form-input form-textarea" placeholder="Escribe la respuesta o definición..." required></textarea>
               </div>
               
@@ -673,16 +686,20 @@
             
             <!-- Search and Filter -->
             <div class="search-container">
+              <label for="search-input" class="sr-only">Buscar flashcards</label>
               <input type="text" id="search-input" class="form-input search-input" placeholder="Buscar flashcards...">
+              <label for="deck-filter" class="sr-only">Filtrar por deck</label>
               <select id="deck-filter" class="form-input filter-select">
                 <option value="">Todos los decks</option>
               </select>
+              <label for="difficulty-filter" class="sr-only">Filtrar por dificultad</label>
               <select id="difficulty-filter" class="form-input filter-select">
                 <option value="">Todas las dificultades</option>
                 <option value="0">Fácil</option>
                 <option value="1">Medio</option>
                 <option value="2">Difícil</option>
               </select>
+              <label for="sort-by" class="sr-only">Ordenar por</label>
               <select id="sort-by" class="form-input filter-select">
                 <option value="created_at">Fecha de creación</option>
                 <option value="front">Frente</option>
@@ -702,10 +719,11 @@
                   <div class="upload-text">Haz clic o arrastra un archivo aquí</div>
                   <div class="upload-hint">Formatos soportados: JSON, CSV, TXT</div>
                 </div>
+                <label for="file-input" class="sr-only">Seleccionar archivo para importar</label>
                 <input type="file" id="file-input" accept=".json,.csv,.txt" style="display: none;" onchange="handleFileUpload(event)">
                 
                 <div class="form-group mt-3">
-                  <label class="form-label">Nombre del deck importado</label>
+                  <label for="import-deck-name" class="form-label">Nombre del deck importado</label>
                   <input type="text" id="import-deck-name" class="form-input" placeholder="Nombre del nuevo deck">
                 </div>
                 
@@ -847,11 +865,11 @@
       </div>
       <div class="modal-body">
         <div class="form-group">
-          <label class="form-label">Email</label>
+          <label for="login-email" class="form-label">Email</label>
           <input type="email" id="login-email" class="form-input" placeholder="tu@email.com" value="demo@example.com">
         </div>
         <div class="form-group">
-          <label class="form-label">Contraseña</label>
+          <label for="login-password" class="form-label">Contraseña</label>
           <input type="password" id="login-password" class="form-input" placeholder="••••••••" value="demo123">
         </div>
       </div>
@@ -871,17 +889,17 @@
       </div>
       <div class="modal-body">
         <div class="form-group">
-          <label class="form-label">Frente (Pregunta)</label>
+          <label for="edit-flashcard-front" class="form-label">Frente (Pregunta)</label>
           <textarea id="edit-flashcard-front" class="form-input form-textarea"></textarea>
         </div>
         <div class="form-group">
-          <label class="form-label">Reverso (Respuesta)</label>
+          <label for="edit-flashcard-back" class="form-label">Reverso (Respuesta)</label>
           <textarea id="edit-flashcard-back" class="form-input form-textarea"></textarea>
         </div>
         <div class="form-group">
-          <label class="form-label">Deck</label>
+          <label for="edit-flashcard-deck" class="form-label">Deck</label>
           <select id="edit-flashcard-deck" class="form-input form-select">
-            <!-- Options will be loaded dynamically -->
+            <option value="">Selecciona un deck...</option>
           </select>
         </div>
       </div>
@@ -901,15 +919,15 @@
       </div>
       <div class="modal-body">
         <div class="form-group">
-          <label class="form-label">Nombre del Deck</label>
+          <label for="edit-deck-name" class="form-label">Nombre del Deck</label>
           <input type="text" id="edit-deck-name" class="form-input">
         </div>
         <div class="form-group">
-          <label class="form-label">Descripción</label>
+          <label for="edit-deck-description" class="form-label">Descripción</label>
           <textarea id="edit-deck-description" class="form-input form-textarea"></textarea>
         </div>
         <div class="form-group">
-          <label class="form-label">
+          <label for="edit-deck-public" class="form-label">
             <input type="checkbox" id="edit-deck-public"> Hacer público
           </label>
         </div>

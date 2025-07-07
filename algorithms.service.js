@@ -427,7 +427,7 @@ function calculateSimpleInterval(cardData, quality) {
  */
 export async function getAlgorithmStats() {
   try {
-    const stats = await apiWithFallback('/api/stats/algorithm', {
+    const stats = await apiWithFallback('/api/dashboard/stats/performance', {
       total_reviews: 0,
       average_retention: 0,
       algorithm_efficiency: 0,

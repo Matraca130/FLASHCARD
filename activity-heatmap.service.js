@@ -91,7 +91,7 @@ async function loadActivityData(forceRefresh = false) {
   try {
     // Cargar desde API con fallback a datos mock
     const data = await apiWithFallback(
-      '/api/stats/activity-heatmap',
+      '/api/dashboard/stats/heatmap',
       generateMockActivityData()
     );
     
