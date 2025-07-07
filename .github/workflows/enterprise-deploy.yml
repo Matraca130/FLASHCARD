@@ -167,11 +167,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: build-artifacts-${{ needs.pre-deployment-checks.outputs.version }}
-        path: |
-          .
-          !node_modules/
-          !.git/
-          !.github/
+        path: dist/
         retention-days: 30
 
   deploy-to-pages:
@@ -191,7 +187,7 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: build-artifacts-${{ needs.pre-deployment-checks.outputs.version }}
-        path: ./build
+        path: ./dist
     
     - name: Setup Pages
       uses: actions/configure-pages@v5
@@ -200,7 +196,7 @@ jobs:
       run: |
         echo "🚀 Preparing deployment from dist/..."
         
-        # Verify dist directory exists
+        # Verify dist directory exists (where artifacts were downloaded)
         if [ ! -d "dist" ]; then
           echo "❌ dist directory not found"
           exit 1
