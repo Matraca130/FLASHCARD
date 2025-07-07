@@ -61,13 +61,15 @@ def get_user_profile():
 
         # Estadísticas del usuario
         total_decks = Deck.query.filter_by(user_id=user_id).count()
-        total_cards = db.session.query(Flashcard).join(Deck).filter(Deck.user_id == user_id).count()
+        total_cards = db.session.query(
+            Flashcard).join(Deck).filter(Deck.user_id == user_id).count()
         total_reviews = CardReview.query.filter_by(user_id=user_id).count()
 
         # Actividad reciente
         recent_sessions = (
-            StudySession.query.filter_by(user_id=user_id).order_by(StudySession.created_at.desc()).limit(5).all()
-        )
+            StudySession.query.filter_by(
+                user_id=user_id).order_by(
+                StudySession.created_at.desc()).limit(5).all())
 
         return jsonify(
             {
@@ -84,7 +86,8 @@ def get_user_profile():
                     "total_decks": total_decks,
                     "total_cards": total_cards,
                     "total_reviews": total_reviews,
-                    "study_streak": calculate_study_streak(user_id),  # Implemented study streak calculation
+                    # Implemented study streak calculation
+                    "study_streak": calculate_study_streak(user_id),
                 },
                 "recent_activity": [
                     {
@@ -110,7 +113,8 @@ def get_dashboard_data():
         user_id = get_current_user_id()
 
         # Obtener decks del usuario
-        decks = db.session.query(Deck).filter_by(user_id=user_id, is_deleted=False).all()
+        decks = db.session.query(
+            Deck).filter_by(user_id=user_id, is_deleted=False).all()
 
         # Usar consulta optimizada para estadísticas de decks
         from backend_app.models.models import QueryOptimizer
@@ -154,7 +158,8 @@ def get_dashboard_data():
         )
 
         # Crear diccionario para acceso rápido
-        reviews_dict = {review.review_date: review.reviews_count for review in daily_reviews}
+        reviews_dict = {
+            review.review_date: review.reviews_count for review in daily_reviews}
 
         # Construir estadísticas diarias
         daily_stats = []
@@ -162,19 +167,21 @@ def get_dashboard_data():
             date = week_ago + timedelta(days=i)
             reviews_count = reviews_dict.get(date, 0)
 
-            daily_stats.append({"date": date.isoformat(), "reviews": reviews_count})
+            daily_stats.append(
+                {"date": date.isoformat(), "reviews": reviews_count})
 
         return jsonify(
             {
                 "decks": decks_data,
                 "statistics": {
                     "total_decks": len(decks_data),
-                    "total_cards": sum(deck["total_cards"] for deck in decks_data),
-                    "due_cards": sum(deck["due_cards"] for deck in decks_data),
+                    "total_cards": sum(
+                        deck["total_cards"] for deck in decks_data),
+                    "due_cards": sum(
+                        deck["due_cards"] for deck in decks_data),
                     "daily_stats": daily_stats,
                 },
-            }
-        )
+            })
     except Exception as e:
         logger.error(f"Error getting dashboard data: {str(e)}")
         return jsonify({"error": "Error interno del servidor"}), 500
@@ -255,10 +262,11 @@ def review_card_frontend(session_id):
 
         # Validar rating
         if rating not in [1, 2, 3, 4]:
-            return jsonify({'error': 'Rating debe ser 1-4 (Again, Hard, Good, Easy)'}), 400
-
+            return jsonify(
+                {'error': 'Rating debe ser 1-4 (Again, Hard, Good, Easy)'}), 400
         # Verificar sesión
-        session = StudySession.query.filter_by(id=session_id, user_id=user_id).first()
+        session = StudySession.query.filter_by(
+            id=session_id, user_id=user_id).first()
         if not session:
             return jsonify({'error': 'Sesión no encontrada'}), 404
 
@@ -337,7 +345,8 @@ def search_content():
         # Buscar en decks
         decks = (
             Deck.query.filter_by(user_id=user_id)
-            .filter(Deck.name.contains(query) | Deck.description.contains(query))
+            .filter(
+                Deck.name.contains(query) | Deck.description.contains(query))
             .limit(10)
             .all()
         )
@@ -347,7 +356,8 @@ def search_content():
             db.session.query(Flashcard)
             .join(Deck)
             .filter(Deck.user_id == user_id)
-            .filter(Flashcard.front.contains(query) | Flashcard.back.contains(query))
+            .filter(
+                Flashcard.front.contains(query) | Flashcard.back.contains(query))
             .limit(20)
             .all()
         )

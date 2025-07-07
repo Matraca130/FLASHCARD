@@ -15,7 +15,8 @@ class Config:
         # Producción (Render con PostgreSQL)
         SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL")
         if SQLALCHEMY_DATABASE_URI.startswith("postgres://"):
-            SQLALCHEMY_DATABASE_URI = SQLALCHEMY_DATABASE_URI.replace("postgres://", "postgresql://", 1)
+            SQLALCHEMY_DATABASE_URI = SQLALCHEMY_DATABASE_URI.replace(
+                "postgres://", "postgresql://", 1)
     else:
         # Desarrollo (SQLite local)
         SQLALCHEMY_DATABASE_URI = "sqlite:///flashcards.db"
@@ -34,7 +35,9 @@ class Config:
     JWT_ALGORITHM = "HS256"
 
     # CORS Configuration
-    CORS_ORIGINS = os.environ.get("CORS_ORIGINS", "http://localhost:3000").split(",")
+    CORS_ORIGINS = os.environ.get(
+        "CORS_ORIGINS",
+        "http://localhost:3000").split(",")
 
     # Rate Limiting
     RATELIMIT_STORAGE_URL = os.environ.get("REDIS_URL", "memory://")

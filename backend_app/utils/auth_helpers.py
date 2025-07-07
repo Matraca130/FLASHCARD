@@ -57,13 +57,16 @@ class AuthHelper:
     def authenticate_user(email: str, password: str) -> Optional[User]:
         """Autenticar usuario con email y contraseña"""
         try:
-            user = User.query.filter(User.email == email, not User.is_deleted).first()
+            user = User.query.filter(
+                User.email == email, not User.is_deleted).first()
 
             if user and check_password_hash(user.password_hash, password):
                 log_user_action("login_success", {"email": email}, user.id)
                 return user
             else:
-                log_user_action("login_failed", {"email": email, "reason": "invalid_credentials"})
+                log_user_action(
+                    "login_failed", {
+                        "email": email, "reason": "invalid_credentials"})
                 return None
 
         except Exception as e:
@@ -75,10 +78,14 @@ class AuthHelper:
         """Crear access token y refresh token para usuario"""
         try:
             # Crear access token (corta duración)
-            access_token = create_access_token(identity=user.id, expires_delta=timedelta(hours=1))  # 1 hora
+            access_token = create_access_token(
+                identity=user.id, expires_delta=timedelta(
+                    hours=1))  # 1 hora
 
             # Crear refresh token (larga duración)
-            refresh_token = create_refresh_token(identity=user.id, expires_delta=timedelta(days=30))  # 30 días
+            refresh_token = create_refresh_token(
+                identity=user.id, expires_delta=timedelta(
+                    days=30))  # 30 días
 
             # Guardar refresh token en BD
             token_hash = AuthHelper.create_token_hash(refresh_token)
@@ -111,7 +118,9 @@ class AuthHelper:
 
         except Exception as e:
             db.session.rollback()
-            log_error(f"Error creating tokens for user {user.id}: {str(e)}", exception=e)
+            log_error(
+                f"Error creating tokens for user {user.id}: {str(e)}",
+                exception=e)
             raise
 
     @staticmethod
@@ -130,7 +139,10 @@ class AuthHelper:
             refresh_record.update_last_used()
 
             # Crear nuevo access token
-            new_access_token = create_access_token(identity=refresh_record.user_id, expires_delta=timedelta(hours=1))
+            new_access_token = create_access_token(
+                identity=refresh_record.user_id,
+                expires_delta=timedelta(
+                    hours=1))
 
             db.session.commit()
 
@@ -152,7 +164,9 @@ class AuthHelper:
             return None
 
     @staticmethod
-    def revoke_refresh_token(refresh_token: str, reason: str = "manual") -> bool:
+    def revoke_refresh_token(
+            refresh_token: str,
+            reason: str = "manual") -> bool:
         """Revocar refresh token específico"""
         try:
             token_hash = AuthHelper.create_token_hash(refresh_token)
@@ -178,17 +192,23 @@ class AuthHelper:
             return False
 
     @staticmethod
-    def revoke_all_user_tokens(user_id: int, reason: str = "logout_all") -> int:
+    def revoke_all_user_tokens(
+            user_id: int,
+            reason: str = "logout_all") -> int:
         """Revocar todos los tokens de un usuario"""
         try:
             count = RefreshToken.revoke_all_for_user(user_id, reason)
 
-            log_user_action("all_tokens_revoked", {"reason": reason, "tokens_count": count}, user_id)
+            log_user_action(
+                "all_tokens_revoked", {
+                    "reason": reason, "tokens_count": count}, user_id)
 
             return count
 
         except Exception as e:
-            log_error(f"Error revoking all tokens for user {user_id}: {str(e)}", exception=e)
+            log_error(
+                f"Error revoking all tokens for user {user_id}: {str(e)}",
+                exception=e)
             return 0
 
     @staticmethod
@@ -204,16 +224,20 @@ class AuthHelper:
                         "id": token.id,
                         "device_info": token.device_info,
                         "ip_address": token.ip_address,
-                        "last_used": (token.last_used.isoformat() if token.last_used else None),
-                        "created_at": (token.created_at.isoformat() if token.created_at else None),
-                        "expires_at": (token.expires_at.isoformat() if token.expires_at else None),
-                    }
-                )
+                        "last_used": (
+                            token.last_used.isoformat() if token.last_used else None),
+                        "created_at": (
+                            token.created_at.isoformat() if token.created_at else None),
+                        "expires_at": (
+                            token.expires_at.isoformat() if token.expires_at else None),
+                    })
 
             return sessions
 
         except Exception as e:
-            log_error(f"Error getting user sessions for user {user_id}: {str(e)}", exception=e)
+            log_error(
+                f"Error getting user sessions for user {user_id}: {str(e)}",
+                exception=e)
             return []
 
     @staticmethod
@@ -229,7 +253,8 @@ class AuthHelper:
             return 0
 
     @staticmethod
-    def validate_token_security(user_id: int, refresh_token: str) -> Tuple[bool, str]:
+    def validate_token_security(
+            user_id: int, refresh_token: str) -> Tuple[bool, str]:
         """Validar seguridad del token (detectar uso sospechoso)"""
         try:
             token_hash = AuthHelper.create_token_hash(refresh_token)
@@ -271,7 +296,9 @@ class AuthHelper:
             return True, "Token válido"
 
         except Exception as e:
-            log_error(f"Error validating token security: {str(e)}", exception=e)
+            log_error(
+                f"Error validating token security: {str(e)}",
+                exception=e)
             return False, "Error de validación"
 
 

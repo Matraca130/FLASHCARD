@@ -83,17 +83,20 @@ def answer_card(validated_data):
 
         # Extraer datos validados
         card_id = validated_data["card_id"]
-        quality = validated_data["quality"]  # 1-4 (1=Again, 2=Hard, 3=Good, 4=Easy)
+        # 1-4 (1=Again, 2=Hard, 3=Good, 4=Easy)
+        quality = validated_data["quality"]
         session_id = validated_data["session_id"]
 
         # Verificar que la carta existe y pertenece al usuario
-        card = db.session.query(Flashcard).join(Deck).filter(Flashcard.id == card_id, Deck.user_id == user_id).first()
+        card = db.session.query(Flashcard).join(Deck).filter(
+            Flashcard.id == card_id, Deck.user_id == user_id).first()
 
         if not card:
             return jsonify({"error": "Carta no encontrada"}), 404
 
         # Verificar sesión
-        session = StudySession.query.filter_by(id=session_id, user_id=user_id).first()
+        session = StudySession.query.filter_by(
+            id=session_id, user_id=user_id).first()
 
         if not session:
             return jsonify({"error": "Sesión no encontrada"}), 404
@@ -136,10 +139,13 @@ def answer_card(validated_data):
 
             # Apply algorithm-specific modifications
             if algorithm == "ultra_sm2":
-                # Ultra SM-2: Apply factor limits (more dynamic than standard SM-2)
+                # Ultra SM-2: Apply factor limits (more dynamic than standard
+                # SM-2)
                 min_factor = 1.3
                 max_factor = 3.0
-                new_ease_factor = max(min_factor, min(max_factor, new_ease_factor))
+                new_ease_factor = max(
+                    min_factor, min(
+                        max_factor, new_ease_factor))
 
             elif algorithm == "anki":
                 # Anki-style: Handle learning steps for new cards
@@ -177,7 +183,8 @@ def answer_card(validated_data):
             flashcard_id=card_id,
             session_id=session_id,
             rating=quality,  # Use 'rating' field, not 'quality'
-            previous_interval=previous_interval,  # Valor previo capturado antes de actualizar
+            previous_interval=previous_interval,
+            # Valor previo capturado antes de actualizar
             new_interval=card.interval_days,  # Valor actualizado después del algoritmo
             response_time=validated_data.get("response_time", 0),
         )
@@ -220,13 +227,11 @@ def answer_card(validated_data):
                         "cards_studied": session.cards_studied,
                         "cards_correct": session.cards_correct,
                         "accuracy": (
-                            round((session.cards_correct / session.cards_studied) * 100, 1)
-                            if session.cards_studied > 0
-                            else 0
-                        ),
+                            round(
+                                (session.cards_correct / session.cards_studied) * 100,
+                                1) if session.cards_studied > 0 else 0),
                     },
-                }
-            ),
+                }),
             200,
         )
 
@@ -246,14 +251,17 @@ def end_study_session(session_id):
     try:
         user_id = get_jwt_identity()
 
-        session = StudySession.query.filter_by(id=session_id, user_id=user_id).first()
+        session = StudySession.query.filter_by(
+            id=session_id, user_id=user_id).first()
 
         if not session:
             return jsonify({"error": "Sesión no encontrada"}), 404
 
         # Finalizar sesión
         session.ended_at = datetime.utcnow()
-        session.total_time = (session.ended_at - session.started_at).total_seconds()
+        session.total_time = (
+            session.ended_at -
+            session.started_at).total_seconds()
 
         # Actualizar tiempo total de estudio del usuario
         user = User.query.get(user_id)
@@ -271,13 +279,11 @@ def end_study_session(session_id):
                         "cards_correct": session.cards_correct,
                         "total_time": session.total_time,
                         "accuracy": (
-                            round((session.cards_correct / session.cards_studied) * 100, 1)
-                            if session.cards_studied > 0
-                            else 0
-                        ),
+                            round(
+                                (session.cards_correct / session.cards_studied) * 100,
+                                1) if session.cards_studied > 0 else 0),
                     },
-                }
-            ),
+                }),
             200,
         )
 

@@ -133,18 +133,18 @@ function autoInitParticles() {
   // Configuración adaptativa según el rendimiento
   const adaptiveConfig = isLowPerformance
     ? {
-        particles: {
-          number: { value: 25 },
-          line_linked: { enable: false },
-          move: { speed: 0.5 },
+      particles: {
+        number: { value: 25 },
+        line_linked: { enable: false },
+        move: { speed: 0.5 },
+      },
+      interactivity: {
+        events: {
+          onhover: { enable: false },
+          onclick: { enable: false },
         },
-        interactivity: {
-          events: {
-            onhover: { enable: false },
-            onclick: { enable: false },
-          },
-        },
-      }
+      },
+    }
     : {};
 
   return initializeParticles(adaptiveConfig);

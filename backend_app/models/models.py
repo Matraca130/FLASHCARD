@@ -16,11 +16,23 @@ class BaseModel(db.Model):
     __abstract__ = True
 
     id = db.Column(db.Integer, primary_key=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, index=True)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    created_at = db.Column(
+        db.DateTime,
+        default=datetime.utcnow,
+        nullable=False,
+        index=True)
+    updated_at = db.Column(
+        db.DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+        nullable=False)
 
     # Soft delete
-    is_deleted = db.Column(db.Boolean, default=False, nullable=False, index=True)
+    is_deleted = db.Column(
+        db.Boolean,
+        default=False,
+        nullable=False,
+        index=True)
     deleted_at = db.Column(db.DateTime)
 
     def soft_delete(self):
@@ -46,7 +58,11 @@ class User(BaseModel):
 
     # Información básica con constraints
     email = db.Column(db.String(120), unique=True, nullable=False, index=True)
-    username = db.Column(db.String(80), unique=True, nullable=False, index=True)
+    username = db.Column(
+        db.String(80),
+        unique=True,
+        nullable=False,
+        index=True)
     password_hash = db.Column(db.String(255), nullable=False)
     first_name = db.Column(db.String(50), nullable=False)
     last_name = db.Column(db.String(50), nullable=False)
@@ -66,7 +82,8 @@ class User(BaseModel):
     reminder_time = db.Column(db.Time)
 
     # Estadísticas con índices para consultas frecuentes
-    total_study_time = db.Column(db.Integer, default=0, index=True)  # en minutos
+    total_study_time = db.Column(
+        db.Integer, default=0, index=True)  # en minutos
     current_streak = db.Column(db.Integer, default=0, index=True)
     longest_streak = db.Column(db.Integer, default=0)
     total_cards_studied = db.Column(db.Integer, default=0, index=True)
@@ -109,7 +126,8 @@ class User(BaseModel):
     )
 
     def set_password(self, password):
-        self.password_hash = bcrypt.generate_password_hash(password).decode("utf-8")
+        self.password_hash = bcrypt.generate_password_hash(
+            password).decode("utf-8")
 
     def check_password(self, password):
         return bcrypt.check_password_hash(self.password_hash, password)
@@ -123,7 +141,11 @@ class User(BaseModel):
         """Calcular tasa de acierto"""
         if self.total_cards_studied == 0:
             return 0
-        return round((self.total_cards_correct / self.total_cards_studied) * 100, 2)
+        return round(
+            (self.total_cards_correct /
+             self.total_cards_studied) *
+            100,
+            2)
 
     def update_streak(self, studied_today=True):
         """Actualizar racha de estudio"""
@@ -183,19 +205,30 @@ class User(BaseModel):
 class Deck(BaseModel):
     __tablename__ = "decks"
 
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False, index=True)
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey("users.id"),
+        nullable=False,
+        index=True)
 
     # Información básica
     name = db.Column(db.String(100), nullable=False, index=True)
     description = db.Column(db.Text)
 
     # Metadatos
-    difficulty_level = db.Column(db.String(20), default="intermediate", index=True)
+    difficulty_level = db.Column(
+        db.String(20),
+        default="intermediate",
+        index=True)
     color = db.Column(db.String(7), default="#2196F3")  # Hex color
     icon = db.Column(db.String(10), default="📚")
 
     # Configuraciones
-    is_public = db.Column(db.Boolean, default=False, nullable=False, index=True)
+    is_public = db.Column(
+        db.Boolean,
+        default=False,
+        nullable=False,
+        index=True)
     allow_collaboration = db.Column(db.Boolean, default=False)
 
     # Estadísticas con índices
@@ -296,7 +329,8 @@ class Deck(BaseModel):
             "category": self.category,
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
-            "last_studied": (self.last_studied.isoformat() if self.last_studied else None),
+            "last_studied": (
+                self.last_studied.isoformat() if self.last_studied else None),
         }
 
         if include_stats:
@@ -314,7 +348,11 @@ class Deck(BaseModel):
 class Flashcard(BaseModel):
     __tablename__ = "flashcards"
 
-    deck_id = db.Column(db.Integer, db.ForeignKey("decks.id"), nullable=False, index=True)
+    deck_id = db.Column(
+        db.Integer,
+        db.ForeignKey("decks.id"),
+        nullable=False,
+        index=True)
 
     # Contenido de la flashcard
     front_text = db.Column(db.Text, nullable=False)
@@ -397,7 +435,7 @@ class Flashcard(BaseModel):
         else:
             self.tags = None
 
-    # ========== PROPIEDADES HÍBRIDAS PARA UNIFICAR NOMBRES DE CAMPOS ==========
+    # ========== PROPIEDADES HÍBRIDAS PARA UNIFICAR NOMBRES DE CAMPOS ========
 
     @hybrid_property
     def front(self):
@@ -552,7 +590,8 @@ class Flashcard(BaseModel):
             "accuracy_rate": self.accuracy_rate,
             "last_review_rating": self.last_review_rating,
             "next_review": self.next_review.isoformat() if self.next_review else None,
-            "last_reviewed": (self.last_reviewed.isoformat() if self.last_reviewed else None),
+            "last_reviewed": (
+                self.last_reviewed.isoformat() if self.last_reviewed else None),
             "is_due": self.is_due,
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
@@ -576,8 +615,16 @@ class Flashcard(BaseModel):
 class StudySession(BaseModel):
     __tablename__ = "study_sessions"
 
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False, index=True)
-    deck_id = db.Column(db.Integer, db.ForeignKey("decks.id"), nullable=False, index=True)
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey("users.id"),
+        nullable=False,
+        index=True)
+    deck_id = db.Column(
+        db.Integer,
+        db.ForeignKey("decks.id"),
+        nullable=False,
+        index=True)
 
     # Configuración de sesión
     algorithm = db.Column(db.String(20), default="fsrs", index=True)
@@ -589,7 +636,11 @@ class StudySession(BaseModel):
     total_time = db.Column(db.Integer, default=0)  # segundos
 
     # Estado
-    is_completed = db.Column(db.Boolean, default=False, nullable=False, index=True)
+    is_completed = db.Column(
+        db.Boolean,
+        default=False,
+        nullable=False,
+        index=True)
 
     # Timestamps con índices para análisis temporal
     started_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
@@ -649,7 +700,8 @@ class StudySession(BaseModel):
             "duration_minutes": self.duration_minutes,
             "is_completed": self.is_completed,
             "started_at": self.started_at.isoformat() if self.started_at else None,
-            "completed_at": (self.completed_at.isoformat() if self.completed_at else None),
+            "completed_at": (
+                self.completed_at.isoformat() if self.completed_at else None),
             "created_at": self.created_at.isoformat() if self.created_at else None,
         }
 
@@ -657,11 +709,20 @@ class StudySession(BaseModel):
 class CardReview(BaseModel):
     __tablename__ = "card_reviews"
 
-    flashcard_id = db.Column(db.Integer, db.ForeignKey("flashcards.id"), nullable=False, index=True)
-    session_id = db.Column(db.Integer, db.ForeignKey("study_sessions.id"), nullable=False, index=True)
+    flashcard_id = db.Column(
+        db.Integer,
+        db.ForeignKey("flashcards.id"),
+        nullable=False,
+        index=True)
+    session_id = db.Column(
+        db.Integer,
+        db.ForeignKey("study_sessions.id"),
+        nullable=False,
+        index=True)
 
     # Respuesta del usuario
-    rating = db.Column(db.Integer, nullable=False, index=True)  # 1=Again, 2=Hard, 3=Good, 4=Easy
+    # 1=Again, 2=Hard, 3=Good, 4=Easy
+    rating = db.Column(db.Integer, nullable=False, index=True)
     response_time = db.Column(db.Integer)  # milisegundos
 
     # Estado antes de la revisión
@@ -707,7 +768,8 @@ class CardReview(BaseModel):
             "new_ease": self.new_ease,
             "new_interval": self.new_interval,
             "new_stability": self.new_stability,
-            "new_next_review": (self.new_next_review.isoformat() if self.new_next_review else None),
+            "new_next_review": (
+                self.new_next_review.isoformat() if self.new_next_review else None),
             "reviewed_at": self.reviewed_at.isoformat() if self.reviewed_at else None,
             "created_at": self.created_at.isoformat() if self.created_at else None,
         }
@@ -766,14 +828,15 @@ class QueryOptimizer:
     def get_due_cards(user_id, deck_id=None, limit=20):
         """Obtener cartas listas para revisión"""
         query = db.session.query(Flashcard).filter(
-            not Flashcard.is_deleted, Flashcard.next_review <= datetime.utcnow()
-        )
+            not Flashcard.is_deleted,
+            Flashcard.next_review <= datetime.utcnow())
 
         if deck_id:
             query = query.filter(Flashcard.deck_id == deck_id)
         else:
             # Filtrar por decks del usuario
-            query = query.join(Deck).filter(Deck.user_id == user_id, not Deck.is_deleted)
+            query = query.join(
+                Deck).filter(Deck.user_id == user_id, not Deck.is_deleted)
 
         return query.order_by(Flashcard.next_review).limit(limit).all()
 
@@ -815,25 +878,31 @@ class QueryOptimizer:
 
         performance = (
             db.session.query(
-                db.func.count(CardReview.id).label("total_reviews"),
-                db.func.avg(CardReview.rating).label("avg_rating"),
-                db.func.count(db.case([(CardReview.rating >= 3, 1)])).label("correct_reviews"),
-            )
-            .join(Flashcard)
-            .filter(
+                db.func.count(
+                    CardReview.id).label("total_reviews"),
+                db.func.avg(
+                    CardReview.rating).label("avg_rating"),
+                db.func.count(
+                    db.case(
+                        [
+                            (CardReview.rating >= 3,
+                             1)])).label("correct_reviews"),
+            ) .join(Flashcard) .filter(
                 Flashcard.deck_id == deck_id,
                 not CardReview.is_deleted,
                 CardReview.reviewed_at >= cutoff_date,
-            )
-            .first()
-        )
+            ) .first())
 
         return {
             "total_reviews": performance.total_reviews or 0,
-            "avg_rating": round(performance.avg_rating or 0, 2),
+            "avg_rating": round(
+                performance.avg_rating or 0,
+                2),
             "correct_reviews": performance.correct_reviews or 0,
             "accuracy_rate": round(
-                ((performance.correct_reviews / performance.total_reviews * 100) if performance.total_reviews else 0),
+                ((performance.correct_reviews /
+                  performance.total_reviews *
+                  100) if performance.total_reviews else 0),
                 2,
             ),
         }
@@ -841,22 +910,24 @@ class QueryOptimizer:
     @staticmethod
     def get_decks_stats(user_id):
         """Obtener estadísticas de todos los decks del usuario en una sola consulta optimizada"""
-        # Consulta agregada para obtener total de cartas y cartas vencidas por deck
+        # Consulta agregada para obtener total de cartas y cartas vencidas por
+        # deck
         stats_query = (
             db.session.query(
                 Flashcard.deck_id.label("deck_id"),
-                db.func.count(Flashcard.id).label("total_cards"),
-                db.func.count(db.case([(Flashcard.next_review <= datetime.utcnow(), 1)])).label("due_cards"),
-            )
-            .join(Deck)
-            .filter(
+                db.func.count(
+                    Flashcard.id).label("total_cards"),
+                db.func.count(
+                    db.case(
+                        [
+                            (Flashcard.next_review <= datetime.utcnow(),
+                             1)])).label("due_cards"),
+            ) .join(Deck) .filter(
                 Deck.user_id == user_id,
                 not Deck.is_deleted,
                 not Flashcard.is_deleted,
-            )
-            .group_by(Flashcard.deck_id)
-            .all()
-        )
+            ) .group_by(
+                Flashcard.deck_id) .all())
 
         # Convertir a diccionario para acceso rápido
         stats_dict = {}

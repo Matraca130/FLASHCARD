@@ -157,7 +157,8 @@ class FileValidator:
     @staticmethod
     def validate_image_file(filename, file_data):
         """Validar archivo de imagen"""
-        if not FileValidator.validate_file_extension(filename, FileValidator.ALLOWED_IMAGE_EXTENSIONS):
+        if not FileValidator.validate_file_extension(
+                filename, FileValidator.ALLOWED_IMAGE_EXTENSIONS):
             return False, "Extensión de imagen no permitida"
 
         if not FileValidator.validate_file_size(file_data):
@@ -176,7 +177,8 @@ class FileValidator:
     @staticmethod
     def validate_audio_file(filename, file_data):
         """Validar archivo de audio"""
-        if not FileValidator.validate_file_extension(filename, FileValidator.ALLOWED_AUDIO_EXTENSIONS):
+        if not FileValidator.validate_file_extension(
+                filename, FileValidator.ALLOWED_AUDIO_EXTENSIONS):
             return False, "Extensión de audio no permitida"
 
         if not FileValidator.validate_file_size(file_data):
@@ -200,7 +202,8 @@ class AttackDetector:
         if self.redis_client:
             try:
                 current = self.redis_client.get(key) or 0
-                self.redis_client.setex(key, 3600, int(current) + 1)  # 1 hora TTL
+                self.redis_client.setex(
+                    key, 3600, int(current) + 1)  # 1 hora TTL
                 return int(current) + 1
             except Exception:
                 pass
@@ -253,7 +256,8 @@ class AttackDetector:
 
     def is_blocked(self, identifier, attempt_type="login", max_attempts=5):
         """Verificar si está bloqueado"""
-        return self.get_failed_attempts(identifier, attempt_type) >= max_attempts
+        return self.get_failed_attempts(
+            identifier, attempt_type) >= max_attempts
 
 
 # Instancia global de detector
@@ -296,8 +300,7 @@ def check_account_lockout(f):
                     {
                         "success": False,
                         "error": "Cuenta temporalmente bloqueada por múltiples intentos fallidos",
-                    }
-                ),
+                    }),
                 429,
             )
 
@@ -323,7 +326,8 @@ def log_security_event(event_type, details=None):
     if redis_client:
         try:
             redis_client.lpush("security_events", json.dumps(event))
-            redis_client.ltrim("security_events", 0, 999)  # Mantener últimos 1000 eventos
+            # Mantener últimos 1000 eventos
+            redis_client.ltrim("security_events", 0, 999)
         except Exception:
             pass
 
@@ -339,7 +343,9 @@ def security_middleware():
             value = request.headers[header]
             # Log si hay múltiples IPs (posible proxy malicioso)
             if "," in value:
-                log_security_event("suspicious_proxy", {"header": header, "value": value})
+                log_security_event(
+                    "suspicious_proxy", {
+                        "header": header, "value": value})
 
     # Verificar User-Agent
     user_agent = request.headers.get("User-Agent", "")
@@ -349,10 +355,12 @@ def security_middleware():
     # Verificar tamaño de request
     if request.content_length and request.content_length > 50 * 1024 * 1024:  # 50MB
         log_security_event("large_request", {"size": request.content_length})
-        return jsonify({"success": False, "error": "Request demasiado grande"}), 413
-
+        return jsonify(
+            {"success": False, "error": "Request demasiado grande"}), 413
 
 # Función para generar tokens seguros
+
+
 def generate_secure_token(length=32):
     """Generar token seguro"""
     return secrets.token_urlsafe(length)
@@ -372,7 +380,11 @@ def verify_secure_hash(data, hashed):
     """Verificar hash seguro"""
     salt = hashed[:32]
     hash_obj = hashed[32:]
-    return hashlib.pbkdf2_hmac("sha256", data.encode(), salt, 100000) == hash_obj
+    return hashlib.pbkdf2_hmac(
+        "sha256",
+        data.encode(),
+        salt,
+        100000) == hash_obj
 
 
 # Configuración de CORS seguro

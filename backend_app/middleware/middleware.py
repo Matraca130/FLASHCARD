@@ -23,7 +23,8 @@ def init_middleware(app):
         if app.debug:
             logger.debug(f"Request: {request.method} {request.path}")
             logger.debug(f"Headers: {dict(request.headers)}")
-            logger.debug(f"Origin: {request.headers.get('Origin', 'No Origin')}")
+            logger.debug(
+                f"Origin: {request.headers.get('Origin', 'No Origin')}")
 
         # Manejar preflight requests (OPTIONS)
         if request.method == "OPTIONS":
@@ -56,7 +57,8 @@ def init_middleware(app):
         # Log de respuesta para debugging
         if app.debug:
             duration = time.time() - getattr(g, "request_start_time", 0)
-            logger.debug(f"Response: {response.status_code} in {duration:.3f}s")
+            logger.debug(
+                f"Response: {response.status_code} in {duration:.3f}s")
 
         return response
 
@@ -191,7 +193,8 @@ def validate_json(required_fields=None):
 
             # Validar campos requeridos
             if required_fields:
-                missing_fields = [field for field in required_fields if field not in data]
+                missing_fields = [
+                    field for field in required_fields if field not in data]
                 if missing_fields:
                     return (
                         jsonify(
@@ -199,8 +202,7 @@ def validate_json(required_fields=None):
                                 "success": False,
                                 "error": f'Campos requeridos faltantes: {", ".join(missing_fields)}',
                                 "code": "MISSING_REQUIRED_FIELDS",
-                            }
-                        ),
+                            }),
                         400,
                     )
 
@@ -226,18 +228,16 @@ def handle_api_errors(f):
             )
         except PermissionError as e:
             logger.warning(f"Permission error in {f.__name__}: {str(e)}")
-            return (
-                jsonify(
-                    {
-                        "success": False,
-                        "error": "No tienes permisos para realizar esta acción",
-                        "code": "PERMISSION_DENIED",
-                    }
-                ),
-                403,
-            )
+            return (jsonify({"success": False,
+                             "error": "No tienes permisos para realizar esta acción",
+                             "code": "PERMISSION_DENIED",
+                             }),
+                    403,
+                    )
         except Exception as e:
-            logger.error(f"Unexpected error in {f.__name__}: {str(e)}", exc_info=True)
+            logger.error(
+                f"Unexpected error in {f.__name__}: {str(e)}",
+                exc_info=True)
             return (
                 jsonify(
                     {

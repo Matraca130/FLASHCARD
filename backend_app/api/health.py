@@ -59,15 +59,18 @@ def detailed_health_check():
             "response_time_ms": round(db_time, 2),
         }
     except Exception as e:
-        health_status["checks"]["database"] = {"status": "unhealthy", "error": str(e)}
+        health_status["checks"]["database"] = {
+            "status": "unhealthy", "error": str(e)}
         health_status["status"] = "degraded"
 
     # Verificar Sentry (si está configurado)
     try:
         sentry_healthy = HealthMonitor.check_sentry_health()
-        health_status["checks"]["sentry"] = {"status": "healthy" if sentry_healthy else "unhealthy"}
+        health_status["checks"]["sentry"] = {
+            "status": "healthy" if sentry_healthy else "unhealthy"}
     except Exception as e:
-        health_status["checks"]["sentry"] = {"status": "unhealthy", "error": str(e)}
+        health_status["checks"]["sentry"] = {
+            "status": "unhealthy", "error": str(e)}
 
     # Métricas del sistema
     try:
@@ -87,7 +90,8 @@ def detailed_health_check():
             health_status["status"] = "degraded"
 
     except Exception as e:
-        health_status["checks"]["system"] = {"status": "unhealthy", "error": str(e)}
+        health_status["checks"]["system"] = {
+            "status": "unhealthy", "error": str(e)}
 
     # Tiempo total de respuesta
     total_time = (time.time() - start_time) * 1000
@@ -157,9 +161,10 @@ def liveness_check():
             {
                 "status": "alive",
                 "timestamp": datetime.utcnow().isoformat(),
-                "uptime_seconds": (time.time() - start_time if "start_time" in globals() else 0),
-            }
-        ),
+                "uptime_seconds": (
+                    time.time() -
+                    start_time if "start_time" in globals() else 0),
+            }),
         200,
     )
 

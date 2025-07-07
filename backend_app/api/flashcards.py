@@ -66,8 +66,9 @@ def get_flashcard(flashcard_id):
 
         # Verificar que la flashcard pertenece al usuario
         flashcard = (
-            db.session.query(Flashcard).join(Deck).filter(Flashcard.id == flashcard_id, Deck.user_id == user_id).first()
-        )
+            db.session.query(Flashcard).join(Deck).filter(
+                Flashcard.id == flashcard_id,
+                Deck.user_id == user_id).first())
 
         if not flashcard:
             return jsonify({"error": "Flashcard no encontrada"}), 404
@@ -83,8 +84,10 @@ def get_flashcard(flashcard_id):
             "stability": flashcard.stability,
             "retrievability": flashcard.retrievability,
             "repetitions": flashcard.repetitions,
-            "last_review": (flashcard.last_review.isoformat() if flashcard.last_review else None),
-            "next_review": (flashcard.next_review.isoformat() if flashcard.next_review else None),
+            "last_review": (
+                flashcard.last_review.isoformat() if flashcard.last_review else None),
+            "next_review": (
+                flashcard.next_review.isoformat() if flashcard.next_review else None),
             "created_at": flashcard.created_at.isoformat(),
             "updated_at": flashcard.updated_at.isoformat(),
         }
@@ -108,8 +111,9 @@ def update_flashcard(flashcard_id):
 
         # Verificar que la flashcard pertenece al usuario
         flashcard = (
-            db.session.query(Flashcard).join(Deck).filter(Flashcard.id == flashcard_id, Deck.user_id == user_id).first()
-        )
+            db.session.query(Flashcard).join(Deck).filter(
+                Flashcard.id == flashcard_id,
+                Deck.user_id == user_id).first())
 
         if not flashcard:
             return jsonify({"error": "Flashcard no encontrada"}), 404
@@ -154,8 +158,9 @@ def delete_flashcard(flashcard_id):
 
         # Verificar que la flashcard pertenece al usuario
         flashcard = (
-            db.session.query(Flashcard).join(Deck).filter(Flashcard.id == flashcard_id, Deck.user_id == user_id).first()
-        )
+            db.session.query(Flashcard).join(Deck).filter(
+                Flashcard.id == flashcard_id,
+                Deck.user_id == user_id).first())
 
         if not flashcard:
             return jsonify({"error": "Flashcard no encontrada"}), 404
@@ -200,9 +205,13 @@ def get_deck_flashcards(deck_id):
         query = Flashcard.query.filter_by(deck_id=deck_id)
 
         if search:
-            query = query.filter(db.or_(Flashcard.front.contains(search), Flashcard.back.contains(search)))
+            query = query.filter(
+                db.or_(
+                    Flashcard.front.contains(search),
+                    Flashcard.back.contains(search)))
 
-        flashcards = query.paginate(page=page, per_page=per_page, error_out=False)
+        flashcards = query.paginate(
+            page=page, per_page=per_page, error_out=False)
 
         flashcards_data = []
         for card in flashcards.items:
@@ -213,10 +222,10 @@ def get_deck_flashcards(deck_id):
                     "back": card.back,
                     "interval": card.interval,
                     "difficulty": card.difficulty,
-                    "next_review": (card.next_review.isoformat() if card.next_review else None),
+                    "next_review": (
+                        card.next_review.isoformat() if card.next_review else None),
                     "created_at": card.created_at.isoformat(),
-                }
-            )
+                })
 
         return (
             jsonify(
@@ -263,15 +272,16 @@ def create_bulk_flashcards():
             return jsonify({"error": "deck_id es requerido"}), 400
 
         if not flashcards_data:
-            return jsonify({"error": "Se requiere al menos una flashcard"}), 400
-
+            return jsonify(
+                {"error": "Se requiere al menos una flashcard"}), 400
         # Verificar que el deck pertenece al usuario
         deck = Deck.query.filter_by(id=deck_id, user_id=user_id).first()
         if not deck:
             return jsonify({"error": "Deck no encontrado"}), 404
 
         # Usar servicio para crear flashcards en lote
-        result = flashcard_service.create_bulk_flashcards(deck_id, flashcards_data)
+        result = flashcard_service.create_bulk_flashcards(
+            deck_id, flashcards_data)
 
         if not result["success"]:
             return jsonify({"error": result["error"]}), 400
@@ -285,8 +295,7 @@ def create_bulk_flashcards():
                     "created_count": bulk_data["created_count"],
                     "flashcards": bulk_data["flashcards"],
                     "message": f"{bulk_data['created_count']} flashcards creadas exitosamente",
-                }
-            ),
+                }),
             201,
         )
 
