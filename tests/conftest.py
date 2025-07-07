@@ -96,10 +96,9 @@ def test_flashcard(db_session, test_deck):
     """Flashcard de prueba"""
     flashcard = Flashcard(
         deck_id=test_deck.id,
-        user_id=test_deck.user_id,
         front_text='Test Question',
         back_text='Test Answer',
-        difficulty=1,
+        difficulty='normal',
         interval_days=1,
         ease_factor=2.5,
         repetitions=0
@@ -181,10 +180,9 @@ def multiple_flashcards(db_session, test_deck):
     for i in range(5):
         flashcard = Flashcard(
             deck_id=test_deck.id,
-            user_id=test_deck.user_id,
             front_text=f'Question {i+1}',
             back_text=f'Answer {i+1}',
-            difficulty=1,
+            difficulty='normal',
             interval_days=1,
             ease_factor=2.5,
             repetitions=0

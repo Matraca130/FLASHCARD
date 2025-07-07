@@ -161,7 +161,7 @@ class TestDeckService:
         result = deck_service.create_deck(test_user.id, valid_deck_data)
         
         assert result['success'] is False
-        assert 'message' in result  # Verificar mensaje de fallo
+        assert 'error' in result  # Verificar mensaje de fallo
     
     @pytest.mark.unit
     def test_get_public_decks(self, deck_service, test_user, db_session):

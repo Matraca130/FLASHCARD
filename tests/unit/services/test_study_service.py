@@ -28,9 +28,9 @@ class TestStudyService:
         from backend_app.models.models import Flashcard
         future_card = Flashcard(
             deck_id=test_deck.id,
-            user_id=test_user.id,
             front_text='Future card',
             back_text='Future answer',
+            difficulty='normal',
             next_review=datetime.utcnow() + timedelta(days=7)
         )
         db_session.add(future_card)
