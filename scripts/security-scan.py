@@ -42,10 +42,22 @@ class SecurityScanner:
         for excluded_dir in self.config.get('exclusions', {}).get('directories', []):
             if excluded_dir in path.parts:
                 return True
+            # También verificar si el path completo contiene el directorio
+            if excluded_dir in str(path):
+                return True
         
         # Excluir archivos por patrón
         for pattern in self.config.get('exclusions', {}).get('files', []):
             if path.match(pattern):
+                return True
+        
+        # Excluir archivos minificados y bundles específicamente
+        if any(pattern in path.name for pattern in ['.min.', '-BMfhnFcW', 'bundle', 'chunk']):
+            return True
+        
+        # Excluir archivos en directorio raíz que parecen bundles
+        if path.parent == Path('.') and any(char in path.name for char in ['-', '_']) and path.suffix == '.js':
+            if len(path.stem) > 10:  # Nombres largos típicos de bundles
                 return True
         
         return False
