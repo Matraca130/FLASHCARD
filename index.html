@@ -420,7 +420,32 @@
             <p class="hero-subtitle">Tu plataforma de aprendizaje inteligente con repetición espaciada</p>
             
             <div class="hero-stats" id="dashboard-stats">
-              <!-- Stats will be loaded dynamically -->
+              <div class="stats-panel">
+                <div class="stat-item">
+                  <span id="total-cards">0</span>
+                  <p>Total de flashcards</p>
+                </div>
+                <div class="stat-item">
+                  <span id="studied-today">0</span>
+                  <p>Estudiadas hoy</p>
+                </div>
+                <div class="stat-item">
+                  <span id="accuracy">0%</span>
+                  <p>Precisión</p>
+                </div>
+                <div class="stat-item">
+                  <span id="streak">0</span>
+                  <p>Racha de estudio</p>
+                </div>
+                <div class="stat-item">
+                  <span id="total-progress">0%</span>
+                  <p>Progreso Total</p>
+                </div>
+                <div class="stat-item">
+                  <span id="study-time">0h 0m</span>
+                  <p>Tiempo de Estudio</p>
+                </div>
+              </div>
             </div>
           </div>
           
@@ -479,9 +504,7 @@
                 </svg> Crear Nuevo
               </button>
             </div>
-            <div class="deck-grid" id="dashboard-decks">
-              <!-- Decks will be loaded dynamically -->
-            </div>
+            <div class="deck-grid" id="dashboard-decks-list"></div>
           </div>
         </section>
         

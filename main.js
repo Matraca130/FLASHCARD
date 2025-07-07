@@ -10,6 +10,7 @@ import './sync-manager.js';
 
 // Importar servicios refactorizados
 import { loadGamificationData } from './gamification.service.js';
+import { loadDashboardData } from './dashboard.service.js';
 
 import { initializeCharts } from './charts.js';
 
@@ -67,6 +68,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Inicializar componentes visuales
     await initializeVisualComponents();
+
+    // Cargar datos del dashboard
+    await loadDashboardData();
 
     // Configurar PWA si está habilitado
     if (APP_CONFIG.features.serviceWorker) {
