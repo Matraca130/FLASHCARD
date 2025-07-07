@@ -29,16 +29,20 @@ class UserService(BaseService):
         """
         try:
             # Verificar email único
-            existing_email = self.db.session.query(User).filter_by(email=user_data["email"]).first()
+            existing_email = self.db.session.query(
+                User).filter_by(email=user_data["email"]).first()
 
             if existing_email:
-                return self._error_response("El email ya está registrado", code=409)
+                return self._error_response(
+                    "El email ya está registrado", code=409)
 
             # Verificar username único
-            existing_username = self.db.session.query(User).filter_by(username=user_data["username"]).first()
+            existing_username = self.db.session.query(User).filter_by(
+                username=user_data["username"]).first()
 
             if existing_username:
-                return self._error_response("El nombre de usuario ya está en uso", code=409)
+                return self._error_response(
+                    "El nombre de usuario ya está en uso", code=409)
 
             # Crear usuario
             user = User(
@@ -52,7 +56,8 @@ class UserService(BaseService):
             self.db.session.add(user)
 
             if not self._commit_or_rollback():
-                return self._error_response("Error al guardar usuario", code=500)
+                return self._error_response(
+                    "Error al guardar usuario", code=500)
 
             # Generar token
             token = create_access_token(identity=str(user.id))
@@ -150,10 +155,12 @@ class UserService(BaseService):
 
             # Verificar username único si se está cambiando
             if "username" in update_data and update_data["username"] != user.username:
-                existing_username = self.db.session.query(User).filter_by(username=update_data["username"]).first()
+                existing_username = self.db.session.query(User).filter_by(
+                    username=update_data["username"]).first()
 
                 if existing_username:
-                    return self._error_response("El nombre de usuario ya está en uso", code=409)
+                    return self._error_response(
+                        "El nombre de usuario ya está en uso", code=409)
 
             # Actualizar campos permitidos
             allowed_fields = [
@@ -173,9 +180,11 @@ class UserService(BaseService):
             self._update_timestamps(user)
 
             if not self._commit_or_rollback():
-                return self._error_response("Error al actualizar perfil", code=500)
+                return self._error_response(
+                    "Error al actualizar perfil", code=500)
 
-            return self._success_response(user.to_dict(), "Perfil actualizado exitosamente")
+            return self._success_response(
+                user.to_dict(), "Perfil actualizado exitosamente")
 
         except Exception as e:
             return self._handle_exception(e, "actualización de perfil")
@@ -199,13 +208,15 @@ class UserService(BaseService):
                 return self._error_response("Usuario no encontrado", code=404)
 
             if not user.check_password(current_password):
-                return self._error_response("Contraseña actual incorrecta", code=401)
+                return self._error_response(
+                    "Contraseña actual incorrecta", code=401)
 
             user.set_password(new_password)
             self._update_timestamps(user)
 
             if not self._commit_or_rollback():
-                return self._error_response("Error al cambiar contraseña", code=500)
+                return self._error_response(
+                    "Error al cambiar contraseña", code=500)
 
             return self._success_response(
                 {"message": "Contraseña actualizada"},
@@ -242,8 +253,10 @@ class UserService(BaseService):
                     "total_cards_studied": user.total_cards_studied or 0,
                     "total_cards_correct": user.total_cards_correct or 0,
                     "accuracy_rate": user.accuracy_rate or 0.0,
-                    "member_since": (user.created_at.isoformat() if user.created_at else None),
-                    "last_study": (user.last_study.isoformat() if user.last_study else None),
+                    "member_since": (
+                        user.created_at.isoformat() if user.created_at else None),
+                    "last_study": (
+                        user.last_study.isoformat() if user.last_study else None),
                 }
 
             stats = self._get_or_set_cache(cache_key, fetch_stats, timeout=600)
@@ -251,9 +264,15 @@ class UserService(BaseService):
             return self._success_response(stats)
 
         except Exception as e:
-            return self._handle_exception(e, "obtención de estadísticas de usuario")
+            return self._handle_exception(
+                e, "obtención de estadísticas de usuario")
 
-    def update_study_stats(self, user_id, cards_studied, cards_correct, study_time):
+    def update_study_stats(
+            self,
+            user_id,
+            cards_studied,
+            cards_correct,
+            study_time):
         """
         Actualizar estadísticas de estudio del usuario
 
@@ -273,19 +292,23 @@ class UserService(BaseService):
                 return self._error_response("Usuario no encontrado", code=404)
 
             # Actualizar estadísticas acumulativas
-            user.total_cards_studied = (user.total_cards_studied or 0) + cards_studied
-            user.total_cards_correct = (user.total_cards_correct or 0) + cards_correct
+            user.total_cards_studied = (
+                user.total_cards_studied or 0) + cards_studied
+            user.total_cards_correct = (
+                user.total_cards_correct or 0) + cards_correct
             user.total_study_time = (user.total_study_time or 0) + study_time
             user.last_study = datetime.utcnow()
 
             # Recalcular tasa de aciertos
             if user.total_cards_studied > 0:
-                user.accuracy_rate = (user.total_cards_correct / user.total_cards_studied) * 100
+                user.accuracy_rate = (
+                    user.total_cards_correct / user.total_cards_studied) * 100
 
             self._update_timestamps(user)
 
             if not self._commit_or_rollback():
-                return self._error_response("Error al actualizar estadísticas", code=500)
+                return self._error_response(
+                    "Error al actualizar estadísticas", code=500)
 
             # Invalidar cache de estadísticas
             self._invalidate_cache_pattern(f"user_stats:{user_id}")
@@ -296,4 +319,5 @@ class UserService(BaseService):
             )
 
         except Exception as e:
-            return self._handle_exception(e, "actualización de estadísticas de estudio")
+            return self._handle_exception(
+                e, "actualización de estadísticas de estudio")

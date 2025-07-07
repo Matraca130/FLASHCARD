@@ -305,8 +305,8 @@ def get_study_cards_v2_optimized(deck_id):
             # Agregar información de estudio optimizada
             is_due = card.next_review <= now if card.next_review else True
             days_overdue = (
-                now -
-                card.next_review).days if card.next_review and card.next_review < now else 0
+                now
+                - card.next_review).days if card.next_review and card.next_review < now else 0
 
             card_data["study_info"] = {
                 "is_new": card.last_review is None,
@@ -474,8 +474,8 @@ def calculate_study_streak_optimized(user_id: int) -> int:
                 and_(
                     Deck.user_id == user_id,
                     StudySession.cards_studied > 0,
-                    StudySession.started_at >= datetime.utcnow() -
-                    timedelta(
+                    StudySession.started_at >= datetime.utcnow()
+                    - timedelta(
                         days=365),
                 )) .distinct() .order_by(
                 func.date(

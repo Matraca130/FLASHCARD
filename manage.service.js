@@ -19,7 +19,27 @@ import {
  */
 export async function loadManageDecks() {
   try {
-    const decks = await apiWithFallback('/api/decks', FALLBACK_DATA.decks);
+    // Intentar cargar desde API primero
+    let decks;
+    try {
+      decks = await api('/api/decks');
+      if (decks && decks.error) {
+        throw new Error(decks.error);
+      }
+    } catch (apiError) {
+      console.log('API no disponible, usando almacenamiento local');
+      // Importar storage service dinámicamente para evitar dependencias circulares
+      const { storageService } = await import('./storage.service.js');
+      const localDecks = storageService.getDecks();
+      
+      // Combinar con datos de fallback si no hay decks locales
+      decks = localDecks.length > 0 ? localDecks : FALLBACK_DATA.decks;
+      
+      if (localDecks.length > 0) {
+        showNotification('Mostrando decks guardados localmente', 'info', 3000);
+      }
+    }
+    
     renderManageDecks(decks);
     return decks;
   } catch (error) {

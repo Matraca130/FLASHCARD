@@ -51,15 +51,15 @@ def validate_json(schema: Type[BaseModel]):
                     # Formatear errores de validación
                     errors = []
                     for error in e.errors():
-            field = ".".join(str(x) for x in error["loc"])
-            message = error["msg"]
-            errors.append(
-                {"field": field, "message": message, "type": error["type"]})
+                        field = ".".join(str(x) for x in error["loc"])
+                        message = error["msg"]
+                        errors.append(
+                            {"field": field, "message": message, "type": error["type"]})
 
-            return (
-                jsonify({"error": "Datos de entrada inválidos", "details": errors}),
-                400,
-            )
+                    return (
+                        jsonify({"error": "Datos de entrada inválidos", "details": errors}),
+                        400,
+                    )
 
             except Exception as e:
                 logger.error(f"Error en validación: {str(e)}")
@@ -74,10 +74,10 @@ def validate_json(schema: Type[BaseModel]):
 
         return decorated_function
 
-    return decorator
+    return decorat
 
 
-def validate_query_params(schema: Type[BaseModel]):
+or def validate_query_params(schema: Type[BaseModel]):
     """
     Decorador para validar parámetros de query usando esquemas Pydantic
 
@@ -105,20 +105,20 @@ def validate_query_params(schema: Type[BaseModel]):
                     # Formatear errores de validación
                     errors = []
                     for error in e.errors():
-            field = ".".join(str(x) for x in error["loc"])
-            message = error["msg"]
-            errors.append(
-                {"field": field, "message": message, "type": error["type"]})
+                        field = ".".join(str(x) for x in error["loc"])
+                        message = error["msg"]
+                        errors.append(
+                            {"field": field, "message": message, "type": error["type"]})
 
-            return (
-                jsonify(
-                    {
-                        "error": "Parámetros de consulta inválidos",
-                        "details": errors,
-                    }
-                ),
-                400,
-            )
+                    return (
+                        jsonify(
+                            {
+                                "error": "Parámetros de consulta inválidos",
+                                "details": errors,
+                            }
+                        ),
+                        400,
+                    )
 
             except Exception as e:
                 logger.error(f"Error en validación de query params: {str(e)}")
@@ -133,22 +133,19 @@ def validate_query_params(schema: Type[BaseModel]):
 
         return decorated_function
 
-    return decorator
+    return decorat
 
-
-def validate_data_manually(
+or def validate_data_manually(
         data: Dict[Any, Any], schema: Type[BaseModel]) -> Dict[str, Any]:
     """
-    Validar datos manualmente sin decorador
-
-    Args:
+    Validar datos manualmente sin decorad
+    or Args:
         data: Datos a validar
         schema: Esquema Pydantic
 
     Returns:
-        Dict con datos validados o información de error
-
-    Raises:
+        Dict con datos validados o información de err
+    or Raises:
         ValidationError: Si los datos no son válidos
     """
     try:

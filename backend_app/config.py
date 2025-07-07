@@ -37,7 +37,7 @@ class Config:
     # CORS Configuration
     CORS_ORIGINS = os.environ.get(
         "CORS_ORIGINS",
-        "http://localhost:3000").split(",")
+        "http://localhost:3000,https://matraca130.github.io").split(",")
 
     # Rate Limiting
     RATELIMIT_STORAGE_URL = os.environ.get("REDIS_URL", "memory://")

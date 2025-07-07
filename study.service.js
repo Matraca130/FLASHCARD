@@ -1,7 +1,7 @@
 import { api } from './apiClient.js';
 import { store } from './store/store.js';
 import { apiWithFallback, performCrudOperation } from './utils/apiHelpers.js';
-import { showNotification, formatDate, generateId } from './utils/helpers.js';
+import { showNotification, formatDate, generateId, formatDateDDMMYYYY } from './utils/helpers.js';
 import { validateRequiredFields } from './utils/validation.js';
 
 /**
@@ -137,7 +137,7 @@ function renderStudyDecks(container, decks, options = {}) {
       const dueCards = deck.due_cards || 0;
       const newCards = deck.new_cards || 0;
       const lastStudied = deck.last_studied
-        ? formatDate(new Date(deck.last_studied), 'DD/MM/YYYY')
+        ? formatDateDDMMYYYY(new Date(deck.last_studied))
         : 'Nunca';
 
       return `

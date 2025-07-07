@@ -1,0 +1,9 @@
+{
+  "maxConcurrentAgents": 3,
+  "lockTimeout": 1800000,
+  "autoMergeEnabled": true,
+  "conflictResolutionStrategy": "smart-merge",
+  "notificationEnabled": true,
+  "lastActivity": {},
+  "activeAgents": []
+}
