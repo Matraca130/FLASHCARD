@@ -1,0 +1,21 @@
+[build]
+  # Force static deployment - no build command
+  command = ""
+  # Publish from root directory
+  publish = "."
+  # Ignore Python files
+  ignore = "requirements.txt"
+
+[build.environment]
+  # Disable automatic dependency detection
+  NETLIFY_SKIP_DEPENDENCY_INSTALL = "true"
+
+[[headers]]
+  # Apply headers to all files
+  for = "/*"
+  [headers.values]
+    # Enable CORS for API calls to Render backend
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
+    Access-Control-Allow-Headers = "Content-Type, Authorization"
+
