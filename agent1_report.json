@@ -3,8 +3,8 @@
   "phase": "analysis",
   "mainFileAnalysis": {
     "file": "./flashcard-app-final.js",
-    "size": 34289,
-    "lines": 1023,
+    "size": 38108,
+    "lines": 1153,
     "functions": [
       {
         "name": "index",
@@ -20,68 +20,68 @@
       },
       {
         "name": "flashcard",
-        "line": 278,
+        "line": 408,
         "type": "arrow",
         "content": "const flashcard = flashcards.find(f => f.id === flashcardId);"
       },
       {
         "name": "studiedToday",
-        "line": 308,
+        "line": 438,
         "type": "arrow",
         "content": "const studiedToday = flashcards.filter(f =>"
       },
       {
         "name": "reviewed",
-        "line": 337,
+        "line": 467,
         "type": "arrow",
         "content": "const reviewed = flashcards.filter(f => f.lastReviewed);"
       },
       {
         "name": "correct",
-        "line": 340,
+        "line": 470,
         "type": "arrow",
         "content": "const correct = reviewed.filter(f => f.easeFactor >= 2.5).length;"
       },
       {
         "name": "studiedToday",
-        "line": 372,
+        "line": 502,
         "type": "arrow",
         "content": "const studiedToday = flashcards.filter(f =>"
       },
       {
         "name": "showSection",
-        "line": 815,
+        "line": 945,
         "content": "function showSection(sectionName) {"
       },
       {
         "name": "debounce",
-        "line": 867,
+        "line": 997,
         "content": "function debounce(func, wait) {"
       },
       {
         "name": "executedFunction",
-        "line": 869,
+        "line": 999,
         "content": "return function executedFunction(...args) {"
       },
       {
         "name": "later",
-        "line": 870,
+        "line": 1000,
         "type": "arrow",
         "content": "const later = () => {"
       },
       {
         "name": "generateActivityHeatmap",
-        "line": 880,
+        "line": 1010,
         "content": "function generateActivityHeatmap() {"
       },
       {
         "name": "handleCreateDeck",
-        "line": 914,
+        "line": 1044,
         "content": "async function handleCreateDeck(event) {"
       },
       {
         "name": "handleCreateFlashcard",
-        "line": 966,
+        "line": 1096,
         "content": "async function handleCreateFlashcard(event) {"
       }
     ],
@@ -170,397 +170,427 @@
         "content": "const items = JSON.parse(localStorage.getItem(storageKey) || '[]');"
       },
       {
-        "name": "DeckService",
+        "name": "AuthService",
         "line": 142,
+        "content": "const AuthService = {"
+      },
+      {
+        "name": "token",
+        "line": 144,
+        "content": "const token = this.getAuthToken();"
+      },
+      {
+        "name": "data",
+        "line": 150,
+        "content": "const data = await ApiService.request('/auth/verify');"
+      },
+      {
+        "name": "result",
+        "line": 175,
+        "content": "const result = await ApiService.request('/auth/login', {"
+      },
+      {
+        "name": "result",
+        "line": 212,
+        "content": "const result = await ApiService.request('/auth/register', {"
+      },
+      {
+        "name": "userStr",
+        "line": 266,
+        "content": "const userStr = localStorage.getItem('currentUser');"
+      },
+      {
+        "name": "DeckService",
+        "line": 272,
         "content": "const DeckService = {"
       },
       {
         "name": "deck",
-        "line": 148,
+        "line": 278,
         "content": "const deck = {"
       },
       {
         "name": "result",
-        "line": 156,
+        "line": 286,
         "content": "const result = await ApiService.request('/decks', {"
       },
       {
         "name": "result",
-        "line": 173,
+        "line": 303,
         "content": "const result = await ApiService.request(`/decks/${id}`, {"
       },
       {
         "name": "FlashcardService",
-        "line": 183,
+        "line": 313,
         "content": "const FlashcardService = {"
       },
       {
         "name": "flashcard",
-        "line": 189,
+        "line": 319,
         "content": "const flashcard = {"
       },
       {
         "name": "result",
-        "line": 199,
+        "line": 329,
         "content": "const result = await ApiService.request('/flashcards', {"
       },
       {
         "name": "SM2Algorithm",
-        "line": 223,
+        "line": 353,
         "content": "const SM2Algorithm = {"
       },
       {
         "name": "{ interval, easeFactor, repetitions }",
-        "line": 226,
+        "line": 356,
         "content": "let { interval, easeFactor, repetitions } = flashcard;"
       },
       {
         "name": "nextReview",
-        "line": 249,
+        "line": 379,
         "content": "const nextReview = new Date();"
       },
       {
         "name": "StudyService",
-        "line": 263,
+        "line": 393,
         "content": "const StudyService = {"
       },
       {
         "name": "flashcards",
-        "line": 265,
+        "line": 395,
         "content": "const flashcards = await FlashcardService.getByDeck(deckId);"
       },
       {
         "name": "now",
-        "line": 266,
+        "line": 396,
         "content": "const now = new Date();"
       },
       {
         "name": "nextReview",
-        "line": 270,
+        "line": 400,
         "content": "const nextReview = new Date(card.nextReview);"
       },
       {
         "name": "flashcards",
-        "line": 277,
+        "line": 407,
         "content": "const flashcards = await ApiService.request('/flashcards');"
       },
       {
         "name": "updates",
-        "line": 285,
+        "line": 415,
         "content": "const updates = SM2Algorithm.calculateNext(flashcard, quality);"
       },
       {
         "name": "updatedFlashcard",
-        "line": 288,
+        "line": 418,
         "content": "const updatedFlashcard = await FlashcardService.update(flashcardId, {"
       },
       {
         "name": "DashboardService",
-        "line": 299,
+        "line": 429,
         "content": "const DashboardService = {"
       },
       {
         "name": "[decks, flashcards]",
-        "line": 302,
+        "line": 432,
         "content": "const [decks, flashcards] = await Promise.all(["
       },
       {
         "name": "today",
-        "line": 307,
+        "line": 437,
         "content": "const today = new Date().toDateString();"
       },
       {
         "name": "totalFlashcards",
-        "line": 312,
+        "line": 442,
         "content": "const totalFlashcards = flashcards.length;"
       },
       {
         "name": "accuracy",
-        "line": 313,
+        "line": 443,
         "content": "const accuracy = this.calculateAccuracy(flashcards);"
       },
       {
         "name": "dates",
-        "line": 346,
+        "line": 476,
         "content": "const dates = flashcards"
       },
       {
         "name": "streak",
-        "line": 352,
+        "line": 482,
         "content": "let streak = 0;"
       },
       {
         "name": "today",
-        "line": 353,
+        "line": 483,
         "content": "const today = new Date().toDateString();"
       },
       {
         "name": "expectedDate",
-        "line": 356,
+        "line": 486,
         "content": "const expectedDate = new Date();"
       },
       {
         "name": "today",
-        "line": 371,
+        "line": 501,
         "content": "const today = new Date().toDateString();"
       },
       {
         "name": "UIController",
-        "line": 381,
+        "line": 511,
         "content": "const UIController = {"
       },
       {
         "name": "stats",
-        "line": 386,
+        "line": 516,
         "content": "const stats = await DashboardService.getStats();"
       },
       {
         "name": "decks",
-        "line": 402,
+        "line": 532,
         "content": "const decks = await DeckService.getAll();"
       },
       {
         "name": "container",
-        "line": 403,
+        "line": 533,
         "content": "const container = document.querySelector('.deck-grid, .decks-container, #decks-list');"
       },
       {
         "name": "decks",
-        "line": 435,
+        "line": 565,
         "content": "const decks = await DeckService.getAll();"
       },
       {
         "name": "selects",
-        "line": 436,
+        "line": 566,
         "content": "const selects = document.querySelectorAll('select[name=\"deckId\"], #deck-select');"
       },
       {
         "name": "element",
-        "line": 446,
+        "line": 576,
         "content": "const element = document.querySelector(selector);"
       },
       {
         "name": "form",
-        "line": 454,
+        "line": 584,
         "content": "const form = document.querySelector(formSelector);"
       },
       {
         "name": "StudyingFlash",
-        "line": 462,
+        "line": 592,
         "content": "const StudyingFlash = {"
       },
       {
         "name": "dashboardSection",
-        "line": 502,
+        "line": 632,
         "content": "const dashboardSection = document.querySelector('#dashboard');"
       },
       {
         "name": "createDeckForm",
-        "line": 525,
+        "line": 655,
         "content": "const createDeckForm = document.querySelector('#create-deck-form, .create-deck-form');"
       },
       {
         "name": "createFlashcardForm",
-        "line": 531,
+        "line": 661,
         "content": "const createFlashcardForm = document.querySelector('#create-flashcard-form, .create-flashcard-form');"
       },
       {
         "name": "formData",
-        "line": 550,
+        "line": 680,
         "content": "const formData = new FormData(event.target);"
       },
       {
         "name": "deckData",
-        "line": 551,
+        "line": 681,
         "content": "const deckData = {"
       },
       {
         "name": "formData",
-        "line": 585,
+        "line": 715,
         "content": "const formData = new FormData(event.target);"
       },
       {
         "name": "flashcardData",
-        "line": 586,
+        "line": 716,
         "content": "const flashcardData = {"
       },
       {
         "name": "flashcards",
-        "line": 618,
+        "line": 748,
         "content": "const flashcards = await StudyService.getFlashcardsForReview(deckId);"
       },
       {
         "name": "{ flashcards, currentIndex }",
-        "line": 650,
+        "line": 780,
         "content": "const { flashcards, currentIndex } = this.currentStudySession;"
       },
       {
         "name": "flashcard",
-        "line": 651,
+        "line": 781,
         "content": "const flashcard = flashcards[currentIndex];"
       },
       {
         "name": "frontElement",
-        "line": 659,
+        "line": 789,
         "content": "const frontElement = document.querySelector('.flashcard-front, #flashcard-front');"
       },
       {
         "name": "backElement",
-        "line": 660,
+        "line": 790,
         "content": "const backElement = document.querySelector('.flashcard-back, #flashcard-back');"
       },
       {
         "name": "progressElement",
-        "line": 661,
+        "line": 791,
         "content": "const progressElement = document.querySelector('.study-progress');"
       },
       {
         "name": "{ flashcards, currentIndex }",
-        "line": 676,
+        "line": 806,
         "content": "const { flashcards, currentIndex } = this.currentStudySession;"
       },
       {
         "name": "flashcard",
-        "line": 677,
+        "line": 807,
         "content": "const flashcard = flashcards[currentIndex];"
       },
       {
         "name": "{ answers }",
-        "line": 704,
+        "line": 834,
         "content": "const { answers } = this.currentStudySession;"
       },
       {
         "name": "targetSection",
-        "line": 731,
+        "line": 861,
         "content": "const targetSection = document.querySelector(`#${sectionName}, .${sectionName}-section`);"
       },
       {
         "name": "activeNavItem",
-        "line": 741,
+        "line": 871,
         "content": "const activeNavItem = document.querySelector(`[data-section=\"${sectionName}\"]`);"
       },
       {
         "name": "notificationStyles",
-        "line": 779,
+        "line": 909,
         "content": "const notificationStyles = document.createElement('style');"
       },
       {
         "name": "targetSection",
-        "line": 825,
+        "line": 955,
         "content": "const targetSection = document.querySelector(`#${sectionName}`);"
       },
       {
         "name": "activeNavItem",
-        "line": 839,
+        "line": 969,
         "content": "const activeNavItem = document.querySelector(`[data-section=\"${sectionName}\"]`);"
       },
       {
         "name": "timeout;",
-        "line": 868,
+        "line": 998,
         "content": "let timeout;"
       },
       {
         "name": "heatmapContainer",
-        "line": 883,
+        "line": 1013,
         "content": "const heatmapContainer = document.querySelector('.activity-heatmap, #activity-heatmap');"
       },
       {
         "name": "today",
-        "line": 890,
+        "line": 1020,
         "content": "const today = new Date();"
       },
       {
         "name": "oneYearAgo",
-        "line": 891,
+        "line": 1021,
         "content": "const oneYearAgo = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate());"
       },
       {
         "name": "heatmapHTML",
-        "line": 893,
+        "line": 1023,
         "content": "let heatmapHTML = '<div class=\"heatmap-grid\">';"
       },
       {
         "name": "activity",
-        "line": 896,
+        "line": 1026,
         "content": "const activity = Math.floor(Math.random() * 5); // 0-4 niveles de actividad"
       },
       {
         "name": "dateStr",
-        "line": 897,
+        "line": 1027,
         "content": "const dateStr = d.toISOString().split('T')[0];"
       },
       {
         "name": "nameInput",
-        "line": 917,
+        "line": 1047,
         "content": "const nameInput = document.querySelector('input[placeholder*=\"Vocabulario\"], #deck-name');"
       },
       {
         "name": "descriptionInput",
-        "line": 918,
+        "line": 1048,
         "content": "const descriptionInput = document.querySelector('textarea[placeholder*=\"contenido\"], #deck-description');"
       },
       {
         "name": "publicCheckbox",
-        "line": 919,
+        "line": 1049,
         "content": "const publicCheckbox = document.querySelector('input[type=\"checkbox\"]');"
       },
       {
         "name": "name",
-        "line": 927,
+        "line": 1057,
         "content": "const name = nameInput.value.trim();"
       },
       {
         "name": "description",
-        "line": 928,
+        "line": 1058,
         "content": "const description = descriptionInput.value.trim();"
       },
       {
         "name": "isPublic",
-        "line": 929,
+        "line": 1059,
         "content": "const isPublic = publicCheckbox ? publicCheckbox.checked : false;"
       },
       {
         "name": "newDeck",
-        "line": 939,
+        "line": 1069,
         "content": "const newDeck = await DeckService.create({"
       },
       {
         "name": "deckSelect",
-        "line": 969,
+        "line": 1099,
         "content": "const deckSelect = document.querySelector('select[name=\"deckId\"], #flashcard-deck');"
       },
       {
         "name": "frontInput",
-        "line": 970,
+        "line": 1100,
         "content": "const frontInput = document.querySelector('textarea[placeholder*=\"pregunta\"], #flashcard-front');"
       },
       {
         "name": "backInput",
-        "line": 971,
+        "line": 1101,
         "content": "const backInput = document.querySelector('textarea[placeholder*=\"respuesta\"], #flashcard-back');"
       },
       {
         "name": "deckId",
-        "line": 979,
+        "line": 1109,
         "content": "const deckId = deckSelect.value;"
       },
       {
         "name": "front",
-        "line": 980,
+        "line": 1110,
         "content": "const front = frontInput.value.trim();"
       },
       {
         "name": "back",
-        "line": 981,
+        "line": 1111,
         "content": "const back = backInput.value.trim();"
       },
       {
         "name": "newFlashcard",
-        "line": 991,
+        "line": 1121,
         "content": "const newFlashcard = await FlashcardService.create({"
       }
     ],
-    "timestamp": "2025-07-08T17:03:44.777Z"
+    "timestamp": "2025-07-08T17:25:04.865Z"
   },
-  "timestamp": "2025-07-08T17:03:44.777Z"
+  "timestamp": "2025-07-08T17:25:04.865Z"
 }
