@@ -3,12 +3,12 @@
   command = ""
   # Publish from root directory
   publish = "."
-  # Ignore Python files
-  ignore = "requirements.txt"
 
 [build.environment]
   # Disable automatic dependency detection
   NETLIFY_SKIP_DEPENDENCY_INSTALL = "true"
+  # Force Node.js runtime to avoid Python detection
+  NODE_VERSION = "18"
 
 [[headers]]
   # Apply headers to all files
