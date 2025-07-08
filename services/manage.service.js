@@ -1,6 +1,6 @@
 import { ApiClient } from './apiClient.js';
 import { store } from './store/store.js';
-import { validateDeckData } from './utils/validation.js';
+import { FormValidator } from './utils/formValidation.js';
 import {
   apiWithFallback,
   performCrudOperation,
@@ -224,8 +224,9 @@ export async function updateDeck(deckId) {
     ?.value?.trim();
   const isPublic = document.getElementById('edit-deck-public')?.checked;
 
-  // Validar datos usando utilidad común
-  if (!validateDeckData(name, description)) {
+  const validation = FormValidator.validateDeckForm({ name, description });
+  if (!validation.isValid) {
+    showNotification(validation.errors[0], 'error');
     return;
   }
 

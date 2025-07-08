@@ -13,12 +13,7 @@ import {
 import { createDeck, createFlashcard } from './create.service.js';
 import { deleteDeck, editDeck, exportDeck } from './manage.service.js';
 import { showNotification } from './utils/helpers.js';
-import {
-  validateLoginCredentials,
-  validateDeckData,
-  validateFlashcardData,
-  validateRequiredFields,
-} from './utils/validation.js';
+import { FormValidator } from './utils/formValidation.js';
 
 // Configuración del sistema de bindings
 const BINDINGS_CONFIG = {
@@ -206,7 +201,9 @@ async function handleLogin(el) {
   const password = form.querySelector('input[name="password"]')?.value?.trim();
 
   // Validar campos
-  if (!validateLoginCredentials(email, password)) {
+  const validation = FormValidator.validateLoginCredentials(email, password);
+  if (!validation.isValid) {
+    showNotification(validation.errors[0], 'error');
     return;
   }
 
@@ -244,12 +241,9 @@ async function handleRegister(el) {
   const name = form.querySelector('input[name="name"]')?.value?.trim();
 
   // Validar campos
-  if (!validateRequiredFields({ email, password, confirmPassword, name })) {
-    return;
-  }
-
-  if (password !== confirmPassword) {
-    showNotification('Las contraseñas no coinciden', 'error', 4000);
+  const validation = FormValidator.validateRegistrationData(email, password, confirmPassword);
+  if (!validation.isValid) {
+    showNotification(validation.errors[0], 'error');
     return;
   }
 

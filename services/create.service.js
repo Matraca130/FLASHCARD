@@ -1,7 +1,7 @@
 import { ApiClient } from './apiClient.js';
 import { store } from './store/store.js';
 import storageService from './storage.service.js';
-import { validateDeckData, validateFlashcardData } from './utils/validation.js';
+import { FormValidator } from './utils/formValidation.js';
 import {
   apiWithFallback,
   performCrudOperation,
@@ -101,7 +101,9 @@ export async function createDeck(deckData = {}) {
   }
 
   // Validar datos del deck usando utilidad común
-  if (!validateDeckData(name, description)) {
+  const validation = FormValidator.validateDeckForm({ name, description });
+  if (!validation.isValid) {
+    showNotification(validation.errors[0], 'error');
     return;
   }
 
@@ -205,7 +207,9 @@ export async function createFlashcard() {
   const back = backInput.value.trim();
 
   // Validar datos usando utilidad común
-  if (!validateFlashcardData(deckId, front, back)) {
+  const validation = FormValidator.validateFlashcardForm({ deckId, front, back });
+  if (!validation.isValid) {
+    showNotification(validation.errors[0], 'error');
     return;
   }
 

@@ -1,4 +1,4 @@
-import { validateDeckData, validateFlashcardData } from './utils/validation.js';
+import { FormValidator } from './utils/formValidation.js';
 import { showNotification, generateId } from './utils/helpers.js';
 
 /**
@@ -310,7 +310,7 @@ class StorageService {
    * @returns {Object|null} - Deck creado
    */
   createDeck(deckData) {
-    if (!validateDeckData(deckData.name, deckData.description || '')) {
+    if (!FormValidator.validateDeckForm({ name: deckData.name, description: deckData.description || '' }).isValid) {
       return null;
     }
 
@@ -371,7 +371,7 @@ class StorageService {
           ? updateData.description
           : decks[deckIndex].description;
 
-      if (!validateDeckData(name, description)) {
+      if (!FormValidator.validateDeckForm({ name, description }).isValid) {
         return null;
       }
     }
@@ -448,7 +448,7 @@ class StorageService {
    */
   createFlashcard(cardData) {
     if (
-      !validateFlashcardData(cardData.deck_id, cardData.front, cardData.back)
+      !FormValidator.validateFlashcardForm({ deckId: cardData.deck_id, front: cardData.front, back: cardData.back }).isValid
     ) {
       return null;
     }
@@ -515,7 +515,7 @@ class StorageService {
       const back = updateData.back || flashcards[cardIndex].back;
       const deckId = flashcards[cardIndex].deck_id;
 
-      if (!validateFlashcardData(deckId, front, back)) {
+      if (!FormValidator.validateFlashcardForm({ deckId, front, back }).isValid) {
         return null;
       }
     }

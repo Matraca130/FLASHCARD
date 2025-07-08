@@ -2,7 +2,7 @@ import { ApiClient } from './apiClient.js';
 import { store } from './store/store.js';
 import { apiWithFallback, performCrudOperation } from './utils/apiHelpers.js';
 import { showNotification, formatDate, generateId, formatDateDDMMYYYY } from './utils/helpers.js';
-import { validateRequiredFields } from './utils/validation.js';
+import { FormValidator } from './utils/formValidation.js';
 
 /**
  * Servicio de estudio refactorizado
@@ -207,7 +207,7 @@ function renderStudyDecks(container, decks, options = {}) {
  * @returns {Promise<void>}
  */
 export async function startStudySession(deckId, options = {}) {
-  if (!validateRequiredFields({ deckId }, ['deckId'])) {
+  if (!FormValidator.validateRequiredFields({ deckId }, ["deckId"]).isValid) {
     showNotification('ID de deck requerido', 'error');
     return;
   }

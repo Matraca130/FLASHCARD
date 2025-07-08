@@ -1,10 +1,7 @@
 import { ApiClient } from './apiClient.js';
 import { store } from './store/store.js';
 import { loadDashboardData } from './dashboard.service.js';
-import {
-  validateLoginCredentials,
-  validateRegistrationData,
-} from './utils/validation.js';
+import { FormValidator } from './utils/formValidation.js';
 import { performCrudOperation } from './utils/apiHelpers.js';
 import { showNotification } from './utils/helpers.js';
 
@@ -42,7 +39,9 @@ export async function checkAuthStatus() {
  * @param {string} password - Contraseña del usuario
  */
 export async function login(email, password) {
-  if (!validateLoginCredentials(email, password)) {
+  const validation = FormValidator.validateLoginCredentials(email, password);
+  if (!validation.isValid) {
+    showNotification(validation.errors[0], 'error');
     return;
   }
 
@@ -78,7 +77,9 @@ export async function login(email, password) {
  * @param {string} name - Nombre del usuario (opcional)
  */
 export async function register(email, password, confirmPassword, name = '') {
-  if (!validateRegistrationData(email, password, confirmPassword)) {
+  const validation = FormValidator.validateRegistrationData(email, password, confirmPassword);
+  if (!validation.isValid) {
+    showNotification(validation.errors[0], 'error');
     return;
   }
 
