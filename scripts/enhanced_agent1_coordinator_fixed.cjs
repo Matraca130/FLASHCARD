@@ -414,6 +414,32 @@ class EnhancedAgent1Coordinator {
             notifyWhen: ['task_start', 'task_complete', 'issue_found']
         };
     }
+    // ===== INTEGRACIÓN CON SISTEMA DE LIMPIEZA =====
+    
+    async executeAutoCleanup() {
+        this.log('🧹 Iniciando limpieza automática antes de verificación...');
+        
+        try {
+            const { AutoCleanupSystem } = require('./auto_cleanup_system.cjs');
+            const cleanup = new AutoCleanupSystem();
+            const results = await cleanup.executeAutoCleanup();
+            
+            this.log(`✅ Limpieza completada: ${results.summary?.totalCleaned || 0} elementos eliminados`);
+            return results;
+        } catch (error) {
+            this.log(`⚠️ Error en limpieza automática: ${error.message}`, 'warn');
+            return null;
+        }
+    }
+    
+    async verifyProjectWithCleanup() {
+        // 1. Ejecutar limpieza automática primero
+        await this.executeAutoCleanup();
+        
+        // 2. Luego ejecutar verificación normal
+        return this.verifyProject();
+    }
+
     findAllProjectFiles() {
         const files = [];
         const extensions = ['.js', '.html', '.css', '.json', '.md'];

@@ -274,6 +274,19 @@ if (window.AGENT_API && window.AGENT_API['AGENT-Y']) {
 node scripts/enhanced_agent1_coordinator_fixed.cjs
 ```
 
+### **Limpieza Automática (NUEVO):**
+```bash
+# Ejecutar limpieza automática de código obsoleto
+node scripts/auto_cleanup_system.cjs
+
+# Verificación con limpieza automática incluida
+node -e "
+const { EnhancedAgent1Coordinator } = require('./scripts/enhanced_agent1_coordinator_fixed.cjs');
+const coordinator = new EnhancedAgent1Coordinator();
+coordinator.verifyProjectWithCleanup();
+"
+```
+
 ### **Asignación de Tarea:**
 ```javascript
 const coordinator = new EnhancedAgent1Coordinator();

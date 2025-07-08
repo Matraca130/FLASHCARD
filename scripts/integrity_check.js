@@ -4,8 +4,8 @@
  * Script para verificar la integridad del proyecto después de eliminación de duplicados
  */
 
-const fs = require('fs');
-const path = require('path');
+const  = require('');
+const  = require('');
 
 class IntegrityChecker {
     constructor() {
@@ -18,19 +18,18 @@ class IntegrityChecker {
     log(message, type = 'info') {
         const timestamp = new Date().toISOString();
         const prefix = type === 'error' ? '❌' : type === 'warning' ? '⚠️' : 'ℹ️';
-        console.log(`${prefix} [INTEGRITY] ${timestamp}: ${message}`);
     }
 
     checkMainFile() {
         this.log('Verificando archivo principal...');
         
-        if (!fs.existsSync(this.mainFile)) {
+        if (!.existsSync(this.mainFile)) {
             this.errors.push(`Archivo principal no encontrado: ${this.mainFile}`);
             return false;
         }
         
         try {
-            const content = fs.readFileSync(this.mainFile, 'utf8');
+            const content = .readFileSync(this.mainFile, 'utf8');
             
             // Verificar sintaxis básica
             if (content.includes('<<<<<<< HEAD') || content.includes('>>>>>>> ')) {
@@ -62,21 +61,21 @@ class IntegrityChecker {
         
         const backupDir = './backup_js';
         
-        if (!fs.existsSync(backupDir)) {
+        if (!.existsSync(backupDir)) {
             this.warnings.push('Directorio backup_js no encontrado');
             return true;
         }
         
         try {
-            const files = fs.readdirSync(backupDir);
+            const files = .readdirSync(backupDir);
             const jsFiles = files.filter(f => f.endsWith('.js'));
             
             this.log(`Archivos en backup: ${jsFiles.length}`);
             
             // Verificar archivos sospechosos
             jsFiles.forEach(file => {
-                const filePath = path.join(backupDir, file);
-                const stats = fs.statSync(filePath);
+                const filePath = .join(backupDir, file);
+                const stats = .statSync(filePath);
                 
                 // Archivos muy pequeños podrían ser problemáticos
                 if (stats.size < 100) {
@@ -85,7 +84,7 @@ class IntegrityChecker {
                 
                 // Verificar contenido básico
                 try {
-                    const content = fs.readFileSync(filePath, 'utf8');
+                    const content = .readFileSync(filePath, 'utf8');
                     if (content.includes('<<<<<<< HEAD') || content.includes('>>>>>>> ')) {
                         this.errors.push(`Marcadores de merge conflict en: ${file}`);
                     }
@@ -108,17 +107,17 @@ class IntegrityChecker {
         const serviceDirs = ['./services', './utils', './store'];
         
         serviceDirs.forEach(dir => {
-            if (fs.existsSync(dir)) {
+            if (.existsSync(dir)) {
                 try {
-                    const files = fs.readdirSync(dir);
+                    const files = .readdirSync(dir);
                     const jsFiles = files.filter(f => f.endsWith('.js'));
                     
                     this.log(`${dir}: ${jsFiles.length} archivos JavaScript`);
                     
                     jsFiles.forEach(file => {
-                        const filePath = path.join(dir, file);
+                        const filePath = .join(dir, file);
                         try {
-                            const content = fs.readFileSync(filePath, 'utf8');
+                            const content = .readFileSync(filePath, 'utf8');
                             if (content.includes('<<<<<<< HEAD') || content.includes('>>>>>>> ')) {
                                 this.errors.push(`Marcadores de merge conflict en: ${filePath}`);
                             }
@@ -140,7 +139,7 @@ class IntegrityChecker {
         this.log('Verificando estado de Git...');
         
         try {
-            const { execSync } = require('child_process');
+            const { execSync } = require('');
             
             // Verificar si hay cambios sin commit
             const status = execSync('git status --porcelain', { encoding: 'utf8' });
@@ -149,7 +148,6 @@ class IntegrityChecker {
                 this.warnings.push('Hay cambios sin commit en el repositorio');
                 this.log('Cambios detectados:');
                 console.log(status);
-            } else {
                 this.log('Repositorio limpio - sin cambios pendientes');
             }
             
@@ -170,8 +168,8 @@ class IntegrityChecker {
         
         const lockDir = '.agent-locks';
         
-        if (fs.existsSync(lockDir)) {
-            const lockFiles = fs.readdirSync(lockDir);
+        if (.existsSync(lockDir)) {
+            const lockFiles = .readdirSync(lockDir);
             
             if (lockFiles.length > 0) {
                 this.warnings.push(`Archivos de lock encontrados: ${lockFiles.join(', ')}`);
@@ -179,8 +177,8 @@ class IntegrityChecker {
                 // Verificar si están expirados
                 lockFiles.forEach(lockFile => {
                     try {
-                        const lockPath = path.join(lockDir, lockFile);
-                        const lockData = JSON.parse(fs.readFileSync(lockPath, 'utf8'));
+                        const lockPath = .join(lockDir, lockFile);
+                        const lockData = JSON.parse(.readFileSync(lockPath, 'utf8'));
                         const lockAge = Date.now() - lockData.timestamp;
                         
                         if (lockAge > 300000) { // 5 minutos
@@ -218,11 +216,11 @@ class IntegrityChecker {
         const existingReports = [];
         
         reportFiles.forEach(reportFile => {
-            if (fs.existsSync(reportFile)) {
+            if (.existsSync(reportFile)) {
                 existingReports.push(reportFile);
                 
                 try {
-                    const report = JSON.parse(fs.readFileSync(reportFile, 'utf8'));
+                    const report = JSON.parse(.readFileSync(reportFile, 'utf8'));
                     this.log(`Reporte válido: ${reportFile}`);
                 } catch (error) {
                     this.errors.push(`Reporte corrupto: ${reportFile} - ${error.message}`);
@@ -254,7 +252,7 @@ class IntegrityChecker {
             warnings: this.warnings
         };
         
-        fs.writeFileSync('integrity_check_report.json', JSON.stringify(report, null, 2));
+        .writeFileSync('integrity_check_report.json', JSON.stringify(report, null, 2));
         this.log(`Reporte de integridad guardado: integrity_check_report.json`);
         
         return report;
@@ -278,31 +276,23 @@ class IntegrityChecker {
             // Mostrar resumen
             console.log('\n=== RESUMEN DE INTEGRIDAD ===');
             console.log(`Estado: ${report.status}`);
-            console.log(`Errores: ${report.summary.errors}`);
             console.log(`Advertencias: ${report.summary.warnings}`);
-            console.log(`Tiempo de verificación: ${Math.round(report.executionTime / 1000)} segundos`);
             
-            if (this.errors.length > 0) {
                 console.log('\n❌ ERRORES ENCONTRADOS:');
-                this.errors.forEach(error => console.log(`  • ${error}`));
             }
-            
             if (this.warnings.length > 0) {
                 console.log('\n⚠️  ADVERTENCIAS:');
                 this.warnings.forEach(warning => console.log(`  • ${warning}`));
-            }
             
             if (this.errors.length === 0 && this.warnings.length === 0) {
                 console.log('\n✅ INTEGRIDAD VERIFICADA - TODO CORRECTO');
             }
             
-            this.log('Verificación de integridad completada');
             
             // Retornar código de salida apropiado
             process.exit(this.errors.length > 0 ? 1 : 0);
             
         } catch (error) {
-            this.log(`Error en verificación: ${error.message}`, 'error');
             process.exit(1);
         }
     }

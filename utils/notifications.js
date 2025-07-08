@@ -33,7 +33,6 @@ class NotificationManager {
     static show(message, type = this.types.INFO, options = {}) {
         const finalOptions = { ...this.config, ...options };
         
-        // Si existe la función showNotification global, usarla
         if (typeof window.showNotification === 'function') {
             window.showNotification(message, type, finalOptions);
             return;

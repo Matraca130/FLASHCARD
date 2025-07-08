@@ -186,7 +186,6 @@ class LazyLoader {
       if (element) {
         observer.observe(element);
       } else {
-        // Reintentar después de un tiempo si el elemento no existe
         setTimeout(checkElement, 1000);
       }
     };
@@ -205,7 +204,6 @@ class LazyLoader {
     
     try {
       console.log(`[LazyLoader] Loading module: ${modulePath}`);
-      
       const module = await import(modulePath);
       
       // Cachear el módulo
@@ -214,7 +212,6 @@ class LazyLoader {
       
       console.log(`[LazyLoader] Module loaded successfully: ${modulePath}`);
       
-      return module;
       
     } catch (error) {
       console.error(`[LazyLoader] Failed to load module: ${modulePath}`, error);
@@ -233,7 +230,6 @@ class LazyLoader {
       // Verificar que el módulo tenga la función de inicialización esperada
       if (module.default && typeof module.default === 'function') {
         const container = document.querySelector(containerSelector);
-        if (container) {
           await module.default(container);
         }
       }

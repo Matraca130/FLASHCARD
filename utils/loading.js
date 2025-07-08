@@ -3,7 +3,7 @@
  * Mejora la experiencia de usuario durante operaciones asíncronas
  */
 
-import { showNotification } from './helpers.js';
+import { showNotification } from '';
 
 /**
  * Muestra un indicador de carga en un botón
@@ -97,7 +97,6 @@ export function showLoadingOverlay(containerSelector, message = 'Cargando...') {
     document.head.appendChild(style);
   }
 
-  // Asegurar que el contenedor tenga position relative
   const originalPosition = container.style.position;
   if (!originalPosition || originalPosition === 'static') {
     container.style.position = 'relative';

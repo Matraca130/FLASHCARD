@@ -226,7 +226,6 @@ class FlashcardFormUtils {
      */
     static clearCreateForm() {
         FormValidator.clearFields(['#front-text', '#back-text']);
-        // Mantener el deck seleccionado para facilitar creación múltiple
     }
     
     /**
@@ -293,7 +292,6 @@ if (typeof module !== 'undefined' && module.exports) {
 }
 
 // Fazer disponível globalmente para compatibilidade
-window.FormValidator = FormValidator;
 window.FlashcardFormUtils = FlashcardFormUtils;
 window.DeckFormUtils = DeckFormUtils;
 

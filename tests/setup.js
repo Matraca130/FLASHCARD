@@ -1,5 +1,5 @@
 // Test setup file for Vitest
-import { vi, beforeEach } from 'vitest';
+import { vi, beforeEach } from '';
 
 // Mock localStorage
 const localStorageMock = {

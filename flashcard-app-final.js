@@ -1,10 +1,7 @@
-// ===== FLASHCARD APPLICATION - COMPLETE INTEGRATED VERSION =====
 // Sin módulos ES6 - Todo en un solo archivo
 // Conectado con Render Backend: https://flashcard-u10n.onrender.com
-
 console.log('🚀 Iniciando StudyingFlash - Versión Integrada Completa');
 
-// ===== CONFIGURACIÓN GLOBAL =====
 const CONFIG = {
     API_BASE_URL: 'https://flashcard-u10n.onrender.com/api',
     STORAGE_PREFIX: 'studyingflash_',
@@ -18,7 +15,6 @@ const Utils = {
             console.log(`🔧 [StudyingFlash] ${message}`, data || '');
         }
     },
-    
     error: (message, error = null) => {
         console.error(`❌ [StudyingFlash] ${message}`, error || '');
     },
@@ -266,7 +262,6 @@ const AuthService = {
         const userStr = localStorage.getItem('currentUser');
         return userStr ? JSON.parse(userStr) : null;
     }
-};
 
 // ===== DECK SERVICE =====
 const DeckService = {
@@ -357,7 +352,6 @@ const SM2Algorithm = {
         
         if (quality >= 3) {
             // Respuesta correcta
-            if (repetitions === 0) {
                 interval = 1;
             } else if (repetitions === 1) {
                 interval = 6;
@@ -503,7 +497,6 @@ const DashboardService = {
             f.lastReviewed && new Date(f.lastReviewed).toDateString() === today
         ).length;
         
-        return studiedToday * 2; // minutos
     }
 };
 
@@ -935,41 +928,29 @@ console.log('  - Crear y gestionar decks');
 console.log('  - Crear y gestionar flashcards');
 console.log('  - Estudiar con algoritmo SM-2');
 console.log('  - Dashboard con estadísticas');
-console.log('  - Sincronización con backend');
 
 
 
-// ===== FUNCIONES FALTANTES PARA COMPATIBILIDAD =====
-
-// Función showSection para compatibilidad con el HTML
 function showSection(sectionName) {
-    Utils.log(`Navegando a sección: ${sectionName}`);
     
-    // Remover clase active de todas las secciones Y forzar display none
     document.querySelectorAll('.section').forEach(section => {
-        section.classList.remove('active');
         section.style.display = 'none'; // Forzar ocultación
-    });
     
     // Agregar clase active a la sección seleccionada Y forzar display block
     const targetSection = document.querySelector(`#${sectionName}`);
     if (targetSection) {
-        targetSection.classList.add('active');
         targetSection.style.display = 'block'; // Forzar visualización
         Utils.log(`Sección mostrada: ${sectionName}`);
-    } else {
         Utils.error(`Sección no encontrada: ${sectionName}`);
     }
     
     // Actualizar navegación activa
-    document.querySelectorAll('.nav-link').forEach(item => {
         item.classList.remove('active');
     });
     
     const activeNavItem = document.querySelector(`[data-section="${sectionName}"]`);
     if (activeNavItem) {
         activeNavItem.classList.add('active');
-    }
     
     // Cargar datos específicos de cada sección
     switch (sectionName) {
@@ -1025,7 +1006,6 @@ function generateActivityHeatmap() {
     for (let d = new Date(oneYearAgo); d <= today; d.setDate(d.getDate() + 1)) {
         const activity = Math.floor(Math.random() * 5); // 0-4 niveles de actividad
         const dateStr = d.toISOString().split('T')[0];
-        
         heatmapHTML += `
             <div class="heatmap-day activity-${activity}" 
                  data-date="${dateStr}" 

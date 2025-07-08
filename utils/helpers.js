@@ -510,7 +510,6 @@ export function sanitizeFilename(filename) {
     return 'archivo';
   }
 
-  // Remover caracteres no válidos para nombres de archivo
   return filename
     .replace(/[<>:"/\\|?*]/g, '')
     .replace(/\s+/g, '_')
@@ -632,14 +631,12 @@ export function initializeParticles(config = {}) {
   };
 
   // Combinar configuración por defecto con la personalizada
-  const finalConfig = { ...defaultConfig, ...config };
 
   if (typeof particlesJS !== 'undefined') {
     try {
       particlesJS('particles-js', finalConfig);
       console.log('✅ Partículas inicializadas exitosamente');
       return true;
-    } catch (error) {
       console.error('❌ Error inicializando partículas:', error);
       return false;
     }
@@ -647,7 +644,6 @@ export function initializeParticles(config = {}) {
     console.log('⚠️ particlesJS no disponible');
     return false;
   }
-}
 
 /**
  * Inicialización automática de partículas con detección inteligente
@@ -660,12 +656,10 @@ export function autoInitParticles() {
     return false;
   }
 
-  // Detectar si el dispositivo es de bajo rendimiento
   const isLowPerformance =
     navigator.hardwareConcurrency < 4 ||
     navigator.deviceMemory < 4 ||
     /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-      navigator.userAgent
     );
 
   // Configuración adaptativa según el rendimiento
@@ -699,13 +693,11 @@ export function showSection(sectionId, options = {}) {
   }
 
   // Fallback básico si el sistema de navegación no está disponible
-  console.warn(
     '⚠️ Sistema de navegación no disponible, usando fallback básico'
   );
 
   const section = document.querySelector(
     `[data-section="${sectionId}"], #${sectionId}`
-  );
   if (section) {
     // Ocultar todas las secciones
     document.querySelectorAll('[data-section], .section').forEach((s) => {
@@ -746,7 +738,6 @@ export function handleGlobalError(error, context = 'Unknown') {
 
 /**
  * Función de utilidad para verificar conectividad
- */
 export async function checkConnectivity() {
   try {
     const response = await fetch('/health', {
@@ -765,7 +756,6 @@ export async function checkConnectivity() {
  * Función de utilidad para detectar características del dispositivo
  */
 export function getDeviceInfo() {
-  return {
     isMobile: /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
       navigator.userAgent
     ),
@@ -813,7 +803,6 @@ window.checkConnectivity = checkConnectivity;
 window.getDeviceInfo = getDeviceInfo;
 
 // Exponer utilidades comunes
-window.formatDate = formatDate;
 window.copyToClipboard = copyToClipboard;
 window.validateRequiredFields = validateRequiredFields;
 window.apiWithFallback = apiWithFallback;
@@ -834,7 +823,6 @@ if (document.readyState !== 'loading') {
   tryInitParticles();
 } else {
   document.addEventListener('DOMContentLoaded', tryInitParticles);
-}
 
 // Configurar manejo de errores globales
 window.addEventListener('error', (event) => {

@@ -15,7 +15,6 @@ Cypress.on('window:before:load', (win) => {
 
 // Handle uncaught exceptions
 Cypress.on('uncaught:exception', (err, runnable) => {
-  // Returning false here prevents Cypress from failing the test
   if (err.message.includes('ResizeObserver loop limit exceeded')) {
     return false;
   }

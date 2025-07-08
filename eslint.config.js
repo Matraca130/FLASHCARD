@@ -1,6 +1,6 @@
-import js from '@eslint/js';
-import globals from 'globals';
-import cypress from 'eslint-plugin-cypress';
+import js from '';
+import  from '';
+import cypress from '';
 
 export default [
   js.configs.recommended,
@@ -27,10 +27,10 @@ export default [
     languageOptions: {
       ecmaVersion: 2023,
       sourceType: 'module',
-      globals: {
-        ...globals.browser,
-        ...globals.node,
-        // Node 20+ globals
+      : {
+        ....browser,
+        ....node,
+        // Node 20+ 
         FormData: 'readonly',
         AbortController: 'readonly',
         AbortSignal: 'readonly',
@@ -94,9 +94,9 @@ export default [
       cypress,
     },
     languageOptions: {
-      globals: {
-        ...globals.browser,
-        // Cypress globals
+      : {
+        ....browser,
+        // Cypress 
         cy: 'readonly',
         Cypress: 'readonly',
         describe: 'readonly',
@@ -113,16 +113,16 @@ export default [
     rules: {
       ...cypress.configs.recommended.rules,
       'no-unused-vars': 'off',
-      'no-undef': 'off', // Cypress globals are defined above
+      'no-undef': 'off', // Cypress  are defined above
     },
   },
   {
     // Vitest test files
     files: ['tests/**/*.js', '**/*.test.js'],
     languageOptions: {
-      globals: {
-        ...globals.node,
-        // Vitest globals
+      : {
+        ....node,
+        // Vitest 
         describe: 'readonly',
         it: 'readonly',
         test: 'readonly',
@@ -144,8 +144,8 @@ export default [
     files: ['*.config.js', 'vite.config.js', 'vitest.config.js'],
     languageOptions: {
       sourceType: 'module',
-      globals: {
-        ...globals.node,
+      : {
+        ....node,
       },
     },
     rules: {

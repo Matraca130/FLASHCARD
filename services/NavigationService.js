@@ -26,7 +26,6 @@ class NavigationService {
    * Inicialización del servicio
    */
   init() {
-    // Esperar a que el sistema de navegación esté disponible
     this.waitForNavigationSystem();
   }
 
