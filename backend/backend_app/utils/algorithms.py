@@ -143,14 +143,9 @@ def calculate_sm2(rating: int, ease_factor: float, interval: int,
         elif rating == 2:  # Hard
             new_ease_factor = max(1.3, ease_factor - 0.15)
         else:
-<<<<<<< HEAD
             new_ease_factor = ease_factor
         
         # Ajustar ease factor según la fórmula SM-2
-=======
-            new_ease_factor = ease_fact
-        or  # Ajustar ease factor según la fórmula SM-2
->>>>>>> 4a64f0c0b7272a924fb9959c73278447c3324b3f
         new_ease_factor = new_ease_factor + \
             (0.1 - (5 - rating) * (0.08 + (5 - rating) * 0.02))
         new_ease_factor = max(1.3, new_ease_factor)
