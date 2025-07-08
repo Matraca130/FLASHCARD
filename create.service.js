@@ -1,5 +1,5 @@
 import { api } from './apiClient.js';
-import { store } from './store/store.js';
+import stateManager from './state-manager.js';
 import storageService from './storage.service.js';
 import { validateDeckData, validateFlashcardData } from './utils/validation.js';
 import {
@@ -67,6 +67,8 @@ export function openCreateDeckModal() {
  * @returns {Promise<Object>} - Deck creado
  */
 export async function createDeck(deckData = {}) {
+  console.log('🎯 CREANDO DECK - Iniciando proceso...');
+  
   const nameInput = document.getElementById('deck-name');
   const descriptionInput = document.getElementById('deck-description');
   const publicInput = document.getElementById('deck-public');
@@ -78,6 +80,8 @@ export async function createDeck(deckData = {}) {
     deckData.isPublic !== undefined
       ? deckData.isPublic
       : publicInput?.checked || false;
+
+  console.log('📝 Datos del deck:', { name, description, isPublic });
 
   // Validación con feedback visual
   const isNameValid = name.length >= 3 && name.length <= 50;
@@ -103,184 +107,128 @@ export async function createDeck(deckData = {}) {
     );
   }
 
-  // Validar datos del deck usando utilidad común
-  if (!validateDeckData(name, description)) {
+  // Validar datos del deck
+  if (!isNameValid || !isDescriptionValid) {
+    showNotification('Por favor corrige los errores en el formulario', 'error');
     return;
   }
 
-  const data = {
-    name: name,
-    description: description,
-    is_public: isPublic,
-  };
-
   try {
-    const deck = await withLoadingFeedback(
-      async () => {
-        try {
-          // Intentar crear en API primero usando apiWithFallback
-          const response = await apiWithFallback('/api/decks', null, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data),
-          });
-
-          if (response.error) {
-            throw new Error(response.message || 'Error al crear deck');
-          }
-
-          return response.data || response;
-        } catch (error) {
-          console.log('API no disponible, usando almacenamiento local');
-          return (
-            storageService?.createDeck(data) || { ...data, id: Date.now() }
-          );
-        }
-      },
-      {
-        buttonSelector: '#create-deck-btn',
-        loadingText: 'Creando deck...',
-        successMessage: '🎉 Deck creado exitosamente',
-        errorMessage: 'Error al crear el deck',
-      }
-    );
-
-    // Limpiar formulario y validaciones
-    if (nameInput || descriptionInput || publicInput) {
-      clearForm('#deck-form');
-
-      // Limpiar validaciones visuales
-      if (nameInput) {
-        nameInput.classList.remove('field-valid', 'field-invalid');
-        const validationMsg = nameInput.parentNode.querySelector(
-          '.validation-message'
-        );
-        if (validationMsg) {
-          validationMsg.remove();
-        }
-      }
-
-      if (descriptionInput) {
-        descriptionInput.classList.remove('field-valid', 'field-invalid');
-        const validationMsg = descriptionInput.parentNode.querySelector(
-          '.validation-message'
-        );
-        if (validationMsg) {
-          validationMsg.remove();
-        }
-      }
-    }
+    console.log('💾 Guardando deck en state manager...');
     
-    // Recargar decks en el dropdown
-    await loadDecksForCreation();
-    
-    // Recargar la gestión de decks
-    try {
-      const { loadManageDecks } = await import('./manage.service.js');
-      if (typeof loadManageDecks === 'function') {
-        await loadManageDecks();
-      }
-    } catch (error) {
-      console.log('No se pudo recargar la gestión de decks:', error);
-    }
-    
-    // Refresh dashboard decks if user is there
-    try {
-      const { loadDashboardData } = await import('./dashboard.service.js');
-      if (typeof loadDashboardData === 'function') {
-        await loadDashboardData();
-      }
-    } catch (error) {
-      console.log('No se pudo recargar el dashboard:', error);
-    }
-    
-    return deck;
-  } catch (error) {
-    console.error('Error creando deck:', error);
-
-    // Mostrar error específico si está disponible
-    const errorMessage = error.message || 'Error desconocido al crear deck';
-    showNotification(errorMessage, 'error', 5000, {
-      title: 'Error al crear deck',
-      actionText: 'Reintentar',
-      actionCallback: () => createDeck(deckData),
+    // Crear deck usando el state manager
+    const newDeck = stateManager.addDeck({
+      name,
+      description,
+      isPublic
     });
+
+    console.log('✅ Deck creado exitosamente:', newDeck);
+
+    // Mostrar notificación de éxito
+    showNotification(`🎉 Deck "${name}" creado exitosamente`, 'success');
+
+    // Limpiar formulario
+    if (nameInput) nameInput.value = '';
+    if (descriptionInput) descriptionInput.value = '';
+    if (publicInput) publicInput.checked = false;
+
+    // Limpiar validaciones visuales
+    [nameInput, descriptionInput].forEach(input => {
+      if (input) {
+        input.classList.remove('valid', 'invalid');
+        const feedback = input.parentNode?.querySelector('.field-feedback');
+        if (feedback) feedback.remove();
+      }
+    });
+
+    console.log('🔄 Notificando actualización a otros componentes...');
+    
+    // El state manager ya notificó automáticamente a todos los componentes suscritos
+    // Dashboard, estudiar, ranking, etc. se actualizarán automáticamente
+
+    return newDeck;
+
+  } catch (error) {
+    console.error('❌ Error creando deck:', error);
+    showNotification('Error al crear el deck: ' + error.message, 'error');
+    throw error;
+  }
+
+/**
+ * Carga los decks disponibles en el dropdown para flashcards
+ */
+export async function loadDecksForCreation() {
+  try {
+    // Usar state manager para obtener decks
+    const decks = stateManager.getDecks();
+
+    const deckSelect = document.getElementById('flashcard-deck');
+    if (deckSelect && Array.isArray(decks)) {
+      deckSelect.innerHTML =
+        '<option value="">Selecciona un deck...</option>' +
+        decks
+          .map((deck) => `<option value="${deck.id}">${deck.name}</option>`)
+          .join('');
+    }
+
+    return decks;
+  } catch (error) {
+    console.error('Error loading decks:', error);
+    showNotification('Error al cargar decks', 'error');
+    return [];
   }
 }
 
 /**
- * Crea una nueva flashcard usando utilidades unificadas
- * REFACTORIZADO: Elimina duplicación con flashcards.service.js
- * Mantiene funcionalidad offline específica de este módulo
+ * Crea una nueva flashcard
  */
 export async function createFlashcard() {
-  // Usar utilidades unificadas para validación y obtención de datos
-  const validation = FlashcardFormUtils.validateAndGetData();
-  
-  if (!validation.isValid) {
-    FlashcardNotifications.validationError();
+  const deckSelect = document.getElementById('flashcard-deck');
+  const frontInput = document.getElementById('flashcard-front');
+  const backInput = document.getElementById('flashcard-back');
+
+  const deckId = deckSelect?.value?.trim() || '';
+  const front = frontInput?.value?.trim() || '';
+  const back = backInput?.value?.trim() || '';
+
+  // Validación
+  if (!deckId) {
+    showNotification('Por favor selecciona un deck', 'error');
+    return;
+  }
+
+  if (!front || !back) {
+    showNotification('Por favor completa ambos lados de la flashcard', 'error');
     return;
   }
 
   try {
-    const flashcard = await performCrudOperation(
-      async () => {
-        try {
-          // Intentar crear en API primero
-          return await api('/api/flashcards', {
-            method: 'POST',
-            body: JSON.stringify({
-              deck_id: validation.data.deckId,
-              front: validation.data.front,
-              back: validation.data.back,
-            }),
-          });
-        } catch (error) {
-          console.log('API no disponible, usando almacenamiento local');
-          return (
-            storageService?.createFlashcard({
-              deck_id: validation.data.deckId,
-              front: validation.data.front,
-              back: validation.data.back,
-            }) || { 
-              deck_id: validation.data.deckId, 
-              front: validation.data.front, 
-              back: validation.data.back, 
-              id: Date.now() 
-            }
-          );
-        }
-      },
-      null, // Usar notificación unificada
-      null  // Usar notificación unificada
-    );
+    console.log('💾 Guardando flashcard en state manager...');
     
-    // Usar notificación unificada
-    FlashcardNotifications.created();
-    
-    // Limpiar formulario usando utilidad unificada
-    FlashcardFormUtils.clearCreateForm();
-    
-    // Recargar datos si estamos en la sección de gestión
-    try {
-      // Intentar recargar la gestión de decks
-      const { loadManageDecks } = await import('./manage.service.js');
-      if (typeof loadManageDecks === 'function') {
-        await loadManageDecks();
-      }
-    } catch (error) {
-      console.log('No se pudo recargar la gestión de decks:', error);
-    }
-    
-    // También recargar el dropdown de decks
-    await loadDecksForCreation();
-    
-    return flashcard;
+    // Crear flashcard usando el state manager
+    const newFlashcard = stateManager.addFlashcard({
+      deckId,
+      front,
+      back
+    });
+
+    console.log('✅ Flashcard creada exitosamente:', newFlashcard);
+
+    // Mostrar notificación de éxito
+    showNotification('🎉 Flashcard creada exitosamente', 'success');
+
+    // Limpiar formulario
+    if (frontInput) frontInput.value = '';
+    if (backInput) backInput.value = '';
+    if (deckSelect) deckSelect.value = '';
+
+    return newFlashcard;
+
   } catch (error) {
-    console.error('Error creating flashcard:', error);
-    FlashcardNotifications.createError();
+    console.error('❌ Error creando flashcard:', error);
+    showNotification('Error al crear la flashcard: ' + error.message, 'error');
+    throw error;
   }
 }
 

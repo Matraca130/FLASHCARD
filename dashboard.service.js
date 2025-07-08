@@ -1,4 +1,5 @@
 import { api } from './apiClient.js';
+import stateManager from './state-manager.js';
 import {
   initializeCharts,
   updateChart,
@@ -27,27 +28,27 @@ import {
  */
 export async function loadDashboardData() {
   try {
-    // Cargar múltiples endpoints en paralelo usando utilidad común
-    const [stats, decks] = await multipleApiWithFallback([
-      {
-        endpoint: '/api/stats',
-        fallback: FALLBACK_DATA.stats,
-      },
-      {
-        endpoint: '/api/decks',
-        fallback: FALLBACK_DATA.decks,
-      },
-    ]);
+    console.log('📊 Cargando datos del dashboard desde state manager...');
+    
+    // Obtener datos del state manager
+    const state = stateManager.getState();
+    const decks = state.decks;
+    const userStats = state.userStats;
+    
+    console.log('📊 Datos obtenidos:', { decks, userStats });
 
-    // Actualizar UI con datos cargados
-    updateDashboardStats(stats);
+    // Actualizar UI con datos del state manager
+    updateDashboardStats(userStats);
     updateDashboardDecks(decks);
 
     // Inicializar gráficos con datos reales
-    initializeChartsWithData(stats);
+    initializeChartsWithData(userStats);
 
     // Generar heatmap de actividad
     await loadAndUpdateActivityHeatmap();
+    
+    console.log('✅ Dashboard actualizado con datos reales');
+    
   } catch (error) {
     console.error('Error loading dashboard data:', error);
     showNotification('Error al cargar datos del dashboard', 'error');
@@ -60,13 +61,13 @@ export async function loadDashboardData() {
  */
 export async function loadUserStats() {
   try {
-    const stats = await apiWithFallback('/api/stats', FALLBACK_DATA.stats);
-    updateDashboardStats(stats);
-    return stats;
+    const userStats = stateManager.get('userStats');
+    updateDashboardStats(userStats);
+    return userStats;
   } catch (error) {
     console.error('Error loading user stats:', error);
     showNotification('Error al cargar estadísticas', 'error');
-    return FALLBACK_DATA.stats;
+    return stateManager.get('userStats') || FALLBACK_DATA.stats;
   }
 }
 
@@ -76,13 +77,13 @@ export async function loadUserStats() {
  */
 export async function loadUserDecks() {
   try {
-    const decks = await apiWithFallback('/api/decks', FALLBACK_DATA.decks);
+    const decks = stateManager.getDecks();
     updateDashboardDecks(decks);
     return decks;
   } catch (error) {
     console.error('Error loading user decks:', error);
     showNotification('Error al cargar decks', 'error');
-    return FALLBACK_DATA.decks;
+    return [];
   }
 }
 

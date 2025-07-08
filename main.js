@@ -3,6 +3,11 @@
  * Gestiona la inicialización de la aplicación StudyingFlash con servicios avanzados
  */
 
+import './state-manager.js';
+import './dashboard-connector.js';
+import './study-connector.js';
+import './ranking-connector.js';
+import './flashcard-algorithm-connector.js';
 import './router.js';
 import './core-navigation.js';
 import './bindings.js';

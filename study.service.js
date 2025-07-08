@@ -1,5 +1,5 @@
 import { api } from './apiClient.js';
-import { store } from './store/store.js';
+import stateManager from './state-manager.js';
 import { apiWithFallback, performCrudOperation } from './utils/apiHelpers.js';
 import { showNotification, formatDate, generateId, formatDateDDMMYYYY } from './utils/helpers.js';
 import { validateRequiredFields } from './utils/validation.js';
@@ -51,27 +51,44 @@ export async function loadStudyDecks(options = {}) {
   }
 
   try {
-    // Cargar decks con fallback
-    const decks = await apiWithFallback('/api/decks', []);
+    console.log('📚 Cargando decks para estudiar desde state manager...');
+    
+    // Obtener decks del state manager
+    const decks = stateManager.getDecks();
 
     if (!decks || decks.length === 0) {
       renderEmptyDecksMessage(container);
       return;
     }
 
-    // Cargar estadísticas de cada deck si está habilitado
-    let decksWithStats = decks;
-    if (showStats) {
-      decksWithStats = await loadDecksWithStats(decks);
-    }
+    console.log('📚 Decks encontrados:', decks);
+
+    // Agregar estadísticas básicas a cada deck
+    const decksWithStats = decks.map(deck => {
+      const flashcards = stateManager.getFlashcardsByDeck(deck.id);
+      const progress = stateManager.get('studyProgress')[deck.id] || {};
+      
+      return {
+        ...deck,
+        flashcardCount: flashcards.length,
+        due_cards: flashcards.length, // Todas las cartas están disponibles para estudio
+        new_cards: flashcards.filter(card => !progress.studied).length,
+        learning_cards: 0,
+        review_cards: flashcards.filter(card => progress.studied).length,
+        last_studied: deck.lastStudied
+      };
+    });
 
     // Filtrar decks con cartas pendientes si está habilitado
-    if (filterDue) {
-      decksWithStats = decksWithStats.filter((deck) => deck.due_cards > 0);
-    }
+    const filteredDecks = filterDue 
+      ? decksWithStats.filter(deck => deck.due_cards > 0)
+      : decksWithStats;
 
     // Renderizar decks
-    renderStudyDecks(container, decksWithStats, { showStats });
+    renderStudyDecks(container, filteredDecks, { showStats });
+    
+    console.log('✅ Decks de estudio cargados');
+    
   } catch (error) {
     console.error('Error loading study decks:', error);
     showNotification('Error al cargar decks para estudiar', 'error');
@@ -202,12 +219,12 @@ function renderStudyDecks(container, decks, options = {}) {
 
 /**
  * Inicia una sesión de estudio
- * @param {number} deckId - ID del deck
+ * @param {string} deckId - ID del deck
  * @param {Object} options - Opciones de la sesión
  * @returns {Promise<void>}
  */
 export async function startStudySession(deckId, options = {}) {
-  if (!validateRequiredFields({ deckId }, ['deckId'])) {
+  if (!deckId) {
     showNotification('ID de deck requerido', 'error');
     return;
   }
@@ -219,62 +236,77 @@ export async function startStudySession(deckId, options = {}) {
   } = options;
 
   try {
+    console.log('🎯 Iniciando sesión de estudio para deck:', deckId);
+    
     showNotification('Iniciando sesión de estudio...', 'info');
 
-    // Cargar información del deck
-    const deck = await apiWithFallback(`/api/decks/${deckId}`, null);
+    // Obtener deck del state manager
+    const deck = stateManager.getDeck(deckId);
     if (!deck) {
       showNotification('Deck no encontrado', 'error');
       return;
     }
 
-    // Cargar cartas para estudiar
-    const endpoint = reviewMode
-      ? `/api/study/cards/review/${deckId}`
-      : `/api/study/cards/due/${deckId}`;
-
-    const cards = await apiWithFallback(endpoint, []);
-
-    if (!cards || cards.length === 0) {
+    // Obtener flashcards del deck
+    const allCards = stateManager.getFlashcardsByDeck(deckId);
+    
+    if (!allCards || allCards.length === 0) {
       showNotification('No hay cartas para estudiar en este deck', 'warning');
       showCompletionMessage(deck);
       return;
     }
 
+    console.log('📚 Cartas encontradas:', allCards.length);
+
+    // Filtrar cartas según el modo
+    let studyCards = allCards;
+    if (reviewMode) {
+      const progress = stateManager.get('studyProgress')[deckId] || {};
+      studyCards = allCards.filter(card => progress.studied);
+    }
+
     // Limitar número de cartas
-    const studyCards = cards.slice(0, maxCards);
+    studyCards = studyCards.slice(0, maxCards);
+
+    console.log('🎯 Cartas para estudiar:', studyCards.length);
 
     // Crear sesión
-    const session = await createStudySession(deck, studyCards, algorithm);
+    const session = {
+      id: generateId(),
+      deckId: deckId,
+      deckName: deck.name,
+      cards: studyCards,
+      algorithm: algorithm,
+      startTime: new Date().toISOString(),
+      currentCardIndex: 0,
+      answeredCards: [],
+      sessionStats: {
+        correct: 0,
+        incorrect: 0,
+        totalTime: 0,
+        averageTime: 0,
+      }
+    };
 
     // Inicializar estado de la sesión
     currentSession = session;
     sessionStartTime = Date.now();
 
-    // Actualizar store
-    store.setState({
-      studySession: {
-        ...session,
-        currentCardIndex: 0,
-        answeredCards: [],
-        sessionStats: {
-          correct: 0,
-          incorrect: 0,
-          totalTime: 0,
-          averageTime: 0,
-        },
-      },
-    });
-
     // Iniciar interfaz de estudio
     if (window.enterStudyMode) {
       window.enterStudyMode(studyCards[0], session);
+    } else {
+      // Fallback: mostrar primera carta
+      showStudyCard(studyCards[0], session);
     }
 
     // Iniciar timer de sesión
     startSessionTimer();
 
     showNotification(`Sesión iniciada: ${studyCards.length} cartas`, 'success');
+    
+    console.log('✅ Sesión de estudio iniciada exitosamente');
+    
   } catch (error) {
     console.error('Error starting study session:', error);
     showNotification('Error al iniciar sesión de estudio', 'error');
