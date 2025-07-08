@@ -1,5 +1,5 @@
 import { api } from './apiClient.js';
-import stateManager from './state-manager.js';
+import { store } from '../store/store.js';
 import storageService from './storage.service.js';
 import { validateDeckData, validateFlashcardData } from './utils/validation.js';
 import {
@@ -117,7 +117,7 @@ export async function createDeck(deckData = {}) {
     console.log('💾 Guardando deck en state manager...');
     
     // Crear deck usando el state manager
-    const newDeck = stateManager.addDeck({
+    const newDeck = store.addDeck({
       name,
       description,
       isPublic
@@ -161,7 +161,7 @@ export async function createDeck(deckData = {}) {
 export async function loadDecksForCreation() {
   try {
     // Usar state manager para obtener decks
-    const decks = stateManager.getDecks();
+    const decks = store.getState().decks;
 
     const deckSelect = document.getElementById('flashcard-deck');
     if (deckSelect && Array.isArray(decks)) {
@@ -207,7 +207,7 @@ export async function createFlashcard() {
     console.log('💾 Guardando flashcard en state manager...');
     
     // Crear flashcard usando el state manager
-    const newFlashcard = stateManager.addFlashcard({
+    const newFlashcard = store.addFlashcard({
       deckId,
       front,
       back

@@ -1,5 +1,5 @@
 import { api } from './apiClient.js';
-import { store } from './store/store.js';
+import { store } from '../store/store.js';
 import { validateDeckData } from './utils/validation.js';
 import {
   apiWithFallback,
