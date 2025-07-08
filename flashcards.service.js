@@ -1,4 +1,4 @@
-import { api } from './apiClient.js';
+import { ApiClient } from './apiClient.js';
 import { store } from './store/store.js';
 import { validateFlashcardData } from './utils/validation.js';
 import {
@@ -31,13 +31,10 @@ export async function createFlashcard() {
   try {
     const result = await performCrudOperation(
       () =>
-        api('/api/flashcards', {
-          method: 'POST',
-          body: JSON.stringify({
-            deck_id: deckId,
-            front: front,
-            back: back,
-          }),
+        ApiClient.post('/api/flashcards', {
+          deck_id: deckId,
+          front: front,
+          back: back,
         }),
       'Flashcard creada exitosamente',
       'Error al crear la flashcard'
@@ -66,7 +63,8 @@ export async function editFlashcard(flashcardId) {
   try {
     const flashcard = await apiWithFallback(
       `/api/flashcards/${flashcardId}`,
-      FALLBACK_DATA.flashcards.find((f) => f.id === flashcardId) || {}
+      FALLBACK_DATA.flashcards.find((f) => f.id === flashcardId) || {},
+      'GET'
     );
 
     editingFlashcardId = flashcardId;
@@ -119,13 +117,10 @@ export async function updateFlashcard() {
   try {
     const result = await performCrudOperation(
       () =>
-        api(`/api/flashcards/${editingFlashcardId}`, {
-          method: 'PUT',
-          body: JSON.stringify({
-            deck_id: deckId,
-            front: front,
-            back: back,
-          }),
+        ApiClient.put(`/api/flashcards/${editingFlashcardId}`, {
+          deck_id: deckId,
+          front: front,
+          back: back,
         }),
       'Flashcard actualizada exitosamente',
       'Error al actualizar la flashcard'
@@ -158,9 +153,7 @@ export async function deleteFlashcard(flashcardId) {
   try {
     await performCrudOperation(
       () =>
-        api(`/api/flashcards/${flashcardId}`, {
-          method: 'DELETE',
-        }),
+        ApiClient.delete(`/api/flashcards/${flashcardId}`),
       'Flashcard eliminada exitosamente',
       'Error al eliminar la flashcard'
     );
@@ -184,7 +177,8 @@ export async function loadFlashcardsByDeck(deckId) {
   try {
     const flashcards = await apiWithFallback(
       `/api/flashcards/deck/${deckId}`,
-      FALLBACK_DATA.flashcards.filter((f) => f.deck_id === deckId)
+      FALLBACK_DATA.flashcards.filter((f) => f.deck_id === deckId),
+      'GET'
     );
 
     return flashcards || [];
@@ -202,7 +196,8 @@ export async function loadAllFlashcards() {
   try {
     const flashcards = await apiWithFallback(
       '/api/flashcards',
-      FALLBACK_DATA.flashcards
+      FALLBACK_DATA.flashcards,
+      'GET'
     );
 
     return flashcards || [];
@@ -244,3 +239,5 @@ export function cancelEdit() {
 export function getEditingFlashcardId() {
   return editingFlashcardId;
 }
+
+

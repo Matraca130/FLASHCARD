@@ -1,4 +1,4 @@
-import { api } from './apiClient.js';
+import { ApiClient } from './apiClient.js';
 import {
   initializeCharts,
   updateChart,
@@ -32,10 +32,12 @@ export async function loadDashboardData() {
       {
         endpoint: '/api/stats',
         fallback: FALLBACK_DATA.stats,
+        method: 'GET',
       },
       {
         endpoint: '/api/decks',
         fallback: FALLBACK_DATA.decks,
+        method: 'GET',
       },
     ]);
 
@@ -60,7 +62,7 @@ export async function loadDashboardData() {
  */
 export async function loadUserStats() {
   try {
-    const stats = await apiWithFallback('/api/stats', FALLBACK_DATA.stats);
+    const stats = await apiWithFallback('/api/stats', FALLBACK_DATA.stats, 'GET');
     updateDashboardStats(stats);
     return stats;
   } catch (error) {
@@ -76,7 +78,7 @@ export async function loadUserStats() {
  */
 export async function loadUserDecks() {
   try {
-    const decks = await apiWithFallback('/api/decks', FALLBACK_DATA.decks);
+    const decks = await apiWithFallback('/api/decks', FALLBACK_DATA.decks, 'GET');
     updateDashboardDecks(decks);
     return decks;
   } catch (error) {
@@ -96,7 +98,7 @@ export async function loadWeeklyStats() {
       weeklyProgress: [12, 19, 15, 25, 22, 18, 30],
       weeklyAccuracy: [75, 80, 85, 78, 82, 88, 90],
       totalStudyTime: 420, // minutos
-    });
+    }, 'GET');
 
     // Atualizar gráficos com dados semanais
     if (weeklyStats.weeklyProgress) {
@@ -304,7 +306,8 @@ async function loadAndUpdateActivityHeatmap() {
   try {
     const activityData = await apiWithFallback(
       '/api/dashboard/stats/heatmap',
-      generateMockActivityData()
+      generateMockActivityData(),
+      'GET'
     );
 
     // Generar heatmap base
@@ -357,7 +360,8 @@ export async function updateDashboardPeriod(period) {
     // Cargar datos específicos del período
     const periodStats = await apiWithFallback(
       `/api/dashboard/stats/${period}`,
-      FALLBACK_DATA.stats
+      FALLBACK_DATA.stats,
+      'GET'
     );
 
     updateDashboardStats(periodStats);
@@ -385,3 +389,5 @@ export async function refreshDashboard() {
 window.loadDashboardData = loadDashboardData;
 window.refreshDashboard = refreshDashboard;
 window.updateDashboardPeriod = updateDashboardPeriod;
+
+

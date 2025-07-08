@@ -758,7 +758,7 @@ class StorageService {
       }
       console.log(`✅ Sincronización pendiente limpiada: ${type}`);
     } catch (error) {
-      console.error(`❌ Error limpiando sincronización pendiente:`, error);
+      console.error('❌ Error limpiando sincronización pendiente:', error);
     }
   }
 

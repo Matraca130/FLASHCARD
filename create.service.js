@@ -1,4 +1,4 @@
-import { api } from './apiClient.js';
+import { ApiClient } from './apiClient.js';
 import { store } from './store/store.js';
 import storageService from './storage.service.js';
 import { validateDeckData, validateFlashcardData } from './utils/validation.js';
@@ -116,10 +116,7 @@ export async function createDeck(deckData = {}) {
       async () => {
         try {
           // Intentar crear en API primero
-          const response = await api('/api/decks', {
-            method: 'POST',
-            body: JSON.stringify(data),
-          });
+          const response = await ApiClient.post('/api/decks', data);
 
           if (response.error) {
             throw new Error(response.message || 'Error al crear deck');
@@ -217,13 +214,10 @@ export async function createFlashcard() {
       async () => {
         try {
           // Intentar crear en API primero
-          return await api('/api/flashcards', {
-            method: 'POST',
-            body: JSON.stringify({
-              deck_id: deckId,
-              front: front,
-              back: back,
-            }),
+          return await ApiClient.post('/api/flashcards', {
+            deck_id: deckId,
+            front: front,
+            back: back,
           });
         } catch (error) {
           console.log('API no disponible, usando almacenamiento local');
@@ -275,12 +269,9 @@ export async function createBulkFlashcards(flashcardsData, deckId) {
   try {
     const result = await performCrudOperation(
       () =>
-        api('/api/flashcards/bulk', {
-          method: 'POST',
-          body: JSON.stringify({
-            deck_id: deckId,
-            flashcards: flashcardsData,
-          }),
+        ApiClient.post('/api/flashcards/bulk', {
+          deck_id: deckId,
+          flashcards: flashcardsData,
         }),
       `${flashcardsData.length} flashcards creadas exitosamente`,
       'Error al crear flashcards en lote'
@@ -323,13 +314,7 @@ export async function importFlashcards(file, deckId) {
 
     const result = await performCrudOperation(
       () =>
-        fetch(`${api.baseURL}/api/decks/import`, {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('authToken')}`,
-          },
-          body: formData,
-        }).then((res) => res.json()),
+        ApiClient.post('/api/decks/import', formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
       'Flashcards importadas exitosamente',
       'Error al importar flashcards'
     );
@@ -398,3 +383,5 @@ export function initializeCreateEvents() {
 window.createDeck = createDeck;
 window.createFlashcard = createFlashcard;
 window.loadDecksForCreation = loadDecksForCreation;
+
+

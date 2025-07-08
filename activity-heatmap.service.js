@@ -1,3 +1,4 @@
+import { ApiClient } from './apiClient.js';
 import { apiWithFallback } from './utils/apiHelpers.js';
 import { showNotification, formatDate, formatDateDDMMYYYY } from './utils/helpers.js';
 
@@ -92,7 +93,8 @@ async function loadActivityData(forceRefresh = false) {
     // Cargar desde API con fallback a datos mock
     const data = await apiWithFallback(
       '/api/dashboard/stats/heatmap',
-      generateMockActivityData()
+      generateMockActivityData(),
+      'GET'
     );
     
     // Actualizar cache
@@ -494,7 +496,7 @@ function animateHeatmapAppearance(containerId) {
 function calculateCurrentStreak(activityData) {
   let streak = 0;
   
-  // Empezar desde el día más reciente
+  // Empezar desde el día más recente
   for (let i = activityData.length - 1; i >= 0; i--) {
     if (activityData[i].activity > 0) {
       streak++;
@@ -545,4 +547,5 @@ export async function refreshActivityHeatmap() {
 window.generateActivityHeatmap = generateActivityHeatmap;
 window.updateHeatmapWithData = updateHeatmapWithData;
 window.refreshActivityHeatmap = refreshActivityHeatmap;
+
 

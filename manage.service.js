@@ -1,4 +1,4 @@
-import { api } from './apiClient.js';
+import { ApiClient } from './apiClient.js';
 import { store } from './store/store.js';
 import { validateDeckData } from './utils/validation.js';
 import {
@@ -19,7 +19,7 @@ import {
  */
 export async function loadManageDecks() {
   try {
-    const decks = await apiWithFallback('/api/decks', FALLBACK_DATA.decks);
+    const decks = await apiWithFallback('/api/decks', FALLBACK_DATA.decks, 'GET');
     renderManageDecks(decks);
     return decks;
   } catch (error) {
@@ -97,7 +97,7 @@ export async function deleteDeck(id) {
 
   try {
     await performCrudOperation(
-      () => api(`/api/decks/${id}`, { method: 'DELETE' }),
+      () => ApiClient.delete(`/api/decks/${id}`),
       'Deck eliminado exitosamente',
       'Error al eliminar deck'
     );
@@ -123,7 +123,8 @@ export async function editDeck(deckId) {
   try {
     const deck = await apiWithFallback(
       `/api/decks/${deckId}`,
-      FALLBACK_DATA.decks.find((d) => d.id === deckId) || {}
+      FALLBACK_DATA.decks.find((d) => d.id === deckId) || {},
+      'GET'
     );
 
     // Mostrar modal de edición o formulario inline
@@ -231,13 +232,10 @@ export async function updateDeck(deckId) {
   try {
     await performCrudOperation(
       () =>
-        api(`/api/decks/${deckId}`, {
-          method: 'PUT',
-          body: JSON.stringify({
-            name: name,
-            description: description,
-            is_public: isPublic,
-          }),
+        ApiClient.put(`/api/decks/${deckId}`, {
+          name: name,
+          description: description,
+          is_public: isPublic,
         }),
       'Deck actualizado exitosamente',
       'Error al actualizar deck'
@@ -277,7 +275,8 @@ export async function loadDeckFlashcards(deckId) {
   try {
     const flashcards = await apiWithFallback(
       `/api/flashcards/deck/${deckId}`,
-      FALLBACK_DATA.flashcards.filter((f) => f.deck_id === deckId)
+      FALLBACK_DATA.flashcards.filter((f) => f.deck_id === deckId),
+      'GET'
     );
 
     renderDeckFlashcards(flashcards, deckId);
@@ -334,7 +333,7 @@ function renderDeckFlashcards(flashcards, deckId) {
               </div>
               <div class="flashcard-back">
                 <strong>Reverso:</strong> ${card.back || 'Sin contenido'}
-              </div>
+              }
             </div>
             <div class="flashcard-actions">
               <button class="btn btn-sm btn-primary" onclick="editFlashcard(${card.id})">
@@ -362,8 +361,8 @@ function renderDeckFlashcards(flashcards, deckId) {
 export async function exportDeck(deckId) {
   try {
     const [deck, flashcards] = await Promise.all([
-      apiWithFallback(`/api/decks/${deckId}`, {}),
-      apiWithFallback(`/api/flashcards/deck/${deckId}`, []),
+      apiWithFallback(`/api/decks/${deckId}`, {}, 'GET'),
+      apiWithFallback(`/api/flashcards/deck/${deckId}`, [], 'GET'),
     ]);
 
     const exportData = {
@@ -410,3 +409,5 @@ window.updateDeck = updateDeck;
 window.closeEditDeckModal = closeEditDeckModal;
 window.loadDeckFlashcards = loadDeckFlashcards;
 window.exportDeck = exportDeck;
+
+

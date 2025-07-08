@@ -3,7 +3,7 @@
  * Elimina duplicación en llamadas API con fallback
  */
 
-import { api } from '../apiClient.js';
+import { ApiClient } from '../apiClient.js';
 import { showNotification } from './helpers.js';
 
 /**
@@ -21,18 +21,18 @@ export async function apiWithFallback(
   showFallbackMessage = true
 ) {
   try {
-    const data = await api(endpoint, options);
+    const data = await ApiClient.request(endpoint, options);
 
     // Si la API devuelve un error, usar fallback
     if (data && data.error) {
       throw new Error(data.error);
     }
 
-    return data;
-  } catch {
+    return data.data; // Retorna solo los datos, no el objeto completo de respuesta
+  } catch (error) {
     if (showFallbackMessage) {
       console.log(
-        `API no disponible para ${endpoint}, usando datos de ejemplo`
+        `API no disponible para ${endpoint}, usando datos de ejemplo. Error: ${error.message}`
       );
     }
 
@@ -60,7 +60,7 @@ export async function multipleApiWithFallback(apiCalls) {
 
 /**
  * Wrapper para operaciones CRUD con manejo de errores estándar
- * @param {Function} operation - Función que realiza la operación
+ * @param {Function} operation - Función que realiza la operación (debe retornar una promesa con el resultado de ApiClient)
  * @param {string} successMessage - Mensaje de éxito
  * @param {string} errorMessage - Mensaje de error
  * @returns {Promise<any>} - Resultado de la operación
@@ -77,9 +77,9 @@ export async function performCrudOperation(
       if (successMessage) {
         showNotification(successMessage, 'success');
       }
-      return result;
+      return result.data; // Retorna solo los datos, no el objeto completo de respuesta
     } else {
-      throw new Error(result?.error || 'Operación fallida');
+      throw new Error(result?.message || 'Operación fallida');
     }
   } catch (error) {
     console.error('Error en operación CRUD:', error);
@@ -106,13 +106,13 @@ export async function loadDataWithRetry(
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-      const data = await api(endpoint);
+      const result = await ApiClient.get(endpoint);
 
-      if (data && !data.error) {
-        return data;
+      if (result && !result.error) {
+        return result.data;
       }
 
-      lastError = new Error(data?.error || 'API error');
+      lastError = new Error(result?.message || 'API error');
     } catch (error) {
       lastError = error;
 
@@ -179,3 +179,5 @@ export const FALLBACK_DATA = {
     created_at: '2024-01-01',
   },
 };
+
+

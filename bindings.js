@@ -316,14 +316,14 @@ async function handleResumeStudy() {
  * Maneja el envío de respuesta
  */
 async function handleSubmitAnswer(el) {
-  const isCorrect = el.dataset.correct === 'true';
-  const difficulty = el.dataset.difficulty || 'normal';
+  const difficulty = parseInt(el.dataset.difficulty, 10);
+  const responseTime = parseInt(el.dataset.responseTime, 10);
 
-  const result = await submitAnswer(isCorrect, difficulty);
+  const result = await submitAnswer(difficulty, responseTime);
 
   if (result && !result.error) {
-    const message = isCorrect ? '¡Correcto!' : 'Incorrecto';
-    const type = isCorrect ? 'success' : 'error';
+    const message = 'Respuesta procesada';
+    const type = 'success';
     showNotification(message, type, 2000);
   }
 }
@@ -724,3 +724,5 @@ if (window.APP_CONFIG?.features?.debugging) {
 }
 
 console.log('🔗 Sistema de bindings inicializado');
+
+

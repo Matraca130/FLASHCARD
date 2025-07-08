@@ -1,4 +1,4 @@
-import { api } from './apiClient.js';
+import { ApiClient } from './apiClient.js';
 import { store } from './store/store.js';
 import { apiWithFallback, performCrudOperation } from './utils/apiHelpers.js';
 import { showNotification, formatDate, generateId, formatDateDDMMYYYY } from './utils/helpers.js';
@@ -52,7 +52,7 @@ export async function loadStudyDecks(options = {}) {
 
   try {
     // Cargar decks con fallback
-    const decks = await apiWithFallback('/api/decks', []);
+    const decks = await apiWithFallback('/api/decks', [], 'GET');
 
     if (!decks || decks.length === 0) {
       renderEmptyDecksMessage(container);
@@ -94,7 +94,7 @@ async function loadDecksWithStats(decks) {
         learning_cards: 0,
         review_cards: 0,
         last_studied: null,
-      });
+      }, 'GET');
 
       return { ...deck, ...stats };
     } catch (error) {
@@ -222,7 +222,7 @@ export async function startStudySession(deckId, options = {}) {
     showNotification('Iniciando sesión de estudio...', 'info');
 
     // Cargar información del deck
-    const deck = await apiWithFallback(`/api/decks/${deckId}`, null);
+    const deck = await apiWithFallback(`/api/decks/${deckId}`, null, 'GET');
     if (!deck) {
       showNotification('Deck no encontrado', 'error');
       return;
@@ -233,7 +233,7 @@ export async function startStudySession(deckId, options = {}) {
       ? `/api/study/cards/review/${deckId}`
       : `/api/study/cards/due/${deckId}`;
 
-    const cards = await apiWithFallback(endpoint, []);
+    const cards = await apiWithFallback(endpoint, [], 'GET');
 
     if (!cards || cards.length === 0) {
       showNotification('No hay cartas para estudiar en este deck', 'warning');
@@ -300,10 +300,7 @@ async function createStudySession(deck, cards, algorithm) {
     // Crear sesión en el servidor
     const session = await performCrudOperation(
       () =>
-        api('/api/study/sessions', {
-          method: 'POST',
-          body: JSON.stringify(sessionData),
-        }),
+        ApiClient.post('/api/study/sessions', sessionData),
       null, // No mostrar notificación
       null
     );
@@ -443,10 +440,7 @@ async function processCardAnswer(card, difficulty, responseTime) {
     // Enviar al servidor para procesamiento
     const result = await performCrudOperation(
       () =>
-        api('/api/study/answer', {
-          method: 'POST',
-          body: JSON.stringify(answerData),
-        }),
+        ApiClient.post('/api/study/answer', answerData),
       null, // No mostrar notificación
       null
     );
@@ -539,10 +533,7 @@ export async function endStudySession() {
     try {
       await performCrudOperation(
         () =>
-          api(`/api/study/sessions/${currentSession.id}/end`, {
-            method: 'POST',
-            body: JSON.stringify(sessionEndData),
-          }),
+          ApiClient.post(`/api/study/sessions/${currentSession.id}/end`, sessionEndData),
         null, // No mostrar notificación
         null
       );
@@ -640,6 +631,7 @@ function showCompletionMessage(deck) {
 function startSessionTimer() {
   if (sessionTimer) {
     clearInterval(sessionTimer);
+    sessionTimer = null;
   }
 
   sessionTimer = setInterval(() => {
@@ -716,3 +708,5 @@ window.endStudySession = endStudySession;
 window.pauseStudySession = pauseStudySession;
 window.resumeStudySession = resumeStudySession;
 window.getCurrentSessionStats = getCurrentSessionStats;
+
+

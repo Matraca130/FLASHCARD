@@ -124,8 +124,9 @@ export class ApiClient {
   static async post(endpoint, data = null, options = {}) {
     return this.request(endpoint, {
       method: 'POST',
-      body: data ? JSON.stringify(data) : null,
+      body: data instanceof FormData ? data : (data ? JSON.stringify(data) : null),
       ...options,
+      headers: data instanceof FormData ? { ...options.headers } : { 'Content-Type': 'application/json', ...options.headers },
     });
   }
 
@@ -492,41 +493,10 @@ export class ApiClient {
   }
 }
 
-// Función de conveniencia para compatibilidad con código existente
-export async function api(endpoint, options = {}) {
-  const method = options.method || 'GET';
-
-  switch (method.toUpperCase()) {
-    case 'GET':
-      return ApiClient.get(endpoint, options);
-    case 'POST':
-      return ApiClient.post(
-        endpoint,
-        options.body ? JSON.parse(options.body) : null,
-        options
-      );
-    case 'PUT':
-      return ApiClient.put(
-        endpoint,
-        options.body ? JSON.parse(options.body) : null,
-        options
-      );
-    case 'PATCH':
-      return ApiClient.patch(
-        endpoint,
-        options.body ? JSON.parse(options.body) : null,
-        options
-      );
-    case 'DELETE':
-      return ApiClient.delete(endpoint, options);
-    default:
-      return ApiClient.request(endpoint, options);
-  }
-}
-
 // Exportar instancia por defecto
 export default ApiClient;
 
 // Exponer globalmente para compatibilidad
 window.ApiClient = ApiClient;
-window.api = api;
+
+

@@ -1,4 +1,4 @@
-import { api } from './apiClient.js';
+import { ApiClient } from './apiClient.js';
 import { store } from './store/store.js';
 import { apiWithFallback, performCrudOperation } from './utils/apiHelpers.js';
 import { showNotification } from './utils/helpers.js';
@@ -279,10 +279,7 @@ export async function saveAlgorithmConfig(algorithmId, params) {
 
     await performCrudOperation(
       () =>
-        api('/api/user/algorithm-config', {
-          method: 'POST',
-          body: JSON.stringify(config),
-        }),
+        ApiClient.post('/api/user/algorithm-config', config),
       null, // No mostrar notificación aquí
       'Error al guardar configuración del algoritmo'
     );
@@ -358,14 +355,11 @@ export async function calculateNextInterval(cardData, quality) {
 
     const result = await performCrudOperation(
       () =>
-        api('/api/study/calculate-interval', {
-          method: 'POST',
-          body: JSON.stringify({
-            card_data: cardData,
-            quality: quality,
-            algorithm: config.algorithm,
-            parameters: config.parameters,
-          }),
+        ApiClient.post('/api/study/calculate-interval', {
+          card_data: cardData,
+          quality: quality,
+          algorithm: config.algorithm,
+          parameters: config.parameters,
         }),
       null, // No mostrar notificación
       'Error al calcular intervalo'
@@ -446,3 +440,5 @@ window.showAlgorithmModal = showAlgorithmModal;
 window.closeAlgorithmModal = closeAlgorithmModal;
 window.selectModalAlgorithm = selectModalAlgorithm;
 window.confirmAlgorithmSelection = confirmAlgorithmSelection;
+
+

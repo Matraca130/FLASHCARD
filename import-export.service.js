@@ -1,4 +1,4 @@
-import { api } from './apiClient.js';
+import { ApiClient } from './apiClient.js';
 import { validateDeckData } from './utils/validation.js';
 import { performCrudOperation, apiWithFallback } from './utils/apiHelpers.js';
 import { showNotification, generateId, downloadFile } from './utils/helpers.js';
@@ -50,8 +50,8 @@ export async function exportDeck(deckId, format = 'json') {
   try {
     // Cargar datos del deck y flashcards
     const [deck, flashcards] = await Promise.all([
-      apiWithFallback(`/api/decks/${deckId}`, {}),
-      apiWithFallback(`/api/flashcards/deck/${deckId}`, [])
+      apiWithFallback(`/api/decks/${deckId}`, {}, 'GET'),
+      apiWithFallback(`/api/flashcards/deck/${deckId}`, [], 'GET')
     ]);
     
     if (!deck.id) {
@@ -112,8 +112,8 @@ export async function exportMultipleDecks(deckIds, format = 'json') {
     
     const exportPromises = deckIds.map(async (deckId) => {
       const [deck, flashcards] = await Promise.all([
-        apiWithFallback(`/api/decks/${deckId}`, {}),
-        apiWithFallback(`/api/flashcards/deck/${deckId}`, [])
+        apiWithFallback(`/api/decks/${deckId}`, {}, 'GET'),
+        apiWithFallback(`/api/flashcards/deck/${deckId}`, [], 'GET')
       ]);
       
       return { deck, flashcards };
@@ -360,7 +360,7 @@ export async function confirmImport() {
     }
     
   } catch (error) {
-    console.error('Error during import:', error);
+    console.error('Error durante la importación:', error);
     showNotification('Error durante la importación', 'error');
   }
 }
@@ -399,13 +399,10 @@ async function importSingleDeck(deckData) {
     
     // Crear deck
     const deck = await performCrudOperation(
-      () => api('/api/decks', {
-        method: 'POST',
-        body: JSON.stringify({
-          name: deckData.name,
-          description: deckData.description || '',
-          is_public: deckData.is_public || false
-        })
+      () => ApiClient.post('/api/decks', {
+        name: deckData.name,
+        description: deckData.description || '',
+        is_public: deckData.is_public || false
       }),
       null, // No mostrar notificación individual
       null
@@ -414,12 +411,9 @@ async function importSingleDeck(deckData) {
     // Importar flashcards
     if (deckData.cards && deckData.cards.length > 0) {
       await performCrudOperation(
-        () => api('/api/flashcards/bulk', {
-          method: 'POST',
-          body: JSON.stringify({
-            deck_id: deck.id,
-            flashcards: deckData.cards
-          })
+        () => ApiClient.post('/api/flashcards/bulk', {
+          deck_id: deck.id,
+          flashcards: deckData.cards
         }),
         null, // No mostrar notificación individual
         null
@@ -656,4 +650,5 @@ window.exportMultipleDecks = exportMultipleDecks;
 window.handleFileUpload = handleFileUpload;
 window.confirmImport = confirmImport;
 window.cancelImport = cancelImport;
+
 

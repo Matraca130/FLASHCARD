@@ -1,4 +1,4 @@
-import { api } from './apiClient.js';
+import { ApiClient } from './apiClient.js';
 import { store } from './store/store.js';
 import {
   apiWithFallback,
@@ -102,10 +102,14 @@ let sessionStats = {
  */
 export async function loadGamificationData() {
   try {
-    const data = await apiWithFallback('/api/gamification/profile', {
-      ...gamificationData,
-      achievements: Object.keys(GAMIFICATION_CONFIG.achievements).slice(0, 2), // Mock: primeros 2 logros
-    });
+    const data = await apiWithFallback(
+      '/api/gamification/profile',
+      {
+        ...gamificationData,
+        achievements: Object.keys(GAMIFICATION_CONFIG.achievements).slice(0, 2), // Mock: primeros 2 logros
+      },
+      'GET'
+    );
 
     gamificationData = { ...gamificationData, ...data };
     updateGamificationUI();
@@ -428,10 +432,7 @@ async function saveGamificationData() {
   try {
     await performCrudOperation(
       () =>
-        api('/api/gamification/profile', {
-          method: 'POST',
-          body: JSON.stringify(gamificationData),
-        }),
+        ApiClient.post('/api/gamification/profile', gamificationData),
       null, // No mostrar notificación
       'Error al guardar progreso de gamificación'
     );
@@ -659,3 +660,5 @@ window.loadGamificationData = loadGamificationData;
 window.startStudySession = startStudySession;
 window.endStudySession = endStudySession;
 window.calculatePoints = calculatePoints;
+
+
