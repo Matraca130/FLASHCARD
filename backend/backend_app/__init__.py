@@ -34,6 +34,8 @@ def create_app(config_class=None):
             "http://localhost:5173",  # Vite dev server
             "https://matraca130.github.io",  # GitHub Pages
             "https://*.github.io",  # Cualquier subdominio de GitHub Pages
+            "https://unrivaled-heliotrope-8763f9.netlify.app",  # Netlify deployment
+            "https://*.netlify.app",  # Cualquier subdominio de Netlify
         ],
         supports_credentials=True,
         allow_headers=[
