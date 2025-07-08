@@ -717,7 +717,7 @@
                 </label>
               </div>
               
-              <button id="create-deck-btn" class="btn btn-primary" data-action="create-deck" type="button">
+              <button id="create-deck-btn" class="btn btn-primary" data-action="create-deck" type="button" onclick="handleCreateDeck(event)">
                 ➕ Crear Deck
               </button>
             </form>
@@ -745,7 +745,7 @@
                 <textarea id="flashcard-back" class="form-input form-textarea" placeholder="Escribe la respuesta o definición..." required></textarea>
               </div>
               
-              <button id="create-flashcard-btn" class="btn btn-success" data-action="create-flashcard" type="button">
+              <button id="create-flashcard-btn" class="btn btn-success" data-action="create-flashcard" type="button" onclick="handleCreateFlashcard(event)">
                 ➕ Crear Flashcard
               </button>
             </form>
@@ -1262,51 +1262,6 @@
     }
     
     // ===== NAVIGATION =====
-    function showSection(sectionName) {
-      console.log('Navigating to section:', sectionName);
-      
-      // Hide all sections
-      document.querySelectorAll('.section').forEach(section => {
-        section.classList.remove('active');
-        section.style.display = 'none';
-      });
-      
-      // Show target section
-      const targetSection = document.getElementById(sectionName);
-      if (targetSection) {
-        targetSection.classList.add('active');
-        targetSection.style.display = 'block';
-        console.log('Section shown:', sectionName);
-      } else {
-        console.error('Section not found:', sectionName);
-      }
-      
-      // Update navigation
-      document.querySelectorAll('.nav-link').forEach(link => {
-        link.classList.remove('active');
-      });
-      
-      const activeLink = document.querySelector(`[data-section="${sectionName}"]`);
-      if (activeLink) {
-        activeLink.classList.add('active');
-      }
-      
-      // Load section-specific data
-      switch (sectionName) {
-        case 'dashboard':
-          loadDashboardData();
-          import('./charts.js').then(m => m.initializeCharts && m.initializeCharts()).catch(e => console.log('Charts not loaded:', e));
-          break;
-        case 'estudiar':
-          import('./study.service.js').then(m => m.loadStudyDecks && m.loadStudyDecks()).catch(e => console.log('Study service not loaded:', e));
-          break;
-          case 'crear':
-            import('./create.service.js').then(m => m.initializeCreateEvents && m.initializeCreateEvents()).catch(e => console.log('Create service not loaded:', e));
-            break;
-          case 'gestionar':
-          import('./manage.service.js').then(m => m.loadManageDecks && m.loadManageDecks()).catch(e => console.log('Manage service not loaded:', e));
-          break;
-        case 'ranking':
           loadRankingData();
           break;
       }
@@ -2375,6 +2330,8 @@
       console.log('Analytics:', { category, action, label });
     }
 
+    console.log('✅ Funciones de compatibilidad agregadas inline');
+
     // ===== ERROR HANDLING =====
     window.addEventListener('error', function(e) {
       console.error('Global error:', e.error);
@@ -2396,7 +2353,7 @@
     
   </script>
 
-    <!-- StudyingFlash - Versión Final Sin ES6 -->
-    <script src="./flashcard-app-final.js?v=20250708053000"></script>
+    <!-- StudyingFlash - Versión Final Sin ES6 - BYPASS CACHE -->
+    <script src="./flashcard-app-final.js?v=20250708054000"></script>
 </body>
 </html>

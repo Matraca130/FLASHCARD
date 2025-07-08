@@ -457,7 +457,8 @@ export function renderEmptyStatsState(container, options = {}) {
   };
 
   const finalOptions = { ...defaultOptions, ...options };
-  renderEmptyState(container, finalOptions);}
+  renderEmptyState(container, finalOptions);
+}
 
 /**
  * Descarga un archivo con el contenido especificado
@@ -469,16 +470,16 @@ export function downloadFile(content, filename, mimeType = 'text/plain') {
   try {
     const blob = new Blob([content], { type: mimeType });
     const url = URL.createObjectURL(blob);
-    
+
     const link = document.createElement('a');
     link.href = url;
     link.download = filename;
     link.style.display = 'none';
-    
+
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    
+
     URL.revokeObjectURL(url);
   } catch (error) {
     console.error('Error downloading file:', error);
@@ -495,8 +496,8 @@ export function capitalizeWords(str) {
   if (!str || typeof str !== 'string') {
     return '';
   }
-  
-  return str.replace(/\b\w/g, l => l.toUpperCase());
+
+  return str.replace(/\b\w/g, (l) => l.toUpperCase());
 }
 
 /**
@@ -508,7 +509,7 @@ export function sanitizeFilename(filename) {
   if (!filename || typeof filename !== 'string') {
     return 'archivo';
   }
-  
+
   // Remover caracteres no válidos para nombres de archivo
   return filename
     .replace(/[<>:"/\\|?*]/g, '')
@@ -526,10 +527,10 @@ export function parseCSV(csvContent, delimiter = ',') {
   if (!csvContent || typeof csvContent !== 'string') {
     return [];
   }
-  
+
   const lines = csvContent.trim().split('\n');
-  return lines.map(line => 
-    line.split(delimiter).map(cell => cell.trim().replace(/^"|"$/g, ''))
+  return lines.map((line) =>
+    line.split(delimiter).map((cell) => cell.trim().replace(/^"|"$/g, ''))
   );
 }
 
@@ -539,12 +540,14 @@ export function parseCSV(csvContent, delimiter = ',') {
  * @returns {string} - Tamaño formateado
  */
 export function formatFileSize(bytes) {
-  if (!bytes || bytes === 0) { return '0 B'; }
-  
+  if (!bytes || bytes === 0) {
+    return '0 B';
+  }
+
   const k = 1024;
   const sizes = ['B', 'KB', 'MB', 'GB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  
+
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
 
@@ -557,7 +560,7 @@ export function isValidEmail(email) {
   if (!email || typeof email !== 'string') {
     return false;
   }
-  
+
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
 }
@@ -571,39 +574,7 @@ export function isValidPassword(password) {
   if (!password || typeof password !== 'string') {
     return false;
   }
-  
+
   // Mínimo 6 caracteres
   return password.length >= 6;
 }
-
-
-
-/**
- * Formatea una fecha en formato DD/MM/YYYY
- * @param {string|Date} date - Fecha a formatear
- * @returns {string} - Fecha en formato DD/MM/YYYY
- */
-export function formatDateDDMMYYYY(date) {
-  if (!date) {
-    return 'N/A';
-  }
-
-  const dateObj = typeof date === 'string' ? new Date(date) : date;
-
-  if (isNaN(dateObj.getTime())) {
-    return 'Fecha inválida';
-  }
-
-  const day = dateObj.getDate().toString().padStart(2, '0');
-  const month = (dateObj.getMonth() + 1).toString().padStart(2, '0');
-  const year = dateObj.getFullYear();
-
-  return `${day}/${month}/${year}`;
-}
-
-
-
-// Exponer funciones clave globalmente para compatibilidad con código HTML
-
-
-

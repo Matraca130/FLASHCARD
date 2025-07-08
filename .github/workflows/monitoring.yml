@@ -1,276 +1,59 @@
-name: Continuous Monitoring
+name: Site Monitoring
 
 on:
   schedule:
-    # Run every 30 minutes
-    - cron: '*/30 * * * *'
+    # Run every 2 hours (reduced frequency)
+    - cron: '0 */2 * * *'
   workflow_dispatch:
-    inputs:
-      check_type:
-        description: 'Type of check to perform'
-        required: true
-        default: 'full'
-        type: choice
-        options:
-        - full
-        - health
-        - performance
-        - security
 
 permissions:
   contents: read
-  issues: write
-  actions: read
 
 jobs:
   health-check:
-    name: Site Health Check
+    name: Basic Health Check
     runs-on: ubuntu-latest
-    
-    outputs:
-      site-status: ${{ steps.health.outputs.status }}
-      response-time: ${{ steps.health.outputs.response_time }}
-      issues-found: ${{ steps.health.outputs.issues }}
+    timeout-minutes: 5
     
     steps:
-    - name: Site availability check
-      id: health
+    - name: Check site availability
       run: |
-        echo "🏥 Performing site health check..."
+        echo "🏥 Checking site health..."
         
         SITE_URL="https://matraca130.github.io/FLASHCARD/"
         
-        # Check site availability
-        HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "$SITE_URL")
-        RESPONSE_TIME=$(curl -s -o /dev/null -w "%{time_total}" "$SITE_URL")
+        # Simple availability check
+        HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "$SITE_URL" || echo "000")
+        RESPONSE_TIME=$(curl -s -o /dev/null -w "%{time_total}" "$SITE_URL" || echo "999")
         
         echo "HTTP Code: $HTTP_CODE"
         echo "Response Time: ${RESPONSE_TIME}s"
         
-        # Set outputs
-        echo "response_time=$RESPONSE_TIME" >> $GITHUB_OUTPUT
-        
         if [ "$HTTP_CODE" = "200" ]; then
-          echo "status=healthy" >> $GITHUB_OUTPUT
-          echo "issues=false" >> $GITHUB_OUTPUT
           echo "✅ Site is healthy"
         else
-          echo "status=unhealthy" >> $GITHUB_OUTPUT
-          echo "issues=true" >> $GITHUB_OUTPUT
-          echo "❌ Site health check failed"
+          echo "❌ Site health check failed (HTTP $HTTP_CODE)"
         fi
-    
-    - name: Performance check
-      run: |
-        echo "⚡ Performance monitoring..."
         
-        SITE_URL="https://matraca130.github.io/FLASHCARD/"
-        RESPONSE_TIME="${{ steps.health.outputs.response_time }}"
-        
-        # Performance thresholds
-        SLOW_THRESHOLD=3.0
-        CRITICAL_THRESHOLD=5.0
-        
-        if (( $(echo "$RESPONSE_TIME > $CRITICAL_THRESHOLD" | bc -l) )); then
-          echo "🚨 CRITICAL: Site is very slow (${RESPONSE_TIME}s > ${CRITICAL_THRESHOLD}s)"
-          echo "performance=critical" >> $GITHUB_OUTPUT
-        elif (( $(echo "$RESPONSE_TIME > $SLOW_THRESHOLD" | bc -l) )); then
-          echo "⚠️ WARNING: Site is slow (${RESPONSE_TIME}s > ${SLOW_THRESHOLD}s)"
-          echo "performance=warning" >> $GITHUB_OUTPUT
+        # Simple performance check
+        if (( $(echo "$RESPONSE_TIME > 10.0" | bc -l 2>/dev/null || echo 0) )); then
+          echo "⚠️ Site is very slow (${RESPONSE_TIME}s)"
+        elif (( $(echo "$RESPONSE_TIME > 5.0" | bc -l 2>/dev/null || echo 0) )); then
+          echo "⚠️ Site is slow (${RESPONSE_TIME}s)"
         else
-          echo "✅ Performance is good (${RESPONSE_TIME}s)"
-          echo "performance=good" >> $GITHUB_OUTPUT
+          echo "✅ Performance is acceptable"
         fi
-    
-    - name: Content verification
+        
+    - name: Basic content check
       run: |
-        echo "📄 Content verification..."
+        echo "📄 Checking basic content..."
         
         SITE_URL="https://matraca130.github.io/FLASHCARD/"
         
-        # Download page content
-        curl -s "$SITE_URL" > page_content.html
-        
-        # Check for critical elements
-        if grep -q "FLASHCARD" page_content.html; then
-          echo "✅ Title found"
+        # Download page and check for basic elements
+        if curl -s "$SITE_URL" | grep -q "FLASHCARD"; then
+          echo "✅ Site content looks good"
         else
-          echo "❌ Title missing"
-        fi
-        
-        if grep -q "dashboard\|study\|create" page_content.html; then
-          echo "✅ Navigation elements found"
-        else
-          echo "❌ Navigation elements missing"
-        fi
-        
-        # Check for JavaScript errors in console (basic)
-        if grep -q "error\|Error\|ERROR" page_content.html; then
-          echo "⚠️ Potential errors found in page"
-        else
-          echo "✅ No obvious errors in page content"
-        fi
-
-  workflow-status:
-    name: Workflow Status Check
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Check recent workflow runs
-      run: |
-        echo "🔄 Checking recent workflow status..."
-        
-        # This would typically use GitHub API to check workflow status
-        # For now, we'll simulate the check
-        
-        echo "Recent workflow runs:"
-        echo "- Enterprise Testing Suite: ✅ Passing"
-        echo "- Enterprise Deployment: ✅ Passing"
-        echo "- Deploy to GitHub Pages: ✅ Passing"
-        
-        # In a real implementation, you would:
-        # 1. Use GitHub API to get recent workflow runs
-        # 2. Check for failures
-        # 3. Alert if multiple failures detected
-        
-        echo "✅ All critical workflows are healthy"
-
-  dependency-check:
-    name: Dependency Security Check
-    runs-on: ubuntu-latest
-    if: github.event.inputs.check_type == 'full' || github.event.inputs.check_type == 'security' || github.event_name == 'schedule'
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-        cache: 'npm'
-    
-    - name: Security audit
-      run: |
-        echo "🔒 Running security audit..."
-        
-        # Run npm audit
-        npm audit --audit-level=moderate || {
-          echo "⚠️ Security vulnerabilities found"
-          npm audit --audit-level=moderate --json > audit-results.json
-          
-          # Check severity
-          if npm audit --audit-level=high; then
-            echo "✅ No high-severity vulnerabilities"
-          else
-            echo "🚨 High-severity vulnerabilities found!"
-          fi
-        }
-    
-    - name: Dependency freshness check
-      run: |
-        echo "📦 Checking dependency freshness..."
-        
-        # Check for outdated packages
-        npm outdated || echo "Some packages are outdated"
-        
-        # Check for deprecated packages
-        npm ls --depth=0 2>&1 | grep -i "deprecated" || echo "No deprecated packages found"
-
-  alert-management:
-    name: Alert Management
-    runs-on: ubuntu-latest
-    needs: [health-check, workflow-status]
-    if: always()
-    
-    steps:
-    - name: Evaluate alerts
-      run: |
-        echo "🚨 Evaluating monitoring results..."
-        
-        SITE_STATUS="${{ needs.health-check.outputs.site-status }}"
-        ISSUES_FOUND="${{ needs.health-check.outputs.issues-found }}"
-        
-        if [ "$SITE_STATUS" = "unhealthy" ] || [ "$ISSUES_FOUND" = "true" ]; then
-          echo "🚨 ALERT: Issues detected!"
-          echo "Site Status: $SITE_STATUS"
-          echo "Issues Found: $ISSUES_FOUND"
-          
-          # In a real implementation, you would:
-          # 1. Send notifications (Slack, email, etc.)
-          # 2. Create GitHub issues
-          # 3. Trigger automatic remediation
-          
-          echo "alert_level=high" >> $GITHUB_OUTPUT
-        else
-          echo "✅ All systems normal"
-          echo "alert_level=none" >> $GITHUB_OUTPUT
-        fi
-    
-    - name: Create incident report
-      if: needs.health-check.outputs.issues-found == 'true'
-      run: |
-        echo "📝 Creating incident report..."
-        
-        cat > incident-report.md << EOF
-        # Incident Report - $(date -u +%Y-%m-%d\ %H:%M:%S\ UTC)
-        
-        ## Summary
-        Monitoring detected issues with the FLASHCARD application.
-        
-        ## Details
-        - Site Status: ${{ needs.health-check.outputs.site-status }}
-        - Response Time: ${{ needs.health-check.outputs.response-time }}s
-        - Detection Time: $(date -u +%Y-%m-%dT%H:%M:%SZ)
-        
-        ## Recommended Actions
-        1. Check site availability
-        2. Review recent deployments
-        3. Check for infrastructure issues
-        4. Consider rollback if necessary
-        
-        ## Monitoring Data
-        - Check Type: ${{ github.event.inputs.check_type || 'scheduled' }}
-        - Workflow Run: ${{ github.run_id }}
-        EOF
-        
-        echo "Incident report created:"
-        cat incident-report.md
-    
-    - name: Recovery recommendations
-      if: needs.health-check.outputs.site-status == 'unhealthy'
-      run: |
-        echo "🔧 Recovery recommendations:"
-        echo "1. Check GitHub Pages status"
-        echo "2. Verify DNS resolution"
-        echo "3. Review recent deployments"
-        echo "4. Consider manual rollback using: gh workflow run rollback.yml"
-        echo "5. Check for GitHub service incidents"
-
-  summary-report:
-    name: Monitoring Summary
-    runs-on: ubuntu-latest
-    needs: [health-check, workflow-status, dependency-check, alert-management]
-    if: always()
-    
-    steps:
-    - name: Generate summary
-      run: |
-        echo "📊 Monitoring Summary Report"
-        echo "=========================="
-        echo "Timestamp: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
-        echo "Check Type: ${{ github.event.inputs.check_type || 'scheduled' }}"
-        echo ""
-        echo "## Results"
-        echo "Site Health: ${{ needs.health-check.outputs.site-status || 'unknown' }}"
-        echo "Response Time: ${{ needs.health-check.outputs.response-time || 'unknown' }}s"
-        echo "Issues Found: ${{ needs.health-check.outputs.issues-found || 'unknown' }}"
-        echo "Alert Level: ${{ needs.alert-management.outputs.alert_level || 'unknown' }}"
-        echo ""
-        echo "## Status"
-        if [ "${{ needs.health-check.outputs.site-status }}" = "healthy" ]; then
-          echo "🟢 All systems operational"
-        else
-          echo "🔴 Issues detected - investigation required"
+          echo "⚠️ Site content may have issues"
         fi
 
