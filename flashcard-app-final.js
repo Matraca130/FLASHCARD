@@ -138,6 +138,136 @@ const ApiService = {
     }
 };
 
+// ===== AUTH SERVICE =====
+const AuthService = {
+    async checkAuthStatus() {
+        const token = this.getAuthToken();
+        if (!token) {
+            return;
+        }
+
+        try {
+            const data = await ApiService.request('/auth/verify');
+            if (data && data.user) {
+                // Actualizar estado de usuario si hay un store
+                if (window.updateAuthUI) {
+                    window.updateAuthUI();
+                }
+                return data.user;
+            } else {
+                this.removeAuthToken();
+                return null;
+            }
+        } catch (error) {
+            Utils.error('Auth verification failed:', error);
+            this.removeAuthToken();
+            return null;
+        }
+    },
+
+    async login(email, password) {
+        if (!email || !password) {
+            Utils.showNotification('Email y contraseña son requeridos', 'error');
+            return false;
+        }
+
+        try {
+            const result = await ApiService.request('/auth/login', {
+                method: 'POST',
+                body: JSON.stringify({ email, password })
+            });
+
+            if (result && result.token) {
+                this.setAuthToken(result.token, result.refresh_token);
+                
+                if (window.updateAuthUI) {
+                    window.updateAuthUI();
+                }
+                if (window.hideLoginModal) {
+                    window.hideLoginModal();
+                }
+
+                Utils.showNotification('Sesión iniciada exitosamente');
+                return result.user;
+            }
+        } catch (error) {
+            Utils.error('Login failed:', error);
+            Utils.showNotification('Error al iniciar sesión', 'error');
+            return false;
+        }
+    },
+
+    async register(email, password, confirmPassword, name = '') {
+        if (!email || !password) {
+            Utils.showNotification('Email y contraseña son requeridos', 'error');
+            return false;
+        }
+
+        if (password !== confirmPassword) {
+            Utils.showNotification('Las contraseñas no coinciden', 'error');
+            return false;
+        }
+
+        try {
+            const result = await ApiService.request('/auth/register', {
+                method: 'POST',
+                body: JSON.stringify({ email, password, name })
+            });
+
+            if (result) {
+                Utils.showNotification('Cuenta creada exitosamente');
+                // Auto-login después del registro
+                return await this.login(email, password);
+            }
+        } catch (error) {
+            Utils.error('Registration failed:', error);
+            Utils.showNotification('Error al crear la cuenta', 'error');
+            return false;
+        }
+    },
+
+    logout() {
+        this.removeAuthToken();
+        
+        if (window.updateAuthUI) {
+            window.updateAuthUI();
+        }
+        if (window.showSection) {
+            window.showSection('inicio');
+        }
+
+        Utils.showNotification('Sesión cerrada', 'info');
+    },
+
+    getAuthToken() {
+        return localStorage.getItem('authToken');
+    },
+
+    setAuthToken(token, refreshToken = null) {
+        if (token) {
+            localStorage.setItem('authToken', token);
+        }
+        if (refreshToken) {
+            localStorage.setItem('refreshToken', refreshToken);
+        }
+    },
+
+    removeAuthToken() {
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('refreshToken');
+    },
+
+    isAuthenticated() {
+        return !!this.getAuthToken();
+    },
+
+    getCurrentUser() {
+        // Intentar obtener usuario del localStorage o estado global
+        const userStr = localStorage.getItem('currentUser');
+        return userStr ? JSON.parse(userStr) : null;
+    }
+};
+
 // ===== DECK SERVICE =====
 const DeckService = {
     async getAll() {

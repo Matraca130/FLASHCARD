@@ -1,0 +1,566 @@
+{
+  "agent": "AGENT-1",
+  "phase": "analysis",
+  "mainFileAnalysis": {
+    "file": "./flashcard-app-final.js",
+    "size": 34289,
+    "lines": 1023,
+    "functions": [
+      {
+        "name": "index",
+        "line": 119,
+        "type": "arrow",
+        "content": "const index = allItems.findIndex(item => item.id === updateData.id);"
+      },
+      {
+        "name": "filtered",
+        "line": 131,
+        "type": "arrow",
+        "content": "const filtered = items.filter(item => item.id !== deleteId);"
+      },
+      {
+        "name": "flashcard",
+        "line": 278,
+        "type": "arrow",
+        "content": "const flashcard = flashcards.find(f => f.id === flashcardId);"
+      },
+      {
+        "name": "studiedToday",
+        "line": 308,
+        "type": "arrow",
+        "content": "const studiedToday = flashcards.filter(f =>"
+      },
+      {
+        "name": "reviewed",
+        "line": 337,
+        "type": "arrow",
+        "content": "const reviewed = flashcards.filter(f => f.lastReviewed);"
+      },
+      {
+        "name": "correct",
+        "line": 340,
+        "type": "arrow",
+        "content": "const correct = reviewed.filter(f => f.easeFactor >= 2.5).length;"
+      },
+      {
+        "name": "studiedToday",
+        "line": 372,
+        "type": "arrow",
+        "content": "const studiedToday = flashcards.filter(f =>"
+      },
+      {
+        "name": "showSection",
+        "line": 815,
+        "content": "function showSection(sectionName) {"
+      },
+      {
+        "name": "debounce",
+        "line": 867,
+        "content": "function debounce(func, wait) {"
+      },
+      {
+        "name": "executedFunction",
+        "line": 869,
+        "content": "return function executedFunction(...args) {"
+      },
+      {
+        "name": "later",
+        "line": 870,
+        "type": "arrow",
+        "content": "const later = () => {"
+      },
+      {
+        "name": "generateActivityHeatmap",
+        "line": 880,
+        "content": "function generateActivityHeatmap() {"
+      },
+      {
+        "name": "handleCreateDeck",
+        "line": 914,
+        "content": "async function handleCreateDeck(event) {"
+      },
+      {
+        "name": "handleCreateFlashcard",
+        "line": 966,
+        "content": "async function handleCreateFlashcard(event) {"
+      }
+    ],
+    "imports": [],
+    "exports": [],
+    "classes": [],
+    "variables": [
+      {
+        "name": "CONFIG",
+        "line": 8,
+        "content": "const CONFIG = {"
+      },
+      {
+        "name": "Utils",
+        "line": 15,
+        "content": "const Utils = {"
+      },
+      {
+        "name": "notification",
+        "line": 28,
+        "content": "const notification = document.createElement('div');"
+      },
+      {
+        "name": "ApiService",
+        "line": 60,
+        "content": "const ApiService = {"
+      },
+      {
+        "name": "url",
+        "line": 63,
+        "content": "const url = `${CONFIG.API_BASE_URL}${endpoint}`;"
+      },
+      {
+        "name": "response",
+        "line": 68,
+        "content": "const response = await fetch(url, {"
+      },
+      {
+        "name": "data",
+        "line": 80,
+        "content": "const data = await response.json();"
+      },
+      {
+        "name": "method",
+        "line": 96,
+        "content": "const method = options.method || 'GET';"
+      },
+      {
+        "name": "storageKey",
+        "line": 97,
+        "content": "const storageKey = `${CONFIG.STORAGE_PREFIX}${endpoint.replace(/\\//g, '_')}`;"
+      },
+      {
+        "name": "stored",
+        "line": 101,
+        "content": "const stored = localStorage.getItem(storageKey);"
+      },
+      {
+        "name": "newData",
+        "line": 105,
+        "content": "const newData = JSON.parse(options.body);"
+      },
+      {
+        "name": "existing",
+        "line": 109,
+        "content": "const existing = JSON.parse(localStorage.getItem(storageKey) || '[]');"
+      },
+      {
+        "name": "updateData",
+        "line": 117,
+        "content": "const updateData = JSON.parse(options.body);"
+      },
+      {
+        "name": "allItems",
+        "line": 118,
+        "content": "const allItems = JSON.parse(localStorage.getItem(storageKey) || '[]');"
+      },
+      {
+        "name": "deleteId",
+        "line": 129,
+        "content": "const deleteId = endpoint.split('/').pop();"
+      },
+      {
+        "name": "items",
+        "line": 130,
+        "content": "const items = JSON.parse(localStorage.getItem(storageKey) || '[]');"
+      },
+      {
+        "name": "DeckService",
+        "line": 142,
+        "content": "const DeckService = {"
+      },
+      {
+        "name": "deck",
+        "line": 148,
+        "content": "const deck = {"
+      },
+      {
+        "name": "result",
+        "line": 156,
+        "content": "const result = await ApiService.request('/decks', {"
+      },
+      {
+        "name": "result",
+        "line": 173,
+        "content": "const result = await ApiService.request(`/decks/${id}`, {"
+      },
+      {
+        "name": "FlashcardService",
+        "line": 183,
+        "content": "const FlashcardService = {"
+      },
+      {
+        "name": "flashcard",
+        "line": 189,
+        "content": "const flashcard = {"
+      },
+      {
+        "name": "result",
+        "line": 199,
+        "content": "const result = await ApiService.request('/flashcards', {"
+      },
+      {
+        "name": "SM2Algorithm",
+        "line": 223,
+        "content": "const SM2Algorithm = {"
+      },
+      {
+        "name": "{ interval, easeFactor, repetitions }",
+        "line": 226,
+        "content": "let { interval, easeFactor, repetitions } = flashcard;"
+      },
+      {
+        "name": "nextReview",
+        "line": 249,
+        "content": "const nextReview = new Date();"
+      },
+      {
+        "name": "StudyService",
+        "line": 263,
+        "content": "const StudyService = {"
+      },
+      {
+        "name": "flashcards",
+        "line": 265,
+        "content": "const flashcards = await FlashcardService.getByDeck(deckId);"
+      },
+      {
+        "name": "now",
+        "line": 266,
+        "content": "const now = new Date();"
+      },
+      {
+        "name": "nextReview",
+        "line": 270,
+        "content": "const nextReview = new Date(card.nextReview);"
+      },
+      {
+        "name": "flashcards",
+        "line": 277,
+        "content": "const flashcards = await ApiService.request('/flashcards');"
+      },
+      {
+        "name": "updates",
+        "line": 285,
+        "content": "const updates = SM2Algorithm.calculateNext(flashcard, quality);"
+      },
+      {
+        "name": "updatedFlashcard",
+        "line": 288,
+        "content": "const updatedFlashcard = await FlashcardService.update(flashcardId, {"
+      },
+      {
+        "name": "DashboardService",
+        "line": 299,
+        "content": "const DashboardService = {"
+      },
+      {
+        "name": "[decks, flashcards]",
+        "line": 302,
+        "content": "const [decks, flashcards] = await Promise.all(["
+      },
+      {
+        "name": "today",
+        "line": 307,
+        "content": "const today = new Date().toDateString();"
+      },
+      {
+        "name": "totalFlashcards",
+        "line": 312,
+        "content": "const totalFlashcards = flashcards.length;"
+      },
+      {
+        "name": "accuracy",
+        "line": 313,
+        "content": "const accuracy = this.calculateAccuracy(flashcards);"
+      },
+      {
+        "name": "dates",
+        "line": 346,
+        "content": "const dates = flashcards"
+      },
+      {
+        "name": "streak",
+        "line": 352,
+        "content": "let streak = 0;"
+      },
+      {
+        "name": "today",
+        "line": 353,
+        "content": "const today = new Date().toDateString();"
+      },
+      {
+        "name": "expectedDate",
+        "line": 356,
+        "content": "const expectedDate = new Date();"
+      },
+      {
+        "name": "today",
+        "line": 371,
+        "content": "const today = new Date().toDateString();"
+      },
+      {
+        "name": "UIController",
+        "line": 381,
+        "content": "const UIController = {"
+      },
+      {
+        "name": "stats",
+        "line": 386,
+        "content": "const stats = await DashboardService.getStats();"
+      },
+      {
+        "name": "decks",
+        "line": 402,
+        "content": "const decks = await DeckService.getAll();"
+      },
+      {
+        "name": "container",
+        "line": 403,
+        "content": "const container = document.querySelector('.deck-grid, .decks-container, #decks-list');"
+      },
+      {
+        "name": "decks",
+        "line": 435,
+        "content": "const decks = await DeckService.getAll();"
+      },
+      {
+        "name": "selects",
+        "line": 436,
+        "content": "const selects = document.querySelectorAll('select[name=\"deckId\"], #deck-select');"
+      },
+      {
+        "name": "element",
+        "line": 446,
+        "content": "const element = document.querySelector(selector);"
+      },
+      {
+        "name": "form",
+        "line": 454,
+        "content": "const form = document.querySelector(formSelector);"
+      },
+      {
+        "name": "StudyingFlash",
+        "line": 462,
+        "content": "const StudyingFlash = {"
+      },
+      {
+        "name": "dashboardSection",
+        "line": 502,
+        "content": "const dashboardSection = document.querySelector('#dashboard');"
+      },
+      {
+        "name": "createDeckForm",
+        "line": 525,
+        "content": "const createDeckForm = document.querySelector('#create-deck-form, .create-deck-form');"
+      },
+      {
+        "name": "createFlashcardForm",
+        "line": 531,
+        "content": "const createFlashcardForm = document.querySelector('#create-flashcard-form, .create-flashcard-form');"
+      },
+      {
+        "name": "formData",
+        "line": 550,
+        "content": "const formData = new FormData(event.target);"
+      },
+      {
+        "name": "deckData",
+        "line": 551,
+        "content": "const deckData = {"
+      },
+      {
+        "name": "formData",
+        "line": 585,
+        "content": "const formData = new FormData(event.target);"
+      },
+      {
+        "name": "flashcardData",
+        "line": 586,
+        "content": "const flashcardData = {"
+      },
+      {
+        "name": "flashcards",
+        "line": 618,
+        "content": "const flashcards = await StudyService.getFlashcardsForReview(deckId);"
+      },
+      {
+        "name": "{ flashcards, currentIndex }",
+        "line": 650,
+        "content": "const { flashcards, currentIndex } = this.currentStudySession;"
+      },
+      {
+        "name": "flashcard",
+        "line": 651,
+        "content": "const flashcard = flashcards[currentIndex];"
+      },
+      {
+        "name": "frontElement",
+        "line": 659,
+        "content": "const frontElement = document.querySelector('.flashcard-front, #flashcard-front');"
+      },
+      {
+        "name": "backElement",
+        "line": 660,
+        "content": "const backElement = document.querySelector('.flashcard-back, #flashcard-back');"
+      },
+      {
+        "name": "progressElement",
+        "line": 661,
+        "content": "const progressElement = document.querySelector('.study-progress');"
+      },
+      {
+        "name": "{ flashcards, currentIndex }",
+        "line": 676,
+        "content": "const { flashcards, currentIndex } = this.currentStudySession;"
+      },
+      {
+        "name": "flashcard",
+        "line": 677,
+        "content": "const flashcard = flashcards[currentIndex];"
+      },
+      {
+        "name": "{ answers }",
+        "line": 704,
+        "content": "const { answers } = this.currentStudySession;"
+      },
+      {
+        "name": "targetSection",
+        "line": 731,
+        "content": "const targetSection = document.querySelector(`#${sectionName}, .${sectionName}-section`);"
+      },
+      {
+        "name": "activeNavItem",
+        "line": 741,
+        "content": "const activeNavItem = document.querySelector(`[data-section=\"${sectionName}\"]`);"
+      },
+      {
+        "name": "notificationStyles",
+        "line": 779,
+        "content": "const notificationStyles = document.createElement('style');"
+      },
+      {
+        "name": "targetSection",
+        "line": 825,
+        "content": "const targetSection = document.querySelector(`#${sectionName}`);"
+      },
+      {
+        "name": "activeNavItem",
+        "line": 839,
+        "content": "const activeNavItem = document.querySelector(`[data-section=\"${sectionName}\"]`);"
+      },
+      {
+        "name": "timeout;",
+        "line": 868,
+        "content": "let timeout;"
+      },
+      {
+        "name": "heatmapContainer",
+        "line": 883,
+        "content": "const heatmapContainer = document.querySelector('.activity-heatmap, #activity-heatmap');"
+      },
+      {
+        "name": "today",
+        "line": 890,
+        "content": "const today = new Date();"
+      },
+      {
+        "name": "oneYearAgo",
+        "line": 891,
+        "content": "const oneYearAgo = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate());"
+      },
+      {
+        "name": "heatmapHTML",
+        "line": 893,
+        "content": "let heatmapHTML = '<div class=\"heatmap-grid\">';"
+      },
+      {
+        "name": "activity",
+        "line": 896,
+        "content": "const activity = Math.floor(Math.random() * 5); // 0-4 niveles de actividad"
+      },
+      {
+        "name": "dateStr",
+        "line": 897,
+        "content": "const dateStr = d.toISOString().split('T')[0];"
+      },
+      {
+        "name": "nameInput",
+        "line": 917,
+        "content": "const nameInput = document.querySelector('input[placeholder*=\"Vocabulario\"], #deck-name');"
+      },
+      {
+        "name": "descriptionInput",
+        "line": 918,
+        "content": "const descriptionInput = document.querySelector('textarea[placeholder*=\"contenido\"], #deck-description');"
+      },
+      {
+        "name": "publicCheckbox",
+        "line": 919,
+        "content": "const publicCheckbox = document.querySelector('input[type=\"checkbox\"]');"
+      },
+      {
+        "name": "name",
+        "line": 927,
+        "content": "const name = nameInput.value.trim();"
+      },
+      {
+        "name": "description",
+        "line": 928,
+        "content": "const description = descriptionInput.value.trim();"
+      },
+      {
+        "name": "isPublic",
+        "line": 929,
+        "content": "const isPublic = publicCheckbox ? publicCheckbox.checked : false;"
+      },
+      {
+        "name": "newDeck",
+        "line": 939,
+        "content": "const newDeck = await DeckService.create({"
+      },
+      {
+        "name": "deckSelect",
+        "line": 969,
+        "content": "const deckSelect = document.querySelector('select[name=\"deckId\"], #flashcard-deck');"
+      },
+      {
+        "name": "frontInput",
+        "line": 970,
+        "content": "const frontInput = document.querySelector('textarea[placeholder*=\"pregunta\"], #flashcard-front');"
+      },
+      {
+        "name": "backInput",
+        "line": 971,
+        "content": "const backInput = document.querySelector('textarea[placeholder*=\"respuesta\"], #flashcard-back');"
+      },
+      {
+        "name": "deckId",
+        "line": 979,
+        "content": "const deckId = deckSelect.value;"
+      },
+      {
+        "name": "front",
+        "line": 980,
+        "content": "const front = frontInput.value.trim();"
+      },
+      {
+        "name": "back",
+        "line": 981,
+        "content": "const back = backInput.value.trim();"
+      },
+      {
+        "name": "newFlashcard",
+        "line": 991,
+        "content": "const newFlashcard = await FlashcardService.create({"
+      }
+    ],
+    "timestamp": "2025-07-08T17:03:44.777Z"
+  },
+  "timestamp": "2025-07-08T17:03:44.777Z"
+}
