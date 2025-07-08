@@ -1,0 +1,78 @@
+{
+  "agentId": "AGENT-4",
+  "task": "Cambiar colores del tema",
+  "timestamp": "2025-07-08T19:08:18.640Z",
+  "mandatoryReading": {
+    "workProtocol": "./AGENT_WORK_PROTOCOL.md",
+    "unificationProtocol": "./UNIFICATION_PROTOCOL.md",
+    "agentConfig": "./agent_config.json"
+  },
+  "permissions": {
+    "canRead": [
+      "services/NavigationService.js",
+      "index.html"
+    ],
+    "canWrite": [
+      "services/NavigationService.js",
+      "index.html"
+    ],
+    "canDelete": [],
+    "forbidden": [
+      "Crear funciones duplicadas",
+      "Modificar archivos de otros agentes",
+      "Modificar lógica de datos"
+    ]
+  },
+  "namingConventions": {
+    "functionPattern": "agent4[A-Z][a-zA-Z]*",
+    "variablePattern": "AGENT4_[A-Z_]+",
+    "examples": {
+      "function": "agent4DataLoad",
+      "variable": "AGENT4_CONFIG"
+    },
+    "forbidden": [
+      "duplicateFunction",
+      "copyFunction",
+      "similarFunction"
+    ]
+  },
+  "communicationProtocol": {
+    "eventSystem": {
+      "emit": "window.dispatchEvent(new CustomEvent('agent-communication', {\n                    detail: { from: 'AGENT-4', action: 'ACTION', data: {} }\n                }))",
+      "listen": "window.addEventListener('agent-communication', (event) => {\n                    if (event.detail.from !== 'AGENT-4') { /* handle */ }\n                })"
+    },
+    "apiRegistration": {
+      "register": "window.AGENT_API = window.AGENT_API || {};\n                window.AGENT_API['AGENT-4'] = { functionName: functionReference };",
+      "call": "window.AGENT_API['TARGET-AGENT'].functionName(params)"
+    }
+  },
+  "unificationRules": {
+    "beforeModifying": [
+      "Buscar funciones similares existentes",
+      "Verificar si puedes reutilizar código",
+      "Comprobar configuraciones existentes"
+    ],
+    "duringModification": [
+      "Usar nombres únicos según convenciones",
+      "Extender funcionalidad existente",
+      "Centralizar nuevas configuraciones"
+    ],
+    "afterModification": [
+      "Verificar cero duplicaciones nuevas",
+      "Validar que las referencias funcionan",
+      "Probar comunicación entre archivos"
+    ]
+  },
+  "requiredChecks": {
+    "preWork": [
+      "Verificar permisos",
+      "Leer protocolos",
+      "Comprobar dependencias"
+    ],
+    "postWork": [
+      "Verificar sintaxis",
+      "Probar funcionalidad",
+      "Confirmar cero duplicados"
+    ]
+  }
+}
