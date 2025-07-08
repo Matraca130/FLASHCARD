@@ -72,6 +72,70 @@ class FormValidator {
         
         return validation;
     }
+
+    /**
+     * Valida formato de email
+     * @param {string} email - Email a validar
+     * @returns {boolean} - true si el email es válido
+     */
+    static validateEmail(email) {
+        const emailRegex = /^[^
+\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email || !emailRegex.test(email)) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Valida fortaleza de contraseña
+     * @param {string} password - Contraseña a validar
+     * @returns {boolean} - true si la contraseña es válida
+     */
+    static validatePassword(password) {
+        if (!password || password.length < 6) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Valida credenciales de login
+     * @param {string} email - Email del usuario
+     * @param {string} password - Contraseña del usuario
+     * @returns {Object} - {isValid: boolean, errors: Array}
+     */
+    static validateLoginCredentials(email, password) {
+        const errors = [];
+        if (!this.validateEmail(email)) {
+            errors.push('Por favor, ingresa un email válido');
+        }
+        if (!this.validatePassword(password)) {
+            errors.push('La contraseña debe tener al menos 6 caracteres');
+        }
+        return { isValid: errors.length === 0, errors };
+    }
+
+    /**
+     * Valida datos de registro
+     * @param {string} email - Email del usuario
+     * @param {string} password - Contraseña del usuario
+     * @param {string} confirmPassword - Confirmación de contraseña
+     * @returns {Object} - {isValid: boolean, errors: Array}
+     */
+    static validateRegistrationData(email, password, confirmPassword) {
+        const errors = [];
+        if (!this.validateEmail(email)) {
+            errors.push('Por favor, ingresa un email válido');
+        }
+        if (!this.validatePassword(password)) {
+            errors.push('La contraseña debe tener al menos 6 caracteres');
+        }
+        if (password !== confirmPassword) {
+            errors.push('Las contraseñas no coinciden');
+        }
+        return { isValid: errors.length === 0, errors };
+    }
     
     /**
      * Obtiene los datos de un formulario de manera segura
@@ -219,7 +283,7 @@ class DeckFormUtils {
     }
 }
 
-// Exportar para uso en módulos
+// Exportar para uso em módulos
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
         FormValidator,
@@ -228,8 +292,9 @@ if (typeof module !== 'undefined' && module.exports) {
     };
 }
 
-// Hacer disponible globalmente para compatibilidad
+// Fazer disponível globalmente para compatibilidade
 window.FormValidator = FormValidator;
 window.FlashcardFormUtils = FlashcardFormUtils;
 window.DeckFormUtils = DeckFormUtils;
+
 

@@ -1,6 +1,6 @@
 import { ApiClient } from './apiClient.js';
 import { store } from './store/store.js';
-import { validateFlashcardData } from './utils/validation.js';
+import { FormValidator } from './utils/formValidation.js';
 import {
   performCrudOperation,
   apiWithFallback,
@@ -19,12 +19,13 @@ let editingFlashcardId = null;
  * Crea una nueva flashcard
  */
 export async function createFlashcard() {
-  const deckId = document.getElementById('flashcard-deck')?.value;
-  const front = document.getElementById('flashcard-front')?.value?.trim();
-  const back = document.getElementById('flashcard-back')?.value?.trim();
+  const deckId = document.getElementById("flashcard-deck")?.value;
+  const front = document.getElementById("flashcard-front")?.value?.trim();
+  const back = document.getElementById("flashcard-back")?.value?.trim();
 
-  // Validar datos usando utilidad común
-  if (!validateFlashcardData(deckId, front, back)) {
+  const validation = FormValidator.validateFlashcardForm({ deckId, front, back });
+  if (!validation.isValid) {
+    showNotification(validation.errors[0], 'error');
     return;
   }
 
@@ -109,8 +110,9 @@ export async function updateFlashcard() {
   const front = document.getElementById('flashcard-front')?.value?.trim();
   const back = document.getElementById('flashcard-back')?.value?.trim();
 
-  // Validar datos usando utilidad común
-  if (!validateFlashcardData(deckId, front, back)) {
+  const validation = FormValidator.validateFlashcardForm({ deckId, front, back });
+  if (!validation.isValid) {
+    showNotification(validation.errors[0], 'error');
     return;
   }
 
