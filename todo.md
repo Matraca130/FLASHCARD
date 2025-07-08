@@ -1,20 +1,7 @@
-# TODO - Correções CI/CD FLASHCARD
+- [x] Consolidate `backup_js/helpers.js` into `utils/helpers.js` by migrating unique functions and removing the redundant file.
+- [x] Analyze `backup_js/router.js` and `backup_js/main.js` for duplication and consolidate if necessary.
+- [x] Review `backup_js/eslint.config.js` and `backup_js/vitest.config.js` for duplication and consolidate if necessary.
+- [ ] Clean up obsolete testing files in `./tests/` and `./cypress/`.
+- [ ] Commit changes with `[AGENT-5]` prefix.
+- [ ] Report progress.
 
-## Problemas Identificados
-
-- [x] Atualizar actions/upload-artifact de v3 para v4 nos workflows
-- [x] Atualizar actions/download-artifact de v3 para v4 nos workflows
-- [x] Corrigir erros ESLint "no-undef" para funções não definidas (updateChartPeriod, updateAccuracyChart, updateProgressChart, etc.)
-- [x] Limpar variáveis não utilizadas (no-unused-vars)
-- [x] Corrigir configuração base no vite.config.js para GitHub Pages
-- [ ] Testar build local antes do push
-- [ ] Fazer commit e push das correções
-
-## Ordem de Trabalho
-
-1. ✅ Corrigir workflows YAML (artifact v4)
-2. ✅ Implementar/remover funções fantasma
-3. ✅ Ajustar vite.config.js
-4. 🔄 Corrigir variáveis não utilizadas
-5. Testar localmente
-6. Push das correções
