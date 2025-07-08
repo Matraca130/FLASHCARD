@@ -465,6 +465,9 @@ const StudyingFlash = {
         Utils.log('🚀 Inicializando StudyingFlash...');
         
         try {
+            // INICIALIZAR NAVEGACIÓN DE SECCIONES PRIMERO
+            this.initializeSections();
+            
             // Cargar datos iniciales
             await this.loadInitialData();
             
@@ -483,6 +486,26 @@ const StudyingFlash = {
             Utils.error('Error inicializando aplicación', error);
             Utils.showNotification('Error al cargar la aplicación', 'error');
         }
+    },
+    
+    // Inicializar navegación de secciones
+    initializeSections() {
+        Utils.log('Inicializando navegación de secciones...');
+        
+        // Ocultar todas las secciones excepto dashboard
+        document.querySelectorAll('.section').forEach(section => {
+            section.classList.remove('active');
+            section.style.display = 'none';
+        });
+        
+        // Mostrar solo dashboard por defecto
+        const dashboardSection = document.querySelector('#dashboard');
+        if (dashboardSection) {
+            dashboardSection.classList.add('active');
+            dashboardSection.style.display = 'block';
+        }
+        
+        Utils.log('Navegación de secciones inicializada');
     },
     
     // Cargar datos iniciales
@@ -792,15 +815,17 @@ console.log('  - Sincronización con backend');
 function showSection(sectionName) {
     Utils.log(`Navegando a sección: ${sectionName}`);
     
-    // Remover clase active de todas las secciones
+    // Remover clase active de todas las secciones Y forzar display none
     document.querySelectorAll('.section').forEach(section => {
         section.classList.remove('active');
+        section.style.display = 'none'; // Forzar ocultación
     });
     
-    // Agregar clase active a la sección seleccionada
+    // Agregar clase active a la sección seleccionada Y forzar display block
     const targetSection = document.querySelector(`#${sectionName}`);
     if (targetSection) {
         targetSection.classList.add('active');
+        targetSection.style.display = 'block'; // Forzar visualización
         Utils.log(`Sección mostrada: ${sectionName}`);
     } else {
         Utils.error(`Sección no encontrada: ${sectionName}`);
