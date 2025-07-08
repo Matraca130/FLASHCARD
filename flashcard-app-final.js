@@ -16,37 +16,11 @@ const Utils = {
         console.error(`❌ [StudyingFlash] ${message}`, error || '');
     },
     
-    showNotification: (message, type = 'success') => {
-        // Crear notificación visual
-        const notification = document.createElement('div');
-        notification.className = `notification ${type}`;
-        notification.textContent = message;
-        notification.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: ${type === 'success' ? '#10b981' : '#ef4444'};
-            color: white;
-            padding: 12px 20px;
-            border-radius: 8px;
-            z-index: 10000;
-            animation: slideIn 0.3s ease;
-        `;
-        
-        document.body.appendChild(notification);
-        
-        setTimeout(() => {
-            notification.remove();
-        }, 3000);
-    },
+
     
-    formatDate: (date) => {
-        return new Date(date).toLocaleDateString('es-ES');
-    },
+
     
-    generateId: () => {
-        return Date.now().toString(36) + Math.random().toString(36).substr(2);
-    }
+
 };
 
 // ===== API SERVICE =====
@@ -961,17 +935,7 @@ console.log('  - Estudiar con algoritmo SM-2');
 }
 
 // Función debounce para optimizar búsquedas
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
-}
+
 
 // Función generateActivityHeatmap para el dashboard
 function generateActivityHeatmap() {
