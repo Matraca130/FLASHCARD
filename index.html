@@ -930,9 +930,7 @@
     </main>
   </div>
 
-  <!-- Modals -->
-  
-  <!-- Login Modal -->
+  <!-- Modals -->  <!-- Login Modal -->
   <div class="modal-overlay" id="login-modal">
     <div class="modal">
       <div class="modal-header">
@@ -940,23 +938,50 @@
         <button class="modal-close" onclick="hideLoginModal()">&times;</button>
       </div>
       <div class="modal-body">
-        <div class="form-group">
-          <label for="login-email" class="form-label">Email</label>
-          <input type="email" id="login-email" class="form-input" placeholder="tu@email.com" value="demo@example.com">
+        <form id="loginForm" onsubmit="handleLoginForm(event)">
+          <div class="form-group">
+            <label for="login-email" class="form-label">Email</label>
+            <input type="email" id="login-email" class="form-input" placeholder="tu@email.com" required>
+          </div>
+          <div class="form-group">
+            <label for="login-password" class="form-label">Contraseña</label>
+            <input type="password" id="login-password" class="form-input" placeholder="Tu contraseña" required>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" onclick="hideLoginModal()">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
+          </div>
+        </form>
+        
+        <div class="auth-divider">
+          <span>¿No tienes cuenta?</span>
         </div>
-        <div class="form-group">
-          <label for="login-password" class="form-label">Contraseña</label>
-          <input type="password" id="login-password" class="form-input" placeholder="••••••••" value="demo123">
+        
+        <form id="registerForm" onsubmit="handleRegisterForm(event)" style="display: none;">
+          <div class="form-group">
+            <label for="register-name" class="form-label">Nombre</label>
+            <input type="text" id="register-name" class="form-input" placeholder="Tu nombre" required>
+          </div>
+          <div class="form-group">
+            <label for="register-email" class="form-label">Email</label>
+            <input type="email" id="register-email" class="form-input" placeholder="tu@email.com" required>
+          </div>
+          <div class="form-group">
+            <label for="register-password" class="form-label">Contraseña</label>
+            <input type="password" id="register-password" class="form-input" placeholder="Tu contraseña" required>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" onclick="hideLoginModal()">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Registrarse</button>
+          </div>
+        </form>
+        
+        <div class="auth-toggle">
+          <button type="button" id="auth-toggle-btn" onclick="toggleAuthMode()">Crear cuenta nueva</button>
         </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-secondary" onclick="hideLoginModal()">Cancelar</button>
-        <button class="btn btn-primary" data-action="login">Iniciar Sesión</button>
       </div>
     </div>
-  </div>
-  
-  <!-- Edit Flashcard Modal -->
+  </div>!-- Edit Flashcard Modal -->
   <div class="modal-overlay" id="edit-flashcard-modal">
     <div class="modal">
       <div class="modal-header">
@@ -2371,7 +2396,10 @@
     
   </script>
 
-    <!-- Script principal de la aplicación V2 -->
-    <script src="./flashcard-app-v2.js?v=20250708034920"></script>
+    <!-- Render API Connector -->
+    <script src="./render-api-connector.js"></script>
+    
+    <!-- Script principal de la aplicación V3 - Render Edition -->
+    <script src="./flashcard-app-v3-render.js?v=20250708050000"></script>
 </body>
 </html>
