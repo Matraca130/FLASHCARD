@@ -784,3 +784,182 @@ console.log('  - Estudiar con algoritmo SM-2');
 console.log('  - Dashboard con estadísticas');
 console.log('  - Sincronización con backend');
 
+
+
+// ===== FUNCIONES FALTANTES PARA COMPATIBILIDAD =====
+
+// Función showSection para compatibilidad con el HTML
+function showSection(sectionName) {
+    if (window.StudyingFlash && window.StudyingFlash.navigateToSection) {
+        window.StudyingFlash.navigateToSection(sectionName);
+    } else {
+        Utils.log(`Navegando a sección: ${sectionName}`);
+        // Fallback básico
+        document.querySelectorAll('.section, [id$="-section"]').forEach(section => {
+            section.style.display = 'none';
+        });
+        
+        const targetSection = document.querySelector(`#${sectionName}, .${sectionName}-section, [data-section="${sectionName}"]`);
+        if (targetSection) {
+            targetSection.style.display = 'block';
+        }
+    }
+}
+
+// Función debounce para optimizar búsquedas
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+// Función generateActivityHeatmap para el dashboard
+function generateActivityHeatmap() {
+    Utils.log('Generando heatmap de actividad...');
+    
+    const heatmapContainer = document.querySelector('.activity-heatmap, #activity-heatmap');
+    if (!heatmapContainer) {
+        Utils.log('Contenedor de heatmap no encontrado');
+        return;
+    }
+    
+    // Generar datos de ejemplo para el heatmap
+    const today = new Date();
+    const oneYearAgo = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate());
+    
+    let heatmapHTML = '<div class="heatmap-grid">';
+    
+    for (let d = new Date(oneYearAgo); d <= today; d.setDate(d.getDate() + 1)) {
+        const activity = Math.floor(Math.random() * 5); // 0-4 niveles de actividad
+        const dateStr = d.toISOString().split('T')[0];
+        
+        heatmapHTML += `
+            <div class="heatmap-day activity-${activity}" 
+                 data-date="${dateStr}" 
+                 title="${dateStr}: ${activity} actividades">
+            </div>
+        `;
+    }
+    
+    heatmapHTML += '</div>';
+    heatmapContainer.innerHTML = heatmapHTML;
+    
+    Utils.log('Heatmap de actividad generado');
+}
+
+// Función para manejar la creación de decks
+async function handleCreateDeck(event) {
+    if (event) event.preventDefault();
+    
+    const nameInput = document.querySelector('input[placeholder*="Vocabulario"], #deck-name');
+    const descriptionInput = document.querySelector('textarea[placeholder*="contenido"], #deck-description');
+    const publicCheckbox = document.querySelector('input[type="checkbox"]');
+    
+    if (!nameInput || !descriptionInput) {
+        Utils.error('Campos de formulario no encontrados');
+        Utils.showNotification('Error: Formulario no encontrado', 'error');
+        return;
+    }
+    
+    const name = nameInput.value.trim();
+    const description = descriptionInput.value.trim();
+    const isPublic = publicCheckbox ? publicCheckbox.checked : false;
+    
+    if (!name) {
+        Utils.showNotification('Por favor, ingresa un nombre para el deck', 'error');
+        return;
+    }
+    
+    try {
+        Utils.log('Creando deck...', { name, description, isPublic });
+        
+        const newDeck = await DeckService.create({
+            name,
+            description,
+            is_public: isPublic
+        });
+        
+        Utils.showNotification(`Deck "${name}" creado exitosamente`, 'success');
+        
+        // Limpiar formulario
+        nameInput.value = '';
+        descriptionInput.value = '';
+        if (publicCheckbox) publicCheckbox.checked = false;
+        
+        // Actualizar UI
+        await UIController.loadDecks();
+        await UIController.loadDeckOptions();
+        await UIController.updateDashboard();
+        
+        Utils.log('Deck creado exitosamente', newDeck);
+        
+    } catch (error) {
+        Utils.error('Error creando deck', error);
+        Utils.showNotification('Error al crear el deck', 'error');
+    }
+}
+
+// Función para manejar la creación de flashcards
+async function handleCreateFlashcard(event) {
+    if (event) event.preventDefault();
+    
+    const deckSelect = document.querySelector('select[name="deckId"], #flashcard-deck');
+    const frontInput = document.querySelector('textarea[placeholder*="pregunta"], #flashcard-front');
+    const backInput = document.querySelector('textarea[placeholder*="respuesta"], #flashcard-back');
+    
+    if (!deckSelect || !frontInput || !backInput) {
+        Utils.error('Campos de formulario de flashcard no encontrados');
+        Utils.showNotification('Error: Formulario no encontrado', 'error');
+        return;
+    }
+    
+    const deckId = deckSelect.value;
+    const front = frontInput.value.trim();
+    const back = backInput.value.trim();
+    
+    if (!deckId || !front || !back) {
+        Utils.showNotification('Por favor, completa todos los campos', 'error');
+        return;
+    }
+    
+    try {
+        Utils.log('Creando flashcard...', { deckId, front, back });
+        
+        const newFlashcard = await FlashcardService.create({
+            deck_id: parseInt(deckId),
+            front,
+            back
+        });
+        
+        Utils.showNotification('Flashcard creada exitosamente', 'success');
+        
+        // Limpiar formulario
+        frontInput.value = '';
+        backInput.value = '';
+        
+        // Actualizar UI
+        await UIController.updateDashboard();
+        
+        Utils.log('Flashcard creada exitosamente', newFlashcard);
+        
+    } catch (error) {
+        Utils.error('Error creando flashcard', error);
+        Utils.showNotification('Error al crear la flashcard', 'error');
+    }
+}
+
+// Exponer funciones globalmente para compatibilidad con HTML
+window.showSection = showSection;
+window.debounce = debounce;
+window.generateActivityHeatmap = generateActivityHeatmap;
+window.handleCreateDeck = handleCreateDeck;
+window.handleCreateFlashcard = handleCreateFlashcard;
+
+Utils.log('✅ Funciones de compatibilidad agregadas');
+

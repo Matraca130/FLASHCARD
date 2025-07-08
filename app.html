@@ -717,7 +717,7 @@
                 </label>
               </div>
               
-              <button id="create-deck-btn" class="btn btn-primary" data-action="create-deck" type="button">
+              <button id="create-deck-btn" class="btn btn-primary" data-action="create-deck" type="button" onclick="handleCreateDeck(event)">
                 ➕ Crear Deck
               </button>
             </form>
@@ -745,7 +745,7 @@
                 <textarea id="flashcard-back" class="form-input form-textarea" placeholder="Escribe la respuesta o definición..." required></textarea>
               </div>
               
-              <button id="create-flashcard-btn" class="btn btn-success" data-action="create-flashcard" type="button">
+              <button id="create-flashcard-btn" class="btn btn-success" data-action="create-flashcard" type="button" onclick="handleCreateFlashcard(event)">
                 ➕ Crear Flashcard
               </button>
             </form>
