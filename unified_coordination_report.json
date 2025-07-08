@@ -1,8 +1,8 @@
 {
-  "timestamp": "2025-07-08T19:03:19.388Z",
+  "timestamp": "2025-07-08T20:44:46.297Z",
   "coordinator": "AGENT-1-UNIFIED",
   "status": "WARNING",
-  "totalIssues": 20,
+  "totalIssues": 7,
   "verification": {
     "duplicates": [
       {
@@ -52,15 +52,6 @@
       },
       {
         "type": "DUPLICATE_FUNCTION",
-        "name": "showSection",
-        "files": [
-          "flashcard-app-final.js",
-          "utils/helpers.js"
-        ],
-        "severity": "HIGH"
-      },
-      {
-        "type": "DUPLICATE_FUNCTION",
         "name": "later",
         "files": [
           "flashcard-app-final.js",
@@ -78,82 +69,9 @@
         "severity": "HIGH"
       }
     ],
-    "communication": [
-      {
-        "type": "BROKEN_IMPORT",
-        "file": "eslint.config.js",
-        "import": "@eslint/js",
-        "severity": "HIGH"
-      },
-      {
-        "type": "BROKEN_IMPORT",
-        "file": "eslint.config.js",
-        "import": "globals",
-        "severity": "HIGH"
-      },
-      {
-        "type": "BROKEN_IMPORT",
-        "file": "eslint.config.js",
-        "import": "eslint-plugin-cypress",
-        "severity": "HIGH"
-      },
-      {
-        "type": "BROKEN_IMPORT",
-        "file": "scripts/integrity_check.js",
-        "import": "fs",
-        "severity": "HIGH"
-      },
-      {
-        "type": "BROKEN_IMPORT",
-        "file": "scripts/integrity_check.js",
-        "import": "path",
-        "severity": "HIGH"
-      },
-      {
-        "type": "BROKEN_IMPORT",
-        "file": "scripts/integrity_check.js",
-        "import": "child_process",
-        "severity": "HIGH"
-      },
-      {
-        "type": "BROKEN_IMPORT",
-        "file": "scripts/master_coordinator.js",
-        "import": "fs",
-        "severity": "HIGH"
-      },
-      {
-        "type": "BROKEN_IMPORT",
-        "file": "scripts/master_coordinator.js",
-        "import": "path",
-        "severity": "HIGH"
-      },
-      {
-        "type": "BROKEN_IMPORT",
-        "file": "scripts/master_coordinator.js",
-        "import": "child_process",
-        "severity": "HIGH"
-      },
-      {
-        "type": "BROKEN_IMPORT",
-        "file": "tests/setup.js",
-        "import": "vitest",
-        "severity": "HIGH"
-      },
-      {
-        "type": "BROKEN_IMPORT",
-        "file": "tests/unit/navigation.test.js",
-        "import": "vitest",
-        "severity": "HIGH"
-      },
-      {
-        "type": "BROKEN_IMPORT",
-        "file": "vitest.config.js",
-        "import": "vitest/config",
-        "severity": "HIGH"
-      }
-    ],
+    "communication": [],
     "fileStructure": []
   },
-  "executionTime": 25,
+  "executionTime": 34,
   "instructionsGenerated": 5
 }

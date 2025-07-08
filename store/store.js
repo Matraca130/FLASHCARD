@@ -98,13 +98,11 @@ export default legacyStore;
 // Exportar también como named export
 export { legacyStore as store };
 
-// Re-exportar el store principal para casos que lo necesiten
 /**
  * MENSAJE DE MIGRACIÓN
  * ====================
  */
 console.log(`
-🔄 AVISO DE MIGRACIÓN:
   import store from '
   
 El store refactorizado ofrece:

@@ -166,7 +166,6 @@ class MasterCoordinator {
             this.log(`Ejecutando prioridad ${priority}: ${agentsInPriority.map(a => a.id).join(', ')}`);
             
             if (priority === 1) {
-                // Prioridad 1: Ejecutar secuencialmente (solo Agente 1)
                 }
             } else {
                 // Prioridades 2 y 3: Ejecutar en paralelo
@@ -300,11 +299,8 @@ class MasterCoordinator {
             
             // 4. Mostrar resumen final
             console.log('\n=== RESUMEN FINAL DE COORDINACIÓN ===');
-            console.log(`Tiempo total de ejecución: ${Math.round(masterReport.totalExecutionTime / 1000)} segundos`);
             console.log(`Agentes saltados: ${masterReport.summary.skipped}`);
-            if (masterReport.summary.failed > 0) {
             }
-        } catch (error) {
             throw error;
             await this.cleanup();
         }

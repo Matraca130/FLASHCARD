@@ -1,5 +1,4 @@
 // Sin módulos ES6 - Todo en un solo archivo
-console.log('🚀 Iniciando StudyingFlash - Versión Integrada Completa');
 const CONFIG = {
     API_BASE_URL: 'https://flashcard-u10n.onrender.com/api',
     STORAGE_PREFIX: 'studyingflash_',
@@ -11,7 +10,6 @@ const Utils = {
     log: (message, data = null) => {
         if (CONFIG.DEBUG) {
             console.log(`🔧 [StudyingFlash] ${message}`, data || '');
-        }
     error: (message, error = null) => {
         console.error(`❌ [StudyingFlash] ${message}`, error || '');
     },
@@ -257,7 +255,6 @@ const AuthService = {
     getCurrentUser() {
         // Intentar obtener usuario del localStorage o estado global
         const userStr = localStorage.getItem('currentUser');
-        return userStr ? JSON.parse(userStr) : null;
 
 // ===== DECK SERVICE =====
 const DeckService = {
@@ -346,7 +343,6 @@ const SM2Algorithm = {
         // quality: 0-5 (0=total blackout, 5=perfect response)
         let { interval, easeFactor, repetitions } = flashcard;
         
-        if (quality >= 3) {
                 interval = 1;
             } else if (repetitions === 1) {
                 interval = 6;
@@ -490,7 +486,6 @@ const DashboardService = {
         const today = new Date().toDateString();
         const studiedToday = flashcards.filter(f => 
             f.lastReviewed && new Date(f.lastReviewed).toDateString() === today
-        ).length;
     }
 };
 
@@ -920,23 +915,16 @@ console.log('🔗 Conectado con Render Backend:', CONFIG.API_BASE_URL);
 console.log('📱 Funcionalidades disponibles:');
 console.log('  - Crear y gestionar decks');
 console.log('  - Crear y gestionar flashcards');
-console.log('  - Estudiar con algoritmo SM-2');
-
 
     
-        section.style.display = 'none'; // Forzar ocultación
     // Agregar clase active a la sección seleccionada Y forzar display block
-    if (targetSection) {
         Utils.log(`Sección mostrada: ${sectionName}`);
-        Utils.error(`Sección no encontrada: ${sectionName}`);
     }
-    
     // Actualizar navegación activa
         item.classList.remove('active');
     });
     
     const activeNavItem = document.querySelector(`[data-section="${sectionName}"]`);
-        activeNavItem.classList.add('active');
     
     // Cargar datos específicos de cada sección
     switch (sectionName) {
@@ -985,7 +973,6 @@ function generateActivityHeatmap() {
     
     // Generar datos de ejemplo para el heatmap
     const today = new Date();
-    const oneYearAgo = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate());
     
     
     for (let d = new Date(oneYearAgo); d <= today; d.setDate(d.getDate() + 1)) {
@@ -1119,7 +1106,6 @@ Utils.log('✅ Funciones de compatibilidad agregadas');
 
 
 function validateUserLogin(username, password) {
-        return { valid: false, error: 'Campos requeridos' };
     }
     if (username.length < 3) {
         return { valid: false, error: 'Usuario muy corto' };

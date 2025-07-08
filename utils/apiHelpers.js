@@ -122,7 +122,6 @@ export async function loadDataWithRetry(
     }
   }
 
-  console.log(
   return fallbackData;
 }
 

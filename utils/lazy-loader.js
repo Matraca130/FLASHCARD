@@ -209,7 +209,6 @@ class LazyLoader {
       this.moduleCache.set(modulePath, module);
       this.loadedModules.add(modulePath);
       
-      console.log(`[LazyLoader] Module loaded successfully: ${modulePath}`);
       
     } catch (error) {
       console.error(`[LazyLoader] Failed to load module: ${modulePath}`, error);
@@ -226,7 +225,6 @@ class LazyLoader {
       const module = await this.loadModule(modulePath);
       
       // Verificar que el módulo tenga la función de inicialización esperada
-      if (module.default && typeof module.default === 'function') {
           await module.default(container);
         }
       }
