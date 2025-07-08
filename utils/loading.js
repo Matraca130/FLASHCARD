@@ -3,7 +3,7 @@
  * Mejora la experiencia de usuario durante operaciones asíncronas
  */
 
-import { showNotification } from '';
+
 
 /**
  * Muestra un indicador de carga en un botón
@@ -280,38 +280,7 @@ export function showProgressToast(message, steps = 1) {
       }, 2000);
     },
 
-    error: (errorMessage = 'Error en la operación') => {
-      const progressBar = toast.querySelector('.progress-bar');
-      const progressText = toast.querySelector('.progress-text');
-      const messageElement = toast.querySelector('.progress-message');
-      const spinner = toast.querySelector('[style*="animation"]');
 
-      if (progressBar) {
-        progressBar.style.background =
-          'linear-gradient(90deg, #ef4444, #dc2626)';
-      }
-      if (progressText) {
-        progressText.textContent = 'Error';
-      }
-      if (messageElement) {
-        messageElement.textContent = errorMessage;
-      }
-      if (spinner) {
-        spinner.style.display = 'none';
-      }
-
-      // Auto-remove after 3 seconds
-      setTimeout(() => {
-        if (toast.parentNode) {
-          toast.style.transform = 'translateX(100%)';
-          setTimeout(() => {
-            if (toast.parentNode) {
-              toast.parentNode.removeChild(toast);
-            }
-          }, 300);
-        }
-      }, 3000);
-    },
 
     remove: () => {
       if (toast.parentNode) {

@@ -3,46 +3,8 @@
  * Funciones de utilidad general para toda la aplicación
  */
 
-/**
- * Función debounce para limitar la frecuencia de ejecución
- * @param {Function} func - Función a ejecutar
- * @param {number} wait - Tiempo de espera en ms
- * @returns {Function} - Función debounced
- */
-export function debounce(func, wait) {
-  let timeout;
-  return function executedFunction(...args) {
-    const later = () => {
-      clearTimeout(timeout);
-      func(...args);
-    };
-    clearTimeout(timeout);
-    timeout = setTimeout(later, wait);
-  };
-}
 
-/**
- * Muestra una notificación temporal en la UI con iconos y mejor UX
- * @param {string} message - Mensaje a mostrar
- * @param {string} type - Tipo de notificación (success, error, warning, info)
- * @param {number} duration - Duración en ms (default: 4000)
- * @param {Object} options - Opciones adicionales
- */
-export function showNotification(
-  message,
-  type = 'info',
-  duration = 4000,
-  options = {}
-) {
-  const {
-    title = null,
-    persistent = false,
-    actionText = null,
-    actionCallback = null,
-  } = options;
 
-  // Iconos para cada tipo de notificación
-  const icons = {
     success: '✅',
     error: '❌',
     warning: '⚠️',
@@ -132,44 +94,9 @@ export function showNotification(
     notification.style.transform = 'translateX(0)';
   }, 100);
 
-  // Auto remove (unless persistent)
-  if (!persistent) {
-    setTimeout(() => {
-      if (notification.parentNode) {
-        notification.style.transform = 'translateX(100%)';
-        setTimeout(() => {
-          if (notification.parentNode) {
-            notification.parentNode.removeChild(notification);
-          }
-        }, 300);
-      }
-    }, duration);
-  }
-}
 
-/**
- * Formatea una fecha para mostrar en la UI
- * @param {string|Date} date - Fecha a formatear
- * @param {string} locale - Locale para el formato (default: 'es-ES')
- * @returns {string} - Fecha formateada
- */
-export function formatDate(date, locale = 'es-ES') {
-  if (!date) {
-    return 'N/A';
-  }
 
-  const dateObj = typeof date === 'string' ? new Date(date) : date;
 
-  if (isNaN(dateObj.getTime())) {
-    return 'Fecha inválida';
-  }
-
-  return dateObj.toLocaleDateString(locale, {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  });
-}
 
 /**
  * Formatea una fecha relativa (ej: "hace 2 días")
@@ -244,13 +171,7 @@ export function truncateText(text, maxLength, suffix = '...') {
   return text.substring(0, maxLength - suffix.length) + suffix;
 }
 
-/**
- * Genera un ID único simple
- * @returns {string} - ID único
- */
-export function generateId() {
-  return Date.now().toString(36) + Math.random().toString(36).substr(2);
-}
+
 
 /**
  * Copia texto al portapapeles
