@@ -1,602 +1,327 @@
 {
-  "timestamp": "2025-07-08T19:16:17.028Z",
+  "timestamp": "2025-07-08T19:19:45.775Z",
   "systemId": "AUTO-CLEANUP",
-  "executionTime": 125,
+  "executionTime": 82,
   "results": {
     "obsoleteFunctions": [],
     "deadCode": [
       {
         "file": "cypress/support/commands.js",
-        "line": 43,
-        "content": "// Command to check if element is visible in viewport",
-        "reason": "Código comentado o debug obsoleto"
-      },
-      {
-        "file": "cypress/support/commands.js",
-        "line": 57,
+        "line": 56,
         "content": "// Wait for CSS transitions/animations to complete by checking for stable DOM",
         "reason": "Código comentado o debug obsoleto"
       },
       {
-        "file": "cypress/support/e2e.js",
-        "line": 18,
-        "content": "// Returning false here prevents Cypress from failing the test",
-        "reason": "Código comentado o debug obsoleto"
-      },
-      {
         "file": "flashcard-app-final.js",
-        "line": 1,
-        "content": "// ===== FLASHCARD APPLICATION - COMPLETE INTEGRATED VERSION =====",
-        "reason": "Código comentado o debug obsoleto"
-      },
-      {
-        "file": "flashcard-app-final.js",
-        "line": 3,
+        "line": 2,
         "content": "// Conectado con Render Backend: https://flashcard-u10n.onrender.com",
         "reason": "Código comentado o debug obsoleto"
       },
       {
         "file": "flashcard-app-final.js",
-        "line": 5,
+        "line": 3,
         "content": "console.log('🚀 Iniciando StudyingFlash - Versión Integrada Completa');",
         "reason": "Código comentado o debug obsoleto"
       },
       {
         "file": "flashcard-app-final.js",
-        "line": 18,
+        "line": 15,
         "content": "console.log(`🔧 [StudyingFlash] ${message}`, data || '');",
         "reason": "Código comentado o debug obsoleto"
       },
       {
         "file": "flashcard-app-final.js",
-        "line": 265,
+        "line": 261,
         "content": "// Intentar obtener usuario del localStorage o estado global",
         "reason": "Código comentado o debug obsoleto"
       },
       {
         "file": "flashcard-app-final.js",
-        "line": 355,
+        "line": 350,
         "content": "// quality: 0-5 (0=total blackout, 5=perfect response)",
         "reason": "Código comentado o debug obsoleto"
       },
       {
         "file": "flashcard-app-final.js",
-        "line": 500,
+        "line": 494,
         "content": "// Estimar tiempo de estudio (2 minutos por flashcard revisada hoy)",
         "reason": "Código comentado o debug obsoleto"
       },
       {
         "file": "flashcard-app-final.js",
-        "line": 931,
+        "line": 924,
         "content": "console.log('✅ StudyingFlash - Versión Integrada Completa Cargada');",
         "reason": "Código comentado o debug obsoleto"
       },
       {
         "file": "flashcard-app-final.js",
-        "line": 932,
+        "line": 925,
         "content": "console.log('🔗 Conectado con Render Backend:', CONFIG.API_BASE_URL);",
         "reason": "Código comentado o debug obsoleto"
       },
       {
         "file": "flashcard-app-final.js",
-        "line": 933,
+        "line": 926,
         "content": "console.log('📱 Funcionalidades disponibles:');",
         "reason": "Código comentado o debug obsoleto"
       },
       {
         "file": "flashcard-app-final.js",
-        "line": 934,
+        "line": 927,
         "content": "console.log('  - Crear y gestionar decks');",
         "reason": "Código comentado o debug obsoleto"
       },
       {
         "file": "flashcard-app-final.js",
-        "line": 935,
+        "line": 928,
         "content": "console.log('  - Crear y gestionar flashcards');",
         "reason": "Código comentado o debug obsoleto"
       },
       {
         "file": "flashcard-app-final.js",
-        "line": 936,
+        "line": 929,
         "content": "console.log('  - Estudiar con algoritmo SM-2');",
         "reason": "Código comentado o debug obsoleto"
       },
       {
         "file": "flashcard-app-final.js",
-        "line": 937,
+        "line": 930,
         "content": "console.log('  - Dashboard con estadísticas');",
         "reason": "Código comentado o debug obsoleto"
       },
       {
         "file": "flashcard-app-final.js",
-        "line": 938,
-        "content": "console.log('  - Sincronización con backend');",
-        "reason": "Código comentado o debug obsoleto"
-      },
-      {
-        "file": "flashcard-app-final.js",
-        "line": 942,
-        "content": "// ===== FUNCIONES FALTANTES PARA COMPATIBILIDAD =====",
-        "reason": "Código comentado o debug obsoleto"
-      },
-      {
-        "file": "flashcard-app-final.js",
-        "line": 944,
-        "content": "// Función showSection para compatibilidad con el HTML",
-        "reason": "Código comentado o debug obsoleto"
-      },
-      {
-        "file": "flashcard-app-final.js",
-        "line": 948,
-        "content": "// Remover clase active de todas las secciones Y forzar display none",
-        "reason": "Código comentado o debug obsoleto"
-      },
-      {
-        "file": "flashcard-app-final.js",
-        "line": 954,
+        "line": 939,
         "content": "// Agregar clase active a la sección seleccionada Y forzar display block",
         "reason": "Código comentado o debug obsoleto"
       },
       {
         "file": "flashcard-app-final.js",
-        "line": 1009,
+        "line": 990,
         "content": "// Función generateActivityHeatmap para el dashboard",
         "reason": "Código comentado o debug obsoleto"
       },
       {
         "file": "flashcard-app-final.js",
-        "line": 1144,
+        "line": 1124,
         "content": "// Exponer funciones globalmente para compatibilidad con HTML",
         "reason": "Código comentado o debug obsoleto"
       },
       {
         "file": "scripts/integrity_check.js",
-        "line": 21,
-        "content": "console.log(`${prefix} [INTEGRITY] ${timestamp}: ${message}`);",
-        "reason": "Código comentado o debug obsoleto"
-      },
-      {
-        "file": "scripts/integrity_check.js",
-        "line": 151,
+        "line": 150,
         "content": "console.log(status);",
         "reason": "Código comentado o debug obsoleto"
       },
       {
         "file": "scripts/integrity_check.js",
-        "line": 279,
+        "line": 277,
         "content": "console.log('\\n=== RESUMEN DE INTEGRIDAD ===');",
         "reason": "Código comentado o debug obsoleto"
       },
       {
         "file": "scripts/integrity_check.js",
-        "line": 280,
+        "line": 278,
         "content": "console.log(`Estado: ${report.status}`);",
         "reason": "Código comentado o debug obsoleto"
       },
       {
         "file": "scripts/integrity_check.js",
-        "line": 281,
-        "content": "console.log(`Errores: ${report.summary.errors}`);",
-        "reason": "Código comentado o debug obsoleto"
-      },
-      {
-        "file": "scripts/integrity_check.js",
-        "line": 282,
+        "line": 279,
         "content": "console.log(`Advertencias: ${report.summary.warnings}`);",
         "reason": "Código comentado o debug obsoleto"
       },
       {
         "file": "scripts/integrity_check.js",
-        "line": 283,
-        "content": "console.log(`Tiempo de verificación: ${Math.round(report.executionTime / 1000)} segundos`);",
-        "reason": "Código comentado o debug obsoleto"
-      },
-      {
-        "file": "scripts/integrity_check.js",
-        "line": 286,
+        "line": 281,
         "content": "console.log('\\n❌ ERRORES ENCONTRADOS:');",
         "reason": "Código comentado o debug obsoleto"
       },
       {
         "file": "scripts/integrity_check.js",
-        "line": 291,
+        "line": 284,
         "content": "console.log('\\n⚠️  ADVERTENCIAS:');",
         "reason": "Código comentado o debug obsoleto"
       },
       {
         "file": "scripts/integrity_check.js",
-        "line": 296,
+        "line": 288,
         "content": "console.log('\\n✅ INTEGRIDAD VERIFICADA - TODO CORRECTO');",
         "reason": "Código comentado o debug obsoleto"
       },
       {
         "file": "scripts/master_coordinator.js",
-        "line": 58,
-        "content": "console.log(`[MASTER] ${timestamp}: ${message}`);",
-        "reason": "Código comentado o debug obsoleto"
-      },
-      {
-        "file": "scripts/master_coordinator.js",
-        "line": 119,
+        "line": 118,
         "content": "console.log(`[${agent.id}] ${output.trim()}`);",
         "reason": "Código comentado o debug obsoleto"
       },
       {
         "file": "scripts/master_coordinator.js",
-        "line": 172,
+        "line": 170,
         "content": "// Prioridad 1: Ejecutar secuencialmente (solo Agente 1)",
         "reason": "Código comentado o debug obsoleto"
       },
       {
         "file": "scripts/master_coordinator.js",
-        "line": 307,
+        "line": 304,
         "content": "console.log('\\n=== RESUMEN FINAL DE COORDINACIÓN ===');",
         "reason": "Código comentado o debug obsoleto"
       },
       {
         "file": "scripts/master_coordinator.js",
-        "line": 308,
+        "line": 305,
         "content": "console.log(`Tiempo total de ejecución: ${Math.round(masterReport.totalExecutionTime / 1000)} segundos`);",
         "reason": "Código comentado o debug obsoleto"
       },
       {
         "file": "scripts/master_coordinator.js",
-        "line": 309,
+        "line": 306,
         "content": "console.log(`Agentes completados: ${masterReport.summary.completed}/${masterReport.summary.totalAgents}`);",
         "reason": "Código comentado o debug obsoleto"
       },
       {
         "file": "scripts/master_coordinator.js",
-        "line": 310,
-        "content": "console.log(`Agentes fallidos: ${masterReport.summary.failed}`);",
-        "reason": "Código comentado o debug obsoleto"
-      },
-      {
-        "file": "scripts/master_coordinator.js",
-        "line": 311,
+        "line": 307,
         "content": "console.log(`Agentes saltados: ${masterReport.summary.skipped}`);",
         "reason": "Código comentado o debug obsoleto"
       },
       {
         "file": "scripts/master_coordinator.js",
-        "line": 312,
-        "content": "console.log(`Total de duplicados encontrados: ${masterReport.summary.totalDuplicatesFound}`);",
-        "reason": "Código comentado o debug obsoleto"
-      },
-      {
-        "file": "scripts/master_coordinator.js",
-        "line": 313,
+        "line": 308,
         "content": "console.log(`Total de recomendaciones: ${masterReport.summary.totalRecommendations}`);",
         "reason": "Código comentado o debug obsoleto"
       },
       {
-        "file": "scripts/master_coordinator.js",
-        "line": 316,
-        "content": "console.log('\\n⚠️  ADVERTENCIA: Algunos agentes fallaron. Revisar logs para detalles.');",
-        "reason": "Código comentado o debug obsoleto"
-      },
-      {
-        "file": "scripts/master_coordinator.js",
-        "line": 318,
-        "content": "console.log('\\n✅ COORDINACIÓN COMPLETADA EXITOSAMENTE');",
-        "reason": "Código comentado o debug obsoleto"
-      },
-      {
-        "file": "services/NavigationService.js",
-        "line": 29,
-        "content": "// Esperar a que el sistema de navegación esté disponible",
-        "reason": "Código comentado o debug obsoleto"
-      },
-      {
         "file": "store/store.js",
-        "line": 23,
-        "content": "// Mantener compatibilidad con la interfaz original",
-        "reason": "Código comentado o debug obsoleto"
-      },
-      {
-        "file": "store/store.js",
-        "line": 33,
+        "line": 32,
         "content": "console.log(",
         "reason": "Código comentado o debug obsoleto"
       },
       {
         "file": "store/store.js",
-        "line": 104,
+        "line": 102,
         "content": "// Re-exportar el store principal para casos que lo necesiten",
         "reason": "Código comentado o debug obsoleto"
       },
       {
         "file": "store/store.js",
-        "line": 111,
+        "line": 108,
         "content": "console.log(`",
         "reason": "Código comentado o debug obsoleto"
       },
       {
         "file": "utils/apiHelpers.js",
-        "line": 34,
+        "line": 119,
         "content": "console.log(",
         "reason": "Código comentado o debug obsoleto"
       },
       {
         "file": "utils/apiHelpers.js",
-        "line": 120,
-        "content": "console.log(",
-        "reason": "Código comentado o debug obsoleto"
-      },
-      {
-        "file": "utils/apiHelpers.js",
-        "line": 128,
+        "line": 126,
         "content": "console.log(",
         "reason": "Código comentado o debug obsoleto"
       },
       {
         "file": "utils/formValidation.js",
-        "line": 229,
-        "content": "// Mantener el deck seleccionado para facilitar creación múltiple",
-        "reason": "Código comentado o debug obsoleto"
-      },
-      {
-        "file": "utils/formValidation.js",
-        "line": 295,
+        "line": 294,
         "content": "// Fazer disponível globalmente para compatibilidade",
         "reason": "Código comentado o debug obsoleto"
       },
       {
         "file": "utils/helpers.js",
-        "line": 513,
-        "content": "// Remover caracteres no válidos para nombres de archivo",
-        "reason": "Código comentado o debug obsoleto"
-      },
-      {
-        "file": "utils/helpers.js",
-        "line": 634,
+        "line": 633,
         "content": "// Combinar configuración por defecto con la personalizada",
         "reason": "Código comentado o debug obsoleto"
       },
       {
         "file": "utils/helpers.js",
-        "line": 640,
+        "line": 638,
         "content": "console.log('✅ Partículas inicializadas exitosamente');",
         "reason": "Código comentado o debug obsoleto"
       },
       {
         "file": "utils/helpers.js",
-        "line": 647,
+        "line": 644,
         "content": "console.log('⚠️ particlesJS no disponible');",
         "reason": "Código comentado o debug obsoleto"
       },
       {
         "file": "utils/helpers.js",
-        "line": 659,
+        "line": 655,
         "content": "console.log('📄 Contenedor de partículas no encontrado');",
         "reason": "Código comentado o debug obsoleto"
       },
       {
         "file": "utils/helpers.js",
-        "line": 663,
-        "content": "// Detectar si el dispositivo es de bajo rendimiento",
-        "reason": "Código comentado o debug obsoleto"
-      },
-      {
-        "file": "utils/helpers.js",
-        "line": 696,
+        "line": 690,
         "content": "// Verificar si el sistema de navegación está disponible",
         "reason": "Código comentado o debug obsoleto"
       },
       {
         "file": "utils/helpers.js",
-        "line": 701,
+        "line": 695,
         "content": "// Fallback básico si el sistema de navegación no está disponible",
         "reason": "Código comentado o debug obsoleto"
       },
       {
         "file": "utils/helpers.js",
-        "line": 741,
+        "line": 733,
         "content": "// Enviar error a servicio de logging si está disponible",
         "reason": "Código comentado o debug obsoleto"
       },
       {
         "file": "utils/helpers.js",
-        "line": 759,
+        "line": 750,
         "content": "console.log('🔌 Sin conectividad con el servidor');",
         "reason": "Código comentado o debug obsoleto"
       },
       {
         "file": "utils/helpers.js",
-        "line": 806,
+        "line": 796,
         "content": "// Exponer funciones globalmente para compatibilidad con código legacy",
         "reason": "Código comentado o debug obsoleto"
       },
       {
         "file": "utils/helpers.js",
-        "line": 826,
+        "line": 815,
         "content": "// Auto-inicializar partículas cuando el DOM esté listo",
         "reason": "Código comentado o debug obsoleto"
       },
       {
         "file": "utils/helpers.js",
-        "line": 857,
+        "line": 845,
         "content": "console.log(",
         "reason": "Código comentado o debug obsoleto"
       },
       {
         "file": "utils/lazy-loader.js",
-        "line": 189,
-        "content": "// Reintentar después de un tiempo si el elemento no existe",
-        "reason": "Código comentado o debug obsoleto"
-      },
-      {
-        "file": "utils/lazy-loader.js",
-        "line": 207,
+        "line": 206,
         "content": "console.log(`[LazyLoader] Loading module: ${modulePath}`);",
         "reason": "Código comentado o debug obsoleto"
       },
       {
         "file": "utils/lazy-loader.js",
-        "line": 215,
+        "line": 213,
         "content": "console.log(`[LazyLoader] Module loaded successfully: ${modulePath}`);",
         "reason": "Código comentado o debug obsoleto"
       },
       {
         "file": "utils/lazy-loader.js",
-        "line": 233,
+        "line": 230,
         "content": "// Verificar que el módulo tenga la función de inicialización esperada",
-        "reason": "Código comentado o debug obsoleto"
-      },
-      {
-        "file": "utils/loading.js",
-        "line": 100,
-        "content": "// Asegurar que el contenedor tenga position relative",
-        "reason": "Código comentado o debug obsoleto"
-      },
-      {
-        "file": "utils/notifications.js",
-        "line": 36,
-        "content": "// Si existe la función showNotification global, usarla",
         "reason": "Código comentado o debug obsoleto"
       }
     ],
     "unusedFiles": [],
     "duplicateConfigs": [],
-    "brokenReferences": [
-      {
-        "file": "eslint.config.js",
-        "reference": "@eslint/js",
-        "reason": "Referencia a archivo inexistente"
-      },
-      {
-        "file": "eslint.config.js",
-        "reference": "globals",
-        "reason": "Referencia a archivo inexistente"
-      },
-      {
-        "file": "eslint.config.js",
-        "reference": "eslint-plugin-cypress",
-        "reason": "Referencia a archivo inexistente"
-      },
-      {
-        "file": "index.html",
-        "reference": "./services/appInitializer.js",
-        "reason": "Referencia a archivo inexistente"
-      },
-      {
-        "file": "index.html",
-        "reference": "./services/auth.service.js",
-        "reason": "Referencia a archivo inexistente"
-      },
-      {
-        "file": "index.html",
-        "reference": "./services/dashboard.service.js",
-        "reason": "Referencia a archivo inexistente"
-      },
-      {
-        "file": "index.html",
-        "reference": "./services/study.service.js",
-        "reason": "Referencia a archivo inexistente"
-      },
-      {
-        "file": "index.html",
-        "reference": "./services/create.service.js",
-        "reason": "Referencia a archivo inexistente"
-      },
-      {
-        "file": "index.html",
-        "reference": "./services/manage.service.js",
-        "reason": "Referencia a archivo inexistente"
-      },
-      {
-        "file": "index.html",
-        "reference": "./services/flashcards.service.js",
-        "reason": "Referencia a archivo inexistente"
-      },
-      {
-        "file": "index.html",
-        "reference": "./services/storage.service.js",
-        "reason": "Referencia a archivo inexistente"
-      },
-      {
-        "file": "index.html",
-        "reference": "./services/gamification.service.js",
-        "reason": "Referencia a archivo inexistente"
-      },
-      {
-        "file": "scripts/integrity_check.js",
-        "reference": "fs",
-        "reason": "Referencia a archivo inexistente"
-      },
-      {
-        "file": "scripts/integrity_check.js",
-        "reference": "path",
-        "reason": "Referencia a archivo inexistente"
-      },
-      {
-        "file": "scripts/integrity_check.js",
-        "reference": "child_process",
-        "reason": "Referencia a archivo inexistente"
-      },
-      {
-        "file": "scripts/master_coordinator.js",
-        "reference": "fs",
-        "reason": "Referencia a archivo inexistente"
-      },
-      {
-        "file": "scripts/master_coordinator.js",
-        "reference": "path",
-        "reason": "Referencia a archivo inexistente"
-      },
-      {
-        "file": "scripts/master_coordinator.js",
-        "reference": "child_process",
-        "reason": "Referencia a archivo inexistente"
-      },
-      {
-        "file": "store/store.js",
-        "reference": "../store.js",
-        "reason": "Referencia a archivo inexistente"
-      },
-      {
-        "file": "store/store.js",
-        "reference": "./store.js",
-        "reason": "Referencia a archivo inexistente"
-      },
-      {
-        "file": "tests/setup.js",
-        "reference": "vitest",
-        "reason": "Referencia a archivo inexistente"
-      },
-      {
-        "file": "tests/unit/navigation.test.js",
-        "reference": "vitest",
-        "reason": "Referencia a archivo inexistente"
-      },
-      {
-        "file": "utils/apiHelpers.js",
-        "reference": "../apiClient.js",
-        "reason": "Referencia a archivo inexistente"
-      },
-      {
-        "file": "utils/apiHelpers.js",
-        "reference": "./helpers.js",
-        "reason": "Referencia a archivo inexistente"
-      },
-      {
-        "file": "utils/loading.js",
-        "reference": "./helpers.js",
-        "reason": "Referencia a archivo inexistente"
-      },
-      {
-        "file": "vitest.config.js",
-        "reference": "vitest/config",
-        "reason": "Referencia a archivo inexistente"
-      }
-    ]
+    "brokenReferences": []
   },
   "summary": {
-    "totalCleaned": 101,
+    "totalCleaned": 51,
     "obsoleteFunctions": 0,
-    "deadCodeLines": 75,
+    "deadCodeLines": 51,
     "unusedFiles": 0,
     "duplicateConfigs": 0,
-    "brokenReferences": 26
+    "brokenReferences": 0
   }
 }

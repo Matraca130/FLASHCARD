@@ -115,7 +115,6 @@ class MasterCoordinator {
             process.stdout.on('data', (data) => {
                 const output = data.toString();
                 stdout += output;
-                console.log(`[${agent.id}] ${output.trim()}`);
             
             process.stderr.on('data', (data) => {
                 const output = data.toString();
@@ -168,7 +167,6 @@ class MasterCoordinator {
             
             if (priority === 1) {
                 // Prioridad 1: Ejecutar secuencialmente (solo Agente 1)
-                for (const agent of agentsInPriority) {
                 }
             } else {
                 // Prioridades 2 y 3: Ejecutar en paralelo
@@ -303,15 +301,10 @@ class MasterCoordinator {
             // 4. Mostrar resumen final
             console.log('\n=== RESUMEN FINAL DE COORDINACIÓN ===');
             console.log(`Tiempo total de ejecución: ${Math.round(masterReport.totalExecutionTime / 1000)} segundos`);
-            console.log(`Agentes completados: ${masterReport.summary.completed}/${masterReport.summary.totalAgents}`);
             console.log(`Agentes saltados: ${masterReport.summary.skipped}`);
-            console.log(`Total de recomendaciones: ${masterReport.summary.totalRecommendations}`);
             if (masterReport.summary.failed > 0) {
-            } else {
             }
-            this.log('Coordinación maestro completada');
         } catch (error) {
-            this.log(`Error en coordinación maestro: ${error.message}`);
             throw error;
             await this.cleanup();
         }

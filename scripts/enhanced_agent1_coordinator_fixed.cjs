@@ -414,6 +414,55 @@ class EnhancedAgent1Coordinator {
             notifyWhen: ['task_start', 'task_complete', 'issue_found']
         };
     }
+    // ===== INTEGRACIÓN CON GESTIÓN INTELIGENTE DE FUNCIONES =====
+    
+    async analyzeAndManageFunction(description, functionCode = null, targetFile = 'flashcard-app-final.js') {
+        this.log('🧠 Iniciando análisis inteligente de función...');
+        
+        try {
+            const { analyzeAndExecuteFunction } = require('./intelligent_function_manager.cjs');
+            const result = await analyzeAndExecuteFunction(description, functionCode, targetFile);
+            
+            this.log(`💡 Recomendación: ${result.recommendation.action} (confianza: ${result.recommendation.confidence})`);
+            
+            if (result.result) {
+                this.log(`✅ Acción ejecutada: ${result.result.action}`);
+            }
+            
+            return result;
+        } catch (error) {
+            this.log(`⚠️ Error en gestión inteligente: ${error.message}`, 'warn');
+            return null;
+        }
+    }
+    
+    async createOrUpdateFunction(description, functionCode, targetFile = 'flashcard-app-final.js') {
+        this.log(`🔧 Creando/actualizando función: "${description}"`);
+        
+        // 1. Analizar si función similar existe
+        const analysis = await this.analyzeAndManageFunction(description, null, targetFile);
+        
+        if (!analysis) {
+            this.log('❌ No se pudo analizar la función', 'error');
+            return false;
+        }
+        
+        // 2. Ejecutar acción recomendada
+        const result = await this.analyzeAndManageFunction(description, functionCode, targetFile);
+        
+        if (result && result.result && result.result.success) {
+            this.log(`✅ Función gestionada exitosamente: ${result.result.action}`, 'success');
+            
+            // 3. Verificar que no se crearon duplicados
+            await this.executeAutoCleanup();
+            
+            return true;
+        } else {
+            this.log('❌ Error gestionando función', 'error');
+            return false;
+        }
+    }
+
     // ===== INTEGRACIÓN CON SISTEMA DE LIMPIEZA =====
     
     async executeAutoCleanup() {

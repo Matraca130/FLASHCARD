@@ -116,7 +116,6 @@ export async function loadDataWithRetry(
       lastError = error;
 
       if (attempt < maxRetries) {
-        console.log(
         );
         await new Promise((resolve) => setTimeout(resolve, retryDelay));
       }
@@ -124,7 +123,6 @@ export async function loadDataWithRetry(
   }
 
   console.log(
-    `Todos los intentos fallaron, usando datos de fallback. Error: ${lastError.message}`
   return fallbackData;
 }
 

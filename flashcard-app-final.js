@@ -1,7 +1,5 @@
 // Sin módulos ES6 - Todo en un solo archivo
-// Conectado con Render Backend: https://flashcard-u10n.onrender.com
 console.log('🚀 Iniciando StudyingFlash - Versión Integrada Completa');
-
 const CONFIG = {
     API_BASE_URL: 'https://flashcard-u10n.onrender.com/api',
     STORAGE_PREFIX: 'studyingflash_',
@@ -14,7 +12,6 @@ const Utils = {
         if (CONFIG.DEBUG) {
             console.log(`🔧 [StudyingFlash] ${message}`, data || '');
         }
-    },
     error: (message, error = null) => {
         console.error(`❌ [StudyingFlash] ${message}`, error || '');
     },
@@ -261,7 +258,6 @@ const AuthService = {
         // Intentar obtener usuario del localStorage o estado global
         const userStr = localStorage.getItem('currentUser');
         return userStr ? JSON.parse(userStr) : null;
-    }
 
 // ===== DECK SERVICE =====
 const DeckService = {
@@ -351,7 +347,6 @@ const SM2Algorithm = {
         let { interval, easeFactor, repetitions } = flashcard;
         
         if (quality >= 3) {
-            // Respuesta correcta
                 interval = 1;
             } else if (repetitions === 1) {
                 interval = 6;
@@ -496,7 +491,6 @@ const DashboardService = {
         const studiedToday = flashcards.filter(f => 
             f.lastReviewed && new Date(f.lastReviewed).toDateString() === today
         ).length;
-        
     }
 };
 
@@ -927,19 +921,12 @@ console.log('📱 Funcionalidades disponibles:');
 console.log('  - Crear y gestionar decks');
 console.log('  - Crear y gestionar flashcards');
 console.log('  - Estudiar con algoritmo SM-2');
-console.log('  - Dashboard con estadísticas');
 
 
-
-function showSection(sectionName) {
     
-    document.querySelectorAll('.section').forEach(section => {
         section.style.display = 'none'; // Forzar ocultación
-    
     // Agregar clase active a la sección seleccionada Y forzar display block
-    const targetSection = document.querySelector(`#${sectionName}`);
     if (targetSection) {
-        targetSection.style.display = 'block'; // Forzar visualización
         Utils.log(`Sección mostrada: ${sectionName}`);
         Utils.error(`Sección no encontrada: ${sectionName}`);
     }
@@ -949,7 +936,6 @@ function showSection(sectionName) {
     });
     
     const activeNavItem = document.querySelector(`[data-section="${sectionName}"]`);
-    if (activeNavItem) {
         activeNavItem.classList.add('active');
     
     // Cargar datos específicos de cada sección
@@ -1001,7 +987,6 @@ function generateActivityHeatmap() {
     const today = new Date();
     const oneYearAgo = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate());
     
-    let heatmapHTML = '<div class="heatmap-grid">';
     
     for (let d = new Date(oneYearAgo); d <= today; d.setDate(d.getDate() + 1)) {
         const activity = Math.floor(Math.random() * 5); // 0-4 niveles de actividad
@@ -1129,4 +1114,17 @@ window.handleCreateDeck = handleCreateDeck;
 window.handleCreateFlashcard = handleCreateFlashcard;
 
 Utils.log('✅ Funciones de compatibilidad agregadas');
+
+
+
+
+function validateUserLogin(username, password) {
+        return { valid: false, error: 'Campos requeridos' };
+    }
+    if (username.length < 3) {
+        return { valid: false, error: 'Usuario muy corto' };
+    }
+    
+    return { valid: true };
+}
 

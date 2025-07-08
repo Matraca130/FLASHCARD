@@ -630,20 +630,17 @@ export function initializeParticles(config = {}) {
     retina_detect: true,
   };
 
-  // Combinar configuración por defecto con la personalizada
 
   if (typeof particlesJS !== 'undefined') {
     try {
       particlesJS('particles-js', finalConfig);
       console.log('✅ Partículas inicializadas exitosamente');
-      return true;
       console.error('❌ Error inicializando partículas:', error);
       return false;
     }
   } else {
     console.log('⚠️ particlesJS no disponible');
     return false;
-  }
 
 /**
  * Inicialización automática de partículas con detección inteligente
@@ -655,7 +652,6 @@ export function autoInitParticles() {
     console.log('📄 Contenedor de partículas no encontrado');
     return false;
   }
-
   const isLowPerformance =
     navigator.hardwareConcurrency < 4 ||
     navigator.deviceMemory < 4 ||
@@ -691,13 +687,11 @@ export function showSection(sectionId, options = {}) {
   if (window.showSection && typeof window.showSection === 'function') {
     return window.showSection(sectionId, options);
   }
-
   // Fallback básico si el sistema de navegación no está disponible
     '⚠️ Sistema de navegación no disponible, usando fallback básico'
   );
 
   const section = document.querySelector(
-    `[data-section="${sectionId}"], #${sectionId}`
   if (section) {
     // Ocultar todas las secciones
     document.querySelectorAll('[data-section], .section').forEach((s) => {
@@ -736,7 +730,6 @@ export function handleGlobalError(error, context = 'Unknown') {
   }
 }
 
-/**
  * Función de utilidad para verificar conectividad
 export async function checkConnectivity() {
   try {
@@ -754,7 +747,6 @@ export async function checkConnectivity() {
 
 /**
  * Función de utilidad para detectar características del dispositivo
- */
 export function getDeviceInfo() {
     isMobile: /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
       navigator.userAgent
@@ -801,7 +793,6 @@ window.showSection = showSection;
 window.handleGlobalError = handleGlobalError;
 window.checkConnectivity = checkConnectivity;
 window.getDeviceInfo = getDeviceInfo;
-
 // Exponer utilidades comunes
 window.copyToClipboard = copyToClipboard;
 window.validateRequiredFields = validateRequiredFields;
@@ -821,7 +812,6 @@ const tryInitParticles = () => {
 
 if (document.readyState !== 'loading') {
   tryInitParticles();
-} else {
   document.addEventListener('DOMContentLoaded', tryInitParticles);
 
 // Configurar manejo de errores globales

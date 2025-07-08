@@ -29,7 +29,6 @@ class LegacyStore {
       this.notifyListeners();
     });
 
-    console.log(
     );
   }
 
@@ -100,14 +99,12 @@ export default legacyStore;
 export { legacyStore as store };
 
 // Re-exportar el store principal para casos que lo necesiten
-export { store as mainStore, StudyingFlashStore, simpleStore };
 /**
  * MENSAJE DE MIGRACIÓN
  * ====================
  */
 console.log(`
 🔄 AVISO DE MIGRACIÓN:
-Este archivo (sto) redirige al sistema de store refactorizado.
   import store from '
   
 El store refactorizado ofrece:

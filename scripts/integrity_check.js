@@ -147,7 +147,6 @@ class IntegrityChecker {
             if (status.trim()) {
                 this.warnings.push('Hay cambios sin commit en el repositorio');
                 this.log('Cambios detectados:');
-                console.log(status);
                 this.log('Repositorio limpio - sin cambios pendientes');
             }
             
@@ -275,23 +274,17 @@ class IntegrityChecker {
             
             // Mostrar resumen
             console.log('\n=== RESUMEN DE INTEGRIDAD ===');
-            console.log(`Estado: ${report.status}`);
             console.log(`Advertencias: ${report.summary.warnings}`);
-            
                 console.log('\n❌ ERRORES ENCONTRADOS:');
-            }
             if (this.warnings.length > 0) {
                 console.log('\n⚠️  ADVERTENCIAS:');
-                this.warnings.forEach(warning => console.log(`  • ${warning}`));
             
             if (this.errors.length === 0 && this.warnings.length === 0) {
                 console.log('\n✅ INTEGRIDAD VERIFICADA - TODO CORRECTO');
-            }
             
             
             // Retornar código de salida apropiado
             process.exit(this.errors.length > 0 ? 1 : 0);
-            
         } catch (error) {
             process.exit(1);
         }

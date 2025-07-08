@@ -291,7 +291,6 @@ if (typeof module !== 'undefined' && module.exports) {
     };
 }
 
-// Fazer disponível globalmente para compatibilidade
 window.FlashcardFormUtils = FlashcardFormUtils;
 window.DeckFormUtils = DeckFormUtils;
 
