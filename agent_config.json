@@ -1,0 +1,201 @@
+{
+  "version": "1.0.0",
+  "last_updated": "2025-07-08T15:30:00Z",
+  "project": "FLASHCARD",
+  
+  "agents": {
+    "AGENT-1": {
+      "role": "Coordinador",
+      "permissions": {
+        "read": ["*"],
+        "write": [],
+        "delete": []
+      },
+      "responsibilities": [
+        "Supervisar otros agentes",
+        "Verificar duplicados",
+        "Validar resultado final",
+        "Generar reportes consolidados"
+      ],
+      "forbidden_actions": [
+        "modify_code",
+        "create_files",
+        "delete_files"
+      ],
+      "communication_channels": ["ALL"]
+    },
+    
+    "AGENT-2": {
+      "role": "Aplicación Principal",
+      "permissions": {
+        "read": ["index.html", "flashcard-app-final.js", "file_mapping.json"],
+        "write": ["index.html", "flashcard-app-final.js"],
+        "delete": []
+      },
+      "responsibilities": [
+        "Mantener lógica principal",
+        "Gestionar estructura HTML",
+        "Coordinar funcionalidad core"
+      ],
+      "forbidden_actions": [
+        "modify_css",
+        "modify_services",
+        "modify_utils"
+      ],
+      "naming_prefix": "agent2App",
+      "variable_prefix": "AGENT2_APP_",
+      "communication_channels": ["AGENT-3", "AGENT-4"]
+    },
+    
+    "AGENT-3": {
+      "role": "Gestión de Datos",
+      "permissions": {
+        "read": ["flashcard-app-final.js", "file_mapping.json"],
+        "write": ["flashcard-app-final.js"],
+        "delete": []
+      },
+      "responsibilities": [
+        "Operaciones CRUD",
+        "Gestión de almacenamiento",
+        "APIs y datos"
+      ],
+      "forbidden_actions": [
+        "modify_ui",
+        "modify_navigation",
+        "modify_styles"
+      ],
+      "naming_prefix": "agent3Data",
+      "variable_prefix": "AGENT3_DATA_",
+      "communication_channels": ["AGENT-2", "AGENT-4"],
+      "data_boundaries": {
+        "start_marker": "// === AGENT-3 DATA SECTION START ===",
+        "end_marker": "// === AGENT-3 DATA SECTION END ==="
+      }
+    },
+    
+    "AGENT-4": {
+      "role": "UI y Navegación",
+      "permissions": {
+        "read": ["services/NavigationService.js", "index.html", "file_mapping.json"],
+        "write": ["services/NavigationService.js", "index.html"],
+        "delete": []
+      },
+      "responsibilities": [
+        "Sistema de navegación",
+        "Interfaz de usuario",
+        "Experiencia de usuario"
+      ],
+      "forbidden_actions": [
+        "modify_data_logic",
+        "modify_styles",
+        "modify_main_app_logic"
+      ],
+      "naming_prefix": "agent4Nav",
+      "variable_prefix": "AGENT4_NAV_",
+      "communication_channels": ["AGENT-2", "AGENT-3"],
+      "ui_boundaries": {
+        "html_sections": ["navigation", "ui-controls"],
+        "js_namespace": "NavigationService"
+      }
+    },
+    
+    "AGENT-5": {
+      "role": "Utilidades y Testing",
+      "permissions": {
+        "read": ["utils/*", "tests/*", "styles.css", "file_mapping.json"],
+        "write": ["utils/*", "tests/*", "styles.css"],
+        "delete": ["tests/*"]
+      },
+      "responsibilities": [
+        "Funciones de utilidad",
+        "Validación de formularios",
+        "Estilos CSS",
+        "Testing y calidad"
+      ],
+      "forbidden_actions": [
+        "modify_main_logic",
+        "modify_navigation",
+        "modify_data_operations"
+      ],
+      "naming_prefix": "agent5Utils",
+      "variable_prefix": "AGENT5_UTILS_",
+      "communication_channels": ["ALL"]
+    }
+  },
+  
+  "communication_protocol": {
+    "event_name": "agent-communication",
+    "required_fields": ["from", "to", "action", "timestamp"],
+    "message_types": [
+      "data-updated",
+      "ui-changed",
+      "navigation-changed",
+      "validation-required",
+      "error-occurred",
+      "task-completed"
+    ]
+  },
+  
+  "naming_conventions": {
+    "functions": {
+      "pattern": "[agent][Function][Action]",
+      "examples": [
+        "agent2AppInitialize",
+        "agent3DataLoad",
+        "agent4NavNavigate",
+        "agent5UtilsValidate"
+      ]
+    },
+    "variables": {
+      "global_pattern": "AGENT[N]_[FUNCTION]_[DESCRIPTION]",
+      "local_pattern": "[agent][function][Description]",
+      "examples": [
+        "AGENT2_APP_CONFIG",
+        "agent3DataCache",
+        "AGENT4_NAV_STATE"
+      ]
+    },
+    "classes": {
+      "pattern": "Agent[N][Function]Service",
+      "examples": [
+        "Agent2AppService",
+        "Agent3DataService",
+        "Agent4NavigationService"
+      ]
+    }
+  },
+  
+  "validation_rules": {
+    "pre_commit": [
+      "verify_no_duplicates",
+      "verify_syntax",
+      "verify_naming_conventions",
+      "verify_permissions",
+      "verify_dependencies"
+    ],
+    "post_commit": [
+      "update_file_mapping",
+      "notify_other_agents",
+      "generate_quality_report"
+    ]
+  },
+  
+  "error_prevention": {
+    "duplicate_detection": {
+      "enabled": true,
+      "threshold": 0.3,
+      "auto_block": true
+    },
+    "syntax_validation": {
+      "enabled": true,
+      "tools": ["eslint", "html-validate", "stylelint"],
+      "auto_fix": false
+    },
+    "permission_check": {
+      "enabled": true,
+      "strict_mode": true,
+      "auto_block": true
+    }
+  }
+}
+
