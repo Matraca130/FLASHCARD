@@ -1,0 +1,463 @@
+{
+  "timestamp": "2025-07-08T14:30:37.798890",
+  "total_html_files": 3,
+  "files_analyzed": [
+    "./app.html",
+    "./index.html",
+    "./tools/icon-uploader.html"
+  ],
+  "duplicates_found": 1,
+  "duplicates": [
+    {
+      "file1": "./app.html",
+      "file2": "./index.html",
+      "similarity": 0.9357142857142857,
+      "priority": "CRITICAL",
+      "common_elements": {
+        "meta_tags": [
+          "<meta content=\"StudyingFlash - Aplicación de flashcards con repetición espaciada para optimizar tu aprendizaje\" name=\"description\"/>",
+          "<meta content=\"yes\" name=\"mobile-web-app-capable\"/>",
+          "<meta content=\"StudyingFlash\" name=\"apple-mobile-web-app-title\"/>",
+          "<meta content=\"black-translucent\" name=\"apple-mobile-web-app-status-bar-style\"/>",
+          "<meta content=\"#2563eb\" name=\"theme-color\"/>",
+          "<meta content=\"default\" name=\"apple-mobile-web-app-status-bar-style\"/>",
+          "<meta charset=\"utf-8\"/>",
+          "<meta content=\"width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes, viewport-fit=cover\" name=\"viewport\"/>",
+          "<meta content=\"#6366f1\" name=\"theme-color\"/>"
+        ],
+        "css_links": [
+          "./responsive.css",
+          "./meta-dark-theme.css",
+          "https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap",
+          "./styles.css",
+          "./apple-mobile.css"
+        ],
+        "script_tags": [
+          "https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js",
+          "https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/gsap.min.js",
+          "https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js",
+          "https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"
+        ],
+        "sections": [
+          "session-total",
+          "total-progress",
+          "file-upload-area",
+          "summary-accuracy",
+          "studied-today-change",
+          "ranking",
+          "session-points",
+          "achievement-notification",
+          "export-options",
+          "study-interface",
+          "achievement-description",
+          "study-time",
+          "study-time-change",
+          "achievements-grid",
+          "flashcard-front",
+          "streak",
+          "flashcard",
+          "crear",
+          "edit-flashcard-modal",
+          "gestionar",
+          "summary-points",
+          "studied-today",
+          "dashboard",
+          "streak-change",
+          "user-total-points",
+          "user-current-streak",
+          "dashboard-stats",
+          "achievement-icon",
+          "total-cards-change",
+          "achievement-title",
+          "dashboard-decks",
+          "session-correct",
+          "accuracy-change",
+          "study-summary",
+          "session-accuracy",
+          "level-progress-bar",
+          "study-controls",
+          "summary-correct",
+          "total-progress-change",
+          "search-results",
+          "user-achievements-count",
+          "login-modal",
+          "accuracy",
+          "user-current-level",
+          "user-level",
+          "dashboard-decks-list",
+          "confirmation-modal",
+          "activity-heatmap",
+          "summary-total",
+          "user-points",
+          "particles-js",
+          "flashcard-back",
+          "study-progress",
+          "estudiar",
+          "apple-sidebar-overlay",
+          "total-cards",
+          "edit-deck-modal",
+          "deck-selection",
+          "manage-decks"
+        ],
+        "forms": [
+          "deck-form",
+          "registerForm",
+          "flashcard-form",
+          "loginForm"
+        ],
+        "buttons": [
+          "logout",
+          "create-deck",
+          "create-flashcard"
+        ]
+      }
+    }
+  ],
+  "file_details": {
+    "./app.html": {
+      "title": "StudyingFlash - Aplicación Completa Integrada",
+      "meta_tags": [
+        "<meta charset=\"utf-8\"/>",
+        "<meta content=\"width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes, viewport-fit=cover\" name=\"viewport\"/>",
+        "<meta content=\"StudyingFlash - Aplicación de flashcards con repetición espaciada para optimizar tu aprendizaje\" name=\"description\"/>",
+        "<meta content=\"#2563eb\" name=\"theme-color\"/>",
+        "<meta content=\"yes\" name=\"mobile-web-app-capable\"/>",
+        "<meta content=\"default\" name=\"apple-mobile-web-app-status-bar-style\"/>",
+        "<meta content=\"StudyingFlash\" name=\"apple-mobile-web-app-title\"/>",
+        "<meta content=\"#6366f1\" name=\"theme-color\"/>",
+        "<meta content=\"yes\" name=\"mobile-web-app-capable\"/>",
+        "<meta content=\"black-translucent\" name=\"apple-mobile-web-app-status-bar-style\"/>"
+      ],
+      "css_links": [
+        "./styles.css",
+        "./meta-dark-theme.css",
+        "./responsive.css",
+        "./apple-mobile.css",
+        "https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+      ],
+      "script_tags": [
+        "https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js",
+        "https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js",
+        "https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js",
+        "https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/gsap.min.js",
+        "\n    // ===== GLOBAL VARIABLES =====\n    let currentUser = null;\n    let currentDeck = null;\n    let currentCards = [];\n    let currentCardIndex = 0;\n    let isCardFlipped = false;\n    let sessionStats = {\n      correct: 0,\n      total: 0,\n      points: 0\n    };\n    let spacedRepetitionData = {};\n    let gamificationData = {\n      points: 0,\n      level: 1,\n      streak: 0,\n      achievements: []\n    };\n    let editingFlashcardId = null;\n    let editingDeckId = null;\n    let confirmationCallback = null;\n    \n    // API Base URL\n    const API_BASE = 'https://5007-iczox3lhteihqe56zh5di-3a250510.manusvm.computer';\n    \n    // ===== INITIALIZATION =====\n    document.addEventListener(\"DOMContentLoaded\", () => {\n      initializeApp();\n      // Inicializar partículas de forma segura\n      if (typeof initializeParticles === 'function') {\n        initializeParticles();\n      } else {\n        console.log('initializeParticles not available');\n      }\n      initializeEventListeners();\n      loadGamificationData();\n      checkAuthStatus();\n      console.log(\"DOM Ready: initializeApp() called.\");\n    });\n    \n    function initializeApp() {\n      // Load spaced repetition data from localStorage\n      const savedSRData = localStorage.getItem('spacedRepetitionData');\n      if (savedSRData) {\n        spacedRepetitionData = JSON.parse(savedSRData);\n      }\n      \n      // Load gamification data from localStorage\n      const savedGamificationData = localStorage.getItem('gamificationData');\n      if (savedGamificationData) {\n        gamificationData = JSON.parse(savedGamificationData);\n        updateGamificationUI();\n      }\n      \n      // Initialize charts de forma segura\n      setTimeout(() => {\n        if (typeof initializeCharts === 'function') {\n          initializeCharts();\n        } else {\n          console.log('initializeCharts not available');\n        }\n        generateActivityHeatmap();\n      }, 1000);\n    }\n    \n    function initializeEventListeners() {\n      // Navigation\n      document.querySelectorAll('.nav-link').forEach(link => {\n        link.addEventListener('click', function(e) {\n          e.preventDefault();\n          const section = this.getAttribute('data-section');\n          showSection(section);\n        });\n      });\n      \n      // Search input\n      const searchInput = document.getElementById('search-input');\n      if (searchInput) {\n        searchInput.addEventListener('input', debounce(searchFlashcards, 300));\n      }\n      \n      // File upload drag and drop\n      const fileUploadArea = document.getElementById('file-upload-area');\n      if (fileUploadArea) {\n        fileUploadArea.addEventListener('dragover', handleDragOver);\n        fileUploadArea.addEventListener('dragleave', handleDragLeave);\n        fileUploadArea.addEventListener('drop', handleFileDrop);\n      }\n      \n      // Modal close on outside click\n      document.querySelectorAll('.modal-overlay').forEach(modal => {\n        modal.addEventListener('click', function(e) {\n          if (e.target === this) {\n            this.classList.remove('active');\n          }\n        });\n      });\n    }\n    \n    // initializeParticles moved to utils/helpers.js\n\n    \n    // ===== AUTHENTICATION =====\n    function checkAuthStatus() {\n      const token = localStorage.getItem('authToken');\n      if (token) {\n        // Verify token with backend\n        fetch(`${API_BASE}/api/auth/verify`, {\n          headers: { 'Authorization': `Bearer ${token}` }\n        })\n        .then(response => response.json())\n        .then(data => {\n          if (data.user) {\n            currentUser = data.user;\n            updateAuthUI();\n            loadDashboardData();\n          } else {\n            localStorage.removeItem('authToken');\n          }\n        })\n        .catch(error => {\n          console.error('Auth verification failed:', error);\n          localStorage.removeItem('authToken');\n        });\n      }\n    }\n    \n    function showLoginModal() {\n      document.getElementById('login-modal').classList.add('active');\n    }\n    \n    function hideLoginModal() {\n      document.getElementById('login-modal').classList.remove('active');\n    }\n    \n    async function login() {\n      const email = document.getElementById('login-email').value;\n      const password = document.getElementById('login-password').value;\n      \n      if (!email || !password) {\n        showNotification('Por favor, completa todos los campos', 'error');\n        return;\n      }\n      \n      try {\n        const response = await fetch(`${API_BASE}/api/auth/login`, {\n          method: 'POST',\n          headers: { 'Content-Type': 'application/json' },\n          body: JSON.stringify({ email, password })\n        });\n        \n        const data = await response.json();\n        \n        if (response.ok) {\n          localStorage.setItem('authToken', data.token);\n          currentUser = data.user;\n          updateAuthUI();\n          hideLoginModal();\n          loadDashboardData();\n          showNotification('¡Bienvenido de vuelta!', 'success');\n        } else {\n          showNotification(data.error || 'Error al iniciar sesión', 'error');\n        }\n      } catch (error) {\n        console.error('Login error:', error);\n        showNotification('Error de conexión', 'error');\n      }\n    }\n    \n    function logout() {\n      localStorage.removeItem('authToken');\n      currentUser = null;\n      updateAuthUI();\n      showSection('dashboard');\n      showNotification('Sesión cerrada correctamente', 'success');\n    }\n    \n    function updateAuthUI() {\n      const guestElements = document.querySelectorAll('.guest-only');\n      const authElements = document.querySelectorAll('.auth-only');\n      \n      if (currentUser) {\n        guestElements.forEach(el => el.classList.add('hidden'));\n        authElements.forEach(el => el.classList.remove('hidden'));\n        document.getElementById('user-name').textContent = currentUser.first_name || currentUser.username;\n      } else {\n        guestElements.forEach(el => el.classList.remove('hidden'));\n        authElements.forEach(el => el.classList.add('hidden'));\n      }\n    }\n    \n    // ===== NAVIGATION =====\n          loadRankingData();\n          break;\n      }\n    }\n    \n    // ===== DASHBOARD =====\n    async function loadDashboardData() {\n      try {\n        // Load stats\n        const statsResponse = await fetch(`${API_BASE}/api/stats`);\n        const stats = await statsResponse.json();\n        \n        updateDashboardStats(stats);\n        \n        // Load decks\n        const decksResponse = await fetch(`${API_BASE}/api/decks`);\n        const decks = await decksResponse.json();\n        \n        updateDashboardDecks(decks);\n        \n      } catch (error) {\n        console.error('Error loading dashboard data:', error);\n        showNotification('Error al cargar datos del dashboard', 'error');\n      }\n    }\n    \n    function updateDashboardStats(stats) {\n      const statsContainer = document.getElementById('dashboard-stats');\n      if (!statsContainer) return;\n      \n      statsContainer.innerHTML = `\n        <div class=\"hero-stat\" style=\"--delay: 0s\">\n          <div class=\"stat-value\">${stats.total_cards || 0}</div>\n          <div class=\"stat-label\">Flashcards</div>\n          <div class=\"stat-change positive\">+${stats.cards_today || 0} hoy</div>\n        </div>\n        <div class=\"hero-stat\" style=\"--delay: 0.1s\">\n          <div class=\"stat-value\">${stats.total_decks || 0}</div>\n          <div class=\"stat-label\">Decks</div>\n          <div class=\"stat-change positive\">+${stats.decks_this_week || 0} esta semana</div>\n        </div>\n        <div class=\"hero-stat\" style=\"--delay: 0.2s\">\n          <div class=\"stat-value\">${stats.study_streak || 0}</div>\n          <div class=\"stat-label\">Racha de Estudio</div>\n          <div class=\"stat-change ${stats.streak_change >= 0 ? 'positive' : 'negative'}\">\n            ${stats.streak_change >= 0 ? '+' : ''}${stats.streak_change || 0} días\n          </div>\n        </div>\n        <div class=\"hero-stat\" style=\"--delay: 0.3s\">\n          <div class=\"stat-value\">${Math.round(stats.accuracy || 0)}%</div>\n          <div class=\"stat-label\">Precisión</div>\n          <div class=\"stat-change ${stats.accuracy_change >= 0 ? 'positive' : 'negative'}\">\n            ${stats.accuracy_change >= 0 ? '+' : ''}${Math.round(stats.accuracy_change || 0)}%\n          </div>\n        </div>\n      `;\n    }\n    \n    function updateDashboardDecks(decks) {\n      const decksContainer = document.getElementById('dashboard-decks');\n      if (!decksContainer) return;\n      \n      if (!decks || decks.length === 0) {\n        decksContainer.innerHTML = `\n          <div class=\"card text-center\">\n            <h3>No tienes decks aún</h3>\n            <p class=\"text-muted mb-3\">Crea tu primer deck para comenzar a estudiar</p>\n            <button class=\"btn btn-primary\" onclick=\"showSection('crear')\">\n              ➕ Crear Primer Deck\n            </button>\n          </div>\n        `;\n        return;\n      }\n      \n      decksContainer.innerHTML = decks.map(deck => `\n        <div class=\"deck-card\" onclick=\"startStudySession(${deck.id})\">\n          <div class=\"deck-header\">\n            <div class=\"deck-icon\">assets/icons/individual/study-icon.png</div>\n            <div class=\"deck-info\">\n              <h3>${deck.name}</h3>\n              <p>${deck.description || 'Sin descripción'}</p>\n            </div>\n          </div>\n          <div class=\"deck-stats\">\n            <div class=\"deck-stat\">\n              <span class=\"deck-stat-value\">${deck.card_count || 0}</span>\n              <span class=\"deck-stat-label\">Cartas</span>\n            </div>\n            <div class=\"deck-stat\">\n              <span class=\"deck-stat-value\">${deck.due_count || 0}</span>\n              <span class=\"deck-stat-label\">Pendientes</span>\n            </div>\n            <div class=\"deck-stat\">\n              <span class=\"deck-stat-value\">${Math.round((deck.accuracy || 0) * 100)}%</span>\n              <span class=\"deck-stat-label\">Precisión</span>\n            </div>\n          </div>\n        </div>\n      `).join('');\n      \n      // ===== CHARTS =====\n      \n      const levels = [\n        { level: 1, points: 0, title: \"Principiante\", icon: \"assets/icons/achievements/first-session.png\" },\n        { level: 5, points: 1000, title: \"Experto\", icon: \"assets/icons/achievements/first-session.png\" },\n        { level: 6, points: 1500, title: \"Maestro\", icon: \"assets/icons/achievements/crown-achievement.png\" },\n        { level: 7, points: 2100, title: \"Sabio\", icon: \"assets/icons/achievements/perfect-session.png\" },\n        { level: 8, points: 2800, title: \"Genio\", icon: \"assets/icons/ui-elements/points-star.png\" },\n        { level: 9, points: 3600, title: \"Leyenda\", icon: \"assets/icons/individual/ranking-icon.png\" },\n        { level: 10, points: 4500, title: \"Inmortal\", icon: \"assets/icons/achievements/crown-achievement.png\" }\n      ];\n      \n      const currentLevel = gamificationData.level;\n      let newLevel = 1;\n      \n      for (let i = levels.length - 1; i >= 0; i--) {\n        if (gamificationData.points >= levels[i].points) {\n          newLevel = levels[i].level;\n          break;\n        }\n      }\n      \n      if (newLevel > currentLevel) {\n        gamificationData.level = newLevel;\n        showLevelUpAnimation(newLevel, levels[newLevel - 1]);\n      }\n    }\n    \n    function updateGamificationUI() {\n      // Update navbar elements\n      const userLevel = document.getElementById('user-level');\n      const userPoints = document.getElementById('user-points');\n      \n      if (userLevel) {\n        const levelData = getLevelData(gamificationData.level);\n        userLevel.innerHTML = `\n          <span class=\"level-icon\">${levelData.icon}</span>\n          <span>Nivel ${gamificationData.level}</span>\n        `;\n      }\n      \n      if (userPoints) {\n        userPoints.innerHTML = `\n          <span>⭐</span>\n          <span>${gamificationData.points} pts</span>\n        `;\n      }\n    }\n    \n    function getLevelData(level) {\n      const levels = [\n        { level: 1, points: 0, title: \"Principiante\", icon: \"🌱\" },\n        { level: 2, points: 100, title: \"Estudiante\", icon: \"assets/icons/individual/study-icon.png\" },\n        { level: 3, points: 300, title: \"Aprendiz\", icon: \"assets/icons/ui-elements/level-badge.png\" },\n        { level: 4, points: 600, title: \"Conocedor\", icon: \"assets/icons/achievements/first-session.png\" },\n        { level: 5, points: 1000, title: \"Experto\", icon: \"assets/icons/achievements/first-session.png\" },\n        { level: 6, points: 1500, title: \"Maestro\", icon: \"assets/icons/achievements/crown-achievement.png\" },\n        { level: 7, points: 2100, title: \"Sabio\", icon: \"assets/icons/achievements/perfect-session.png\" },\n        { level: 8, points: 2800, title: \"Genio\", icon: \"assets/icons/ui-elements/points-star.png\" },\n        { level: 9, points: 3600, title: \"Leyenda\", icon: \"assets/icons/individual/ranking-icon.png\" },\n        { level: 10, points: 4500, title: \"Inmortal\", icon: \"assets/icons/achievements/crown-achievement.png\" }\n      ];\n      \n      return levels[level - 1] || levels[0];\n    }\n    \n    function showPointsAnimation(points) {\n      const animation = document.createElement('div');\n      animation.className = 'points-animation';\n      animation.textContent = `+${points}`;\n      animation.style.left = '50%';\n      animation.style.top = '50%';\n      \n      document.body.appendChild(animation);\n      \n      setTimeout(() => {\n        document.body.removeChild(animation);\n      }, 2000);\n    }\n    \n    function showLevelUpAnimation(level, levelData) {\n      showAchievement(\n        `¡Nivel ${level}!`,\n        `Has alcanzado el nivel ${levelData.title}`,\n        levelData.icon\n      );\n    }\n    \n    function checkAchievements() {\n      const achievements = [\n        {\n          id: 'first_session',\n          title: 'Primera Sesión',\n          description: 'Completa tu primera sesión de estudio',\n          icon: 'assets/icons/achievements/first-session.png',\n          condition: () => sessionStats.total > 0\n        },\n        {\n          id: 'perfect_session',\n          title: 'Sesión Perfecta',\n          description: 'Responde todas las cartas correctamente',\n          icon: 'assets/icons/achievements/perfect-session.png',\n          condition: () => sessionStats.total > 0 && sessionStats.correct === sessionStats.total\n        },\n        {\n          id: 'speed_demon',\n          title: 'Demonio de la Velocidad',\n          description: 'Completa una sesión en menos de 2 minutos',\n          icon: 'assets/icons/achievements/speed-demon.png',\n          condition: () => sessionStats.total >= 5 && Math.random() > 0.7 // Simulated\n        },\n        {\n          id: 'streak_3',\n          title: 'Racha de 3',\n          description: 'Estudia 3 días consecutivos',\n          icon: 'assets/icons/ui-elements/points-star.png',\n          condition: () => gamificationData.streak >= 3\n        },\n        {\n          id: 'points_100',\n          title: 'Centurión',\n          description: 'Acumula 100 puntos',\n          icon: 'assets/icons/achievements/first-session.png',\n          condition: () => gamificationData.points >= 100\n        }\n      ];\n      \n      achievements.forEach(achievement => {\n        if (!gamificationData.achievements.includes(achievement.id) && achievement.condition()) {\n          gamificationData.achievements.push(achievement.id);\n          showAchievement(achievement.title, achievement.description, achievement.icon);\n          gamificationData.points += 50; // Bonus points for achievement\n        }\n      });\n      \n      saveGamificationData();\n    }\n    \n    function showAchievement(title, description, icon) {\n      const notification = document.getElementById('achievement-notification');\n      \n      document.getElementById('achievement-title').textContent = title;\n      document.getElementById('achievement-description').textContent = description;\n      document.getElementById('achievement-icon').innerHTML = `<svg style=\"height: 32px; width: 32px; font-size: 32px;\"><use href=\"#icon-trophy\"></use></svg>`;\n      \n      notification.classList.add('show');\n      \n      setTimeout(() => {\n        notification.classList.remove('show');\n      }, 5000);\n    }\n    \n    // ===== CREATE SYSTEM =====\n    async function loadCreateDecks() {\n      try {\n        const response = await fetch(`${API_BASE}/api/decks`);\n        const decks = await response.json();\n        \n        const flashcardDeckSelect = document.getElementById('flashcard-deck');\n        if (flashcardDeckSelect) {\n          flashcardDeckSelect.innerHTML = '<option value=\"\">Selecciona un deck...</option>' +\n            decks.map(deck => `<option value=\"${deck.id}\">${deck.name}</option>`).join('');\n        }\n        \n      } catch (error) {\n        console.error('Error loading create decks:', error);\n      }\n    }\n    \n    // Función createDeck movida a create.service.js - eliminando duplicado\n    \n    async function createFlashcard() {\n      const deckId = document.getElementById('flashcard-deck').value;\n      const front = document.getElementById('flashcard-front').value.trim();\n      const back = document.getElementById('flashcard-back').value.trim();\n      \n      if (!deckId || !front || !back) {\n        showNotification('Por favor, completa todos los campos', 'error');\n        return;\n      }\n      \n      try {\n        const response = await fetch(`${API_BASE}/api/flashcards`, {\n          method: 'POST',\n          headers: {\n            'Content-Type': 'application/json',\n            'Authorization': `Bearer ${localStorage.getItem('authToken')}`\n          },\n          body: JSON.stringify({\n            deck_id: parseInt(deckId),\n            front,\n            back\n          })\n        });\n        \n        const data = await response.json();\n        \n        if (response.ok) {\n          showNotification('Flashcard creada exitosamente', 'success');\n          \n          // Clear form\n          document.getElementById('flashcard-front').value = '';\n          document.getElementById('flashcard-back').value = '';\n          \n        } else {\n          showNotification(data.error || 'Error al crear flashcard', 'error');\n        }\n      } catch (error) {\n        console.error('Error creating flashcard:', error);\n        showNotification('Error de conexión', 'error');\n      }\n    }\n    \n    // ===== MANAGE SYSTEM =====\n    async function loadManageData() {\n      await loadManageDecks();\n      await loadManageFilters();\n      await loadExportOptions();\n    }\n    \n    async function loadManageDecks() {\n      try {\n        const response = await fetch(`${API_BASE}/api/decks`);\n        const decks = await response.json();\n        \n        const manageDecksContainer = document.getElementById('manage-decks');\n        if (!manageDecksContainer) return;\n        \n        if (!decks || decks.length === 0) {\n          manageDecksContainer.innerHTML = `\n            <div class=\"card text-center\">\n              <h3>No tienes decks para gestionar</h3>\n              <p class=\"text-muted mb-3\">Crea tu primer deck para comenzar</p>\n              <button class=\"btn btn-primary\" onclick=\"showSection('crear')\">\n                ➕ Crear Deck\n              </button>\n            </div>\n          `;\n          return;\n        }\n        \n        manageDecksContainer.innerHTML = decks.map(deck => `\n          <div class=\"deck-card\">\n            <div class=\"deck-header\">\n              <div class=\"deck-icon\">assets/icons/individual/study-icon.png</div>\n              <div class=\"deck-info\">\n                <h3>${deck.name}</h3>\n                <p>${deck.description || 'Sin descripción'}</p>\n              </div>\n            </div>\n            <div class=\"deck-stats\">\n              <div class=\"deck-stat\">\n                <span class=\"deck-stat-value\">${deck.card_count || 0}</span>\n                <span class=\"deck-stat-label\">Cartas</span>\n              </div>\n              <div class=\"deck-stat\">\n                <span class=\"deck-stat-value\">${deck.is_public ? 'Sí' : 'No'}</span>\n                <span class=\"deck-stat-label\">Público</span>\n              </div>\n            </div>\n            <div class=\"card-actions mt-3\">\n              <button class=\"btn btn-secondary\" onclick=\"editDeck(${deck.id})\">\n                ✏️ Editar\n              </button>\n              <button class=\"btn btn-danger\" onclick=\"deleteDeck(${deck.id}, '${deck.name}')\">\n                🗑️ Eliminar\n              </button>\n              <button class=\"btn btn-primary\" onclick=\"exportDeck(${deck.id}, 'json')\">\n                📤 Exportar\n              </button>\n            </div>\n          </div>\n        `).join('');\n        \n      } catch (error) {\n        console.error('Error loading manage decks:', error);\n        showNotification('Error al cargar decks para gestionar', 'error');\n      }\n    }\n    \n    async function loadManageFilters() {\n      try {\n        const response = await fetch(`${API_BASE}/api/decks`);\n        const decks = await response.json();\n        \n        const deckFilter = document.getElementById('deck-filter');\n        if (deckFilter) {\n          deckFilter.innerHTML = '<option value=\"\">Todos los decks</option>' +\n            decks.map(deck => `<option value=\"${deck.id}\">${deck.name}</option>`).join('');\n        }\n        \n      } catch (error) {\n        console.error('Error loading manage filters:', error);\n      }\n    }\n    \n    async function loadExportOptions() {\n      try {\n        const response = await fetch(`${API_BASE}/api/decks`);\n        const decks = await response.json();\n        \n        const exportOptions = document.getElementById('export-options');\n        if (!exportOptions) return;\n        \n        if (!decks || decks.length === 0) {\n          exportOptions.innerHTML = `\n            <div class=\"text-center text-muted\">\n              <p>No hay decks para exportar</p>\n            </div>\n          `;\n          return;\n        }\n        \n        exportOptions.innerHTML = decks.map(deck => `\n          <div class=\"export-option\">\n            <div class=\"export-info\">\n              <div class=\"export-icon\">assets/icons/individual/study-icon.png</div>\n              <div class=\"export-details\">\n                <h4>${deck.name}</h4>\n                <p>${deck.card_count || 0} flashcards</p>\n              </div>\n            </div>\n            <div class=\"export-actions\">\n              <button class=\"btn btn-secondary\" onclick=\"exportDeck(${deck.id}, 'json')\">\n                JSON\n              </button>\n              <button class=\"btn btn-secondary\" onclick=\"exportDeck(${deck.id}, 'csv')\">\n                CSV\n              </button>\n            </div>\n          </div>\n        `).join('');\n        \n      } catch (error) {\n        console.error('Error loading export options:', error);\n      }\n    }\n    \n    async function searchFlashcards() {\n      const query = document.getElementById('search-input').value.trim();\n      const deckId = document.getElementById('deck-filter').value;\n      const difficulty = document.getElementById('difficulty-filter').value;\n      const sortBy = document.getElementById('sort-by').value;\n      \n      try {\n        const params = new URLSearchParams();\n        if (query) params.append('q', query);\n        if (deckId) params.append('deck_id', deckId);\n        if (difficulty) params.append('difficulty', difficulty);\n        if (sortBy) params.append('sort_by', sortBy);\n        \n        const response = await fetch(`${API_BASE}/api/flashcards/search?${params}`);\n        const flashcards = await response.json();\n        \n        displaySearchResults(flashcards);\n        \n      } catch (error) {\n        console.error('Error searching flashcards:', error);\n        showNotification('Error al buscar flashcards', 'error');\n      }\n    }\n    \n    function displaySearchResults(flashcards) {\n      const resultsContainer = document.getElementById('search-results');\n      if (!resultsContainer) return;\n      \n      if (!flashcards || flashcards.length === 0) {\n        resultsContainer.innerHTML = `\n          <div class=\"card text-center\">\n            <h3>No se encontraron resultados</h3>\n            <p class=\"text-muted\">Intenta con otros términos de búsqueda</p>\n          </div>\n        `;\n        return;\n      }\n      \n      resultsContainer.innerHTML = `\n        <h3 class=\"card-title mb-3\">Resultados de búsqueda (${flashcards.length})</h3>\n        ${flashcards.map(card => `\n          <div class=\"search-result-item\">\n            <div class=\"search-result-header\">\n              <div class=\"search-result-title\">Flashcard #${card.id}</div>\n              <div class=\"search-result-actions\">\n                <button class=\"btn btn-secondary\" onclick=\"editFlashcard(${card.id})\">\n                  ✏️ Editar\n                </button>\n                <button class=\"btn btn-danger\" onclick=\"deleteFlashcard(${card.id})\">\n                  🗑️ Eliminar\n                </button>\n              </div>\n            </div>\n            <div class=\"search-result-content\">\n              <strong>Frente:</strong> ${card.front}<br>\n              <strong>Reverso:</strong> ${card.back}\n            </div>\n            <div class=\"search-result-meta\">\n              <span>Dificultad: ${card.difficulty || 0}</span>\n              <span>Creado: ${new Date(card.created_at).toLocaleDateString()}</span>\n            </div>\n          </div>\n        `).join('')}\n      `;\n    }\n    \n    // ===== EDIT/DELETE FUNCTIONS =====\n    async function editDeck(deckId) {\n      try {\n        const response = await fetch(`${API_BASE}/api/decks/${deckId}`);\n        const deck = await response.json();\n        \n        editingDeckId = deckId;\n        \n        document.getElementById('edit-deck-name').value = deck.name;\n        document.getElementById('edit-deck-description').value = deck.description || '';\n        document.getElementById('edit-deck-public').checked = deck.is_public;\n        \n        showEditDeckModal();\n        \n      } catch (error) {\n        console.error('Error loading deck for edit:', error);\n        showNotification('Error al cargar deck para editar', 'error');\n      }\n    }\n    \n    async function updateDeck() {\n      if (!editingDeckId) return;\n      \n      const name = document.getElementById('edit-deck-name').value.trim();\n      const description = document.getElementById('edit-deck-description').value.trim();\n      const isPublic = document.getElementById('edit-deck-public').checked;\n      \n      if (!name) {\n        showNotification('Por favor, ingresa un nombre para el deck', 'error');\n        return;\n      }\n      \n      try {\n        const response = await fetch(`${API_BASE}/api/decks/${editingDeckId}`, {\n          method: 'PUT',\n          headers: {\n            'Content-Type': 'application/json',\n            'Authorization': `Bearer ${localStorage.getItem('authToken')}`\n          },\n          body: JSON.stringify({\n            name,\n            description,\n            is_public: isPublic\n          })\n        });\n        \n        const data = await response.json();\n        \n        if (response.ok) {\n          showNotification('Deck actualizado exitosamente', 'success');\n          hideEditDeckModal();\n          loadManageDecks();\n        } else {\n          showNotification(data.error || 'Error al actualizar deck', 'error');\n        }\n      } catch (error) {\n        console.error('Error updating deck:', error);\n        showNotification('Error de conexión', 'error');\n      }\n    }\n    \n    function deleteDeck(deckId, deckName) {\n      showConfirmation(\n        'Eliminar Deck',\n        `¿Estás seguro de que quieres eliminar el deck \"${deckName}\"? Esta acción no se puede deshacer y eliminará todas las flashcards del deck.`,\n        () => confirmDeleteDeck(deckId)\n      );\n    }\n    \n    async function confirmDeleteDeck(deckId) {\n      try {\n        const response = await fetch(`${API_BASE}/api/decks/${deckId}`, {\n          method: 'DELETE',\n          headers: {\n            'Authorization': `Bearer ${localStorage.getItem('authToken')}`\n          }\n        });\n        \n        if (response.ok) {\n          showNotification('Deck eliminado exitosamente', 'success');\n          loadManageDecks();\n        } else {\n          const data = await response.json();\n          showNotification(data.error || 'Error al eliminar deck', 'error');\n        }\n      } catch (error) {\n        console.error('Error deleting deck:', error);\n        showNotification('Error de conexión', 'error');\n      }\n    }\n    \n    async function editFlashcard(flashcardId) {\n      try {\n        const response = await fetch(`${API_BASE}/api/flashcards/${flashcardId}`);\n        const flashcard = await response.json();\n        \n        editingFlashcardId = flashcardId;\n        \n        document.getElementById('edit-flashcard-front').value = flashcard.front;\n        document.getElementById('edit-flashcard-back').value = flashcard.back;\n        \n        // Load decks for selection\n        const decksResponse = await fetch(`${API_BASE}/api/decks`);\n        const decks = await decksResponse.json();\n        \n        const deckSelect = document.getElementById('edit-flashcard-deck');\n        deckSelect.innerHTML = decks.map(deck => \n          `<option value=\"${deck.id}\" ${deck.id === flashcard.deck_id ? 'selected' : ''}>${deck.name}</option>`\n        ).join('');\n        \n        showEditFlashcardModal();\n        \n      } catch (error) {\n        console.error('Error loading flashcard for edit:', error);\n        showNotification('Error al cargar flashcard para editar', 'error');\n      }\n    }\n    \n    async function updateFlashcard() {\n      if (!editingFlashcardId) return;\n      \n      const front = document.getElementById('edit-flashcard-front').value.trim();\n      const back = document.getElementById('edit-flashcard-back').value.trim();\n      const deckId = document.getElementById('edit-flashcard-deck').value;\n      \n      if (!front || !back || !deckId) {\n        showNotification('Por favor, completa todos los campos', 'error');\n        return;\n      }\n      \n      try {\n        const response = await fetch(`${API_BASE}/api/flashcards/${editingFlashcardId}`, {\n          method: 'PUT',\n          headers: {\n            'Content-Type': 'application/json',\n            'Authorization': `Bearer ${localStorage.getItem('authToken')}`\n          },\n          body: JSON.stringify({\n            front,\n            back,\n            deck_id: parseInt(deckId)\n          })\n        });\n        \n        const data = await response.json();\n        \n        if (response.ok) {\n          showNotification('Flashcard actualizada exitosamente', 'success');\n          hideEditFlashcardModal();\n          searchFlashcards(); // Refresh search results\n        } else {\n          showNotification(data.error || 'Error al actualizar flashcard', 'error');\n        }\n      } catch (error) {\n        console.error('Error updating flashcard:', error);\n        showNotification('Error de conexión', 'error');\n      }\n    }\n    \n    function deleteFlashcard(flashcardId) {\n      showConfirmation(\n        'Eliminar Flashcard',\n        '¿Estás seguro de que quieres eliminar esta flashcard? Esta acción no se puede deshacer.',\n        () => confirmDeleteFlashcard(flashcardId)\n      );\n    }\n    \n    async function confirmDeleteFlashcard(flashcardId) {\n      try {\n        const response = await fetch(`${API_BASE}/api/flashcards/${flashcardId}`, {\n          method: 'DELETE',\n          headers: {\n            'Authorization': `Bearer ${localStorage.getItem('authToken')}`\n          }\n        });\n        \n        if (response.ok) {\n          showNotification('Flashcard eliminada exitosamente', 'success');\n          searchFlashcards(); // Refresh search results\n        } else {\n          const data = await response.json();\n          showNotification(data.error || 'Error al eliminar flashcard', 'error');\n        }\n      } catch (error) {\n        console.error('Error deleting flashcard:', error);\n        showNotification('Error de conexión', 'error');\n      }\n    }\n    \n    // ===== IMPORT/EXPORT FUNCTIONS =====\n    async function exportDeck(deckId, format) {\n      try {\n        const response = await fetch(`${API_BASE}/api/decks/${deckId}/export?format=${format}`);\n        \n        if (format === 'csv') {\n          const blob = await response.blob();\n          const url = window.URL.createObjectURL(blob);\n          const a = document.createElement('a');\n          a.href = url;\n          a.download = `deck_${deckId}.csv`;\n          document.body.appendChild(a);\n          a.click();\n          document.body.removeChild(a);\n          window.URL.revokeObjectURL(url);\n        } else {\n          const data = await response.json();\n          const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });\n          const url = window.URL.createObjectURL(blob);\n          const a = document.createElement('a');\n          a.href = url;\n          a.download = `deck_${deckId}.json`;\n          document.body.appendChild(a);\n          a.click();\n          document.body.removeChild(a);\n          window.URL.revokeObjectURL(url);\n        }\n        \n        showNotification('Deck exportado exitosamente', 'success');\n        \n      } catch (error) {\n        console.error('Error exporting deck:', error);\n        showNotification('Error al exportar deck', 'error');\n      }\n    }\n    \n    function handleFileUpload(event) {\n      const file = event.target.files[0];\n      if (file) {\n        processImportFile(file);\n      }\n    }\n    \n    function handleDragOver(event) {\n      event.preventDefault();\n      event.currentTarget.classList.add('dragover');\n    }\n    \n    function handleDragLeave(event) {\n      event.preventDefault();\n      event.currentTarget.classList.remove('dragover');\n    }\n    \n    function handleFileDrop(event) {\n      event.preventDefault();\n      event.currentTarget.classList.remove('dragover');\n      \n      const files = event.dataTransfer.files;\n      if (files.length > 0) {\n        processImportFile(files[0]);\n      }\n    }\n    \n    function processImportFile(file) {\n      const reader = new FileReader();\n      \n      reader.onload = function(e) {\n        const content = e.target.result;\n        const extension = file.name.split('.').pop().toLowerCase();\n        \n        // Store file content for import\n        window.importFileContent = content;\n        window.importFileFormat = extension;\n        \n        // Update UI to show file is ready\n        const uploadArea = document.getElementById('file-upload-area');\n        uploadArea.innerHTML = `\n          <div class=\"upload-icon\">✅</div>\n          <div class=\"upload-text\">Archivo cargado: ${file.name}</div>\n          <div class=\"upload-hint\">Listo para importar</div>\n        `;\n        \n        showNotification('Archivo cargado correctamente', 'success');\n      };\n      \n      reader.readAsText(file);\n    }\n    \n    async function importDeck() {\n      if (!window.importFileContent || !window.importFileFormat) {\n        showNotification('Por favor, selecciona un archivo primero', 'error');\n        return;\n      }\n      \n      const deckName = document.getElementById('import-deck-name').value.trim();\n      if (!deckName) {\n        showNotification('Por favor, ingresa un nombre para el deck importado', 'error');\n        return;\n      }\n      \n      try {\n        const response = await fetch(`${API_BASE}/api/decks/import`, {\n          method: 'POST',\n          headers: {\n            'Content-Type': 'application/json',\n            'Authorization': `Bearer ${localStorage.getItem('authToken')}`\n          },\n          body: JSON.stringify({\n            content: window.importFileContent,\n            format: window.importFileFormat,\n            deck_name: deckName\n          })\n        });\n        \n        const data = await response.json();\n        \n        if (response.ok) {\n          showNotification('Deck importado exitosamente', 'success');\n          \n          // Clear form\n          document.getElementById('import-deck-name').value = '';\n          document.getElementById('file-upload-area').innerHTML = `\n            <div class=\"upload-icon\">📁</div>\n            <div class=\"upload-text\">Haz clic o arrastra un archivo aquí</div>\n            <div class=\"upload-hint\">Formatos soportados: JSON, CSV, TXT</div>\n          `;\n          \n          // Clear stored file data\n          delete window.importFileContent;\n          delete window.importFileFormat;\n          \n          // Reload manage data\n          loadManageData();\n          \n        } else {\n          showNotification(data.error || 'Error al importar deck', 'error');\n        }\n      } catch (error) {\n        console.error('Error importing deck:', error);\n        showNotification('Error de conexión', 'error');\n      }\n    }\n    \n    // ===== RANKING SYSTEM =====\n    async function loadRankingData() {\n      updateRankingStats();\n      loadLeaderboard('global');\n      loadAchievements();\n    }\n    \n    function updateRankingStats() {\n      document.getElementById('user-total-points').textContent = gamificationData.points;\n      document.getElementById('user-current-level').textContent = gamificationData.level;\n      document.getElementById('user-current-streak').textContent = gamificationData.streak;\n      document.getElementById('user-achievements-count').textContent = gamificationData.achievements.length;\n      \n      // Update level progress\n      const currentLevelData = getLevelData(gamificationData.level);\n      const nextLevelData = getLevelData(gamificationData.level + 1);\n      \n      if (nextLevelData) {\n        const currentPoints = gamificationData.points - currentLevelData.points;\n        const requiredPoints = nextLevelData.points - currentLevelData.points;\n        const progress = (currentPoints / requiredPoints) * 100;\n        \n        document.getElementById('level-progress-text').textContent = \n          `${currentPoints} / ${requiredPoints} XP`;\n        document.getElementById('level-progress-bar').style.width = `${Math.min(progress, 100)}%`;\n      } else {\n        document.getElementById('level-progress-text').textContent = 'Nivel máximo alcanzado';\n        document.getElementById('level-progress-bar').style.width = '100%';\n      }\n    }\n    \n    function loadLeaderboard(period) {\n      // Mock leaderboard data - in a real app, this would come from the backend\n      const leaderboardData = [\n        { rank: 1, name: 'Ana García', points: 2450, level: 8, streak: 15, avatar: 'A' },\n        { rank: 2, name: 'Carlos López', points: 2180, level: 7, streak: 12, avatar: 'C' },\n        { rank: 3, name: 'María Rodríguez', points: 1950, level: 6, streak: 8, avatar: 'M' },\n        { rank: 4, name: 'Juan Pérez', points: 1720, level: 6, streak: 5, avatar: 'J' },\n        { rank: 5, name: 'Laura Martín', points: 1580, level: 5, streak: 10, avatar: 'L' },\n        { rank: 6, name: 'Tú', points: gamificationData.points, level: gamificationData.level, streak: gamificationData.streak, avatar: 'T', current: true },\n        { rank: 7, name: 'Pedro Sánchez', points: 1200, level: 4, streak: 3, avatar: 'P' },\n        { rank: 8, name: 'Sofia Ruiz', points: 980, level: 4, streak: 7, avatar: 'S' },\n        { rank: 9, name: 'Diego Torres', points: 850, level: 3, streak: 2, avatar: 'D' },\n        { rank: 10, name: 'Elena Vega', points: 720, level: 3, streak: 4, avatar: 'E' }\n      ];\n      \n      // Sort by points and update ranks\n      leaderboardData.sort((a, b) => b.points - a.points);\n      leaderboardData.forEach((user, index) => {\n        user.rank = index + 1;\n      });\n      \n      const leaderboardBody = document.getElementById('leaderboard-body');\n      if (!leaderboardBody) return;\n      \n      leaderboardBody.innerHTML = leaderboardData.map(user => `\n        <tr class=\"${user.current ? 'leaderboard-current' : ''}\">\n          <td class=\"leaderboard-rank\">${user.rank}</td>\n          <td>\n            <div class=\"leaderboard-user\">\n              <div class=\"leaderboard-avatar\">${user.avatar}</div>\n              <span class=\"leaderboard-name\">${user.name}</span>\n            </div>\n          </td>\n          <td class=\"leaderboard-score\">${user.points}</td>\n          <td>${user.level}</td>\n          <td>${user.streak}</td>\n        </tr>\n      `).join('');\n    }\n    \n    function loadAchievements() {\n      const allAchievements = [\n        { id: 'first_session', title: 'Primera Sesión', description: 'Completa tu primera sesión de estudio', icon: 'assets/icons/achievements/first-session.png', points: 50 },\n        { id: 'perfect_session', title: 'Sesión Perfecta', description: 'Responde todas las cartas correctamente', icon: 'assets/icons/achievements/perfect-session.png', points: 100 },\n        { id: 'speed_demon', title: 'Demonio de la Velocidad', description: 'Completa una sesión en menos de 2 minutos', icon: 'assets/icons/achievements/speed-demon.png', points: 75 },\n        { id: 'streak_3', title: 'Racha de 3', description: 'Estudia 3 días consecutivos', icon: 'assets/icons/ui-elements/points-star.png', points: 150 },\n        { id: 'streak_7', title: 'Semana Completa', description: 'Estudia 7 días consecutivos', icon: '📅', points: 300 },\n        { id: 'points_100', title: 'Centurión', description: 'Acumula 100 puntos', icon: 'assets/icons/achievements/first-session.png', points: 50 },\n        { id: 'points_500', title: 'Guerrero', description: 'Acumula 500 puntos', icon: '⚔️', points: 100 },\n        { id: 'points_1000', title: 'Campeón', description: 'Acumula 1000 puntos', icon: 'assets/icons/achievements/crown-achievement.png', points: 200 },\n        { id: 'level_5', title: 'Experto', description: 'Alcanza el nivel 5', icon: 'assets/icons/achievements/first-session.png', points: 250 },\n        { id: 'level_10', title: 'Maestro', description: 'Alcanza el nivel 10', icon: 'assets/icons/achievements/perfect-session.png', points: 500 },\n        { id: 'cards_100', title: 'Estudioso', description: 'Estudia 100 flashcards', icon: 'assets/icons/individual/study-icon.png', points: 100 },\n        { id: 'cards_500', title: 'Erudito', description: 'Estudia 500 flashcards', icon: '🧠', points: 200 },\n        { id: 'deck_creator', title: 'Creador', description: 'Crea tu primer deck', icon: '🎨', points: 75 },\n        { id: 'social_butterfly', title: 'Mariposa Social', description: 'Comparte un deck público', icon: '🦋', points: 100 },\n        { id: 'night_owl', title: 'Búho Nocturno', description: 'Estudia después de las 10 PM', icon: '🦉', points: 50 }\n      ];\n      \n      const achievementsGrid = document.getElementById('achievements-grid');\n      if (!achievementsGrid) return;\n      \n      achievementsGrid.innerHTML = allAchievements.map(achievement => {\n        const isUnlocked = gamificationData.achievements.includes(achievement.id);\n        return `\n          <div class=\"deck-card ${isUnlocked ? '' : 'opacity-50'}\">\n            <div class=\"deck-header\">\n              <div class=\"deck-icon\">${achievement.icon}</div>\n              <div class=\"deck-info\">\n                <h3>${achievement.title}</h3>\n                <p>${achievement.description}</p>\n              </div>\n            </div>\n            <div class=\"deck-stats\">\n              <div class=\"deck-stat\">\n                <span class=\"deck-stat-value\">${achievement.points}</span>\n                <span class=\"deck-stat-label\">Puntos</span>\n              </div>\n              <div class=\"deck-stat\">\n                <span class=\"deck-stat-value\">${isUnlocked ? '✅' : '🔒'}</span>\n                <span class=\"deck-stat-label\">${isUnlocked ? 'Desbloqueado' : 'Bloqueado'}</span>\n              </div>\n            </div>\n          </div>\n        `;\n      }).join('');\n    }\n    \n    // ===== MODAL FUNCTIONS =====\n    function showEditFlashcardModal() {\n      document.getElementById('edit-flashcard-modal').classList.add('active');\n    }\n    \n    function hideEditFlashcardModal() {\n      document.getElementById('edit-flashcard-modal').classList.remove('active');\n      editingFlashcardId = null;\n    }\n    \n    function showEditDeckModal() {\n      document.getElementById('edit-deck-modal').classList.add('active');\n    }\n    \n    function hideEditDeckModal() {\n      document.getElementById('edit-deck-modal').classList.remove('active');\n      editingDeckId = null;\n    }\n    \n    function showConfirmation(title, message, callback) {\n      document.getElementById('confirmation-title').textContent = title;\n      document.getElementById('confirmation-message').textContent = message;\n      confirmationCallback = callback;\n      document.getElementById('confirmation-modal').classList.add('active');\n    }\n    \n    function hideConfirmationModal() {\n      document.getElementById('confirmation-modal').classList.remove('active');\n      confirmationCallback = null;\n    }\n    \n    function confirmAction() {\n      if (confirmationCallback) {\n        confirmationCallback();\n      }\n      hideConfirmationModal();\n    }\n    \n    // ===== UTILITY FUNCTIONS =====\n    // showNotification moved to utils/helpers.js\n\n    \n    // debounce moved to utils/helpers.js\n\n    \n    // ===== KEYBOARD SHORTCUTS =====\n    document.addEventListener('keydown', function(e) {\n      // Escape key to close modals\n      if (e.key === 'Escape') {\n        document.querySelectorAll('.modal-overlay.active').forEach(modal => {\n          modal.classList.remove('active');\n        });\n      }\n      \n      // Space bar to flip card during study\n      if (e.code === 'Space' && document.getElementById('study-interface').classList.contains('active')) {\n        e.preventDefault();\n        flipCard();\n      }\n      \n      // Number keys for difficulty during study\n      if (isCardFlipped && document.getElementById('study-interface').classList.contains('active')) {\n        switch (e.key) {\n          case '1':\n            e.preventDefault();\n            evaluateCard(0); // Again\n            break;\n          case '2':\n            e.preventDefault();\n            evaluateCard(1); // Hard\n            break;\n          case '3':\n            e.preventDefault();\n            evaluateCard(2); // Good\n            break;\n          case '4':\n            e.preventDefault();\n            evaluateCard(3); // Easy\n            break;\n        }\n      }\n    });\n    \n    // ===== SERVICE WORKER FOR PWA =====\n    if ('serviceWorker' in navigator) {\n      window.addEventListener('load', function() {\n        navigator.serviceWorker.register('/sw.js')\n          .then(function(registration) {\n            console.log('ServiceWorker registration successful');\n          })\n          .catch(function(err) {\n            console.log('ServiceWorker registration failed');\n          });\n      });\n    }\n    \n    // ===== PERFORMANCE MONITORING =====\n    if ('performance' in window) {\n      window.addEventListener('load', function() {\n        setTimeout(() => {\n          const perfData = performance.getEntriesByType('navigation')[0];\n          console.log('Page load time:', perfData.loadEventEnd - perfData.loadEventStart, 'ms');\n        }, 0);\n      });\n    }\n    \n    // ===== ANALYTICS TRACKING =====\n    function trackEvent(category, action, label) {\n      // In a real app, this would send data to analytics service\n      console.log('Analytics:', { category, action, label });\n    }\n\n    console.log('✅ Funciones de compatibilidad agregadas inline');\n\n    // ===== ERROR HANDLING =====\n    window.addEventListener('error', function(e) {\n      console.error('Global error:', e.error);\n      showNotification('Ha ocurrido un error inesperado', 'error');\n    });\n    \n    window.addEventListener('unhandledrejection', function(e) {\n      console.error('Unhandled promise rejection:', e.reason);\n      showNotification('Error de conexión', 'error');\n    });\n    \n    // ===== INITIALIZATION COMPLETE =====\n    console.log('StudyingFlash - Aplicación Integrada Cargada');\n    console.log('Funcionalidades disponibles:');\n    console.log('- Sistema de repetición espaciada (Agente 1)');\n    console.log('- Gamificación completa (Agente 2)');\n    console.log('- Gestión CRUD avanzada (Agente 3)');\n    console.log('- Optimizaciones UX ultra premium (Agente 4)');\n    \n  ",
+        "./flashcard-app-final.js?v=20250708054000"
+      ],
+      "inline_styles": [
+        "\n    /* Estilos para accesibilidad - Screen Reader Only */\n    .sr-only {\n      position: absolute;\n      width: 1px;\n      height: 1px;\n      padding: 0;\n      margin: -1px;\n      overflow: hidden;\n      clip: rect(0, 0, 0, 0);\n      white-space: nowrap;\n      border: 0;\n    }\n    \n    .icon {\n      width: 20px;\n      height: 20px;\n      display: inline-block;\n      vertical-align: middle;\n      margin-right: 8px;\n    }\n    \n    .logo-icon {\n      width: 28px;\n      height: 28px;\n      margin-right: 10px;\n    }\n    \n    .nav-link .icon {\n      transition: transform 0.2s ease;\n    }\n    \n    .nav-link:hover .icon {\n      transform: scale(1.1);\n    }\n    \n    .nav-link.active .icon {\n      color: #6366f1;\n    }\n  "
+      ],
+      "body_classes": [],
+      "sections": [
+        "apple-sidebar-overlay",
+        "particles-js",
+        "user-level",
+        "user-points",
+        "dashboard",
+        "dashboard-stats",
+        "total-cards",
+        "total-cards-change",
+        "studied-today",
+        "studied-today-change",
+        "accuracy",
+        "accuracy-change",
+        "streak",
+        "streak-change",
+        "study-time",
+        "study-time-change",
+        "total-progress",
+        "total-progress-change",
+        "activity-heatmap",
+        "dashboard-decks",
+        "dashboard-decks-list",
+        "estudiar",
+        "deck-selection",
+        "study-interface",
+        "study-progress",
+        "flashcard",
+        "flashcard-front",
+        "flashcard-back",
+        "study-controls",
+        "session-correct",
+        "session-total",
+        "session-accuracy",
+        "session-points",
+        "study-summary",
+        "summary-correct",
+        "summary-total",
+        "summary-accuracy",
+        "summary-points",
+        "crear",
+        "gestionar",
+        "file-upload-area",
+        "export-options",
+        "search-results",
+        "manage-decks",
+        "ranking",
+        "user-total-points",
+        "user-current-level",
+        "user-current-streak",
+        "user-achievements-count",
+        "level-progress-bar",
+        "achievements-grid",
+        "login-modal",
+        "edit-flashcard-modal",
+        "edit-deck-modal",
+        "confirmation-modal",
+        "achievement-notification",
+        "achievement-icon",
+        "achievement-title",
+        "achievement-description"
+      ],
+      "forms": [
+        "deck-form",
+        "flashcard-form",
+        "loginForm",
+        "registerForm"
+      ],
+      "buttons": [
+        "logout",
+        "create-deck",
+        "create-flashcard"
+      ],
+      "navigation": [
+        "#",
+        "#",
+        "#",
+        "#",
+        "#",
+        "#",
+        "#",
+        "#",
+        "#",
+        "#",
+        "#",
+        "#",
+        "#"
+      ],
+      "images": [],
+      "total_elements": 571,
+      "file_size": 94460,
+      "line_count": 2359
+    },
+    "./index.html": {
+      "title": "StudyingFlash - Aplicación Completa Integrada",
+      "meta_tags": [
+        "<meta charset=\"utf-8\"/>",
+        "<meta content=\"width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes, viewport-fit=cover\" name=\"viewport\"/>",
+        "<meta content=\"StudyingFlash - Aplicación de flashcards con repetición espaciada para optimizar tu aprendizaje\" name=\"description\"/>",
+        "<meta content=\"#2563eb\" name=\"theme-color\"/>",
+        "<meta content=\"yes\" name=\"mobile-web-app-capable\"/>",
+        "<meta content=\"default\" name=\"apple-mobile-web-app-status-bar-style\"/>",
+        "<meta content=\"StudyingFlash\" name=\"apple-mobile-web-app-title\"/>",
+        "<meta content=\"#6366f1\" name=\"theme-color\"/>",
+        "<meta content=\"yes\" name=\"mobile-web-app-capable\"/>",
+        "<meta content=\"black-translucent\" name=\"apple-mobile-web-app-status-bar-style\"/>"
+      ],
+      "css_links": [
+        "./styles.css",
+        "./meta-dark-theme.css",
+        "./responsive.css",
+        "./apple-mobile.css",
+        "https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+      ],
+      "script_tags": [
+        "https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js",
+        "https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js",
+        "https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js",
+        "https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/gsap.min.js",
+        "\n    import * as AppInitializer from './services/appInitializer.js';\n    import * as AuthService from './services/auth.service.js';\n    import * as DashboardService from './services/dashboard.service.js';\n    import * as StudyService from './services/study.service.js';\n    import * as CreateService from './services/create.service.js';\n    import * as ManageService from './services/manage.service.js';\n    import * as FlashcardsService from './services/flashcards.service.js';\n    import * as StorageService from './services/storage.service.js';\n    import * as NavigationService from './services/NavigationService.js';\n    import * as GamificationService from './services/gamification.service.js';\n\n    // ===== GLOBAL VARIABLES =====\n    let currentUser = null;\n    let currentDeck = null;\n    let currentCards = [];\n    let currentCardIndex = 0;\n    let isCardFlipped = false;\n    let sessionStats = {\n      correct: 0,\n      total: 0,\n      points: 0\n    };\n    let spacedRepetitionData = {};\n    let gamificationData = {\n      points: 0,\n      level: 1,\n      streak: 0,\n      achievements: []\n    };\n    let editingFlashcardId = null;\n    let editingDeckId = null;\n    let confirmationCallback = nue\n\n        \n      } catch (error) {\n        console.error('Error loading manage decks:', error);\n        showNotification('Error al cargar decks para gestion    \n\n    \n\n    \n\n    \n\n    \n\n    \n\n    \n\n    \n\n    \n\n    \n\n    \n\n    \n\n    \n s[0]);\n      }\n    }\n    \n\n    \n\n    \n\n    \n\n    \n\n\n    \n\n      const allAchievements = [\n        { id: 'first_session', title: 'Primera Sesión', description: 'Completa tu primera sesión de estudio', icon: 'assets/icons/achievements/first-session.png', points: 50 },\n        { id: 'perfect_session', title: 'Sesión Perfecta', description: 'Responde todas las cartas correctamente', icon: 'assets/icons/achievements/perfect-session.png', points: 100 },\n        { id: 'speed_demon', title: 'Demonio de la Velocidad', description: 'Completa una sesión en menos de 2 minutos', icon: 'assets/icons/achievements/speed-demon.png', points: 75 },\n        { id: 'streak_3', title: 'Racha de 3', description: 'Estudia 3 días consecutivos', icon: 'assets/icons/ui-elements/points-star.png', points: 150 },\n        { id: 'streak_7', title: 'Semana Completa', description: 'Estudia 7 días consecutivos', icon: '📅', points: 300 },\n        { id: 'points_100', title: 'Centurión', description: 'Acumula 100 puntos', icon: 'assets/icons/achievements/first-session.png', points: 50 },\n        { id: 'points_500', title: 'Guerrero', description: 'Acumula 500 puntos', icon: '⚔️', points: 100 },\n        { id: 'points_1000', title: 'Campeón', description: 'Acumula 1000 puntos', icon: 'assets/icons/achievements/crown-achievement.png', points: 200 },\n        { id: 'level_5', title: 'Experto', description: 'Alcanza el nivel 5', icon: 'assets/icons/achievements/first-session.png', points: 250 },\n        { id: 'level_10', title: 'Maestro', description: 'Alcanza el nivel 10', icon: 'assets/icons/achievements/perfect-session.png', points: 500 },\n        { id: 'cards_100', title: 'Estudioso', description: 'Estudia 100 flashcards', icon: 'assets/icons/individual/study-icon.png', points: 100 },\n        { id: 'cards_500', title: 'Erudito', description: 'Estudia 500 flashcards', icon: '🧠', points: 200 },\n        { id: 'deck_creator', title: 'Creador', description: 'Crea tu primer deck', icon: '🎨', points: 75 },\n        { id: 'social_butterfly', title: 'Mariposa Social', description: 'Comparte un deck público', icon: '🦋', points: 100 },\n        { id: 'night_owl', title: 'Búho Nocturno', description: 'Estudia después de las 10 PM', icon: '🦉', points: 50 }\n      ];\n      \n\n    \n\n    \n\n    \n\n    \n\n    \n\n    \n\n    \n\n    \n\n    \n\n    \n\n    \n\n    \n\n    \n\n\n\n    \n\n    \n\n    \n  "
+      ],
+      "inline_styles": [
+        "\n    /* Estilos para accesibilidad - Screen Reader Only */\n    .sr-only {\n      position: absolute;\n      width: 1px;\n      height: 1px;\n      padding: 0;\n      margin: -1px;\n      overflow: hidden;\n      clip: rect(0, 0, 0, 0);\n      white-space: nowrap;\n      border: 0;\n    }\n    \n    .icon {\n      width: 20px;\n      height: 20px;\n      display: inline-block;\n      vertical-align: middle;\n      margin-right: 8px;\n    }\n    \n    .logo-icon {\n      width: 28px;\n      height: 28px;\n      margin-right: 10px;\n    }\n    \n    .nav-link .icon {\n      transition: transform 0.2s ease;\n    }\n    \n    .nav-link:hover .icon {\n      transform: scale(1.1);\n    }\n    \n    .nav-link.active .icon {\n      color: #6366f1;\n    }\n  "
+      ],
+      "body_classes": [],
+      "sections": [
+        "apple-sidebar-overlay",
+        "particles-js",
+        "user-level",
+        "user-points",
+        "dashboard",
+        "dashboard-stats",
+        "total-cards",
+        "total-cards-change",
+        "studied-today",
+        "studied-today-change",
+        "accuracy",
+        "accuracy-change",
+        "streak",
+        "streak-change",
+        "study-time",
+        "study-time-change",
+        "total-progress",
+        "total-progress-change",
+        "activity-heatmap",
+        "dashboard-decks",
+        "dashboard-decks-list",
+        "estudiar",
+        "deck-selection",
+        "study-interface",
+        "study-progress",
+        "flashcard",
+        "flashcard-front",
+        "flashcard-back",
+        "study-controls",
+        "session-correct",
+        "session-total",
+        "session-accuracy",
+        "session-points",
+        "study-summary",
+        "summary-correct",
+        "summary-total",
+        "summary-accuracy",
+        "summary-points",
+        "crear",
+        "gestionar",
+        "file-upload-area",
+        "export-options",
+        "search-results",
+        "manage-decks",
+        "ranking",
+        "user-total-points",
+        "user-current-level",
+        "user-current-streak",
+        "user-achievements-count",
+        "level-progress-bar",
+        "achievements-grid",
+        "login-modal",
+        "edit-flashcard-modal",
+        "edit-deck-modal",
+        "confirmation-modal",
+        "achievement-notification",
+        "achievement-icon",
+        "achievement-title",
+        "achievement-description"
+      ],
+      "forms": [
+        "deck-form",
+        "flashcard-form",
+        "loginForm",
+        "registerForm"
+      ],
+      "buttons": [
+        "logout",
+        "create-deck",
+        "create-flashcard"
+      ],
+      "navigation": [
+        "#",
+        "#",
+        "#",
+        "#",
+        "#",
+        "#",
+        "#",
+        "#",
+        "#",
+        "#",
+        "#",
+        "#",
+        "#"
+      ],
+      "images": [],
+      "total_elements": 570,
+      "file_size": 49752,
+      "line_count": 1206
+    },
+    "./tools/icon-uploader.html": {
+      "title": "🎨 Icon Uploader - FLASHCARD",
+      "meta_tags": [
+        "<meta charset=\"utf-8\"/>",
+        "<meta content=\"width=device-width, initial-scale=1.0\" name=\"viewport\"/>"
+      ],
+      "css_links": [],
+      "script_tags": [
+        "\n        import { IconManager } from '../utils/icon-manager.js';\n\n        let uploadedIcons = [];\n\n        // Configurar drag & drop\n        const uploadArea = document.querySelector('.upload-area');\n        \n        uploadArea.addEventListener('dragover', (e) => {\n            e.preventDefault();\n            uploadArea.style.borderColor = '#667eea';\n            uploadArea.style.background = '#f0f4ff';\n        });\n\n        uploadArea.addEventListener('dragleave', (e) => {\n            e.preventDefault();\n            uploadArea.style.borderColor = '#cbd5e0';\n            uploadArea.style.background = '#f8fafc';\n        });\n\n        uploadArea.addEventListener('drop', (e) => {\n            e.preventDefault();\n            uploadArea.style.borderColor = '#cbd5e0';\n            uploadArea.style.background = '#f8fafc';\n            \n            const files = Array.from(e.dataTransfer.files);\n            handleFiles(files);\n        });\n\n        // Configurar input de archivo\n        document.getElementById('fileInput').addEventListener('change', (e) => {\n            const files = Array.from(e.target.files);\n            handleFiles(files);\n        });\n\n        // Manejar archivos subidos\n        function handleFiles(files) {\n            const validFiles = files.filter(file => {\n                const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/svg+xml'];\n                const maxSize = 2 * 1024 * 1024; // 2MB\n                \n                if (!validTypes.includes(file.type)) {\n                    showStatus(`❌ ${file.name}: Formato no válido`, 'error');\n                    return false;\n                }\n                \n                if (file.size > maxSize) {\n                    showStatus(`❌ ${file.name}: Archivo muy grande (máx. 2MB)`, 'error');\n                    return false;\n                }\n                \n                return true;\n            });\n\n            if (validFiles.length === 0) return;\n\n            validFiles.forEach(file => {\n                const reader = new FileReader();\n                reader.onload = (e) => {\n                    const iconData = {\n                        name: file.name.replace(/\\.[^/.]+$/, ''),\n                        filename: file.name,\n                        data: e.target.result,\n                        type: file.type.includes('svg') ? 'svg' : 'image'\n                    };\n                    \n                    uploadedIcons.push(iconData);\n                    updateIconPreview();\n                    showStatus(`✅ ${file.name} subido exitosamente`, 'success');\n                };\n                reader.readAsDataURL(file);\n            });\n        }\n\n        // Actualizar vista previa\n        function updateIconPreview() {\n            const preview = document.getElementById('iconPreview');\n            preview.innerHTML = '';\n\n            uploadedIcons.forEach((icon, index) => {\n                const iconItem = document.createElement('div');\n                iconItem.className = 'icon-item';\n                iconItem.innerHTML = `\n                    <div class=\"icon-display\">\n                        <img src=\"${icon.data}\" alt=\"${icon.name}\">\n                    </div>\n                    <div class=\"icon-name\">${icon.name}</div>\n                    <div class=\"icon-actions\">\n                        <button class=\"btn-small btn-copy\" onclick=\"copyIconCode('${icon.name}')\">\n                            Copiar Código\n                        </button>\n                        <button class=\"btn-small btn-delete\" onclick=\"removeIcon(${index})\">\n                            Eliminar\n                        </button>\n                    </div>\n                `;\n                preview.appendChild(iconItem);\n            });\n        }\n\n        // Copiar código del icono\n        window.copyIconCode = function(iconName) {\n            const code = `IconManager.renderIcon('${iconName}')`;\n            navigator.clipboard.writeText(code).then(() => {\n                showStatus(`📋 Código copiado: ${code}`, 'info');\n            });\n        };\n\n        // Eliminar icono\n        window.removeIcon = function(index) {\n            uploadedIcons.splice(index, 1);\n            updateIconPreview();\n            showStatus('🗑️ Icono eliminado', 'info');\n        };\n\n        // Generar icono con IA\n        window.generateIcon = async function() {\n            const description = document.getElementById('iconDescription').value;\n            const style = document.getElementById('iconStyle').value;\n            \n            if (!description.trim()) {\n                showStatus('❌ Por favor describe el icono que quieres generar', 'error');\n                return;\n            }\n\n            showStatus('🤖 Generando icono con IA...', 'info');\n            \n            try {\n                const result = await IconManager.generateIcon(description, style);\n                \n                if (result.success) {\n                    const iconData = {\n                        name: result.name,\n                        filename: `${result.name}.svg`,\n                        data: `data:image/svg+xml;base64,${btoa(result.svg)}`,\n                        type: 'svg'\n                    };\n                    \n                    uploadedIcons.push(iconData);\n                    updateIconPreview();\n                    showStatus(`✅ Icono \"${description}\" generado exitosamente`, 'success');\n                } else {\n                    showStatus(`⚠️ ${result.message}`, 'error');\n                }\n            } catch (error) {\n                showStatus(`❌ Error generando icono: ${error.message}`, 'error');\n            }\n        };\n\n        // Mostrar mensaje de estado\n        function showStatus(message, type) {\n            const statusDiv = document.getElementById('statusMessage');\n            statusDiv.className = `status-message status-${type}`;\n            statusDiv.textContent = message;\n            \n            setTimeout(() => {\n                statusDiv.textContent = '';\n                statusDiv.className = '';\n            }, 5000);\n        }\n\n        // Guardar iconos al cerrar\n        window.addEventListener('beforeunload', () => {\n            if (uploadedIcons.length > 0) {\n                // Aquí se guardarían los iconos en el sistema\n                console.log('💾 Guardando iconos...', uploadedIcons);\n            }\n        });\n    "
+      ],
+      "inline_styles": [
+        "\n        * {\n            margin: 0;\n            padding: 0;\n            box-sizing: border-box;\n        }\n\n        body {\n            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;\n            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);\n            min-height: 100vh;\n            padding: 20px;\n        }\n\n        .container {\n            max-width: 800px;\n            margin: 0 auto;\n            background: rgba(255, 255, 255, 0.95);\n            border-radius: 20px;\n            padding: 30px;\n            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);\n        }\n\n        h1 {\n            text-align: center;\n            color: #333;\n            margin-bottom: 30px;\n            font-size: 2.5rem;\n        }\n\n        .upload-section {\n            background: #f8fafc;\n            border-radius: 15px;\n            padding: 25px;\n            margin-bottom: 30px;\n            border: 2px dashed #cbd5e0;\n            transition: all 0.3s ease;\n        }\n\n        .upload-section:hover {\n            border-color: #667eea;\n            background: #f0f4ff;\n        }\n\n        .upload-area {\n            text-align: center;\n            padding: 40px 20px;\n        }\n\n        .upload-icon {\n            font-size: 4rem;\n            margin-bottom: 20px;\n            color: #667eea;\n        }\n\n        .upload-text {\n            font-size: 1.2rem;\n            color: #4a5568;\n            margin-bottom: 20px;\n        }\n\n        .file-input {\n            display: none;\n        }\n\n        .upload-btn {\n            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);\n            color: white;\n            border: none;\n            padding: 15px 30px;\n            border-radius: 10px;\n            font-size: 1.1rem;\n            cursor: pointer;\n            transition: transform 0.2s ease;\n        }\n\n        .upload-btn:hover {\n            transform: translateY(-2px);\n        }\n\n        .icon-preview {\n            display: grid;\n            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));\n            gap: 20px;\n            margin-top: 30px;\n        }\n\n        .icon-item {\n            background: white;\n            border-radius: 10px;\n            padding: 20px;\n            text-align: center;\n            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);\n            transition: transform 0.2s ease;\n        }\n\n        .icon-item:hover {\n            transform: translateY(-5px);\n        }\n\n        .icon-display {\n            width: 60px;\n            height: 60px;\n            margin: 0 auto 10px;\n            display: flex;\n            align-items: center;\n            justify-content: center;\n            background: #f7fafc;\n            border-radius: 8px;\n        }\n\n        .icon-display img {\n            max-width: 100%;\n            max-height: 100%;\n            object-fit: contain;\n        }\n\n        .icon-name {\n            font-weight: 600;\n            color: #2d3748;\n            margin-bottom: 10px;\n        }\n\n        .icon-actions {\n            display: flex;\n            gap: 10px;\n            justify-content: center;\n        }\n\n        .btn-small {\n            padding: 5px 10px;\n            border: none;\n            border-radius: 5px;\n            cursor: pointer;\n            font-size: 0.8rem;\n            transition: all 0.2s ease;\n        }\n\n        .btn-copy {\n            background: #48bb78;\n            color: white;\n        }\n\n        .btn-delete {\n            background: #f56565;\n            color: white;\n        }\n\n        .btn-small:hover {\n            transform: scale(1.05);\n        }\n\n        .generate-section {\n            background: #fff5f5;\n            border-radius: 15px;\n            padding: 25px;\n            margin-bottom: 30px;\n            border: 2px solid #fed7d7;\n        }\n\n        .generate-form {\n            display: flex;\n            gap: 15px;\n            align-items: end;\n            flex-wrap: wrap;\n        }\n\n        .form-group {\n            flex: 1;\n            min-width: 200px;\n        }\n\n        .form-label {\n            display: block;\n            margin-bottom: 5px;\n            font-weight: 600;\n            color: #2d3748;\n        }\n\n        .form-input {\n            width: 100%;\n            padding: 12px;\n            border: 2px solid #e2e8f0;\n            border-radius: 8px;\n            font-size: 1rem;\n            transition: border-color 0.2s ease;\n        }\n\n        .form-input:focus {\n            outline: none;\n            border-color: #667eea;\n        }\n\n        .generate-btn {\n            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);\n            color: white;\n            border: none;\n            padding: 12px 25px;\n            border-radius: 8px;\n            cursor: pointer;\n            font-weight: 600;\n            transition: transform 0.2s ease;\n        }\n\n        .generate-btn:hover {\n            transform: translateY(-2px);\n        }\n\n        .status-message {\n            padding: 15px;\n            border-radius: 8px;\n            margin: 20px 0;\n            font-weight: 500;\n        }\n\n        .status-success {\n            background: #c6f6d5;\n            color: #22543d;\n            border: 1px solid #9ae6b4;\n        }\n\n        .status-error {\n            background: #fed7d7;\n            color: #742a2a;\n            border: 1px solid #fc8181;\n        }\n\n        .status-info {\n            background: #bee3f8;\n            color: #2a4365;\n            border: 1px solid #90cdf4;\n        }\n    "
+      ],
+      "body_classes": [],
+      "sections": [
+        "statusMessage",
+        "iconPreview"
+      ],
+      "forms": [],
+      "buttons": [],
+      "navigation": [],
+      "images": [],
+      "total_elements": 36,
+      "file_size": 14242,
+      "line_count": 460
+    }
+  },
+  "agent_distribution": {
+    "agent_1": {
+      "role": "Coordinador HTML",
+      "responsibility": "Verificación y coordinación general",
+      "files": [
+        "./app.html",
+        "./index.html",
+        "./tools/icon-uploader.html"
+      ],
+      "tasks": [
+        "Verificar duplicados",
+        "Coordinar otros agentes",
+        "Validar resultado final"
+      ]
+    },
+    "agent_2": {
+      "role": "Aplicación Principal",
+      "responsibility": "index.html y estructura principal",
+      "files": [
+        "./index.html"
+      ],
+      "tasks": [
+        "Consolidar estructura principal",
+        "Eliminar elementos duplicados"
+      ]
+    },
+    "agent_3": {
+      "role": "Aplicaciones Secundarias",
+      "responsibility": "app.html y archivos secundarios",
+      "files": [
+        "./app.html"
+      ],
+      "tasks": [
+        "Analizar necesidad de app.html",
+        "Consolidar o eliminar"
+      ]
+    },
+    "agent_4": {
+      "role": "Herramientas y Utilidades",
+      "responsibility": "tools/ y archivos de utilidad",
+      "files": [
+        "./tools/icon-uploader.html"
+      ],
+      "tasks": [
+        "Revisar herramientas",
+        "Eliminar duplicados de utilidades"
+      ]
+    },
+    "agent_5": {
+      "role": "Limpieza y Validación",
+      "responsibility": "CSS, JS inline y validación final",
+      "files": [
+        "./app.html",
+        "./index.html",
+        "./tools/icon-uploader.html"
+      ],
+      "tasks": [
+        "Limpiar CSS duplicado",
+        "Consolidar JS inline",
+        "Validar HTML"
+      ]
+    }
+  },
+  "summary": {
+    "critical_duplicates": 1,
+    "high_duplicates": 0,
+    "medium_duplicates": 0,
+    "total_file_size": 158454,
+    "total_elements": 1177
+  }
+}
