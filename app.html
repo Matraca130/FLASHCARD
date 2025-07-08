@@ -2381,20 +2381,22 @@
     function showSection(sectionName) {
       console.log('Navigating to section:', sectionName);
       
-      // Ocultar todas las secciones
+      // Remover clase active de todas las secciones
       document.querySelectorAll('.section').forEach(section => {
-        section.style.display = 'none';
+        section.classList.remove('active');
       });
       
-      // Mostrar sección seleccionada
-      const targetSection = document.querySelector(`#${sectionName}, .${sectionName}-section`);
+      // Agregar clase active a la sección seleccionada
+      const targetSection = document.querySelector(`#${sectionName}`);
       if (targetSection) {
-        targetSection.style.display = 'block';
+        targetSection.classList.add('active');
         console.log('Section shown:', sectionName);
+      } else {
+        console.error('Section not found:', sectionName);
       }
       
       // Actualizar navegación activa
-      document.querySelectorAll('.nav-item, .nav-link').forEach(item => {
+      document.querySelectorAll('.nav-link').forEach(item => {
         item.classList.remove('active');
       });
       
@@ -2578,6 +2580,23 @@
     window.generateActivityHeatmap = generateActivityHeatmap;
     window.handleCreateDeck = handleCreateDeck;
     window.handleCreateFlashcard = handleCreateFlashcard;
+    
+    // ===== INICIALIZACIÓN DE NAVEGACIÓN =====
+    document.addEventListener('DOMContentLoaded', function() {
+      // Agregar event listeners a los enlaces de navegación
+      document.querySelectorAll('[data-section]').forEach(navLink => {
+        navLink.addEventListener('click', function(e) {
+          e.preventDefault();
+          const sectionName = this.getAttribute('data-section');
+          showSection(sectionName);
+        });
+      });
+      
+      // Mostrar dashboard por defecto
+      showSection('dashboard');
+      
+      console.log('✅ Navegación inicializada correctamente');
+    });
     
     console.log('✅ Funciones de compatibilidad agregadas inline');
 
