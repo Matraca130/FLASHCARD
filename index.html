@@ -1552,52 +1552,7 @@
       }
     }
     
-    async function createDeck() {
-      const name = document.getElementById('deck-name').value.trim();
-      const description = document.getElementById('deck-description').value.trim();
-      const isPublic = document.getElementById('deck-public').checked;
-      
-      if (!name) {
-        showNotification(
-          'Por favor, ingresa un nombre para el deck', 'error');
-        return;
-      }
-      
-      try {
-        const response = await fetch(`${API_BASE}/api/decks`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-          },
-          body: JSON.stringify({
-            name,
-            description,
-            is_public: isPublic
-          })
-        });
-        
-        const data = await response.json();
-        
-        if (response.ok) {
-          showNotification('Deck creado exitosamente', 'success');
-          
-          // Clear form
-          document.getElementById('deck-name').value = '';
-          document.getElementById('deck-description').value = '';
-          document.getElementById('deck-public').checked = false;
-          
-          // Reload deck list for flashcard creation
-          loadCreateDecks();
-          
-        } else {
-          showNotification(data.error || 'Error al crear deck', 'error');
-        }
-      } catch (error) {
-        console.error('Error creating deck:', error);
-        showNotification('Error de conexión', 'error');
-      }
-    }
+    // Función createDeck movida a create.service.js - eliminando duplicado
     
     async function createFlashcard() {
       const deckId = document.getElementById('flashcard-deck').value;

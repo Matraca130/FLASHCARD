@@ -14,11 +14,8 @@ import { showSection } from './core-navigation.js';
 // Importar servicios refactorizados
 import { loadGamificationData } from './gamification.service.js';
 import { loadDashboardData } from './dashboard.service.js';
-<<<<<<< HEAD
 import { initializeCreateEvents } from './create.service.js';
-=======
 import { generateActivityHeatmap } from './activity-heatmap.service.js';
->>>>>>> 4a64f0c0b7272a924fb9959c73278447c3324b3f
 
 import { initializeCharts } from './charts.js';
 import { initializeDashboard } from './dashboard-init.js';
