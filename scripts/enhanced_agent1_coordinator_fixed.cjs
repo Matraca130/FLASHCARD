@@ -414,6 +414,268 @@ class EnhancedAgent1Coordinator {
             notifyWhen: ['task_start', 'task_complete', 'issue_found']
         };
     }
+    // ===== VERIFICACIÓN DE ESTÁNDARES OBLIGATORIOS =====
+    
+    async loadCodingStandards() {
+        this.log('📋 Cargando estándares de codificación obligatorios...');
+        
+        try {
+            const fs = require('fs');
+            const standardsPath = './AGENT_CODING_STANDARDS.md';
+            
+            if (!fs.existsSync(standardsPath)) {
+                this.log('❌ AGENT_CODING_STANDARDS.md no encontrado - CRÍTICO', 'error');
+                return false;
+            }
+            
+            const standards = fs.readFileSync(standardsPath, 'utf8');
+            this.codingStandards = this.parseCodingStandards(standards);
+            
+            this.log('✅ Estándares de codificación cargados exitosamente');
+            return true;
+        } catch (error) {
+            this.log(`❌ Error cargando estándares: ${error.message}`, 'error');
+            return false;
+        }
+    }
+    
+    parseCodingStandards(content) {
+        return {
+            namingConventions: this.extractNamingConventions(content),
+            dependencies: this.extractDependencyRules(content),
+            syntaxRules: this.extractSyntaxRules(content),
+            prohibitedActions: this.extractProhibitedActions(content),
+            requiredActions: this.extractRequiredActions(content)
+        };
+    }
+    
+    extractNamingConventions(content) {
+        const conventions = {};
+        
+        // Extraer prefijos obligatorios
+        const prefixMatch = content.match(/#### \*\*Prefijos Obligatorios:\*\*([\s\S]*?)#### \*\*Sufijos/);
+        if (prefixMatch) {
+            const prefixes = prefixMatch[1].match(/`(\w+)`/g);
+            conventions.prefixes = prefixes ? prefixes.map(p => p.replace(/`/g, '')) : [];
+        }
+        
+        // Extraer sufijos
+        const suffixMatch = content.match(/#### \*\*Sufijos para Contexto:\*\*([\s\S]*?)### \*\*🔧/);
+        if (suffixMatch) {
+            const suffixes = suffixMatch[1].match(/`(\w+)`/g);
+            conventions.suffixes = suffixes ? suffixes.map(s => s.replace(/`/g, '')) : [];
+        }
+        
+        return conventions;
+    }
+    
+    extractDependencyRules(content) {
+        const dependencies = {};
+        
+        // Extraer servicios disponibles
+        const servicesMatch = content.match(/#### \*\*Dependencias Comunes Disponibles:\*\*([\s\S]*?)```/);
+        if (servicesMatch) {
+            const services = servicesMatch[1].match(/- (\w+)/g);
+            dependencies.availableServices = services ? services.map(s => s.replace('- ', '')) : [];
+        }
+        
+        return dependencies;
+    }
+    
+    extractSyntaxRules(content) {
+        return {
+            indentation: 4, // espacios
+            braceStyle: 'javascript',
+            commentsRequired: true,
+            errorHandlingRequired: true
+        };
+    }
+    
+    extractProhibitedActions(content) {
+        const prohibitedMatch = content.match(/### \*\*🚫 PROHIBIDO ABSOLUTAMENTE:\*\*([\s\S]*?)### \*\*✅ OBLIGATORIO/);
+        if (prohibitedMatch) {
+            const actions = prohibitedMatch[1].match(/\d+\. \*\*NO ([^*]+)\*\*/g);
+            return actions ? actions.map(a => a.replace(/\d+\. \*\*NO /, '').replace(/\*\*/, '')) : [];
+        }
+        return [];
+    }
+    
+    extractRequiredActions(content) {
+        const requiredMatch = content.match(/### \*\*✅ OBLIGATORIO SIEMPRE:\*\*([\s\S]*?)---/);
+        if (requiredMatch) {
+            const actions = requiredMatch[1].match(/\d+\. \*\*SÍ ([^*]+)\*\*/g);
+            return actions ? actions.map(a => a.replace(/\d+\. \*\*SÍ /, '').replace(/\*\*/, '')) : [];
+        }
+        return [];
+    }
+    
+    async verifyCodingStandards(filePath) {
+        this.log(`🔍 Verificando estándares de codificación en ${filePath}...`);
+        
+        if (!this.codingStandards) {
+            const loaded = await this.loadCodingStandards();
+            if (!loaded) {
+                return { passed: false, error: 'No se pudieron cargar estándares' };
+            }
+        }
+        
+        try {
+            const fs = require('fs');
+            const content = fs.readFileSync(filePath, 'utf8');
+            
+            const violations = [];
+            
+            // Verificar nomenclatura de funciones
+            const functionNames = this.extractFunctionNames(content);
+            functionNames.forEach(name => {
+                if (!this.validateFunctionName(name)) {
+                    violations.push(`Función '${name}' no sigue convenciones de nomenclatura`);
+                }
+            });
+            
+            // Verificar dependencias
+            const imports = this.extractImports(content);
+            imports.forEach(imp => {
+                if (!this.validateDependency(imp)) {
+                    violations.push(`Dependencia '${imp}' no está en lista de servicios disponibles`);
+                }
+            });
+            
+            // Verificar sintaxis básica
+            if (!this.validateSyntax(content)) {
+                violations.push('Código no cumple reglas básicas de sintaxis');
+            }
+            
+            const passed = violations.length === 0;
+            
+            this.log(passed ? '✅ Código cumple estándares' : `❌ ${violations.length} violaciones encontradas`);
+            
+            return {
+                passed: passed,
+                violations: violations,
+                score: Math.max(0, 100 - (violations.length * 10))
+            };
+        } catch (error) {
+            this.log(`❌ Error verificando estándares: ${error.message}`, 'error');
+            return { passed: false, error: error.message };
+        }
+    }
+    
+    validateFunctionName(name) {
+        if (!this.codingStandards?.namingConventions?.prefixes) return true;
+        
+        const validPrefixes = this.codingStandards.namingConventions.prefixes;
+        return validPrefixes.some(prefix => name.toLowerCase().startsWith(prefix.toLowerCase()));
+    }
+    
+    validateDependency(dependency) {
+        if (!this.codingStandards?.dependencies?.availableServices) return true;
+        
+        const available = this.codingStandards.dependencies.availableServices;
+        return available.includes(dependency) || dependency.includes('require') || dependency.includes('import');
+    }
+    
+    validateSyntax(content) {
+        // Verificaciones básicas de sintaxis
+        const hasProperIndentation = !content.includes('\t'); // No tabs
+        const hasProperBraces = this.validateBraces(content);
+        
+        return hasProperIndentation && hasProperBraces;
+    }
+    
+    validateBraces(content) {
+        let braceCount = 0;
+        for (let char of content) {
+            if (char === '{') braceCount++;
+            if (char === '}') braceCount--;
+            if (braceCount < 0) return false;
+        }
+        return braceCount === 0;
+    }
+    
+    extractFunctionNames(content) {
+        const functionRegex = /function\s+([a-zA-Z_$][a-zA-Z0-9_$]*)/g;
+        const arrowFunctionRegex = /([a-zA-Z_$][a-zA-Z0-9_$]*)\s*[:=]\s*(?:async\s+)?\(/g;
+        
+        const names = [];
+        let match;
+        
+        while ((match = functionRegex.exec(content)) !== null) {
+            names.push(match[1]);
+        }
+        
+        while ((match = arrowFunctionRegex.exec(content)) !== null) {
+            names.push(match[1]);
+        }
+        
+        return names;
+    }
+    
+    extractImports(content) {
+        const requireRegex = /require\(['"]([^'"]+)['"]\)/g;
+        const importRegex = /import.*from\s+['"]([^'"]+)['"]/g;
+        
+        const imports = [];
+        let match;
+        
+        while ((match = requireRegex.exec(content)) !== null) {
+            imports.push(match[1]);
+        }
+        
+        while ((match = importRegex.exec(content)) !== null) {
+            imports.push(match[1]);
+        }
+        
+        return imports;
+    }
+    
+    async checkServicesAvailable(requiredServices) {
+        this.log(`🔍 Verificando disponibilidad de servicios: ${requiredServices.join(', ')}`);
+        
+        const available = this.codingStandards?.dependencies?.availableServices || [];
+        const missing = requiredServices.filter(service => !available.includes(service));
+        
+        return {
+            allFound: missing.length === 0,
+            missing: missing,
+            available: available
+        };
+    }
+    
+    async enforceStandardsBeforeWork(agentId, description, targetFiles = []) {
+        this.log(`🛡️ Aplicando estándares obligatorios para ${agentId}...`);
+        
+        // 1. Cargar estándares si no están cargados
+        if (!this.codingStandards) {
+            const loaded = await this.loadCodingStandards();
+            if (!loaded) {
+                throw new Error('CRÍTICO: No se pueden cargar estándares de codificación');
+            }
+        }
+        
+        // 2. Verificar que la descripción no viola reglas prohibidas
+        const prohibited = this.codingStandards.prohibitedActions || [];
+        for (const action of prohibited) {
+            if (description.toLowerCase().includes(action.toLowerCase())) {
+                throw new Error(`PROHIBIDO: ${action} - Descripción: "${description}"`);
+            }
+        }
+        
+        // 3. Verificar archivos objetivo
+        for (const file of targetFiles) {
+            if (file === 'flashcard-app-final.js') {
+                this.log('⚠️ Modificación de archivo principal - verificación extra requerida', 'warn');
+                const analysis = await this.analyzeAndManageFunction(description, null, file);
+                if (!analysis) {
+                    throw new Error('CRÍTICO: Análisis inteligente requerido para archivo principal');
+                }
+            }
+        }
+        
+        this.log(`✅ Estándares verificados para ${agentId} - Puede proceder`);
+        return true;
+    }
+
     // ===== INTEGRACIÓN CON GESTIÓN INTELIGENTE DE FUNCIONES =====
     
     async analyzeAndManageFunction(description, functionCode = null, targetFile = 'flashcard-app-final.js') {
