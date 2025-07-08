@@ -1,0 +1,2402 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes, viewport-fit=cover">
+  <meta name="description" content="StudyingFlash - Aplicación de flashcards con repetición espaciada para optimizar tu aprendizaje">
+  <meta name="theme-color" content="#2563eb">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="StudyingFlash">
+  
+  <title>StudyingFlash - Aplicación Completa Integrada</title>
+  
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="./manifest.webmanifest">
+  
+  <!-- Iconos PWA -->
+  <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="./icons/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png">
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./meta-dark-theme.css">
+  <link rel="stylesheet" href="./responsive.css">
+  <link rel="stylesheet" href="./apple-mobile.css">
+  
+  <!-- Cargar iconos SVG embebidos -->
+  <style>
+    /* Estilos para accesibilidad - Screen Reader Only */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+    
+    .icon {
+      width: 20px;
+      height: 20px;
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+    
+    .logo-icon {
+      width: 28px;
+      height: 28px;
+      margin-right: 10px;
+    }
+    
+    .nav-link .icon {
+      transition: transform 0.2s ease;
+    }
+    
+    .nav-link:hover .icon {
+      transform: scale(1.1);
+    }
+    
+    .nav-link.active .icon {
+      color: #6366f1;
+    }
+  </style>
+
+  <!-- SVG Icons Embedded -->
+  <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+    <!-- Dashboard Icon -->
+    <symbol id="icon-dashboard" viewBox="0 0 24 24">
+      <path d="M3 18h4v-6H3v6zm6-12h4v12h-4V6zm6 4h4v8h-4v-8z" fill="currentColor" opacity="0.8"/>
+      <path d="M2 20h20v2H2v-2z" fill="currentColor" opacity="0.4"/>
+      <circle cx="5" cy="12" r="1.5" fill="currentColor"/>
+      <circle cx="11" cy="8" r="1.5" fill="currentColor"/>
+      <circle cx="17" cy="12" r="1.5" fill="currentColor"/>
+    </symbol>
+
+    <!-- Study Icon -->
+    <symbol id="icon-study" viewBox="0 0 24 24">
+      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" fill="currentColor" opacity="0.1"/>
+      <path d="M8 8h8v2H8V8zm0 4h8v2H8v-2zm0 4h5v2H8v-2z" fill="currentColor" opacity="0.6"/>
+      <path d="M12 6L8 10h8l-4-4z" fill="currentColor" opacity="0.8"/>
+      <circle cx="18" cy="6" r="2" fill="currentColor" opacity="0.9"/>
+    </symbol>
+
+    <!-- Create Icon -->
+    <symbol id="icon-create" viewBox="0 0 24 24">
+      <rect x="4" y="4" width="6" height="6" rx="1" fill="currentColor" opacity="0.7"/>
+      <rect x="14" y="4" width="6" height="6" rx="1" fill="currentColor" opacity="0.5"/>
+      <rect x="4" y="14" width="6" height="6" rx="1" fill="currentColor" opacity="0.6"/>
+      <rect x="14" y="14" width="6" height="6" rx="1" fill="currentColor" opacity="0.8"/>
+      <path d="M12 8V4m0 16v-4m4-8h4m-16 0h4" stroke="currentColor" stroke-width="2" opacity="0.4"/>
+    </symbol>
+
+    <!-- Manage Icon -->
+    <symbol id="icon-manage" viewBox="0 0 24 24">
+      <rect x="3" y="3" width="7" height="7" rx="1" fill="currentColor" opacity="0.6"/>
+      <rect x="14" y="3" width="7" height="7" rx="1" fill="currentColor" opacity="0.7"/>
+      <rect x="3" y="14" width="7" height="7" rx="1" fill="currentColor" opacity="0.8"/>
+      <rect x="14" y="14" width="7" height="7" rx="1" fill="currentColor" opacity="0.5"/>
+      <circle cx="6.5" cy="6.5" r="1" fill="currentColor"/>
+      <circle cx="17.5" cy="6.5" r="1" fill="currentColor"/>
+      <circle cx="6.5" cy="17.5" r="1" fill="currentColor"/>
+      <circle cx="17.5" cy="17.5" r="1" fill="currentColor"/>
+    </symbol>
+
+    <!-- Ranking Icon -->
+    <symbol id="icon-ranking" viewBox="0 0 24 24">
+      <rect x="2" y="16" width="4" height="6" rx="1" fill="currentColor" opacity="0.5"/>
+      <rect x="10" y="12" width="4" height="10" rx="1" fill="currentColor" opacity="0.7"/>
+      <rect x="18" y="8" width="4" height="14" rx="1" fill="currentColor" opacity="0.9"/>
+      <circle cx="4" cy="14" r="1.5" fill="currentColor"/>
+      <circle cx="12" cy="10" r="1.5" fill="currentColor"/>
+      <circle cx="20" cy="6" r="1.5" fill="currentColor"/>
+      <path d="M6 14l4-2m4-2l4-2" stroke="currentColor" stroke-width="1.5" opacity="0.4"/>
+    </symbol>
+
+    <!-- Logo -->
+    <symbol id="logo" viewBox="0 0 400 80">
+      <defs>
+        <linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" style="stop-color:#4F46E5;stop-opacity:1" />
+          <stop offset="30%" style="stop-color:#7C3AED;stop-opacity:1" />
+          <stop offset="70%" style="stop-color:#C026D3;stop-opacity:1" />
+          <stop offset="100%" style="stop-color:#EC4899;stop-opacity:1" />
+        </linearGradient>
+      </defs>
+      <text x="20" y="50" font-family="Inter, sans-serif" font-size="32" font-weight="800" fill="url(#textGradient)">StudyingFlash</text>
+      <circle cx="350" cy="25" r="8" fill="#4F46E5" opacity="0.6"/>
+      <circle cx="370" cy="35" r="6" fill="#7C3AED" opacity="0.7"/>
+      <circle cx="360" cy="50" r="5" fill="#C026D3" opacity="0.8"/>
+    </symbol>
+
+    <!-- Star Icon -->
+    <symbol id="icon-star" viewBox="0 0 24 24">
+      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="currentColor"/>
+    </symbol>
+
+    <!-- Plus Icon -->
+    <symbol id="icon-plus" viewBox="0 0 24 24">
+      <path d="M12 2v20M2 12h20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </symbol>
+
+    <!-- Trophy Icon -->
+    <symbol id="icon-trophy" viewBox="0 0 24 24">
+      <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18" stroke="currentColor" stroke-width="2"/>
+      <path d="M6 9h12v6a6 6 0 0 1-12 0V9z" fill="currentColor" opacity="0.7"/>
+      <path d="M9 22h6" stroke="currentColor" stroke-width="2"/>
+      <path d="M12 19v3" stroke="currentColor" stroke-width="2"/>
+    </symbol>
+
+    <!-- Crown Icon -->
+    <symbol id="icon-crown" viewBox="0 0 24 24">
+      <path d="M5 16L3 8l5.5 4L12 4l3.5 8L21 8l-2 8H5z" fill="currentColor" opacity="0.8"/>
+      <circle cx="5" cy="8" r="2" fill="currentColor"/>
+      <circle cx="12" cy="4" r="2" fill="currentColor"/>
+      <circle cx="19" cy="8" r="2" fill="currentColor"/>
+    </symbol>
+
+    <!-- Medal Icon -->
+    <symbol id="icon-medal" viewBox="0 0 24 24">
+      <circle cx="12" cy="8" r="6" fill="currentColor" opacity="0.7"/>
+      <path d="M8.21 13.89L7 23l5-3 5 3-1.21-9.11" stroke="currentColor" stroke-width="2"/>
+      <circle cx="12" cy="8" r="3" fill="currentColor"/>
+    </symbol>
+  </svg>
+
+  
+  <!-- PWA Meta Tags -->
+  <meta name="theme-color" content="#6366f1">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  
+  <!-- Preload Critical Resources -->
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" as="style">
+  
+  <!-- External Libraries -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js" type="module"></script>
+  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/gsap.min.js"></script>
+  
+  
+</head>
+<body>
+  <!-- ===== ESTRUCTURA APPLE-STYLE MÓVIL ===== -->
+  
+  <!-- Header Apple-style (solo móvil) -->
+  <header class="apple-header">
+    <button class="apple-menu-btn" id="apple-menu-btn" aria-label="Abrir menú">
+      <div class="apple-hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </button>
+    <a href="#" class="apple-logo">StudyingFlash</a>
+    <div style="width: 44px;"></div> <!-- Spacer para centrar logo -->
+  </header>
+  
+  <!-- Overlay del sidebar -->
+  <div class="apple-sidebar-overlay" id="apple-sidebar-overlay"></div>
+  
+  <!-- Sidebar Apple-style -->
+  <nav class="apple-sidebar" id="apple-sidebar">
+    <div class="apple-sidebar-header">
+      <span class="apple-sidebar-title">Menú</span>
+      <button class="apple-close-btn" id="apple-close-btn" aria-label="Cerrar menú">
+        ✕
+      </button>
+    </div>
+    <div class="apple-nav">
+      <a href="#" class="apple-nav-item active" data-section="dashboard">
+        <svg class="apple-nav-icon" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
+        </svg>
+        Dashboard
+      </a>
+      <a href="#" class="apple-nav-item" data-section="estudiar">
+        <svg class="apple-nav-icon" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+        </svg>
+        Estudiar
+      </a>
+      <a href="#" class="apple-nav-item" data-section="crear">
+        <svg class="apple-nav-icon" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+        </svg>
+        Crear Decks
+      </a>
+      <a href="#" class="apple-nav-item" data-section="gestionar">
+        <svg class="apple-nav-icon" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+        </svg>
+        Gestionar
+      </a>
+      <a href="#" class="apple-nav-item" data-section="ranking">
+        <svg class="apple-nav-icon" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M7.5 21H2V9h5.5v12zm7.25-18h-5.5v18h5.5V3zM22 11h-5.5v10H22V11z"/>
+        </svg>
+        Ranking
+      </a>
+      <a href="#" class="apple-nav-item" data-section="configuracion">
+        <svg class="apple-nav-icon" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.82,11.69,4.82,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/>
+        </svg>
+        Configuración
+      </a>
+    </div>
+  </nav>
+  
+  <!-- Contenido principal Apple-style (solo móvil) -->
+  <main class="apple-main" id="apple-main">
+    <!-- Sección hero con acción principal -->
+    <section class="apple-hero-section">
+      <button class="apple-primary-action" id="apple-login-btn">
+        👤 Iniciar Sesión
+      </button>
+    </section>
+    
+    <!-- Tarjeta de stats -->
+    <div class="apple-stats-card">
+      <div class="apple-stats-content">
+        <div>
+          <div class="apple-level">Nivel 1</div>
+          <div class="apple-points">0 puntos</div>
+        </div>
+        <div>
+          🌱
+        </div>
+      </div>
+    </div>
+    
+    <!-- Sección de acciones secundarias -->
+    <section class="apple-actions-section">
+      <button class="apple-secondary-action" data-section="estudiar">
+        📚 Estudiar
+      </button>
+      <button class="apple-secondary-action" data-section="crear">
+        ➕ Crear Decks
+      </button>
+    </section>
+    
+    <!-- Sección de progreso -->
+    <section class="apple-progress-section">
+      <div class="apple-progress-header">
+        <h3 class="apple-progress-title">Progreso Semanal</h3>
+        <div class="apple-progress-controls">
+          <button class="apple-progress-btn active">7D</button>
+          <button class="apple-progress-btn">30D</button>
+          <button class="apple-progress-btn">90D</button>
+        </div>
+      </div>
+      <div style="height: 120px; background: #f8f9fa; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #666;">
+        📊 Gráfico de progreso
+      </div>
+    </section>
+  </main>
+  
+  <!-- ===== ESTRUCTURA ORIGINAL (DESKTOP) ===== -->
+  
+  <div class="app-container">
+    <!-- Background Effects -->
+    <div class="background-effects">
+      <div id="particles-js" class="particles-container"></div>
+      <div class="floating-shapes">
+        <div class="floating-shape"></div>
+        <div class="floating-shape"></div>
+        <div class="floating-shape"></div>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar mobile-nav">
+      <div class="navbar-content nav-header">
+        <a href="#" class="logo">
+          <svg style="width: 180px; height: 40px;">
+            <use href="#logo"></use>
+          </svg>
+        </a>
+        
+        <!-- Botón hamburguesa para móvil -->
+        <button id="mobile-menu-btn" class="hamburger-btn" aria-label="Menú">
+          <div class="hamburger-icon">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </button>
+        
+        <ul class="nav-menu" id="mobile-menu">
+          <li class="nav-item">
+            <a href="#" class="nav-link active" data-section="dashboard">
+              <svg class="icon">
+                <use href="#icon-dashboard"></use>
+              </svg>
+              Dashboard
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link" data-section="estudiar">
+              <svg class="icon">
+                <use href="#icon-study"></use>
+              </svg>
+              Estudiar
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link" data-section="crear">
+              <svg class="icon">
+                <use href="#icon-create"></use>
+              </svg>
+              Crear
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link" data-section="gestionar">
+              <svg class="icon">
+                <use href="#icon-manage"></use>
+              </svg>
+              Gestionar
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link" data-section="ranking">
+              <svg class="icon">
+                <use href="#icon-ranking"></use>
+              </svg>
+              Ranking
+            </a>
+          </li>
+        </ul>
+        
+        <div class="user-menu">
+          <div class="connection-status">
+            <div class="status-dot"></div>
+            Backend Conectado
+          </div>
+          
+          <div class="level-indicator" id="user-level">
+            <span class="level-icon">🌱</span>
+            <span>Nivel 1</span>
+          </div>
+          
+          <div class="points-display" id="user-points">
+            <svg style="height: 16px; width: 16px;">
+              <use href="#icon-star"></use>
+            </svg>
+            <span>0 pts</span>
+          </div>
+          
+          <div class="guest-only">
+            <button class="btn btn-secondary" onclick="showLoginModal()">
+              👤 Iniciar Sesión
+            </button>
+          </div>
+          
+          <div class="auth-only hidden">
+            <span id="user-name" class="text-white">Usuario</span>
+            <button class="btn btn-secondary" data-action="logout">
+              Cerrar Sesión
+            </button>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="container">
+        
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="section active">
+          <div class="dashboard-hero">
+            <h1 class="hero-title">StudyingFlash</h1>
+            <p class="hero-subtitle">Tu plataforma de aprendizaje inteligente con repetición espaciada</p>
+            
+            <div class="hero-stats" id="dashboard-stats">
+              <!-- Estadísticas principales -->
+              <div class="stats-grid">
+                <div class="stat-card">
+                  <div class="stat-icon">📚</div>
+                  <div class="stat-content">
+                    <div class="stat-value" id="total-cards" data-stat="total-cards">0</div>
+                    <div class="stat-label">Total Flashcards</div>
+                    <div class="stat-change" id="total-cards-change">+0 esta semana</div>
+                  </div>
+                </div>
+                
+                <div class="stat-card">
+                  <div class="stat-icon">🎯</div>
+                  <div class="stat-content">
+                    <div class="stat-value" id="studied-today" data-stat="studied-today">0</div>
+                    <div class="stat-label">Estudiadas Hoy</div>
+                    <div class="stat-change" id="studied-today-change">Meta: 20</div>
+                  </div>
+                </div>
+                
+                <div class="stat-card">
+                  <div class="stat-icon">📊</div>
+                  <div class="stat-content">
+                    <div class="stat-value" id="accuracy" data-stat="accuracy">0%</div>
+                    <div class="stat-label">Precisión</div>
+                    <div class="stat-change" id="accuracy-change">+0% vs ayer</div>
+                  </div>
+                </div>
+                
+                <div class="stat-card">
+                  <div class="stat-icon">🔥</div>
+                  <div class="stat-content">
+                    <div class="stat-value" id="streak" data-stat="streak">0</div>
+                    <div class="stat-label">Racha de Estudio</div>
+                    <div class="stat-change" id="streak-change">días consecutivos</div>
+                  </div>
+                </div>
+                
+                <div class="stat-card">
+                  <div class="stat-icon">⏱️</div>
+                  <div class="stat-content">
+                    <div class="stat-value" id="study-time" data-stat="study-time">0m</div>
+                    <div class="stat-label">Tiempo de Estudio</div>
+                    <div class="stat-change" id="study-time-change">hoy</div>
+                  </div>
+                </div>
+                
+                <div class="stat-card">
+                  <div class="stat-icon">📈</div>
+                  <div class="stat-content">
+                    <div class="stat-value" id="total-progress" data-stat="total-progress">0%</div>
+                    <div class="stat-label">Progreso Total</div>
+                    <div class="stat-change" id="total-progress-change">completado</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Charts Section -->
+          <div class="charts-grid">
+            <div class="chart-container">
+              <div class="chart-header">
+                <h3 class="chart-title">Progreso Semanal</h3>
+                <div class="chart-actions">
+                  <button class="chart-action" onclick="updateChartPeriod('7d')">7D</button>
+                  <button class="chart-action" onclick="updateChartPeriod('30d')">30D</button>
+                  <button class="chart-action" onclick="updateChartPeriod('90d')">90D</button>
+                </div>
+              </div>
+              <div class="chart-canvas">
+                <canvas id="weeklyProgressChart" width="400" height="200"></canvas>
+              </div>
+            </div>
+            
+            <div class="chart-container">
+              <div class="chart-header">
+                <h3 class="chart-title">Precisión</h3>
+              </div>
+              <div class="chart-canvas">
+                <canvas id="accuracyTrendChart" width="400" height="200"></canvas>
+              </div>
+            </div>
+            
+            <div class="chart-container">
+              <div class="chart-header">
+                <h3 class="chart-title">Distribución por Categoría</h3>
+              </div>
+              <div class="chart-canvas">
+                <canvas id="categoryDistributionChart" width="400" height="200"></canvas>
+              </div>
+            </div>
+            
+            <div class="chart-container">
+              <div class="chart-header">
+                <h3 class="chart-title">Rendimiento</h3>
+              </div>
+              <div class="chart-canvas">
+                <canvas id="performanceChart" width="400" height="200"></canvas>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Activity Heatmap -->
+          <div class="activity-heatmap">
+            <div class="heatmap-header">
+              <h3 class="heatmap-title">Actividad de Estudio</h3>
+              <div class="heatmap-legend">
+                <span>Menos</span>
+                <div class="heatmap-day activity-0"></div>
+                <div class="heatmap-day activity-1"></div>
+                <div class="heatmap-day activity-2"></div>
+                <div class="heatmap-day activity-3"></div>
+                <div class="heatmap-day activity-4"></div>
+                <span>Más</span>
+              </div>
+            </div>
+            <div class="heatmap-grid" id="activity-heatmap">
+              <!-- Heatmap will be generated dynamically -->
+            </div>
+          </div>
+          
+          <!-- Decks Overview -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Mis Decks</h3>
+              <button class="btn btn-primary" onclick="showSection('crear')">
+                <svg style="height: 16px; width: 16px; margin-right: 6px;">
+                  <use href="#icon-plus"></use>
+                </svg> Crear Nuevo
+              </button>
+            </div>
+            <div class="deck-grid" id="dashboard-decks">
+              <!-- Decks will be loaded dynamically -->
+            </div>
+            <div class="decks-list" id="dashboard-decks-list" data-section="decks">
+              <!-- Alternative container for decks list -->
+            </div>
+          </div>
+        </section>
+        
+        <!-- Study Section -->
+        <section id="estudiar" class="section">
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Estudiar Flashcards</h2>
+              <p class="text-muted">Selecciona un deck para comenzar tu sesión de estudio</p>
+            </div>
+            
+            <!-- Deck Selection -->
+            <div id="deck-selection" class="deck-grid">
+              <!-- Decks for study will be loaded dynamically -->
+            </div>
+            
+            <!-- Study Interface -->
+            <div id="study-interface" class="hidden">
+              <!-- Study Header -->
+              <div class="progress-container">
+                <div class="progress-header">
+                  <h3 class="progress-title" id="study-deck-name">Deck Name</h3>
+                  <div class="progress-stats">
+                    <span id="current-card">1</span> / <span id="total-cards">10</span>
+                  </div>
+                </div>
+                <div class="progress-bar">
+                  <div class="progress-fill" id="study-progress" style="width: 0%"></div>
+                </div>
+              </div>
+              
+              <!-- Flashcard -->
+              <div class="flashcard-container">
+                <div class="flashcard" id="flashcard" onclick="flipCard()">
+                  <div class="flashcard-face flashcard-front" id="flashcard-front">
+                    <div>
+                      <h3>Pregunta</h3>
+                      <p id="card-front-text">Cargando...</p>
+                    </div>
+                  </div>
+                  <div class="flashcard-face flashcard-back" id="flashcard-back">
+                    <div>
+                      <h3>Respuesta</h3>
+                      <p id="card-back-text">Cargando...</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Study Controls -->
+              <div class="study-controls" id="study-controls">
+                <button class="difficulty-btn btn-again" onclick="evaluateCard(0)">
+                  <span class="difficulty-label">Otra vez</span>
+                </button>
+                <button class="difficulty-btn btn-hard" onclick="evaluateCard(1)">
+                  <span class="difficulty-label">Difícil</span>
+                </button>
+                <button class="difficulty-btn btn-good" onclick="evaluateCard(2)">
+                  <span class="difficulty-label">Bien</span>
+                </button>
+                <button class="difficulty-btn btn-easy" onclick="evaluateCard(3)">
+                  <span class="difficulty-label">Fácil</span>
+                </button>
+              </div>
+              
+              <!-- Session Stats -->
+              <div class="card">
+                <div class="card-header">
+                  <h3 class="card-title">Estadísticas de Sesión</h3>
+                </div>
+                <div class="hero-stats">
+                  <div class="hero-stat">
+                    <div class="stat-value" id="session-correct">0</div>
+                    <div class="stat-label">Correctas</div>
+                  </div>
+                  <div class="hero-stat">
+                    <div class="stat-value" id="session-total">0</div>
+                    <div class="stat-label">Total</div>
+                  </div>
+                  <div class="hero-stat">
+                    <div class="stat-value" id="session-accuracy">0%</div>
+                    <div class="stat-label">Precisión</div>
+                  </div>
+                  <div class="hero-stat">
+                    <div class="stat-value" id="session-points">0</div>
+                    <div class="stat-label">Puntos</div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Exit Button -->
+              <div class="text-center mt-4">
+                <button class="btn btn-secondary" onclick="exitStudySession()">
+                  ❌ Salir de la Sesión
+                </button>
+              </div>
+            </div>
+            
+            <!-- Study Summary -->
+            <div id="study-summary" class="hidden">
+              <div class="card text-center">
+                <h2 class="card-title mb-4">¡Sesión Completada!</h2>
+                <div class="hero-stats">
+                  <div class="hero-stat">
+                    <div class="stat-value" id="summary-correct">0</div>
+                    <div class="stat-label">Correctas</div>
+                  </div>
+                  <div class="hero-stat">
+                    <div class="stat-value" id="summary-total">0</div>
+                    <div class="stat-label">Total</div>
+                  </div>
+                  <div class="hero-stat">
+                    <div class="stat-value" id="summary-accuracy">0%</div>
+                    <div class="stat-label">Precisión</div>
+                  </div>
+                  <div class="hero-stat">
+                    <div class="stat-value" id="summary-points">0</div>
+                    <div class="stat-label">Puntos Ganados</div>
+                  </div>
+                </div>
+                <div class="mt-4">
+                  <button class="btn btn-primary" onclick="startNewSession()">
+                    🔄 Nueva Sesión
+                  </button>
+                  <button class="btn btn-secondary" onclick="showSection('dashboard')">
+                    📊 Ver Dashboard
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+        
+        <!-- Create Section -->
+        <section id="crear" class="section">
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Crear Nuevo Contenido</h2>
+              <p class="text-muted">Crea nuevos decks y flashcards para tu aprendizaje</p>
+            </div>
+            
+            <!-- Create Deck Form -->
+            <form id="deck-form" class="deck-form">
+              <div class="form-group">
+                <label for="deck-name" class="form-label">Nombre del Deck</label>
+                <input type="text" id="deck-name" class="form-input" placeholder="Ej: Vocabulario Inglés" required>
+              </div>
+              
+              <div class="form-group">
+                <label for="deck-description" class="form-label">Descripción</label>
+                <textarea id="deck-description" class="form-input form-textarea" placeholder="Describe el contenido de este deck..."></textarea>
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">
+                  <input type="checkbox" id="deck-public"> Hacer público
+                </label>
+              </div>
+              
+              <button id="create-deck-btn" class="btn btn-primary" data-action="create-deck" type="button">
+                ➕ Crear Deck
+              </button>
+            </form>
+            
+            <hr style="margin: 2rem 0; border: 1px solid rgba(255, 255, 255, 0.1);">
+            
+            <!-- Create Flashcard Form -->
+            <form id="flashcard-form" class="flashcard-form">
+              <h3 class="card-title mb-3">Agregar Flashcard</h3>
+              
+              <div class="form-group">
+                <label for="flashcard-deck" class="form-label">Seleccionar Deck</label>
+                <select id="flashcard-deck" class="form-input form-select" required>
+                  <option value="">Selecciona un deck...</option>
+                </select>
+              </div>
+              
+              <div class="form-group">
+                <label for="flashcard-front" class="form-label">Frente (Pregunta)</label>
+                <textarea id="flashcard-front" class="form-input form-textarea" placeholder="Escribe la pregunta o término..." required></textarea>
+              </div>
+              
+              <div class="form-group">
+                <label for="flashcard-back" class="form-label">Reverso (Respuesta)</label>
+                <textarea id="flashcard-back" class="form-input form-textarea" placeholder="Escribe la respuesta o definición..." required></textarea>
+              </div>
+              
+              <button id="create-flashcard-btn" class="btn btn-success" data-action="create-flashcard" type="button">
+                ➕ Crear Flashcard
+              </button>
+            </form>
+          </div>
+        </section>
+        
+        <!-- Manage Section -->
+        <section id="gestionar" class="section">
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Gestionar Contenido</h2>
+              <p class="text-muted">Edita, elimina y organiza tus decks y flashcards</p>
+            </div>
+            
+            <!-- Search and Filter -->
+            <div class="search-container">
+              <label for="search-input" class="sr-only">Buscar flashcards</label>
+              <input type="text" id="search-input" class="form-input search-input" placeholder="Buscar flashcards...">
+              <label for="deck-filter" class="sr-only">Filtrar por deck</label>
+              <select id="deck-filter" class="form-input filter-select">
+                <option value="">Todos los decks</option>
+              </select>
+              <label for="difficulty-filter" class="sr-only">Filtrar por dificultad</label>
+              <select id="difficulty-filter" class="form-input filter-select">
+                <option value="">Todas las dificultades</option>
+                <option value="0">Fácil</option>
+                <option value="1">Medio</option>
+                <option value="2">Difícil</option>
+              </select>
+              <label for="sort-by" class="sr-only">Ordenar por</label>
+              <select id="sort-by" class="form-input filter-select">
+                <option value="created_at">Fecha de creación</option>
+                <option value="front">Frente</option>
+                <option value="difficulty">Dificultad</option>
+              </select>
+              <button class="btn btn-primary" onclick="searchFlashcards()">
+                🔍 Buscar
+              </button>
+            </div>
+            
+            <!-- Import/Export Section -->
+            <div class="import-export-container">
+              <div class="import-section">
+                <h3 class="section-title">📥 Importar Deck</h3>
+                <div class="file-upload-area" id="file-upload-area" onclick="document.getElementById('file-input').click()">
+                  <div class="upload-icon">📁</div>
+                  <div class="upload-text">Haz clic o arrastra un archivo aquí</div>
+                  <div class="upload-hint">Formatos soportados: JSON, CSV, TXT</div>
+                </div>
+                <label for="file-input" class="sr-only">Seleccionar archivo para importar</label>
+                <input type="file" id="file-input" accept=".json,.csv,.txt" style="display: none;" onchange="handleFileUpload(event)">
+                
+                <div class="form-group mt-3">
+                  <label for="import-deck-name" class="form-label">Nombre del deck importado</label>
+                  <input type="text" id="import-deck-name" class="form-input" placeholder="Nombre del nuevo deck">
+                </div>
+                
+                <button class="btn btn-success" onclick="importDeck()">
+                  📥 Importar
+                </button>
+              </div>
+              
+              <div class="export-section">
+                <h3 class="section-title">📤 Exportar Deck</h3>
+                <div class="export-options" id="export-options">
+                  <!-- Export options will be loaded dynamically -->
+                </div>
+              </div>
+            </div>
+            
+            <!-- Search Results -->
+            <div class="search-results" id="search-results">
+              <!-- Search results will be displayed here -->
+            </div>
+            
+            <!-- Deck Management -->
+            <div class="card mt-4">
+              <div class="card-header">
+                <h3 class="card-title">Gestionar Decks</h3>
+              </div>
+              <div class="deck-grid" id="manage-decks">
+                <!-- Decks for management will be loaded dynamically -->
+              </div>
+            </div>
+          </div>
+        </section>
+        
+        <!-- Ranking Section -->
+        <section id="ranking" class="section">
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">
+                <svg style="height: 20px; width: 20px; margin-right: 8px; vertical-align: middle;">
+                  <use href="#icon-trophy"></use>
+                </svg> Ranking y Logros
+              </h2>
+              <p class="text-muted">Compite con otros usuarios y desbloquea logros</p>
+            </div>
+            
+            <!-- User Stats -->
+            <div class="hero-stats mb-4">
+              <div class="hero-stat">
+                <div class="stat-value" id="user-total-points">0</div>
+                <div class="stat-label">Puntos Totales</div>
+              </div>
+              <div class="hero-stat">
+                <div class="stat-value" id="user-current-level">1</div>
+                <div class="stat-label">Nivel Actual</div>
+              </div>
+              <div class="hero-stat">
+                <div class="stat-value" id="user-current-streak">0</div>
+                <div class="stat-label">Racha Actual</div>
+              </div>
+              <div class="hero-stat">
+                <div class="stat-value" id="user-achievements-count">0</div>
+                <div class="stat-label">Logros</div>
+              </div>
+            </div>
+            
+            <!-- Level Progress -->
+            <div class="progress-container">
+              <div class="progress-header">
+                <h3 class="progress-title">Progreso de Nivel</h3>
+                <div class="progress-stats">
+                  <span id="level-progress-text">0 / 100 XP</span>
+                </div>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" id="level-progress-bar" style="width: 0%"></div>
+              </div>
+            </div>
+            
+            <!-- Leaderboard Filters -->
+            <div class="chart-actions mb-3">
+              <button class="chart-action" onclick="loadLeaderboard('global')">Global</button>
+              <button class="chart-action" onclick="loadLeaderboard('weekly')">Semanal</button>
+              <button class="chart-action" onclick="loadLeaderboard('monthly')">Mensual</button>
+            </div>
+            
+            <!-- Leaderboard -->
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">
+                  <svg style="height: 18px; width: 18px; margin-right: 6px; vertical-align: middle;">
+                    <use href="#icon-crown"></use>
+                  </svg> Tabla de Líderes
+                </h3>
+              </div>
+              <table class="leaderboard-table">
+                <thead>
+                  <tr>
+                    <th>Posición</th>
+                    <th>Usuario</th>
+                    <th>Puntos</th>
+                    <th>Nivel</th>
+                    <th>Racha</th>
+                  </tr>
+                </thead>
+                <tbody id="leaderboard-body">
+                  <!-- Leaderboard data will be loaded dynamically -->
+                </tbody>
+              </table>
+            </div>
+            
+            <!-- Achievements -->
+            <div class="card mt-4">
+              <div class="card-header">
+                <h3 class="card-title">
+                  <svg style="height: 18px; width: 18px; margin-right: 6px; vertical-align: middle;">
+                    <use href="#icon-medal"></use>
+                  </svg> Logros
+                </h3>
+              </div>
+              <div class="deck-grid" id="achievements-grid">
+                <!-- Achievements will be loaded dynamically -->
+              </div>
+            </div>
+          </div>
+        </section>
+        
+      </div>
+    </main>
+  </div>
+
+  <!-- Modals -->  <!-- Login Modal -->
+  <div class="modal-overlay" id="login-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title">Iniciar Sesión</h2>
+        <button class="modal-close" onclick="hideLoginModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="loginForm" onsubmit="handleLoginForm(event)">
+          <div class="form-group">
+            <label for="login-email" class="form-label">Email</label>
+            <input type="email" id="login-email" class="form-input" placeholder="tu@email.com" required>
+          </div>
+          <div class="form-group">
+            <label for="login-password" class="form-label">Contraseña</label>
+            <input type="password" id="login-password" class="form-input" placeholder="Tu contraseña" required>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" onclick="hideLoginModal()">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
+          </div>
+        </form>
+        
+        <div class="auth-divider">
+          <span>¿No tienes cuenta?</span>
+        </div>
+        
+        <form id="registerForm" onsubmit="handleRegisterForm(event)" style="display: none;">
+          <div class="form-group">
+            <label for="register-name" class="form-label">Nombre</label>
+            <input type="text" id="register-name" class="form-input" placeholder="Tu nombre" required>
+          </div>
+          <div class="form-group">
+            <label for="register-email" class="form-label">Email</label>
+            <input type="email" id="register-email" class="form-input" placeholder="tu@email.com" required>
+          </div>
+          <div class="form-group">
+            <label for="register-password" class="form-label">Contraseña</label>
+            <input type="password" id="register-password" class="form-input" placeholder="Tu contraseña" required>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" onclick="hideLoginModal()">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Registrarse</button>
+          </div>
+        </form>
+        
+        <div class="auth-toggle">
+          <button type="button" id="auth-toggle-btn" onclick="toggleAuthMode()">Crear cuenta nueva</button>
+        </div>
+      </div>
+    </div>
+  </div>!-- Edit Flashcard Modal -->
+  <div class="modal-overlay" id="edit-flashcard-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title">Editar Flashcard</h2>
+        <button class="modal-close" onclick="hideEditFlashcardModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="edit-flashcard-front" class="form-label">Frente (Pregunta)</label>
+          <textarea id="edit-flashcard-front" class="form-input form-textarea"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="edit-flashcard-back" class="form-label">Reverso (Respuesta)</label>
+          <textarea id="edit-flashcard-back" class="form-input form-textarea"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="edit-flashcard-deck" class="form-label">Deck</label>
+          <select id="edit-flashcard-deck" class="form-input form-select">
+            <option value="">Selecciona un deck...</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="hideEditFlashcardModal()">Cancelar</button>
+        <button class="btn btn-success" onclick="updateFlashcard()">Guardar Cambios</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Edit Deck Modal -->
+  <div class="modal-overlay" id="edit-deck-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title">Editar Deck</h2>
+        <button class="modal-close" onclick="hideEditDeckModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="edit-deck-name" class="form-label">Nombre del Deck</label>
+          <input type="text" id="edit-deck-name" class="form-input">
+        </div>
+        <div class="form-group">
+          <label for="edit-deck-description" class="form-label">Descripción</label>
+          <textarea id="edit-deck-description" class="form-input form-textarea"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="edit-deck-public" class="form-label">
+            <input type="checkbox" id="edit-deck-public"> Hacer público
+          </label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="hideEditDeckModal()">Cancelar</button>
+        <button class="btn btn-success" onclick="updateDeck()">Guardar Cambios</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Confirmation Modal -->
+  <div class="modal-overlay" id="confirmation-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title" id="confirmation-title">Confirmar Acción</h2>
+        <button class="modal-close" onclick="hideConfirmationModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p id="confirmation-message">¿Estás seguro de que quieres realizar esta acción?</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="hideConfirmationModal()">Cancelar</button>
+        <button class="btn btn-danger" id="confirmation-confirm" onclick="confirmAction()">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Achievement Notification -->
+  <div class="achievement-notification" id="achievement-notification">
+    <div class="achievement-header">
+      <div class="achievement-icon" id="achievement-icon">assets/icons/achievements/first-session.png</div>
+      <div>
+        <div class="achievement-title" id="achievement-title">¡Logro Desbloqueado!</div>
+        <div class="achievement-description" id="achievement-description">Has completado tu primera sesión</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript -->
+  <script type="module">
+    // ===== GLOBAL VARIABLES =====
+    let currentUser = null;
+    let currentDeck = null;
+    let currentCards = [];
+    let currentCardIndex = 0;
+    let isCardFlipped = false;
+    let sessionStats = {
+      correct: 0,
+      total: 0,
+      points: 0
+    };
+    let spacedRepetitionData = {};
+    let gamificationData = {
+      points: 0,
+      level: 1,
+      streak: 0,
+      achievements: []
+    };
+    let editingFlashcardId = null;
+    let editingDeckId = null;
+    let confirmationCallback = null;
+    
+    // API Base URL
+    const API_BASE = 'https://5007-iczox3lhteihqe56zh5di-3a250510.manusvm.computer';
+    
+    // ===== INITIALIZATION =====
+    document.addEventListener("DOMContentLoaded", () => {
+      initializeApp();
+      // Inicializar partículas de forma segura
+      if (typeof initializeParticles === 'function') {
+        initializeParticles();
+      } else {
+        console.log('initializeParticles not available');
+      }
+      initializeEventListeners();
+      loadGamificationData();
+      checkAuthStatus();
+      console.log("DOM Ready: initializeApp() called.");
+    });
+    
+    function initializeApp() {
+      // Load spaced repetition data from localStorage
+      const savedSRData = localStorage.getItem('spacedRepetitionData');
+      if (savedSRData) {
+        spacedRepetitionData = JSON.parse(savedSRData);
+      }
+      
+      // Load gamification data from localStorage
+      const savedGamificationData = localStorage.getItem('gamificationData');
+      if (savedGamificationData) {
+        gamificationData = JSON.parse(savedGamificationData);
+        updateGamificationUI();
+      }
+      
+      // Initialize charts de forma segura
+      setTimeout(() => {
+        if (typeof initializeCharts === 'function') {
+          initializeCharts();
+        } else {
+          console.log('initializeCharts not available');
+        }
+        generateActivityHeatmap();
+      }, 1000);
+    }
+    
+    function initializeEventListeners() {
+      // Navigation
+      document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          const section = this.getAttribute('data-section');
+          showSection(section);
+        });
+      });
+      
+      // Search input
+      const searchInput = document.getElementById('search-input');
+      if (searchInput) {
+        searchInput.addEventListener('input', debounce(searchFlashcards, 300));
+      }
+      
+      // File upload drag and drop
+      const fileUploadArea = document.getElementById('file-upload-area');
+      if (fileUploadArea) {
+        fileUploadArea.addEventListener('dragover', handleDragOver);
+        fileUploadArea.addEventListener('dragleave', handleDragLeave);
+        fileUploadArea.addEventListener('drop', handleFileDrop);
+      }
+      
+      // Modal close on outside click
+      document.querySelectorAll('.modal-overlay').forEach(modal => {
+        modal.addEventListener('click', function(e) {
+          if (e.target === this) {
+            this.classList.remove('active');
+          }
+        });
+      });
+    }
+    
+    // initializeParticles moved to utils/helpers.js
+
+    
+    // ===== AUTHENTICATION =====
+    function checkAuthStatus() {
+      const token = localStorage.getItem('authToken');
+      if (token) {
+        // Verify token with backend
+        fetch(`${API_BASE}/api/auth/verify`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.user) {
+            currentUser = data.user;
+            updateAuthUI();
+            loadDashboardData();
+          } else {
+            localStorage.removeItem('authToken');
+          }
+        })
+        .catch(error => {
+          console.error('Auth verification failed:', error);
+          localStorage.removeItem('authToken');
+        });
+      }
+    }
+    
+    function showLoginModal() {
+      document.getElementById('login-modal').classList.add('active');
+    }
+    
+    function hideLoginModal() {
+      document.getElementById('login-modal').classList.remove('active');
+    }
+    
+    async function login() {
+      const email = document.getElementById('login-email').value;
+      const password = document.getElementById('login-password').value;
+      
+      if (!email || !password) {
+        showNotification('Por favor, completa todos los campos', 'error');
+        return;
+      }
+      
+      try {
+        const response = await fetch(`${API_BASE}/api/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          localStorage.setItem('authToken', data.token);
+          currentUser = data.user;
+          updateAuthUI();
+          hideLoginModal();
+          loadDashboardData();
+          showNotification('¡Bienvenido de vuelta!', 'success');
+        } else {
+          showNotification(data.error || 'Error al iniciar sesión', 'error');
+        }
+      } catch (error) {
+        console.error('Login error:', error);
+        showNotification('Error de conexión', 'error');
+      }
+    }
+    
+    function logout() {
+      localStorage.removeItem('authToken');
+      currentUser = null;
+      updateAuthUI();
+      showSection('dashboard');
+      showNotification('Sesión cerrada correctamente', 'success');
+    }
+    
+    function updateAuthUI() {
+      const guestElements = document.querySelectorAll('.guest-only');
+      const authElements = document.querySelectorAll('.auth-only');
+      
+      if (currentUser) {
+        guestElements.forEach(el => el.classList.add('hidden'));
+        authElements.forEach(el => el.classList.remove('hidden'));
+        document.getElementById('user-name').textContent = currentUser.first_name || currentUser.username;
+      } else {
+        guestElements.forEach(el => el.classList.remove('hidden'));
+        authElements.forEach(el => el.classList.add('hidden'));
+      }
+    }
+    
+    // ===== NAVIGATION =====
+    function showSection(sectionName) {
+      console.log('Navigating to section:', sectionName);
+      
+      // Hide all sections
+      document.querySelectorAll('.section').forEach(section => {
+        section.classList.remove('active');
+        section.style.display = 'none';
+      });
+      
+      // Show target section
+      const targetSection = document.getElementById(sectionName);
+      if (targetSection) {
+        targetSection.classList.add('active');
+        targetSection.style.display = 'block';
+        console.log('Section shown:', sectionName);
+      } else {
+        console.error('Section not found:', sectionName);
+      }
+      
+      // Update navigation
+      document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active');
+      });
+      
+      const activeLink = document.querySelector(`[data-section="${sectionName}"]`);
+      if (activeLink) {
+        activeLink.classList.add('active');
+      }
+      
+      // Load section-specific data
+      switch (sectionName) {
+        case 'dashboard':
+          loadDashboardData();
+          import('./charts.js').then(m => m.initializeCharts && m.initializeCharts()).catch(e => console.log('Charts not loaded:', e));
+          break;
+        case 'estudiar':
+          import('./study.service.js').then(m => m.loadStudyDecks && m.loadStudyDecks()).catch(e => console.log('Study service not loaded:', e));
+          break;
+          case 'crear':
+            import('./create.service.js').then(m => m.initializeCreateEvents && m.initializeCreateEvents()).catch(e => console.log('Create service not loaded:', e));
+            break;
+          case 'gestionar':
+          import('./manage.service.js').then(m => m.loadManageDecks && m.loadManageDecks()).catch(e => console.log('Manage service not loaded:', e));
+          break;
+        case 'ranking':
+          loadRankingData();
+          break;
+      }
+    }
+    
+    // ===== DASHBOARD =====
+    async function loadDashboardData() {
+      try {
+        // Load stats
+        const statsResponse = await fetch(`${API_BASE}/api/stats`);
+        const stats = await statsResponse.json();
+        
+        updateDashboardStats(stats);
+        
+        // Load decks
+        const decksResponse = await fetch(`${API_BASE}/api/decks`);
+        const decks = await decksResponse.json();
+        
+        updateDashboardDecks(decks);
+        
+      } catch (error) {
+        console.error('Error loading dashboard data:', error);
+        showNotification('Error al cargar datos del dashboard', 'error');
+      }
+    }
+    
+    function updateDashboardStats(stats) {
+      const statsContainer = document.getElementById('dashboard-stats');
+      if (!statsContainer) return;
+      
+      statsContainer.innerHTML = `
+        <div class="hero-stat" style="--delay: 0s">
+          <div class="stat-value">${stats.total_cards || 0}</div>
+          <div class="stat-label">Flashcards</div>
+          <div class="stat-change positive">+${stats.cards_today || 0} hoy</div>
+        </div>
+        <div class="hero-stat" style="--delay: 0.1s">
+          <div class="stat-value">${stats.total_decks || 0}</div>
+          <div class="stat-label">Decks</div>
+          <div class="stat-change positive">+${stats.decks_this_week || 0} esta semana</div>
+        </div>
+        <div class="hero-stat" style="--delay: 0.2s">
+          <div class="stat-value">${stats.study_streak || 0}</div>
+          <div class="stat-label">Racha de Estudio</div>
+          <div class="stat-change ${stats.streak_change >= 0 ? 'positive' : 'negative'}">
+            ${stats.streak_change >= 0 ? '+' : ''}${stats.streak_change || 0} días
+          </div>
+        </div>
+        <div class="hero-stat" style="--delay: 0.3s">
+          <div class="stat-value">${Math.round(stats.accuracy || 0)}%</div>
+          <div class="stat-label">Precisión</div>
+          <div class="stat-change ${stats.accuracy_change >= 0 ? 'positive' : 'negative'}">
+            ${stats.accuracy_change >= 0 ? '+' : ''}${Math.round(stats.accuracy_change || 0)}%
+          </div>
+        </div>
+      `;
+    }
+    
+    function updateDashboardDecks(decks) {
+      const decksContainer = document.getElementById('dashboard-decks');
+      if (!decksContainer) return;
+      
+      if (!decks || decks.length === 0) {
+        decksContainer.innerHTML = `
+          <div class="card text-center">
+            <h3>No tienes decks aún</h3>
+            <p class="text-muted mb-3">Crea tu primer deck para comenzar a estudiar</p>
+            <button class="btn btn-primary" onclick="showSection('crear')">
+              ➕ Crear Primer Deck
+            </button>
+          </div>
+        `;
+        return;
+      }
+      
+      decksContainer.innerHTML = decks.map(deck => `
+        <div class="deck-card" onclick="startStudySession(${deck.id})">
+          <div class="deck-header">
+            <div class="deck-icon">assets/icons/individual/study-icon.png</div>
+            <div class="deck-info">
+              <h3>${deck.name}</h3>
+              <p>${deck.description || 'Sin descripción'}</p>
+            </div>
+          </div>
+          <div class="deck-stats">
+            <div class="deck-stat">
+              <span class="deck-stat-value">${deck.card_count || 0}</span>
+              <span class="deck-stat-label">Cartas</span>
+            </div>
+            <div class="deck-stat">
+              <span class="deck-stat-value">${deck.due_count || 0}</span>
+              <span class="deck-stat-label">Pendientes</span>
+            </div>
+            <div class="deck-stat">
+              <span class="deck-stat-value">${Math.round((deck.accuracy || 0) * 100)}%</span>
+              <span class="deck-stat-label">Precisión</span>
+            </div>
+          </div>
+        </div>
+      `).join('');
+      
+      // ===== CHARTS =====
+      
+      const levels = [
+        { level: 1, points: 0, title: "Principiante", icon: "assets/icons/achievements/first-session.png" },
+        { level: 5, points: 1000, title: "Experto", icon: "assets/icons/achievements/first-session.png" },
+        { level: 6, points: 1500, title: "Maestro", icon: "assets/icons/achievements/crown-achievement.png" },
+        { level: 7, points: 2100, title: "Sabio", icon: "assets/icons/achievements/perfect-session.png" },
+        { level: 8, points: 2800, title: "Genio", icon: "assets/icons/ui-elements/points-star.png" },
+        { level: 9, points: 3600, title: "Leyenda", icon: "assets/icons/individual/ranking-icon.png" },
+        { level: 10, points: 4500, title: "Inmortal", icon: "assets/icons/achievements/crown-achievement.png" }
+      ];
+      
+      const currentLevel = gamificationData.level;
+      let newLevel = 1;
+      
+      for (let i = levels.length - 1; i >= 0; i--) {
+        if (gamificationData.points >= levels[i].points) {
+          newLevel = levels[i].level;
+          break;
+        }
+      }
+      
+      if (newLevel > currentLevel) {
+        gamificationData.level = newLevel;
+        showLevelUpAnimation(newLevel, levels[newLevel - 1]);
+      }
+    }
+    
+    function updateGamificationUI() {
+      // Update navbar elements
+      const userLevel = document.getElementById('user-level');
+      const userPoints = document.getElementById('user-points');
+      
+      if (userLevel) {
+        const levelData = getLevelData(gamificationData.level);
+        userLevel.innerHTML = `
+          <span class="level-icon">${levelData.icon}</span>
+          <span>Nivel ${gamificationData.level}</span>
+        `;
+      }
+      
+      if (userPoints) {
+        userPoints.innerHTML = `
+          <span>⭐</span>
+          <span>${gamificationData.points} pts</span>
+        `;
+      }
+    }
+    
+    function getLevelData(level) {
+      const levels = [
+        { level: 1, points: 0, title: "Principiante", icon: "🌱" },
+        { level: 2, points: 100, title: "Estudiante", icon: "assets/icons/individual/study-icon.png" },
+        { level: 3, points: 300, title: "Aprendiz", icon: "assets/icons/ui-elements/level-badge.png" },
+        { level: 4, points: 600, title: "Conocedor", icon: "assets/icons/achievements/first-session.png" },
+        { level: 5, points: 1000, title: "Experto", icon: "assets/icons/achievements/first-session.png" },
+        { level: 6, points: 1500, title: "Maestro", icon: "assets/icons/achievements/crown-achievement.png" },
+        { level: 7, points: 2100, title: "Sabio", icon: "assets/icons/achievements/perfect-session.png" },
+        { level: 8, points: 2800, title: "Genio", icon: "assets/icons/ui-elements/points-star.png" },
+        { level: 9, points: 3600, title: "Leyenda", icon: "assets/icons/individual/ranking-icon.png" },
+        { level: 10, points: 4500, title: "Inmortal", icon: "assets/icons/achievements/crown-achievement.png" }
+      ];
+      
+      return levels[level - 1] || levels[0];
+    }
+    
+    function showPointsAnimation(points) {
+      const animation = document.createElement('div');
+      animation.className = 'points-animation';
+      animation.textContent = `+${points}`;
+      animation.style.left = '50%';
+      animation.style.top = '50%';
+      
+      document.body.appendChild(animation);
+      
+      setTimeout(() => {
+        document.body.removeChild(animation);
+      }, 2000);
+    }
+    
+    function showLevelUpAnimation(level, levelData) {
+      showAchievement(
+        `¡Nivel ${level}!`,
+        `Has alcanzado el nivel ${levelData.title}`,
+        levelData.icon
+      );
+    }
+    
+    function checkAchievements() {
+      const achievements = [
+        {
+          id: 'first_session',
+          title: 'Primera Sesión',
+          description: 'Completa tu primera sesión de estudio',
+          icon: 'assets/icons/achievements/first-session.png',
+          condition: () => sessionStats.total > 0
+        },
+        {
+          id: 'perfect_session',
+          title: 'Sesión Perfecta',
+          description: 'Responde todas las cartas correctamente',
+          icon: 'assets/icons/achievements/perfect-session.png',
+          condition: () => sessionStats.total > 0 && sessionStats.correct === sessionStats.total
+        },
+        {
+          id: 'speed_demon',
+          title: 'Demonio de la Velocidad',
+          description: 'Completa una sesión en menos de 2 minutos',
+          icon: 'assets/icons/achievements/speed-demon.png',
+          condition: () => sessionStats.total >= 5 && Math.random() > 0.7 // Simulated
+        },
+        {
+          id: 'streak_3',
+          title: 'Racha de 3',
+          description: 'Estudia 3 días consecutivos',
+          icon: 'assets/icons/ui-elements/points-star.png',
+          condition: () => gamificationData.streak >= 3
+        },
+        {
+          id: 'points_100',
+          title: 'Centurión',
+          description: 'Acumula 100 puntos',
+          icon: 'assets/icons/achievements/first-session.png',
+          condition: () => gamificationData.points >= 100
+        }
+      ];
+      
+      achievements.forEach(achievement => {
+        if (!gamificationData.achievements.includes(achievement.id) && achievement.condition()) {
+          gamificationData.achievements.push(achievement.id);
+          showAchievement(achievement.title, achievement.description, achievement.icon);
+          gamificationData.points += 50; // Bonus points for achievement
+        }
+      });
+      
+      saveGamificationData();
+    }
+    
+    function showAchievement(title, description, icon) {
+      const notification = document.getElementById('achievement-notification');
+      
+      document.getElementById('achievement-title').textContent = title;
+      document.getElementById('achievement-description').textContent = description;
+      document.getElementById('achievement-icon').innerHTML = `<svg style="height: 32px; width: 32px; font-size: 32px;"><use href="#icon-trophy"></use></svg>`;
+      
+      notification.classList.add('show');
+      
+      setTimeout(() => {
+        notification.classList.remove('show');
+      }, 5000);
+    }
+    
+    // ===== CREATE SYSTEM =====
+    async function loadCreateDecks() {
+      try {
+        const response = await fetch(`${API_BASE}/api/decks`);
+        const decks = await response.json();
+        
+        const flashcardDeckSelect = document.getElementById('flashcard-deck');
+        if (flashcardDeckSelect) {
+          flashcardDeckSelect.innerHTML = '<option value="">Selecciona un deck...</option>' +
+            decks.map(deck => `<option value="${deck.id}">${deck.name}</option>`).join('');
+        }
+        
+      } catch (error) {
+        console.error('Error loading create decks:', error);
+      }
+    }
+    
+    // Función createDeck movida a create.service.js - eliminando duplicado
+    
+    async function createFlashcard() {
+      const deckId = document.getElementById('flashcard-deck').value;
+      const front = document.getElementById('flashcard-front').value.trim();
+      const back = document.getElementById('flashcard-back').value.trim();
+      
+      if (!deckId || !front || !back) {
+        showNotification('Por favor, completa todos los campos', 'error');
+        return;
+      }
+      
+      try {
+        const response = await fetch(`${API_BASE}/api/flashcards`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          },
+          body: JSON.stringify({
+            deck_id: parseInt(deckId),
+            front,
+            back
+          })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          showNotification('Flashcard creada exitosamente', 'success');
+          
+          // Clear form
+          document.getElementById('flashcard-front').value = '';
+          document.getElementById('flashcard-back').value = '';
+          
+        } else {
+          showNotification(data.error || 'Error al crear flashcard', 'error');
+        }
+      } catch (error) {
+        console.error('Error creating flashcard:', error);
+        showNotification('Error de conexión', 'error');
+      }
+    }
+    
+    // ===== MANAGE SYSTEM =====
+    async function loadManageData() {
+      await loadManageDecks();
+      await loadManageFilters();
+      await loadExportOptions();
+    }
+    
+    async function loadManageDecks() {
+      try {
+        const response = await fetch(`${API_BASE}/api/decks`);
+        const decks = await response.json();
+        
+        const manageDecksContainer = document.getElementById('manage-decks');
+        if (!manageDecksContainer) return;
+        
+        if (!decks || decks.length === 0) {
+          manageDecksContainer.innerHTML = `
+            <div class="card text-center">
+              <h3>No tienes decks para gestionar</h3>
+              <p class="text-muted mb-3">Crea tu primer deck para comenzar</p>
+              <button class="btn btn-primary" onclick="showSection('crear')">
+                ➕ Crear Deck
+              </button>
+            </div>
+          `;
+          return;
+        }
+        
+        manageDecksContainer.innerHTML = decks.map(deck => `
+          <div class="deck-card">
+            <div class="deck-header">
+              <div class="deck-icon">assets/icons/individual/study-icon.png</div>
+              <div class="deck-info">
+                <h3>${deck.name}</h3>
+                <p>${deck.description || 'Sin descripción'}</p>
+              </div>
+            </div>
+            <div class="deck-stats">
+              <div class="deck-stat">
+                <span class="deck-stat-value">${deck.card_count || 0}</span>
+                <span class="deck-stat-label">Cartas</span>
+              </div>
+              <div class="deck-stat">
+                <span class="deck-stat-value">${deck.is_public ? 'Sí' : 'No'}</span>
+                <span class="deck-stat-label">Público</span>
+              </div>
+            </div>
+            <div class="card-actions mt-3">
+              <button class="btn btn-secondary" onclick="editDeck(${deck.id})">
+                ✏️ Editar
+              </button>
+              <button class="btn btn-danger" onclick="deleteDeck(${deck.id}, '${deck.name}')">
+                🗑️ Eliminar
+              </button>
+              <button class="btn btn-primary" onclick="exportDeck(${deck.id}, 'json')">
+                📤 Exportar
+              </button>
+            </div>
+          </div>
+        `).join('');
+        
+      } catch (error) {
+        console.error('Error loading manage decks:', error);
+        showNotification('Error al cargar decks para gestionar', 'error');
+      }
+    }
+    
+    async function loadManageFilters() {
+      try {
+        const response = await fetch(`${API_BASE}/api/decks`);
+        const decks = await response.json();
+        
+        const deckFilter = document.getElementById('deck-filter');
+        if (deckFilter) {
+          deckFilter.innerHTML = '<option value="">Todos los decks</option>' +
+            decks.map(deck => `<option value="${deck.id}">${deck.name}</option>`).join('');
+        }
+        
+      } catch (error) {
+        console.error('Error loading manage filters:', error);
+      }
+    }
+    
+    async function loadExportOptions() {
+      try {
+        const response = await fetch(`${API_BASE}/api/decks`);
+        const decks = await response.json();
+        
+        const exportOptions = document.getElementById('export-options');
+        if (!exportOptions) return;
+        
+        if (!decks || decks.length === 0) {
+          exportOptions.innerHTML = `
+            <div class="text-center text-muted">
+              <p>No hay decks para exportar</p>
+            </div>
+          `;
+          return;
+        }
+        
+        exportOptions.innerHTML = decks.map(deck => `
+          <div class="export-option">
+            <div class="export-info">
+              <div class="export-icon">assets/icons/individual/study-icon.png</div>
+              <div class="export-details">
+                <h4>${deck.name}</h4>
+                <p>${deck.card_count || 0} flashcards</p>
+              </div>
+            </div>
+            <div class="export-actions">
+              <button class="btn btn-secondary" onclick="exportDeck(${deck.id}, 'json')">
+                JSON
+              </button>
+              <button class="btn btn-secondary" onclick="exportDeck(${deck.id}, 'csv')">
+                CSV
+              </button>
+            </div>
+          </div>
+        `).join('');
+        
+      } catch (error) {
+        console.error('Error loading export options:', error);
+      }
+    }
+    
+    async function searchFlashcards() {
+      const query = document.getElementById('search-input').value.trim();
+      const deckId = document.getElementById('deck-filter').value;
+      const difficulty = document.getElementById('difficulty-filter').value;
+      const sortBy = document.getElementById('sort-by').value;
+      
+      try {
+        const params = new URLSearchParams();
+        if (query) params.append('q', query);
+        if (deckId) params.append('deck_id', deckId);
+        if (difficulty) params.append('difficulty', difficulty);
+        if (sortBy) params.append('sort_by', sortBy);
+        
+        const response = await fetch(`${API_BASE}/api/flashcards/search?${params}`);
+        const flashcards = await response.json();
+        
+        displaySearchResults(flashcards);
+        
+      } catch (error) {
+        console.error('Error searching flashcards:', error);
+        showNotification('Error al buscar flashcards', 'error');
+      }
+    }
+    
+    function displaySearchResults(flashcards) {
+      const resultsContainer = document.getElementById('search-results');
+      if (!resultsContainer) return;
+      
+      if (!flashcards || flashcards.length === 0) {
+        resultsContainer.innerHTML = `
+          <div class="card text-center">
+            <h3>No se encontraron resultados</h3>
+            <p class="text-muted">Intenta con otros términos de búsqueda</p>
+          </div>
+        `;
+        return;
+      }
+      
+      resultsContainer.innerHTML = `
+        <h3 class="card-title mb-3">Resultados de búsqueda (${flashcards.length})</h3>
+        ${flashcards.map(card => `
+          <div class="search-result-item">
+            <div class="search-result-header">
+              <div class="search-result-title">Flashcard #${card.id}</div>
+              <div class="search-result-actions">
+                <button class="btn btn-secondary" onclick="editFlashcard(${card.id})">
+                  ✏️ Editar
+                </button>
+                <button class="btn btn-danger" onclick="deleteFlashcard(${card.id})">
+                  🗑️ Eliminar
+                </button>
+              </div>
+            </div>
+            <div class="search-result-content">
+              <strong>Frente:</strong> ${card.front}<br>
+              <strong>Reverso:</strong> ${card.back}
+            </div>
+            <div class="search-result-meta">
+              <span>Dificultad: ${card.difficulty || 0}</span>
+              <span>Creado: ${new Date(card.created_at).toLocaleDateString()}</span>
+            </div>
+          </div>
+        `).join('')}
+      `;
+    }
+    
+    // ===== EDIT/DELETE FUNCTIONS =====
+    async function editDeck(deckId) {
+      try {
+        const response = await fetch(`${API_BASE}/api/decks/${deckId}`);
+        const deck = await response.json();
+        
+        editingDeckId = deckId;
+        
+        document.getElementById('edit-deck-name').value = deck.name;
+        document.getElementById('edit-deck-description').value = deck.description || '';
+        document.getElementById('edit-deck-public').checked = deck.is_public;
+        
+        showEditDeckModal();
+        
+      } catch (error) {
+        console.error('Error loading deck for edit:', error);
+        showNotification('Error al cargar deck para editar', 'error');
+      }
+    }
+    
+    async function updateDeck() {
+      if (!editingDeckId) return;
+      
+      const name = document.getElementById('edit-deck-name').value.trim();
+      const description = document.getElementById('edit-deck-description').value.trim();
+      const isPublic = document.getElementById('edit-deck-public').checked;
+      
+      if (!name) {
+        showNotification('Por favor, ingresa un nombre para el deck', 'error');
+        return;
+      }
+      
+      try {
+        const response = await fetch(`${API_BASE}/api/decks/${editingDeckId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          },
+          body: JSON.stringify({
+            name,
+            description,
+            is_public: isPublic
+          })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          showNotification('Deck actualizado exitosamente', 'success');
+          hideEditDeckModal();
+          loadManageDecks();
+        } else {
+          showNotification(data.error || 'Error al actualizar deck', 'error');
+        }
+      } catch (error) {
+        console.error('Error updating deck:', error);
+        showNotification('Error de conexión', 'error');
+      }
+    }
+    
+    function deleteDeck(deckId, deckName) {
+      showConfirmation(
+        'Eliminar Deck',
+        `¿Estás seguro de que quieres eliminar el deck "${deckName}"? Esta acción no se puede deshacer y eliminará todas las flashcards del deck.`,
+        () => confirmDeleteDeck(deckId)
+      );
+    }
+    
+    async function confirmDeleteDeck(deckId) {
+      try {
+        const response = await fetch(`${API_BASE}/api/decks/${deckId}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          }
+        });
+        
+        if (response.ok) {
+          showNotification('Deck eliminado exitosamente', 'success');
+          loadManageDecks();
+        } else {
+          const data = await response.json();
+          showNotification(data.error || 'Error al eliminar deck', 'error');
+        }
+      } catch (error) {
+        console.error('Error deleting deck:', error);
+        showNotification('Error de conexión', 'error');
+      }
+    }
+    
+    async function editFlashcard(flashcardId) {
+      try {
+        const response = await fetch(`${API_BASE}/api/flashcards/${flashcardId}`);
+        const flashcard = await response.json();
+        
+        editingFlashcardId = flashcardId;
+        
+        document.getElementById('edit-flashcard-front').value = flashcard.front;
+        document.getElementById('edit-flashcard-back').value = flashcard.back;
+        
+        // Load decks for selection
+        const decksResponse = await fetch(`${API_BASE}/api/decks`);
+        const decks = await decksResponse.json();
+        
+        const deckSelect = document.getElementById('edit-flashcard-deck');
+        deckSelect.innerHTML = decks.map(deck => 
+          `<option value="${deck.id}" ${deck.id === flashcard.deck_id ? 'selected' : ''}>${deck.name}</option>`
+        ).join('');
+        
+        showEditFlashcardModal();
+        
+      } catch (error) {
+        console.error('Error loading flashcard for edit:', error);
+        showNotification('Error al cargar flashcard para editar', 'error');
+      }
+    }
+    
+    async function updateFlashcard() {
+      if (!editingFlashcardId) return;
+      
+      const front = document.getElementById('edit-flashcard-front').value.trim();
+      const back = document.getElementById('edit-flashcard-back').value.trim();
+      const deckId = document.getElementById('edit-flashcard-deck').value;
+      
+      if (!front || !back || !deckId) {
+        showNotification('Por favor, completa todos los campos', 'error');
+        return;
+      }
+      
+      try {
+        const response = await fetch(`${API_BASE}/api/flashcards/${editingFlashcardId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          },
+          body: JSON.stringify({
+            front,
+            back,
+            deck_id: parseInt(deckId)
+          })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          showNotification('Flashcard actualizada exitosamente', 'success');
+          hideEditFlashcardModal();
+          searchFlashcards(); // Refresh search results
+        } else {
+          showNotification(data.error || 'Error al actualizar flashcard', 'error');
+        }
+      } catch (error) {
+        console.error('Error updating flashcard:', error);
+        showNotification('Error de conexión', 'error');
+      }
+    }
+    
+    function deleteFlashcard(flashcardId) {
+      showConfirmation(
+        'Eliminar Flashcard',
+        '¿Estás seguro de que quieres eliminar esta flashcard? Esta acción no se puede deshacer.',
+        () => confirmDeleteFlashcard(flashcardId)
+      );
+    }
+    
+    async function confirmDeleteFlashcard(flashcardId) {
+      try {
+        const response = await fetch(`${API_BASE}/api/flashcards/${flashcardId}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          }
+        });
+        
+        if (response.ok) {
+          showNotification('Flashcard eliminada exitosamente', 'success');
+          searchFlashcards(); // Refresh search results
+        } else {
+          const data = await response.json();
+          showNotification(data.error || 'Error al eliminar flashcard', 'error');
+        }
+      } catch (error) {
+        console.error('Error deleting flashcard:', error);
+        showNotification('Error de conexión', 'error');
+      }
+    }
+    
+    // ===== IMPORT/EXPORT FUNCTIONS =====
+    async function exportDeck(deckId, format) {
+      try {
+        const response = await fetch(`${API_BASE}/api/decks/${deckId}/export?format=${format}`);
+        
+        if (format === 'csv') {
+          const blob = await response.blob();
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `deck_${deckId}.csv`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          window.URL.revokeObjectURL(url);
+        } else {
+          const data = await response.json();
+          const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `deck_${deckId}.json`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          window.URL.revokeObjectURL(url);
+        }
+        
+        showNotification('Deck exportado exitosamente', 'success');
+        
+      } catch (error) {
+        console.error('Error exporting deck:', error);
+        showNotification('Error al exportar deck', 'error');
+      }
+    }
+    
+    function handleFileUpload(event) {
+      const file = event.target.files[0];
+      if (file) {
+        processImportFile(file);
+      }
+    }
+    
+    function handleDragOver(event) {
+      event.preventDefault();
+      event.currentTarget.classList.add('dragover');
+    }
+    
+    function handleDragLeave(event) {
+      event.preventDefault();
+      event.currentTarget.classList.remove('dragover');
+    }
+    
+    function handleFileDrop(event) {
+      event.preventDefault();
+      event.currentTarget.classList.remove('dragover');
+      
+      const files = event.dataTransfer.files;
+      if (files.length > 0) {
+        processImportFile(files[0]);
+      }
+    }
+    
+    function processImportFile(file) {
+      const reader = new FileReader();
+      
+      reader.onload = function(e) {
+        const content = e.target.result;
+        const extension = file.name.split('.').pop().toLowerCase();
+        
+        // Store file content for import
+        window.importFileContent = content;
+        window.importFileFormat = extension;
+        
+        // Update UI to show file is ready
+        const uploadArea = document.getElementById('file-upload-area');
+        uploadArea.innerHTML = `
+          <div class="upload-icon">✅</div>
+          <div class="upload-text">Archivo cargado: ${file.name}</div>
+          <div class="upload-hint">Listo para importar</div>
+        `;
+        
+        showNotification('Archivo cargado correctamente', 'success');
+      };
+      
+      reader.readAsText(file);
+    }
+    
+    async function importDeck() {
+      if (!window.importFileContent || !window.importFileFormat) {
+        showNotification('Por favor, selecciona un archivo primero', 'error');
+        return;
+      }
+      
+      const deckName = document.getElementById('import-deck-name').value.trim();
+      if (!deckName) {
+        showNotification('Por favor, ingresa un nombre para el deck importado', 'error');
+        return;
+      }
+      
+      try {
+        const response = await fetch(`${API_BASE}/api/decks/import`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          },
+          body: JSON.stringify({
+            content: window.importFileContent,
+            format: window.importFileFormat,
+            deck_name: deckName
+          })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          showNotification('Deck importado exitosamente', 'success');
+          
+          // Clear form
+          document.getElementById('import-deck-name').value = '';
+          document.getElementById('file-upload-area').innerHTML = `
+            <div class="upload-icon">📁</div>
+            <div class="upload-text">Haz clic o arrastra un archivo aquí</div>
+            <div class="upload-hint">Formatos soportados: JSON, CSV, TXT</div>
+          `;
+          
+          // Clear stored file data
+          delete window.importFileContent;
+          delete window.importFileFormat;
+          
+          // Reload manage data
+          loadManageData();
+          
+        } else {
+          showNotification(data.error || 'Error al importar deck', 'error');
+        }
+      } catch (error) {
+        console.error('Error importing deck:', error);
+        showNotification('Error de conexión', 'error');
+      }
+    }
+    
+    // ===== RANKING SYSTEM =====
+    async function loadRankingData() {
+      updateRankingStats();
+      loadLeaderboard('global');
+      loadAchievements();
+    }
+    
+    function updateRankingStats() {
+      document.getElementById('user-total-points').textContent = gamificationData.points;
+      document.getElementById('user-current-level').textContent = gamificationData.level;
+      document.getElementById('user-current-streak').textContent = gamificationData.streak;
+      document.getElementById('user-achievements-count').textContent = gamificationData.achievements.length;
+      
+      // Update level progress
+      const currentLevelData = getLevelData(gamificationData.level);
+      const nextLevelData = getLevelData(gamificationData.level + 1);
+      
+      if (nextLevelData) {
+        const currentPoints = gamificationData.points - currentLevelData.points;
+        const requiredPoints = nextLevelData.points - currentLevelData.points;
+        const progress = (currentPoints / requiredPoints) * 100;
+        
+        document.getElementById('level-progress-text').textContent = 
+          `${currentPoints} / ${requiredPoints} XP`;
+        document.getElementById('level-progress-bar').style.width = `${Math.min(progress, 100)}%`;
+      } else {
+        document.getElementById('level-progress-text').textContent = 'Nivel máximo alcanzado';
+        document.getElementById('level-progress-bar').style.width = '100%';
+      }
+    }
+    
+    function loadLeaderboard(period) {
+      // Mock leaderboard data - in a real app, this would come from the backend
+      const leaderboardData = [
+        { rank: 1, name: 'Ana García', points: 2450, level: 8, streak: 15, avatar: 'A' },
+        { rank: 2, name: 'Carlos López', points: 2180, level: 7, streak: 12, avatar: 'C' },
+        { rank: 3, name: 'María Rodríguez', points: 1950, level: 6, streak: 8, avatar: 'M' },
+        { rank: 4, name: 'Juan Pérez', points: 1720, level: 6, streak: 5, avatar: 'J' },
+        { rank: 5, name: 'Laura Martín', points: 1580, level: 5, streak: 10, avatar: 'L' },
+        { rank: 6, name: 'Tú', points: gamificationData.points, level: gamificationData.level, streak: gamificationData.streak, avatar: 'T', current: true },
+        { rank: 7, name: 'Pedro Sánchez', points: 1200, level: 4, streak: 3, avatar: 'P' },
+        { rank: 8, name: 'Sofia Ruiz', points: 980, level: 4, streak: 7, avatar: 'S' },
+        { rank: 9, name: 'Diego Torres', points: 850, level: 3, streak: 2, avatar: 'D' },
+        { rank: 10, name: 'Elena Vega', points: 720, level: 3, streak: 4, avatar: 'E' }
+      ];
+      
+      // Sort by points and update ranks
+      leaderboardData.sort((a, b) => b.points - a.points);
+      leaderboardData.forEach((user, index) => {
+        user.rank = index + 1;
+      });
+      
+      const leaderboardBody = document.getElementById('leaderboard-body');
+      if (!leaderboardBody) return;
+      
+      leaderboardBody.innerHTML = leaderboardData.map(user => `
+        <tr class="${user.current ? 'leaderboard-current' : ''}">
+          <td class="leaderboard-rank">${user.rank}</td>
+          <td>
+            <div class="leaderboard-user">
+              <div class="leaderboard-avatar">${user.avatar}</div>
+              <span class="leaderboard-name">${user.name}</span>
+            </div>
+          </td>
+          <td class="leaderboard-score">${user.points}</td>
+          <td>${user.level}</td>
+          <td>${user.streak}</td>
+        </tr>
+      `).join('');
+    }
+    
+    function loadAchievements() {
+      const allAchievements = [
+        { id: 'first_session', title: 'Primera Sesión', description: 'Completa tu primera sesión de estudio', icon: 'assets/icons/achievements/first-session.png', points: 50 },
+        { id: 'perfect_session', title: 'Sesión Perfecta', description: 'Responde todas las cartas correctamente', icon: 'assets/icons/achievements/perfect-session.png', points: 100 },
+        { id: 'speed_demon', title: 'Demonio de la Velocidad', description: 'Completa una sesión en menos de 2 minutos', icon: 'assets/icons/achievements/speed-demon.png', points: 75 },
+        { id: 'streak_3', title: 'Racha de 3', description: 'Estudia 3 días consecutivos', icon: 'assets/icons/ui-elements/points-star.png', points: 150 },
+        { id: 'streak_7', title: 'Semana Completa', description: 'Estudia 7 días consecutivos', icon: '📅', points: 300 },
+        { id: 'points_100', title: 'Centurión', description: 'Acumula 100 puntos', icon: 'assets/icons/achievements/first-session.png', points: 50 },
+        { id: 'points_500', title: 'Guerrero', description: 'Acumula 500 puntos', icon: '⚔️', points: 100 },
+        { id: 'points_1000', title: 'Campeón', description: 'Acumula 1000 puntos', icon: 'assets/icons/achievements/crown-achievement.png', points: 200 },
+        { id: 'level_5', title: 'Experto', description: 'Alcanza el nivel 5', icon: 'assets/icons/achievements/first-session.png', points: 250 },
+        { id: 'level_10', title: 'Maestro', description: 'Alcanza el nivel 10', icon: 'assets/icons/achievements/perfect-session.png', points: 500 },
+        { id: 'cards_100', title: 'Estudioso', description: 'Estudia 100 flashcards', icon: 'assets/icons/individual/study-icon.png', points: 100 },
+        { id: 'cards_500', title: 'Erudito', description: 'Estudia 500 flashcards', icon: '🧠', points: 200 },
+        { id: 'deck_creator', title: 'Creador', description: 'Crea tu primer deck', icon: '🎨', points: 75 },
+        { id: 'social_butterfly', title: 'Mariposa Social', description: 'Comparte un deck público', icon: '🦋', points: 100 },
+        { id: 'night_owl', title: 'Búho Nocturno', description: 'Estudia después de las 10 PM', icon: '🦉', points: 50 }
+      ];
+      
+      const achievementsGrid = document.getElementById('achievements-grid');
+      if (!achievementsGrid) return;
+      
+      achievementsGrid.innerHTML = allAchievements.map(achievement => {
+        const isUnlocked = gamificationData.achievements.includes(achievement.id);
+        return `
+          <div class="deck-card ${isUnlocked ? '' : 'opacity-50'}">
+            <div class="deck-header">
+              <div class="deck-icon">${achievement.icon}</div>
+              <div class="deck-info">
+                <h3>${achievement.title}</h3>
+                <p>${achievement.description}</p>
+              </div>
+            </div>
+            <div class="deck-stats">
+              <div class="deck-stat">
+                <span class="deck-stat-value">${achievement.points}</span>
+                <span class="deck-stat-label">Puntos</span>
+              </div>
+              <div class="deck-stat">
+                <span class="deck-stat-value">${isUnlocked ? '✅' : '🔒'}</span>
+                <span class="deck-stat-label">${isUnlocked ? 'Desbloqueado' : 'Bloqueado'}</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+    
+    // ===== MODAL FUNCTIONS =====
+    function showEditFlashcardModal() {
+      document.getElementById('edit-flashcard-modal').classList.add('active');
+    }
+    
+    function hideEditFlashcardModal() {
+      document.getElementById('edit-flashcard-modal').classList.remove('active');
+      editingFlashcardId = null;
+    }
+    
+    function showEditDeckModal() {
+      document.getElementById('edit-deck-modal').classList.add('active');
+    }
+    
+    function hideEditDeckModal() {
+      document.getElementById('edit-deck-modal').classList.remove('active');
+      editingDeckId = null;
+    }
+    
+    function showConfirmation(title, message, callback) {
+      document.getElementById('confirmation-title').textContent = title;
+      document.getElementById('confirmation-message').textContent = message;
+      confirmationCallback = callback;
+      document.getElementById('confirmation-modal').classList.add('active');
+    }
+    
+    function hideConfirmationModal() {
+      document.getElementById('confirmation-modal').classList.remove('active');
+      confirmationCallback = null;
+    }
+    
+    function confirmAction() {
+      if (confirmationCallback) {
+        confirmationCallback();
+      }
+      hideConfirmationModal();
+    }
+    
+    // ===== UTILITY FUNCTIONS =====
+    // showNotification moved to utils/helpers.js
+
+    
+    // debounce moved to utils/helpers.js
+
+    
+    // ===== KEYBOARD SHORTCUTS =====
+    document.addEventListener('keydown', function(e) {
+      // Escape key to close modals
+      if (e.key === 'Escape') {
+        document.querySelectorAll('.modal-overlay.active').forEach(modal => {
+          modal.classList.remove('active');
+        });
+      }
+      
+      // Space bar to flip card during study
+      if (e.code === 'Space' && document.getElementById('study-interface').classList.contains('active')) {
+        e.preventDefault();
+        flipCard();
+      }
+      
+      // Number keys for difficulty during study
+      if (isCardFlipped && document.getElementById('study-interface').classList.contains('active')) {
+        switch (e.key) {
+          case '1':
+            e.preventDefault();
+            evaluateCard(0); // Again
+            break;
+          case '2':
+            e.preventDefault();
+            evaluateCard(1); // Hard
+            break;
+          case '3':
+            e.preventDefault();
+            evaluateCard(2); // Good
+            break;
+          case '4':
+            e.preventDefault();
+            evaluateCard(3); // Easy
+            break;
+        }
+      }
+    });
+    
+    // ===== SERVICE WORKER FOR PWA =====
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/sw.js')
+          .then(function(registration) {
+            console.log('ServiceWorker registration successful');
+          })
+          .catch(function(err) {
+            console.log('ServiceWorker registration failed');
+          });
+      });
+    }
+    
+    // ===== PERFORMANCE MONITORING =====
+    if ('performance' in window) {
+      window.addEventListener('load', function() {
+        setTimeout(() => {
+          const perfData = performance.getEntriesByType('navigation')[0];
+          console.log('Page load time:', perfData.loadEventEnd - perfData.loadEventStart, 'ms');
+        }, 0);
+      });
+    }
+    
+    // ===== ANALYTICS TRACKING =====
+    function trackEvent(category, action, label) {
+      // In a real app, this would send data to analytics service
+      console.log('Analytics:', { category, action, label });
+    }
+
+    // ===== ERROR HANDLING =====
+    window.addEventListener('error', function(e) {
+      console.error('Global error:', e.error);
+      showNotification('Ha ocurrido un error inesperado', 'error');
+    });
+    
+    window.addEventListener('unhandledrejection', function(e) {
+      console.error('Unhandled promise rejection:', e.reason);
+      showNotification('Error de conexión', 'error');
+    });
+    
+    // ===== INITIALIZATION COMPLETE =====
+    console.log('StudyingFlash - Aplicación Integrada Cargada');
+    console.log('Funcionalidades disponibles:');
+    console.log('- Sistema de repetición espaciada (Agente 1)');
+    console.log('- Gamificación completa (Agente 2)');
+    console.log('- Gestión CRUD avanzada (Agente 3)');
+    console.log('- Optimizaciones UX ultra premium (Agente 4)');
+    
+  </script>
+
+    <!-- StudyingFlash - Versión Final Sin ES6 - BYPASS CACHE -->
+    <script src="./flashcard-app-final.js?v=20250708054000"></script>
+</body>
+</html>
