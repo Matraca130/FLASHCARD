@@ -790,19 +790,51 @@ console.log('  - Sincronización con backend');
 
 // Función showSection para compatibilidad con el HTML
 function showSection(sectionName) {
-    if (window.StudyingFlash && window.StudyingFlash.navigateToSection) {
-        window.StudyingFlash.navigateToSection(sectionName);
+    Utils.log(`Navegando a sección: ${sectionName}`);
+    
+    // Remover clase active de todas las secciones
+    document.querySelectorAll('.section').forEach(section => {
+        section.classList.remove('active');
+    });
+    
+    // Agregar clase active a la sección seleccionada
+    const targetSection = document.querySelector(`#${sectionName}`);
+    if (targetSection) {
+        targetSection.classList.add('active');
+        Utils.log(`Sección mostrada: ${sectionName}`);
     } else {
-        Utils.log(`Navegando a sección: ${sectionName}`);
-        // Fallback básico
-        document.querySelectorAll('.section, [id$="-section"]').forEach(section => {
-            section.style.display = 'none';
-        });
-        
-        const targetSection = document.querySelector(`#${sectionName}, .${sectionName}-section, [data-section="${sectionName}"]`);
-        if (targetSection) {
-            targetSection.style.display = 'block';
-        }
+        Utils.error(`Sección no encontrada: ${sectionName}`);
+    }
+    
+    // Actualizar navegación activa
+    document.querySelectorAll('.nav-link').forEach(item => {
+        item.classList.remove('active');
+    });
+    
+    const activeNavItem = document.querySelector(`[data-section="${sectionName}"]`);
+    if (activeNavItem) {
+        activeNavItem.classList.add('active');
+    }
+    
+    // Cargar datos específicos de cada sección
+    switch (sectionName) {
+        case 'dashboard':
+            if (window.StudyingFlash && window.StudyingFlash.loadDashboardData) {
+                window.StudyingFlash.loadDashboardData();
+            }
+            break;
+        case 'estudiar':
+            Utils.log('Cargando sección de estudio');
+            break;
+        case 'crear':
+            Utils.log('Cargando sección de crear');
+            break;
+        case 'gestionar':
+            Utils.log('Cargando sección de gestionar');
+            break;
+        case 'ranking':
+            Utils.log('Cargando sección de ranking');
+            break;
     }
 }
 
