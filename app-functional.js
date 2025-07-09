@@ -377,7 +377,164 @@ class StudyingFlashApp {
 
     startStudySession(deckId) {
         console.log(`📚 Iniciando sesión de estudio para deck ${deckId}`);
-        this.showNotification('Función de estudio en desarrollo', 'info');
+        
+        // Encontrar el deck
+        const deck = this.decks.find(d => d.id === deckId);
+        if (!deck) {
+            this.showNotification('Deck no encontrado', 'error');
+            return;
+        }
+
+        // Obtener flashcards del deck
+        const deckCards = this.flashcards.filter(card => card.deckId === deckId);
+        if (deckCards.length === 0) {
+            this.showNotification('Este deck no tiene flashcards para estudiar', 'error');
+            return;
+        }
+
+        // Inicializar sesión de estudio
+        this.currentStudySession = {
+            deckId: deckId,
+            deckName: deck.name,
+            cards: [...deckCards],
+            currentCardIndex: 0,
+            showingAnswer: false,
+            correctAnswers: 0,
+            totalAnswered: 0
+        };
+
+        // Mostrar interfaz de estudio
+        this.showStudyInterface();
+    }
+
+    showStudyInterface() {
+        // Cambiar a la sección de estudiar si no estamos ahí
+        if (this.currentSection !== 'estudiar') {
+            this.showSection('estudiar');
+        }
+
+        // Obtener el contenedor de la sección de estudiar
+        const deckSelection = document.getElementById('deck-selection');
+        if (!deckSelection) return;
+
+        // Mostrar interfaz de estudio
+        deckSelection.innerHTML = `
+            <div class="study-interface">
+                <div class="study-header">
+                    <h2>📚 Estudiando: ${this.currentStudySession.deckName}</h2>
+                    <div class="study-progress">
+                        <span>Tarjeta ${this.currentStudySession.currentCardIndex + 1} de ${this.currentStudySession.cards.length}</span>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${((this.currentStudySession.currentCardIndex) / this.currentStudySession.cards.length) * 100}%"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flashcard-container">
+                    <div class="flashcard" id="study-flashcard">
+                        <div class="flashcard-content">
+                            <div class="flashcard-question">
+                                ${this.currentStudySession.cards[this.currentStudySession.currentCardIndex].front}
+                            </div>
+                            <div class="flashcard-answer" id="flashcard-answer" style="display: none;">
+                                ${this.currentStudySession.cards[this.currentStudySession.currentCardIndex].back}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="study-controls">
+                    <button class="btn btn-secondary" onclick="app.endStudySession()">
+                        ❌ Terminar Sesión
+                    </button>
+                    <button class="btn btn-primary" id="reveal-answer-btn" onclick="app.revealAnswer()">
+                        👁️ Mostrar Respuesta
+                    </button>
+                    <div class="answer-buttons" id="answer-buttons" style="display: none;">
+                        <button class="btn btn-danger" onclick="app.answerCard(false)">
+                            ❌ Incorrecto
+                        </button>
+                        <button class="btn btn-success" onclick="app.answerCard(true)">
+                            ✅ Correcto
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="study-stats">
+                    <span>Correctas: ${this.currentStudySession.correctAnswers}</span>
+                    <span>Total: ${this.currentStudySession.totalAnswered}</span>
+                    <span>Precisión: ${this.currentStudySession.totalAnswered > 0 ? Math.round((this.currentStudySession.correctAnswers / this.currentStudySession.totalAnswered) * 100) : 0}%</span>
+                </div>
+            </div>
+        `;
+    }
+
+    revealAnswer() {
+        const answerDiv = document.getElementById('flashcard-answer');
+        const revealBtn = document.getElementById('reveal-answer-btn');
+        const answerButtons = document.getElementById('answer-buttons');
+        
+        if (answerDiv && revealBtn && answerButtons) {
+            answerDiv.style.display = 'block';
+            revealBtn.style.display = 'none';
+            answerButtons.style.display = 'flex';
+            this.currentStudySession.showingAnswer = true;
+        }
+    }
+
+    answerCard(isCorrect) {
+        if (isCorrect) {
+            this.currentStudySession.correctAnswers++;
+        }
+        this.currentStudySession.totalAnswered++;
+        
+        // Avanzar a la siguiente tarjeta
+        this.currentStudySession.currentCardIndex++;
+        this.currentStudySession.showingAnswer = false;
+        
+        // Verificar si terminamos todas las tarjetas
+        if (this.currentStudySession.currentCardIndex >= this.currentStudySession.cards.length) {
+            this.completeStudySession();
+        } else {
+            this.showStudyInterface();
+        }
+    }
+
+    completeStudySession() {
+        const accuracy = Math.round((this.currentStudySession.correctAnswers / this.currentStudySession.totalAnswered) * 100);
+        
+        const deckSelection = document.getElementById('deck-selection');
+        if (deckSelection) {
+            deckSelection.innerHTML = `
+                <div class="study-complete">
+                    <h2>🎉 ¡Sesión Completada!</h2>
+                    <div class="final-stats">
+                        <h3>Resultados de: ${this.currentStudySession.deckName}</h3>
+                        <p><strong>Tarjetas estudiadas:</strong> ${this.currentStudySession.totalAnswered}</p>
+                        <p><strong>Respuestas correctas:</strong> ${this.currentStudySession.correctAnswers}</p>
+                        <p><strong>Precisión:</strong> ${accuracy}%</p>
+                    </div>
+                    <div class="completion-actions">
+                        <button class="btn btn-primary" onclick="app.startStudySession(${this.currentStudySession.deckId})">
+                            🔄 Estudiar de Nuevo
+                        </button>
+                        <button class="btn btn-secondary" onclick="app.loadStudySection()">
+                            📚 Volver a Decks
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+        
+        this.showNotification(`¡Sesión completada! Precisión: ${accuracy}%`, 'success');
+        this.currentStudySession = null;
+    }
+
+    endStudySession() {
+        if (confirm('¿Estás seguro de que quieres terminar la sesión de estudio?')) {
+            this.currentStudySession = null;
+            this.loadStudySection();
+        }
     }
 
     editDeck(deckId) {
