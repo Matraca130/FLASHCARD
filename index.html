@@ -24,6 +24,7 @@
   <link rel="stylesheet" href="./meta-dark-theme.css">
   <link rel="stylesheet" href="./responsive.css">
   <link rel="stylesheet" href="./apple-mobile.css">
+  <link rel="stylesheet" href="./section-styles.css">
   
   <!-- Cargar iconos SVG embebidos -->
   <style>
@@ -1069,137 +1070,8 @@
   </div>
 
   <!-- JavaScript -->
-  <script type="module">
-    import * as AppInitializer from '';
-    import * as AuthService from '';
-    import * as DashboardService from '';
-    import * as StudyService from '';
-    import * as CreateService from '';
-    import * as ManageService from '';
-    import * as FlashcardsService from '';
-    import * as StorageService from '';
-    import * as NavigationService from './services/NavigationService.js';
-    import * as GamificationService from '';
-
-    // ===== GLOBAL VARIABLES =====
-    let currentUser = null;
-    let currentDeck = null;
-    let currentCards = [];
-    let currentCardIndex = 0;
-    let isCardFlipped = false;
-    let sessionStats = {
-      correct: 0,
-      total: 0,
-      points: 0
-    };
-    let spacedRepetitionData = {};
-    let gamificationData = {
-      points: 0,
-      level: 1,
-      streak: 0,
-      achievements: []
-    };
-    let editingFlashcardId = null;
-    let editingDeckId = null;
-    let confirmationCallback = nue
-
-        
-      } catch (error) {
-        console.error('Error loading manage decks:', error);
-        showNotification('Error al cargar decks para gestion    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
- s[0]);
-      }
-    }
-    
-
-    
-
-    
-
-    
-
-    
-
-
-    
-
-      const allAchievements = [
-        { id: 'first_session', title: 'Primera Sesión', description: 'Completa tu primera sesión de estudio', icon: 'assets/icons/achievements/first-session.png', points: 50 },
-        { id: 'perfect_session', title: 'Sesión Perfecta', description: 'Responde todas las cartas correctamente', icon: 'assets/icons/achievements/perfect-session.png', points: 100 },
-        { id: 'speed_demon', title: 'Demonio de la Velocidad', description: 'Completa una sesión en menos de 2 minutos', icon: 'assets/icons/achievements/speed-demon.png', points: 75 },
-        { id: 'streak_3', title: 'Racha de 3', description: 'Estudia 3 días consecutivos', icon: 'assets/icons/ui-elements/points-star.png', points: 150 },
-        { id: 'streak_7', title: 'Semana Completa', description: 'Estudia 7 días consecutivos', icon: '📅', points: 300 },
-        { id: 'points_100', title: 'Centurión', description: 'Acumula 100 puntos', icon: 'assets/icons/achievements/first-session.png', points: 50 },
-        { id: 'points_500', title: 'Guerrero', description: 'Acumula 500 puntos', icon: '⚔️', points: 100 },
-        { id: 'points_1000', title: 'Campeón', description: 'Acumula 1000 puntos', icon: 'assets/icons/achievements/crown-achievement.png', points: 200 },
-        { id: 'level_5', title: 'Experto', description: 'Alcanza el nivel 5', icon: 'assets/icons/achievements/first-session.png', points: 250 },
-        { id: 'level_10', title: 'Maestro', description: 'Alcanza el nivel 10', icon: 'assets/icons/achievements/perfect-session.png', points: 500 },
-        { id: 'cards_100', title: 'Estudioso', description: 'Estudia 100 flashcards', icon: 'assets/icons/individual/study-icon.png', points: 100 },
-        { id: 'cards_500', title: 'Erudito', description: 'Estudia 500 flashcards', icon: '🧠', points: 200 },
-        { id: 'deck_creator', title: 'Creador', description: 'Crea tu primer deck', icon: '🎨', points: 75 },
-        { id: 'social_butterfly', title: 'Mariposa Social', description: 'Comparte un deck público', icon: '🦋', points: 100 },
-        { id: 'night_owl', title: 'Búho Nocturno', description: 'Estudia después de las 10 PM', icon: '🦉', points: 50 }
-      ];
-      
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-
-
-    
-
-    
-
-    
-  </script>
+  <!-- JavaScript Funcional -->
+  <script src="./app-functional.js"></script>
 
 
 </body>
