@@ -953,32 +953,25 @@ body {
 }
 
 /* ===== STUDY CONTROLS ===== */
+.study-controls {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
+  flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
   .study-controls {
-    display: flex;
-    justify-content: center;
-    gap: var(--space-md);
-    margin-bottom: var(--space-xl);
-    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: center;
   }
 
   .difficulty-btn {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--space-xs);
-    padding: 1.25rem var(--space-lg);
-    border: none;
-    border-radius: 16px;
-    font-family: inherit;
-    font-weight: var(--font-weight-medium);
-    cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    min-width: 110px;
-    position: relative;
-    overflow: hidden;
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    width: 100%;
+    max-width: 200px;
   }
+}
 
 .difficulty-btn::before {
   content: '';
