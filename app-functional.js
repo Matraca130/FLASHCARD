@@ -450,7 +450,7 @@ class StudyingFlashApp {
                     <button class="btn btn-primary" id="reveal-answer-btn" onclick="app.revealAnswer()">
                         👁️ Mostrar Respuesta
                     </button>
-                    <div class="answer-buttons" id="answer-buttons" style="display: none;">
+                    <div class="answer-buttons" id="answer-buttons" style="display: none; flex-wrap: wrap; justify-content: center;">
                         <button class="btn btn-danger" onclick="app.answerCard(false)">
                             ❌ Incorrecto
                         </button>
