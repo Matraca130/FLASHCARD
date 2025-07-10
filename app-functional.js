@@ -314,11 +314,7 @@ class StudyingFlashApp {
     }
 
     loadDecksForStudy() {
-        const deckSelection = document.getElementById('deck-selection');
-        if (!deckSelection) return;
-
-        if (this.decks.length === 0) {
-            deckSelection.innerHTML = `
+   `
                 <div class="empty-state">
                     <p>No tienes decks para estudiar. ¡Crea tu primer deck!</p>
                     <button class="btn btn-primary" onclick="app.showSection('crear')">
@@ -328,8 +324,7 @@ class StudyingFlashApp {
             `;
             return;
         }
-
-        deckSelection.innerHTML = this.decks.map(deck => `
+        // deckSelection.innerHTML = `this.decks.map(deck => `
             <div class="deck-card">
                 <div class="deck-header">
                     <h3 class="deck-title">${deck.name}</h3>
@@ -414,75 +409,49 @@ class StudyingFlashApp {
         }
 
         // Obtener el contenedor de la sección de estudiar
-        const deckSelection = document.getElementById('deck-selection');
-        if (!deckSelection) return;
+        // Old dynamic HTML injection removed
+        //        // Old dynamic HTML injection removed
+        /        // Old dynamic HTML injection removed
+        /        // Ocultar la sección de selección de decks y mostrar la interfaz de estudio
+        document.getElementById("deck-selection").classList.add("hidden");
+        document.getElementById("study-interface").classList.remove("hidden");
 
-        // Mostrar interfaz de estudio
-        deckSelection.innerHTML = `
-            <div class="study-interface">
-                <div class="study-header">
-                    <h2>📚 Estudiando: ${this.currentStudySession.deckName}</h2>
-                    <div class="study-progress">
-                        <span>Tarjeta ${this.currentStudySession.currentCardIndex + 1} de ${this.currentStudySession.cards.length}</span>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: ${((this.currentStudySession.currentCardIndex) / this.currentStudySession.cards.length) * 100}%"></div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="flashcard-container">
-                    <div class="flashcard" id="study-flashcard">
-                        <div class="flashcard-content">
-                            <div class="flashcard-question">
-                                ${this.currentStudySession.cards[this.currentStudySession.currentCardIndex].front}
-                            </div>
-                            <div class="flashcard-answer" id="flashcard-answer" style="display: none;">
-                                ${this.currentStudySession.cards[this.currentStudySession.currentCardIndex].back}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="study-controls">
-                    <button class="btn btn-secondary" onclick="app.endStudySession()">
-                        ❌ Terminar Sesión
-                    </button>
-                    <button class="btn btn-primary" id="reveal-answer-btn" onclick="app.revealAnswer()">
-                        👁️ Mostrar Respuesta
-                    </button>
-                    <div class="answer-buttons" id="answer-buttons" style="display: none; flex-wrap: wrap; justify-content: center;">
-                        <button class="btn btn-danger" onclick="app.answerCard(false)">
-                            ❌ Incorrecto
-                        </button>
-                        <button class="btn btn-success" onclick="app.answerCard(true)">
-                            ✅ Correcto
-                        </button>
-                    </div>
-                </div>
+        // Actualizar el nombre del deck y el progreso
+        document.getElementById("study-deck-name").innerText = this.currentStudySession.deckName;
+        document.getElementById("total-cards").innerText = this.currentStudySession.cards.length;
+        this.updateStudyProgress();
+
+        // Cargar la tarjeta ac
+
                 
                 <div class="study-stats">
                     <span>Correctas: ${this.currentStudySession.correctAnswers}</span>
                     <span>Total: ${this.currentStudySession.totalAnswered}</span>
                     <span>Precisión: ${this.currentStudySession.totalAnswered > 0 ? Math.round((this.currentStudySession.correctAnswers / this.currentStudySession.totalAnswered) * 100) : 0}%</span>
-                </div>
-            </div>
-        `;
+        // `;
+
+        // Ocultar la sección de selección de decks y mostrar la interfaz de estudio
+        document.getElementById("deck-selection").classList.add("hidden");
+        document.getElementById("study-interface").classList.remove("hidden");
+
+        // Actualizar el nombre del deck y el progreso
+        document.getElementById("study-deck-name").innerText = this.currentStudySession.deckName;
+        document.getElementById("total-cards").innerText = this.currentStudySession.cards.length;
+        this.updateStudyProgress();
+
+        // Cargar la tarjeta actual
+        this.loadCurrentFlashcard();
     }
 
     revealAnswer() {
-        const answerDiv = document.getElementById('flashcard-answer');
-        const revealBtn = document.getElementById('reveal-answer-btn');
-        const answerButtons = document.getElementById('answer-buttons');
-        
-        if (answerDiv && revealBtn && answerButtons) {
-            answerDiv.style.display = 'block';
-            revealBtn.style.display = 'none';
-            answerButtons.style.display = 'flex';
-            this.currentStudySession.showingAnswer = true;
-        }
+        this.flipCard(); // Flip the card to show the back
+
+        // Show the difficulty buttons
+        document.getElementById("difficulty-buttons").classList.remove("hidden");
+        document.getElementById("reveal-answer-btn").classList.add("hidden");
     }
 
-    answerCard(isCorrect) {
+    _old_answerCard(isCorrect) {
         if (isCorrect) {
             this.currentStudySession.correctAnswers++;
         }
@@ -501,12 +470,7 @@ class StudyingFlashApp {
     }
 
     completeStudySession() {
-        const accuracy = Math.round((this.currentStudySession.correctAnswers / this.currentStudySession.totalAnswered) * 100);
-        
-        const deckSelection = document.getElementById('deck-selection');
-        if (deckSelection) {
-            deckSelection.innerHTML = `
-                <div class="study-complete">
+        const accuracy = Math.round((this.currentStudySession.correctAnswers / this.currentStudySession.totalAnswered) * 100udy-complete">
                     <h2>🎉 ¡Sesión Completada!</h2>
                     <div class="final-stats">
                         <h3>Resultados de: ${this.currentStudySession.deckName}</h3>
@@ -661,4 +625,114 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Hacer la app accesible globalmente para debugging
 window.StudyingFlashApp = StudyingFlashApp;
+
+
+
+    updateStudyProgress() {
+        const currentCardEl = document.getElementById("current-card");
+        const totalCardsEl = document.getElementById("total-cards");
+        const progressBarFill = document.querySelector("#study-interface .progress-fill");
+
+        if (currentCardEl) currentCardEl.innerText = this.currentStudySession.currentCardIndex + 1;
+        if (totalCardsEl) totalCardsEl.innerText = this.currentStudySession.cards.length;
+        if (progressBarFill) {
+            const progress = (this.currentStudySession.currentCardIndex / this.currentStudySession.cards.length) * 100;
+            progressBarFill.style.width = `${progress}%`;
+        }
+    }
+
+
+
+
+    loadCurrentFlashcard() {
+        const currentCard = this.currentStudySession.cards[this.currentStudySession.currentCardIndex];
+        document.getElementById("card-front-text").innerText = currentCard.front;
+        document.getElementById("card-back-text").innerText = currentCard.back;
+        
+        // Reset flashcard to front view
+        document.getElementById("study-flashcard").classList.remove("flipped");
+
+        // Hide answer buttons and show reveal button
+        document.getElementById("reveal-answer-btn").style.display = "block";
+        document.getElementById("answer-buttons").style.display = "none";
+
+        this.updateStudyProgress();
+    }
+
+
+
+
+    flipCard() {
+        document.getElementById("study-flashcard").classList.toggle("flipped");
+    }
+
+
+
+
+    evaluateCard(difficulty) {
+        // Ensure the card is flipped to show the answer before evaluating
+        document.getElementById("study-flashcard").classList.add("flipped");
+
+        // Update stats based on difficulty
+        this.currentStudySession.totalAnswered++;
+        let pointsEarned = 0;
+
+        if (difficulty === 0) { // Otra vez
+            // Reinsert card at the end for review
+            this.currentStudySession.cards.push(this.currentStudySession.cards[this.currentStudySession.currentCardIndex]);
+            pointsEarned = 0;
+        } else if (difficulty === 1) { // Difícil
+            this.currentStudySession.correctAnswers++;
+            pointsEarned = 1;
+        } else if (difficulty === 2) { // Bien
+            this.currentStudySession.correctAnswers++;
+            pointsEarned = 2;
+        } else if (difficulty === 3) { // Fácil
+            this.currentStudySession.correctAnswers++;
+            pointsEarned = 3;
+        }
+
+        // Add points to session total
+        if (!this.currentStudySession.points) {
+            this.currentStudySession.points = 0;
+        }
+        this.currentStudySession.points += pointsEarned;
+
+        // Advance to next card
+        this.currentStudySession.currentCardIndex++;
+
+        // Check if session is complete
+        if (this.currentStudySession.currentCardIndex >= this.currentStudySession.cards.length) {
+            this.finishStudySession();
+        } else {
+            this.loadCurrentFlashcard();
+        }
+
+        // Update UI stats
+        document.getElementById("session-correct").innerText = this.currentStudySession.correctAnswers;
+        document.getElementById("session-total").innerText = this.currentStudySession.totalAnswered;
+        document.getElementById("session-accuracy").innerText = this.currentStudySession.totalAnswered > 0 ? Math.round((this.currentStudySession.correctAnswers / this.currentStudySession.totalAnswered) * 100) + "%": "0%";
+        document.getElementById("session-points").innerText = this.currentStudySession.points;
+    }
+
+
+
+
+    finishStudySession() {
+        const correct = this.currentStudySession.correctAnswers;
+        const total = this.currentStudySession.totalAnswered;
+        const accuracy = total ? Math.round((correct / total) * 100) : 0;
+
+        document.getElementById("summary-correct").innerText = correct;
+        document.getElementById("summary-total").innerText = total;
+        document.getElementById("summary-accuracy").innerText = accuracy + "%";
+        document.getElementById("summary-points").innerText = this.currentStudySession.points || 0;
+
+        document.getElementById("study-interface").classList.add("hidden");
+        document.getElementById("study-summary").classList.remove("hidden");
+
+        this.showNotification(`¡Sesión completada! Precisión: ${accuracy}%`, "success");
+        this.currentStudySession = null;
+    }
+
 
