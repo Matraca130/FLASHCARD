@@ -650,7 +650,7 @@ window.StudyingFlashApp = StudyingFlashApp;
         document.getElementById("card-back-text").innerText = currentCard.back;
         
         // Reset flashcard to front view
-        document.getElementById("study-flashcard").classList.remove("flipped");
+        document.getElementById("flashcard").classList.remove("flipped");
 
         // Hide answer buttons and show reveal button
         document.getElementById("reveal-answer-btn").style.display = "block";

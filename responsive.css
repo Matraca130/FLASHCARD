@@ -667,3 +667,12 @@ p {
     font-size: 1rem;
   }
 }
+
+
+@media (max-width: 767px) {
+  #study-interface {
+    padding-bottom: 60px; /* Adjust based on apple-nav height */
+  }
+}
+
+
