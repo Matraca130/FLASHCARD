@@ -869,9 +869,10 @@ body {
 /* ===== ULTRA PREMIUM FLASHCARDS ===== */
 .flashcard-container {
   perspective: 1000px;
-  width: 100%;
+  width: 90%;
   max-width: 500px;
-  height: 300px;
+  height: auto;
+  min-height: 250px;
   margin: 0 auto var(--space-xl);
   position: relative;
 }
@@ -918,8 +919,8 @@ body {
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: var(--space-xl);
-  font-size: 1.5rem;
+  padding: clamp(1rem, 5vw, 2rem);
+  font-size: clamp(1rem, 4vw, 1.5rem);
   font-weight: var(--font-weight-medium);
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
   transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
@@ -952,32 +953,32 @@ body {
 }
 
 /* ===== STUDY CONTROLS ===== */
-.study-controls {
-  display: flex;
-  justify-content: center;
-  gap: var(--space-md);
-  margin-bottom: var(--space-xl);
-  flex-wrap: wrap;
-}
+  .study-controls {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-md);
+    margin-bottom: var(--space-xl);
+    flex-wrap: wrap;
+  }
 
-.difficulty-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-xs);
-  padding: 1.25rem var(--space-lg);
-  border: none;
-  border-radius: 16px;
-  font-family: inherit;
-  font-weight: var(--font-weight-medium);
-  cursor: pointer;
-  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  min-width: 110px;
-  position: relative;
-  overflow: hidden;
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
+  .difficulty-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: 1.25rem var(--space-lg);
+    border: none;
+    border-radius: 16px;
+    font-family: inherit;
+    font-weight: var(--font-weight-medium);
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    min-width: 110px;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
 
 .difficulty-btn::before {
   content: '';
