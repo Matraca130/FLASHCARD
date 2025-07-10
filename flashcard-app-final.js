@@ -395,36 +395,26 @@ const SM2Algorithm = {
 // ===== STUDY SERVICE =====
 const StudyService = {
     async getFlashcardsForReview(deckId) {
-        const flashcards = await FlashcardService.getByDeck(deckId);
-        const now = new Date();
-        
-        // Filtrar flashcards que necesitan revisión
-        return flashcards.filter(card => {
-            const nextReview = new Date(card.nextReview);
-            return nextReview <= now;
-        });
+        const result = await ApiService.request("/study/cards/due");
+        if (result && result.cards) {
+            return result.cards;
+        } else {
+            return [];
+        }
     },
     
-    async processAnswer(flashcardId, quality) {
-        // Obtener flashcard actual
-        const flashcards = await ApiService.request("/flashcards");
-        const flashcard = flashcards.find(f => f.id === flashcardId);
-        
-        if (!flashcard) {
-            throw new Error("Flashcard no encontrada");
-        }
-        
-        // Calcular próxima revisión con SM-2
-        const updates = SM2Algorithm.calculateNext(flashcard, quality);
-        
-        // Actualizar flashcard
-        const updatedFlashcard = await FlashcardService.update(flashcardId, {
-            ...flashcard,
-            ...updates
+    async processAnswer(sessionId, flashcardId, quality, responseTime = 0) {
+        const result = await ApiService.request("/study/card/answer", {
+            method: "POST",
+            body: JSON.stringify({
+                session_id: sessionId,
+                card_id: flashcardId,
+                quality: quality,
+                response_time: responseTime
+            })
         });
-        
-        Utils.log(`Flashcard actualizada con SM-2:`, updates);
-        return updatedFlashcard;
+        Utils.log(`Respuesta procesada:`, result);
+        return result;
     }
 };
 
@@ -764,22 +754,33 @@ const StudyingFlash = {
     // Iniciar sesión de estudio
     async startStudy(deckId) {
         try {
-            const flashcards = await StudyService.getFlashcardsForReview(deckId);
-            
-            if (flashcards.length === 0) {
+            const sessionResponse = await ApiService.request("/study/session", {
+                method: "POST",
+                body: JSON.stringify({ deck_id: deckId })
+            });
+
+            if (!sessionResponse.success) {
+                Utils.showNotification(sessionResponse.error || "Error al iniciar sesión de estudio", "error");
+                return;
+            }
+
+            const { session, cards } = sessionResponse;
+
+            if (cards.length === 0) {
                 Utils.showNotification("No hay flashcards para revisar en este deck");
                 return;
             }
             
-            Utils.log(`Iniciando estudio con ${flashcards.length} flashcards`);
+            Utils.log(`Iniciando estudio con ${cards.length} flashcards`);
             
             // Navegar a sección de estudio
             this.navigateToSection("estudiar");
             
             // Inicializar sesión de estudio
             this.currentStudySession = {
+                sessionId: session.id,
                 deckId,
-                flashcards,
+                flashcards: cards,
                 currentIndex: 0,
                 answers: []
             };
@@ -865,7 +866,7 @@ const StudyingFlash = {
                 default: sm2Quality = 3; // Default a 'correct response with difficulty'
             }
 
-            await StudyService.processAnswer(flashcard.id, sm2Quality);
+            await StudyService.processAnswer(this.currentStudySession.sessionId, flashcard.id, sm2Quality);
             
             // Guardar respuesta
             this.currentStudySession.answers.push({

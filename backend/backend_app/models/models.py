@@ -518,15 +518,9 @@ class Flashcard(BaseModel):
     @property
     def easiness_factor(self):
         """Alias para ease_factor - terminología alternativa"""
-<<<<<<< HEAD
         return self.ease_factor
     
     @easiness_factor.setter
-=======
-        return self.ease_fact
-    or @ easiness_factor.setter
-
->>>>>>> 4a64f0c0b7272a924fb9959c73278447c3324b3f
     def easiness_factor(self, value):
         self.ease_factor = value
 
@@ -916,12 +910,7 @@ class QueryOptimizer:
     @staticmethod
     def get_decks_stats(user_id):
         """Obtener estadísticas de todos los decks del usuario en una sola consulta optimizada"""
-<<<<<<< HEAD
         # Consulta agregada para obtener total de cartas y cartas vencidas por deck
-=======
-        # Consulta agregada para obtener total de cartas y cartas vencidas p
-        or  # deck
->>>>>>> 4a64f0c0b7272a924fb9959c73278447c3324b3f
         stats_query = (
             db.session.query(
                 Flashcard.deck_id.label("deck_id"),

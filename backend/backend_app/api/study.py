@@ -45,8 +45,7 @@ def start_study_session():
             return jsonify({"error": "Deck no encontrado"}), 404
 
         # Usar servicio para crear sesión
-        result = study_service.start_session(user_id, deck_id, data)
-
+        result = study_service.start_study_session(user_id, deck_id, algorithm=data.get("algorithm", "fsrs"))
         if not result["success"]:
             return jsonify({"error": result["error"]}), 400
 
@@ -69,116 +68,13 @@ def start_study_session():
         return jsonify({"error": "Error interno del servidor"}), 500
 
 
-def _validate_answer(user_id, card_id, session_id):
-    card = db.session.query(Flashcard).join(Deck).filter(
-        Flashcard.id == card_id, Deck.user_id == user_id).first()
-    if not card:
-        return None, None, jsonify({"error": "Carta no encontrada"}), 404
-
-    session = StudySession.query.filter_by(
-        id=session_id, user_id=user_id).first()
-    if not session:
-        return None, None, jsonify({"error": "Sesión no encontrada"}), 404
-
-    return card, session, None, None
 
 
-def _update_card_and_review(card, session, quality, validated_data):
-    algorithm = session.algorithm or "fsrs"
-    previous_interval = card.interval_days
-
-    if algorithm == "fsrs":
-        elapsed_days = 0
-        if card.last_reviewed:
-            elapsed_days = (datetime.utcnow() - card.last_reviewed).days
-        new_stability, new_difficulty, new_interval = calculate_fsrs(
-            quality, card.stability, card.difficulty_fsrs, elapsed_days)
-        card.stability = new_stability
-        card.difficulty_fsrs = new_difficulty
-        card.interval_days = new_interval
-        card.repetitions += 1
-    elif algorithm in ("sm2", "ultra_sm2", "anki"):
-        new_ease_factor, new_interval, new_repetitions = calculate_sm2(
-            quality, card.ease_factor, card.interval_days, card.repetitions)
-
-        if algorithm == "ultra_sm2":
-            min_factor = 1.3
-            max_factor = 3.0
-            new_ease_factor = max(min_factor, min(max_factor, new_ease_factor))
-        elif algorithm == "anki":
-            if card.repetitions == 0 and quality >= 3:
-                new_interval = 1
-            elif card.repetitions == 1 and quality >= 3:
-                new_interval = 4
-            elif quality < 3:
-                new_interval = 1
-                new_repetitions = 0
-
-        card.ease_factor = new_ease_factor
-        card.interval_days = new_interval
-        card.repetitions = new_repetitions
-    else:
-        new_ease_factor, new_interval, new_repetitions = calculate_sm2(
-            quality, card.ease_factor, card.interval_days, card.repetitions)
-        card.ease_factor = new_ease_factor
-        card.interval_days = new_interval
-        card.repetitions = new_repetitions
-
-    card.last_reviewed = datetime.utcnow()
-    card.next_review = get_next_review_date(card.interval_days)
-
-    review = CardReview(
-        flashcard_id=card.id,
-        session_id=session.id,
-        rating=quality,
-        previous_interval=previous_interval,
-        new_interval=card.interval_days,
-        response_time=validated_data.get("response_time", 0),
-    )
-    db.session.add(review)
-    return review, algorithm
 
 
-def _update_session_and_user_stats(session, user, quality):
-    session.cards_studied += 1
-    if quality >= 3:
-        session.cards_correct += 1
-
-    user.total_cards_studied += 1
-    if quality >= 3:
-        user.total_cards_correct += 1
 
 
-def _build_response(card, review, session, algorithm, quality):
-    return (
-        jsonify(
-            {
-                "success": True,
-                "card": {
-                    "id": card.id,
-                    "interval": card.interval_days,
-                    "next_review": card.next_review.isoformat(),
-                    "difficulty": card.difficulty,
-                    "stability": card.stability,
-                    "repetitions": card.repetitions,
-                },
-                "review": {
-                    "id": review.id,
-                    "quality": quality,
-                    "new_interval": card.interval_days,
-                    "algorithm": algorithm,
-                },
-                "session_stats": {
-                    "cards_studied": session.cards_studied,
-                    "cards_correct": session.cards_correct,
-                    "accuracy": (
-                        round(
-                            (session.cards_correct / session.cards_studied) * 100,
-                            1) if session.cards_studied > 0 else 0),
-                },
-            }),
-        200,
-    )
+
 
 
 @study_bp.route("/card/answer", methods=["POST"])
@@ -191,21 +87,11 @@ def answer_card(validated_data):
         quality = validated_data["quality"]
         session_id = validated_data["session_id"]
 
-        card, session, error_response, status_code = _validate_answer(
-            user_id, card_id, session_id)
-        if error_response:
-            return error_response, status_code
 
-        review, algorithm = _update_card_and_review(
-            card, session, quality, validated_data)
-
-        user = User.query.get(user_id)
-        _update_session_and_user_stats(session, user, quality)
-
-        db.session.commit()
-
-        return _build_response(card, review, session, algorithm, quality)
-
+        result = study_service.review_card(session_id, user_id, card_id, quality, validated_data.get("response_time"))
+        if not result["success"]:
+            return jsonify({"error": result["error"]}), 400
+        return jsonify(result["data"]), 200
     except Exception as e:
         logger.error(f"Error procesando respuesta de carta: {str(e)}")
         db.session.rollback()
@@ -274,36 +160,10 @@ def get_due_cards():
     try:
         user_id = get_jwt_identity()
 
-        # Obtener cartas que necesitan revisión
-        now = datetime.utcnow()
-        due_cards = (
-            db.session.query(Flashcard)
-            .join(Deck)
-            .filter(Deck.user_id == user_id, Flashcard.next_review <= now)
-            .limit(50)
-            .all()
-        )
-
-        cards_data = []
-        for card in due_cards:
-            cards_data.append(
-                {
-                    "id": card.id,
-                    "front": card.front,
-                    "back": card.back,
-                    "deck_id": card.deck_id,
-                    "deck_name": card.deck.name,
-                    "interval": card.interval_days,
-                    "difficulty": card.difficulty,
-                    "next_review": card.next_review.isoformat(),
-                }
-            )
-
-        return (
-            jsonify({"success": True, "cards": cards_data, "total": len(cards_data)}),
-            200,
-        )
-
+        result = study_service.get_due_cards(user_id)
+        if not result["success"]:
+            return jsonify({"error": result["error"]}), 400
+        return jsonify(result["data"]), 200
     except Exception as e:
         logger.error(f"Error obteniendo cartas pendientes: {str(e)}")
         return jsonify({"error": "Error interno del servidor"}), 500

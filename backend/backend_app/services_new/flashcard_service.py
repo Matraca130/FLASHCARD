@@ -97,7 +97,6 @@ class FlashcardService(BaseService):
                 e, "obtención de flashcards del usuario")
 
     def create_flashcard(self, user_id, flashcard_data):
-        """
         Crear nueva flashcard
 
         Args:
@@ -112,13 +111,7 @@ class FlashcardService(BaseService):
             if not deck_id:
                 return self._error_response(
                     "El ID del deck es requerido", code=400)
-
-            # Verificar que el deck existe y pertenece al usuario
-            deck, error = self._get_resource_if_owned(
-                Deck, deck_id, user_id, "deck")
-            if error:
-                return err
-            or # Validar contenido mínimo
+            # Validar contenido mínimo
             front_text = flashcard_data.get("front_text", "").strip()
             back_text = flashcard_data.get("back_text", "").strip()
 
@@ -379,8 +372,8 @@ class FlashcardService(BaseService):
             deck, error = self._get_resource_if_owned(
                 Deck, deck_id, user_id, "deck")
             if error:
-                return err
-            or if not flashcards_data or not isinstance(flashcards_data, list):
+                return error
+            if not flashcards_data or not isinstance(flashcards_data, list):
                 return self._error_response(
     "Se requiere una lista de flashcards", code=400)
 
@@ -496,49 +489,4 @@ class FlashcardService(BaseService):
             return self._handle_exception(
                 e, "obtención de flashcards para estudio")
 
-
-    def _get_cards_for_study(self, deck_id, limit=20):
-        """
-        Obtiene cartas para estudiar de un deck específico
-        
-        Args:
-            deck_id: ID del deck
-            limit: Número máximo de cartas a obtener
-            
-        Returns:
-            list: Lista de flashcards para estudiar
-        # Obtener cartas vencidas primero
-        due_cards = (
-            self.db.session.query(Flashcard)
-            .filter(
-                and_(
-                    Flashcard.deck_id == deck_id,
-                    not_(Flashcard.is_deleted),
-                    Flashcard.next_review <= datetime.utcnow(),
-                )
-            )
-            .order_by(Flashcard.next_review.asc())
-            .limit(limit)
-            .all()
-        )
-        
-        # Si no hay suficientes cartas vencidas, agregar cartas nuevas
-        if len(due_cards) < limit:
-            remaining_limit = limit - len(due_cards)
-            new_cards = (
-                self.db.session.query(Flashcard)
-                .filter(
-                    and_(
-                        Flashcard.deck_id == deck_id,
-                        not_(Flashcard.is_deleted),
-                        Flashcard.last_reviewed.is_(None),
-                    )
-                )
-                .order_by(Flashcard.created_at.asc())
-                .limit(remaining_limit)
-                .all()
-            )
-            due_cards.extend(new_cards)
-            
-        return due_cards
 
