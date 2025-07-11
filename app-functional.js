@@ -244,39 +244,47 @@ class StudyingFlashApp {
     showSection(sectionName) {
         Utils.log(`Navegando a sección: ${sectionName}`);
         
-        // Ocultar todas las secciones
+        // Ocultar todas las secciones con !important
         document.querySelectorAll('.section').forEach(section => {
-            section.style.display = 'none';
+            section.style.setProperty('display', 'none', 'important');
         });
 
-        // Mostrar la sección solicitada
+        // Mostrar la sección solicitada con !important
         const targetSection = document.getElementById(sectionName);
         if (targetSection) {
-            targetSection.style.display = 'block';
+            targetSection.style.setProperty('display', 'block', 'important');
+            targetSection.style.setProperty('visibility', 'visible', 'important');
+            targetSection.style.setProperty('opacity', '1', 'important');
             this.currentSection = sectionName;
+            
+            // Cargar contenido específico de la sección
+            this.loadSectionContent(sectionName);
+        } else {
+            Utils.error(`Sección ${sectionName} no encontrada`);
         }
 
         // Actualizar navegación activa
         document.querySelectorAll('[data-section]').forEach(link => {
             link.classList.remove('active');
         });
+        // Marcar enlace activo
+        const activeLink = document.querySelector(`[data-section="${sectionName}"]`);
+        if (activeLink) {
+            activeLink.classList.add('active');
+        }
+    }
 
-        // Marcar como activo el enlace correspondiente
-        const activeLinks = document.querySelectorAll(`[data-section="${sectionName}"]`);
-        activeLinks.forEach(link => {
-            link.classList.add('active');
-        });
-
-        // Cargar contenido específico de la sección
+    loadSectionContent(sectionName) {
+        // Cargar contenido específico según la sección
         switch (sectionName) {
             case 'dashboard':
                 this.loadDashboard();
                 break;
-            case 'crear':
-                this.loadCreateSection();
-                break;
             case 'estudiar':
                 this.loadStudySection();
+                break;
+            case 'crear':
+                this.loadCreateSection();
                 break;
             case 'gestionar':
                 this.loadManageSection();
@@ -284,20 +292,18 @@ class StudyingFlashApp {
             case 'ranking':
                 this.loadRankingSection();
                 break;
-            case 'estadisticas':
+            case 'stats':
                 this.loadStatsSection();
                 break;
-            case 'configuracion':
+            case 'config':
                 this.loadConfigSection();
                 break;
+            default:
+                Utils.log(`Sección ${sectionName} no tiene carga específica`);
         }
-
-        // Cerrar menú móvil si está abierto
-        this.closeMobileMenu();
     }
 
-    toggleMobileMenu() {
-        const mobileMenu = document.querySelector('.mobile-menu');
+    loadDashboard() {     const mobileMenu = document.querySelector('.mobile-menu');
         if (mobileMenu) {
             mobileMenu.classList.toggle('active');
         }
