@@ -213,9 +213,7 @@ class StudyingFlashApp {
             deckId: parseInt(deckSelect.value),
             front_content: frontInput.value.trim(),
             back_content: backInput.value.trim(),
-            createdAt: new Date().toISOString(),
-            difficulty: 0,
-            nextReview: new Date().toISOString()
+            createdAt: new Date().toISOString()
         };
 
         console.log('✅ Creando flashcard:', newFlashcard);
