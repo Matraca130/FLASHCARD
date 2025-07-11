@@ -1008,3 +1008,87 @@ window.CONFIG = CONFIG;
 window.Utils = Utils;
 window.ApiService = ApiService;
 
+
+
+// ===== FUNÇÕES PARA O NOVO MODAL DE LOGIN =====
+
+// Função para login com Facebook
+function loginWithFacebook() {
+    Utils.log('Tentativa de login com Facebook');
+    Utils.showNotification('Login com Facebook em desenvolvimento', 'info');
+    // Aqui seria implementada a integração com Facebook SDK
+}
+
+// Função para login com Google
+function loginWithGoogle() {
+    Utils.log('Tentativa de login com Google');
+    Utils.showNotification('Login com Google em desenvolvimento', 'info');
+    // Aqui seria implementada a integração com Google OAuth
+}
+
+// Função para mostrar modal de esqueci a senha
+function showForgotPassword() {
+    Utils.log('Mostrando modal de esqueci a senha');
+    Utils.showNotification('Funcionalidade de recuperação de senha em desenvolvimento', 'info');
+    // Aqui seria implementado o modal de recuperação de senha
+}
+
+// Função para mostrar modal de registro
+function showRegisterModal() {
+    Utils.log('Mostrando modal de registro');
+    // Esconder modal de login e mostrar modal de registro
+    hideLoginModal();
+    // Aqui seria implementado o modal de registro separado
+    Utils.showNotification('Modal de registro em desenvolvimento', 'info');
+}
+
+// Melhorar a função de login existente
+function handleLoginForm(event) {
+    event.preventDefault();
+    
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
+    
+    Utils.log('Tentativa de login', { email });
+    
+    // Simulação de login bem-sucedido
+    if (email && password) {
+        Utils.showNotification('Login realizado com sucesso!', 'success');
+        hideLoginModal();
+        
+        // Atualizar interface para usuário logado
+        updateUIForLoggedUser(email);
+    } else {
+        Utils.showNotification('Por favor, preencha todos os campos', 'error');
+    }
+}
+
+// Função para atualizar UI quando usuário está logado
+function updateUIForLoggedUser(email) {
+    // Atualizar botões de login para mostrar usuário logado
+    const loginButtons = document.querySelectorAll('#apple-login-btn, .btn[onclick*="showLoginModal"]');
+    loginButtons.forEach(btn => {
+        btn.textContent = `👤 ${email.split('@')[0]}`;
+        btn.onclick = () => showUserMenu();
+    });
+    
+    // Salvar estado de login
+    localStorage.setItem('studyingflash_user', JSON.stringify({ email, loggedIn: true }));
+}
+
+// Função para mostrar menu do usuário
+function showUserMenu() {
+    Utils.showNotification('Menu do usuário em desenvolvimento', 'info');
+}
+
+// Verificar se usuário já está logado ao carregar a página
+function checkUserLogin() {
+    const user = JSON.parse(localStorage.getItem('studyingflash_user') || '{}');
+    if (user.loggedIn && user.email) {
+        updateUIForLoggedUser(user.email);
+    }
+}
+
+// Chamar verificação de login quando a página carregar
+document.addEventListener('DOMContentLoaded', checkUserLogin);
+

@@ -26,6 +26,7 @@
   <link rel="stylesheet" href="./apple-mobile.css">
   <link rel="stylesheet" href="./section-styles.css">
   <link rel="stylesheet" href="./dashboard-modern.css">
+  <link rel="stylesheet" href="./modern-login-styles.css">
   
   <!-- Cargar iconos SVG embebidos -->
   <style>
@@ -977,28 +978,49 @@
   <div class="modal-overlay" id="login-modal">
     <div class="modal">
       <div class="modal-header">
-        <h2 class="modal-title">Iniciar Sesión</h2>
+        <h2 class="modal-title">Entrar</h2>
         <button class="modal-close" onclick="hideLoginModal()">&times;</button>
       </div>
       <div class="modal-body">
+        <p class="login-subtitle">Já tem uma conta?</p>
+        
         <form id="loginForm" onsubmit="handleLoginForm(event)">
           <div class="form-group">
-            <label for="login-email" class="form-label">Email</label>
-            <input type="email" id="login-email" class="form-input" placeholder="tu@email.com" required>
+            <div class="input-container">
+              <input type="email" id="login-email" class="form-input modern-input" placeholder="Email" required>
+              <span class="input-icon">👤</span>
+            </div>
           </div>
           <div class="form-group">
-            <label for="login-password" class="form-label">Contraseña</label>
-            <input type="password" id="login-password" class="form-input" placeholder="Tu contraseña" required>
+            <div class="input-container">
+              <input type="password" id="login-password" class="form-input modern-input" placeholder="Senha" required>
+              <span class="input-icon">👁️</span>
+            </div>
           </div>
-          <div class="form-actions">
-            <button type="button" class="btn btn-secondary" onclick="hideLoginModal()">Cancelar</button>
-            <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
+          
+          <div class="forgot-password">
+            <a href="#" onclick="showForgotPassword()">Esqueci a senha</a>
           </div>
+          
+          <button type="submit" class="btn btn-primary modern-login-btn">Entrar</button>
         </form>
         
-        <div class="auth-divider">
-          <span>¿No tienes cuenta?</span>
+        <div class="social-login">
+          <button type="button" class="btn btn-social btn-facebook" onclick="loginWithFacebook()">
+            <span class="social-icon">📘</span>
+            Entre com Facebook
+          </button>
+          <button type="button" class="btn btn-social btn-google" onclick="loginWithGoogle()">
+            <span class="social-icon">🔴</span>
+            Entre com Google
+          </button>
         </div>
+        
+        <div class="auth-divider">
+          <span>Não tem uma conta?</span>
+        </div>
+        
+        <button type="button" class="btn btn-outline create-account-btn" onclick="showRegisterModal()">Criar conta</button>
         
         <form id="registerForm" onsubmit="handleRegisterForm(event)" style="display: none;">
           <div class="form-group">
