@@ -609,7 +609,11 @@ class StudyingFlashApp {
         this.updateStudyProgress();
     }
 
-    flipCard() {
+    flipCard(event) {
+        // Prevent default touch behavior to avoid conflicts with scrolling/zooming
+        if (event && event.type === 'touchend') {
+            event.preventDefault();
+        }
         document.getElementById("flashcard").classList.toggle("flipped");
     }
 
