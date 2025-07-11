@@ -342,3 +342,12 @@ VITE_DEBUG=false
 **Versión**: 2.0.0 (Unificación Multimedia)  
 **Fecha**: Enero 2024
 
+
+
+
+## ⚠️ Nota Importante para Contribuidores
+
+Antes de realizar cualquier `commit`, por favor, asegúrate de que tu versión local del repositorio esté completamente actualizada con los últimos cambios del repositorio remoto. Para ello, ejecuta `git pull origin main` (o la rama correspondiente) antes de empezar a trabajar y antes de hacer tu `commit` y `push`.
+
+Esto ayuda a prevenir conflictos y asegura que todos los colaboradores estén trabajando con la versión más reciente del código.
+
