@@ -29,20 +29,20 @@ class FormValidator {
     
     /**
      * Valida un formulario de flashcard
-     * @param {Object} formData - {deckId, front, back}
+     * @param {Object} formData - {deckId, front_content, back_content}
      * @returns {Object} - {isValid: boolean, errors: Array}
      */
     static validateFlashcardForm(formData) {
-        const requiredFields = ['deckId', 'front', 'back'];
+        const requiredFields = ['deckId', 'front_content', 'back_content'];
         const validation = this.validateRequiredFields(formData, requiredFields);
         
         // Validaciones adicionales específicas
-        if (formData.front && formData.front.trim().length > 1000) {
+        if (formData.front_content && formData.front_content.trim().length > 1000) {
             validation.errors.push('El texto frontal no puede exceder 1000 caracteres');
             validation.isValid = false;
         }
         
-        if (formData.back && formData.back.trim().length > 1000) {
+        if (formData.back_content && formData.back_content.trim().length > 1000) {
             validation.errors.push('El texto trasero no puede exceder 1000 caracteres');
             validation.isValid = false;
         }
@@ -211,13 +211,13 @@ class FormValidator {
 class FlashcardFormUtils {
     /**
      * Obtiene datos del formulario de creación de flashcard
-     * @returns {Object} - {deckId, front, back}
+     * @returns {Object} - {deckId, front_content, back_content}
      */
     static getCreateFormData() {
         return FormValidator.getFieldData({
             deckId: '#deck-select',
-            front: '#front-text',
-            back: '#back-text'
+            front_content: '#front-text',
+            back_content: '#back-text'
         });
     }
     
