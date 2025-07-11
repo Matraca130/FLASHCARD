@@ -1,5 +1,8 @@
 # 🎓 StudyingFlash - Aplicación de Flashcards Inteligente
 
+[![Enterprise Testing Suite](https://github.com/Matraca130/FLASHCARD/workflows/Enterprise%20Testing%20Suite/badge.svg)](https://github.com/Matraca130/FLASHCARD/actions/workflows/enterprise-testing.yml)
+[![GitHub Pages](https://github.com/Matraca130/FLASHCARD/workflows/Deploy%20to%20GitHub%20Pages/badge.svg)](https://github.com/Matraca130/FLASHCARD/actions/workflows/deploy-pages.yml)
+
 ## ✨ Características Principales
 
 - 📚 **Gestión de Mazos**: Crea y organiza tus flashcards por temas

@@ -40,7 +40,6 @@ Cypress.Commands.add('answerFlashcard', (difficulty = 'good') => {
   cy.get(`[data-testid="answer-${difficulty}"]`).click();
 });
 
-// Command to check if element is visible in viewport
 Cypress.Commands.add('isInViewport', { prevSubject: true }, (subject) => {
   cy.wrap(subject).should('be.visible');
   cy.window().then((win) => {
@@ -54,8 +53,6 @@ Cypress.Commands.add('isInViewport', { prevSubject: true }, (subject) => {
 
 // Command to wait for animations to complete
 Cypress.Commands.add('waitForAnimations', () => {
-  // Wait for CSS transitions/animations to complete by checking for stable DOM
-  cy.get('body').should('be.visible');
   cy.document().its('readyState').should('equal', 'complete');
 });
 

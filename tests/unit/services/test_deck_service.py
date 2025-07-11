@@ -95,6 +95,8 @@ class TestDeckService:
         other_user = User(
             username='otheruser',
             email='other@example.com',
+            first_name='Other',
+            last_name='User',
             password_hash='hashed'
         )
         db_session.add(other_user)
@@ -152,14 +154,14 @@ class TestDeckService:
     
     @pytest.mark.unit
     @patch('backend_app.services_new.deck_service.db.session.commit')
-    def test_create_deck_database_error(self, mock_commit, deck_service, test_user, valid_deck_data):
-        """Test manejo de error de base de datos"""
+    def test_create_deck_database_failure(self, mock_commit, deck_service, test_user, valid_deck_data):
+        """Test manejo de fallo de base de datos"""
         mock_commit.side_effect = IntegrityError("Test error", None, None)
         
         result = deck_service.create_deck(test_user.id, valid_deck_data)
         
         assert result['success'] is False
-        assert 'error' in result
+        assert 'error' in result  # Verificar mensaje de fallo
     
     @pytest.mark.unit
     def test_get_public_decks(self, deck_service, test_user, db_session):

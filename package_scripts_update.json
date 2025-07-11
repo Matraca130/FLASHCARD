@@ -1,0 +1,20 @@
+{
+  "scripts": {
+    "agents:coordinate-5": "node scripts/master_coordinator.js",
+    "agents:status": "node scripts/check_agent_status.js",
+    "agents:stop-all": "node scripts/stop_all_agents.js",
+    "agents:cleanup": "node scripts/cleanup_locks.js",
+    "agents:rollback": "node scripts/rollback_changes.js",
+    "agent1:run": "node scripts/agent1_coordinator.js",
+    "agent2:run": "node scripts/agent2_core_services.js",
+    "agent3:run": "node scripts/agent3_data_management.js",
+    "agent4:run": "node scripts/agent4_ui_dashboard.js",
+    "agent5:run": "node scripts/agent5_utils_testing.js",
+    "duplicates:analyze": "python3 analyze_js_duplicates.py",
+    "duplicates:detailed": "python3 detailed_duplicate_analysis.py",
+    "integrity:check": "node scripts/integrity_check.js",
+    "pre-agents": "npm run duplicates:analyze && npm run integrity:check",
+    "post-agents": "npm run integrity:check && git status"
+  }
+}
+

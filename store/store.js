@@ -2,12 +2,12 @@
  * STORE/STORE.JS - COMPATIBILIDAD Y RE-EXPORTACIÓN
  * ================================================
  *
- * Este archivo mantiene compatibilidad con imports que usan 'store/store.js'
+ * Este archivo mantiene compatibilidad con imports que usan 'sto'
  * mientras redirige al sistema de store refactorizado principal
  */
 
 // Importar el store refactorizado principal
-import store, { StudyingFlashStore, simpleStore } from '../store.js';
+import store, { StudyingFlashStore, simpleStore } from '';
 
 /**
  * CLASE DE COMPATIBILIDAD
@@ -20,7 +20,6 @@ class LegacyStore {
     // Usar el store refactorizado como backend
     this.store = store;
 
-    // Mantener compatibilidad con la interfaz original
     this.state = this.store.getState();
     this.listeners = [];
 
@@ -30,8 +29,6 @@ class LegacyStore {
       this.notifyListeners();
     });
 
-    console.log(
-      '🔄 LegacyStore inicializado - Redirigiendo al store refactorizado'
     );
   }
 
@@ -101,18 +98,12 @@ export default legacyStore;
 // Exportar también como named export
 export { legacyStore as store };
 
-// Re-exportar el store principal para casos que lo necesiten
-export { store as mainStore, StudyingFlashStore, simpleStore };
-
 /**
  * MENSAJE DE MIGRACIÓN
  * ====================
  */
 console.log(`
-🔄 AVISO DE MIGRACIÓN:
-Este archivo (store/store.js) redirige al sistema de store refactorizado.
-Considera migrar tus imports a:
-  import store from './store.js'
+  import store from '
   
 El store refactorizado ofrece:
 ✅ Mejor rendimiento

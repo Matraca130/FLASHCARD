@@ -1,0 +1,59 @@
+name: Site Monitoring
+
+on:
+  schedule:
+    # Run every 2 hours (reduced frequency)
+    - cron: '0 */2 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  health-check:
+    name: Basic Health Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    
+    steps:
+    - name: Check site availability
+      run: |
+        echo "🏥 Checking site health..."
+        
+        SITE_URL="https://matraca130.github.io/FLASHCARD/"
+        
+        # Simple availability check
+        HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "$SITE_URL" || echo "000")
+        RESPONSE_TIME=$(curl -s -o /dev/null -w "%{time_total}" "$SITE_URL" || echo "999")
+        
+        echo "HTTP Code: $HTTP_CODE"
+        echo "Response Time: ${RESPONSE_TIME}s"
+        
+        if [ "$HTTP_CODE" = "200" ]; then
+          echo "✅ Site is healthy"
+        else
+          echo "❌ Site health check failed (HTTP $HTTP_CODE)"
+        fi
+        
+        # Simple performance check
+        if (( $(echo "$RESPONSE_TIME > 10.0" | bc -l 2>/dev/null || echo 0) )); then
+          echo "⚠️ Site is very slow (${RESPONSE_TIME}s)"
+        elif (( $(echo "$RESPONSE_TIME > 5.0" | bc -l 2>/dev/null || echo 0) )); then
+          echo "⚠️ Site is slow (${RESPONSE_TIME}s)"
+        else
+          echo "✅ Performance is acceptable"
+        fi
+        
+    - name: Basic content check
+      run: |
+        echo "📄 Checking basic content..."
+        
+        SITE_URL="https://matraca130.github.io/FLASHCARD/"
+        
+        # Download page and check for basic elements
+        if curl -s "$SITE_URL" | grep -q "FLASHCARD"; then
+          echo "✅ Site content looks good"
+        else
+          echo "⚠️ Site content may have issues"
+        fi
+

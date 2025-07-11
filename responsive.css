@@ -332,6 +332,53 @@ p {
   .visible-mobile {
     display: none;
   }
+
+  /* Ajustes específicos para tablets grandes (ej. 1024px de ancho) */
+  /* Asegurar que los elementos interactivos sean fácilmente clickeables con el dedo */
+  .btn,
+  .nav-link,
+  .flashcard,
+  .form-input,
+  .form-textarea,
+  .form-select {
+    min-height: 56px; /* Aumentar el área táctil */
+    padding: 16px 28px; /* Aumentar el padding para facilitar el toque */
+    font-size: 18px; /* Aumentar el tamaño de fuente para mejor legibilidad */
+  }
+
+  .flashcard-container {
+    width: 80%; /* Ajustar el ancho de la flashcard para tablets */
+    max-width: 600px;
+    min-height: 300px;
+  }
+
+  .flashcard-face {
+    font-size: clamp(1.2rem, 3vw, 1.8rem); /* Ajustar tamaño de fuente de flashcard */
+    padding: clamp(1.5rem, 6vw, 2.5rem);
+  }
+
+  .study-controls .difficulty-btn {
+    min-width: 150px; /* Asegurar que los botones de dificultad sean más grandes */
+    padding: 16px 24px;
+    font-size: 18px;
+  }
+
+  .deck-card {
+    padding: 24px; /* Aumentar padding de las tarjetas de deck */
+  }
+
+  .modal {
+    max-width: 700px; /* Aumentar el tamaño de los modales */
+    padding: 32px;
+  }
+
+  .modal-title {
+    font-size: 1.8rem;
+  }
+
+  .form-label {
+    font-size: 18px;
+  }
 }
 
 /* ===== DESKTOP STYLES (1024px+) ===== */
@@ -667,3 +714,14 @@ p {
     font-size: 1rem;
   }
 }
+
+
+@media (max-width: 767px) {
+  #study-interface {
+    padding-bottom: 60px; /* Adjust based on apple-nav height */
+  }
+}
+
+
+
+

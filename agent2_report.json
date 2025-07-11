@@ -1,0 +1,372 @@
+{
+  "agent": "AGENT-2",
+  "timestamp": "2025-07-08T16:44:10.836Z",
+  "executionTime": 13,
+  "scope": {
+    "assignedFiles": [
+      "./backup_js/auth.service.js",
+      "./backup_js/apiClient.js"
+    ],
+    "assignedDirectories": [
+      "./services/"
+    ],
+    "analyzedFiles": 6
+  },
+  "analysis": {
+    "files": [
+      {
+        "path": "./backup_js/auth.service.js",
+        "size": 4040,
+        "lines": 162,
+        "hash": "fe60f6442a32e099ead761fe35ebd928",
+        "lastModified": "2025-07-08T16:15:24.058Z",
+        "functions": [
+          {
+            "name": "checkAuthStatus",
+            "line": 14,
+            "type": "export",
+            "async": true,
+            "content": "export async function checkAuthStatus() {"
+          },
+          {
+            "name": "login",
+            "line": 42,
+            "type": "export",
+            "async": true,
+            "content": "export async function login(email, password) {"
+          },
+          {
+            "name": "register",
+            "line": 86,
+            "type": "export",
+            "async": true,
+            "content": "export async function register(email, password, confirmPassword, name = '') {"
+          },
+          {
+            "name": "logout",
+            "line": 114,
+            "type": "export",
+            "async": false,
+            "content": "export function logout() {"
+          },
+          {
+            "name": "clearAuthData",
+            "line": 131,
+            "type": "regular",
+            "async": false,
+            "content": "function clearAuthData() {"
+          },
+          {
+            "name": "getAuthToken",
+            "line": 140,
+            "type": "export",
+            "async": false,
+            "content": "export function getAuthToken() {"
+          },
+          {
+            "name": "isAuthenticated",
+            "line": 148,
+            "type": "export",
+            "async": false,
+            "content": "export function isAuthenticated() {"
+          },
+          {
+            "name": "getCurrentUser",
+            "line": 156,
+            "type": "export",
+            "async": false,
+            "content": "export function getCurrentUser() {"
+          }
+        ],
+        "imports": [
+          {
+            "line": 1,
+            "content": "import { api } from './apiClient.js';",
+            "from": "'./apiClient.js';"
+          },
+          {
+            "line": 2,
+            "content": "import { store } from './store/store.js';",
+            "from": "'./store/store.js';"
+          },
+          {
+            "line": 3,
+            "content": "import { loadDashboardData } from './dashboard.service.js';",
+            "from": "'./dashboard.service.js';"
+          },
+          {
+            "line": 4,
+            "content": "import {",
+            "from": null
+          },
+          {
+            "line": 8,
+            "content": "import { performCrudOperation } from './utils/apiHelpers.js';",
+            "from": "'./utils/apiHelpers.js';"
+          },
+          {
+            "line": 9,
+            "content": "import { showNotification } from './utils/helpers.js';",
+            "from": "'./utils/helpers.js';"
+          }
+        ],
+        "exports": 7
+      },
+      {
+        "path": "./backup_js/apiClient.js",
+        "size": 4723,
+        "lines": 201,
+        "hash": "f6f70fbabdafd3d2a486deb4155d8259",
+        "lastModified": "2025-07-08T16:15:24.058Z",
+        "functions": [
+          {
+            "name": "api",
+            "line": 151,
+            "type": "export",
+            "async": true,
+            "content": "export async function api(endpoint, options = {}) {"
+          },
+          {
+            "name": "apiWithFallback",
+            "line": 166,
+            "type": "export",
+            "async": true,
+            "content": "export async function apiWithFallback(endpoint, options = {}) {"
+          }
+        ],
+        "imports": [],
+        "exports": 5
+      },
+      {
+        "path": "services/CacheManager.js",
+        "size": 12754,
+        "lines": 513,
+        "hash": "6e92e83739af367961a2e88a558bfcbc",
+        "lastModified": "2025-07-08T16:15:24.062Z",
+        "functions": [
+          {
+            "name": "getCache",
+            "line": 502,
+            "type": "arrow",
+            "async": false,
+            "content": "export const getCache = (key, options) => cacheManager.get(key, options);"
+          },
+          {
+            "name": "setCache",
+            "line": 503,
+            "type": "arrow",
+            "async": false,
+            "content": "export const setCache = (key, value, options) => cacheManager.set(key, value, options);"
+          },
+          {
+            "name": "deleteCache",
+            "line": 504,
+            "type": "arrow",
+            "async": false,
+            "content": "export const deleteCache = (key, options) => cacheManager.delete(key, options);"
+          },
+          {
+            "name": "clearCache",
+            "line": 505,
+            "type": "arrow",
+            "async": false,
+            "content": "export const clearCache = (options) => cacheManager.clear(options);"
+          },
+          {
+            "name": "getOrSetCache",
+            "line": 506,
+            "type": "arrow",
+            "async": false,
+            "content": "export const getOrSetCache = (key, fetcher, options) => cacheManager.getOrSet(key, fetcher, options);"
+          },
+          {
+            "name": "getCacheMetrics",
+            "line": 507,
+            "type": "arrow",
+            "async": false,
+            "content": "export const getCacheMetrics = () => cacheManager.getMetrics();"
+          },
+          {
+            "name": "configureCacheManager",
+            "line": 508,
+            "type": "arrow",
+            "async": false,
+            "content": "export const configureCacheManager = (config) => cacheManager.configure(config);"
+          }
+        ],
+        "imports": [],
+        "exports": 8
+      },
+      {
+        "path": "services/ConfigManager.js",
+        "size": 13460,
+        "lines": 521,
+        "hash": "c59fe5c56955ce513967e841d053561c",
+        "lastModified": "2025-07-08T16:15:24.062Z",
+        "functions": [
+          {
+            "name": "getConfig",
+            "line": 510,
+            "type": "arrow",
+            "async": false,
+            "content": "export const getConfig = (path, defaultValue) => configManager.get(path, defaultValue);"
+          },
+          {
+            "name": "setConfig",
+            "line": 511,
+            "type": "arrow",
+            "async": false,
+            "content": "export const setConfig = (path, value) => configManager.set(path, value);"
+          },
+          {
+            "name": "isFeatureEnabled",
+            "line": 512,
+            "type": "arrow",
+            "async": false,
+            "content": "export const isFeatureEnabled = (feature) => configManager.isFeatureEnabled(feature);"
+          },
+          {
+            "name": "setFeature",
+            "line": 513,
+            "type": "arrow",
+            "async": false,
+            "content": "export const setFeature = (feature, enabled) => configManager.setFeature(feature, enabled);"
+          },
+          {
+            "name": "onConfigChange",
+            "line": 514,
+            "type": "arrow",
+            "async": false,
+            "content": "export const onConfigChange = (path, callback) => configManager.onChange(path, callback);"
+          },
+          {
+            "name": "getEnvironment",
+            "line": 515,
+            "type": "arrow",
+            "async": false,
+            "content": "export const getEnvironment = () => configManager.environment;"
+          },
+          {
+            "name": "getEnvironmentInfo",
+            "line": 516,
+            "type": "arrow",
+            "async": false,
+            "content": "export const getEnvironmentInfo = () => configManager.getEnvironmentInfo();"
+          }
+        ],
+        "imports": [],
+        "exports": 8
+      },
+      {
+        "path": "services/ErrorHandler.js",
+        "size": 9454,
+        "lines": 351,
+        "hash": "c7e541cd644420ab8328684065404605",
+        "lastModified": "2025-07-08T16:15:24.062Z",
+        "functions": [
+          {
+            "name": "reportError",
+            "line": 342,
+            "type": "arrow",
+            "async": false,
+            "content": "export const reportError = (error, context) => errorHandler.reportError(error, context);"
+          },
+          {
+            "name": "addErrorStrategy",
+            "line": 343,
+            "type": "arrow",
+            "async": false,
+            "content": "export const addErrorStrategy = (type, strategy) => errorHandler.addStrategy(type, strategy);"
+          },
+          {
+            "name": "addErrorListener",
+            "line": 344,
+            "type": "arrow",
+            "async": false,
+            "content": "export const addErrorListener = (listener) => errorHandler.addListener(listener);"
+          },
+          {
+            "name": "getErrorStats",
+            "line": 345,
+            "type": "arrow",
+            "async": false,
+            "content": "export const getErrorStats = () => errorHandler.getStats();"
+          },
+          {
+            "name": "configureErrorHandler",
+            "line": 346,
+            "type": "arrow",
+            "async": false,
+            "content": "export const configureErrorHandler = (config) => errorHandler.configure(config);"
+          }
+        ],
+        "imports": [],
+        "exports": 6
+      },
+      {
+        "path": "services/NavigationService.js",
+        "size": 5297,
+        "lines": 202,
+        "hash": "e880e396db3e70bbbd311d1b66640827",
+        "lastModified": "2025-07-08T16:15:24.062Z",
+        "functions": [
+          {
+            "name": "checkNavigation",
+            "line": 37,
+            "type": "arrow",
+            "async": false,
+            "content": "const checkNavigation = () => {"
+          },
+          {
+            "name": "navigateTo",
+            "line": 193,
+            "type": "arrow",
+            "async": false,
+            "content": "export const navigateTo = (sectionId, options) => navigationService.navigateTo(sectionId, options);"
+          },
+          {
+            "name": "getCurrentSection",
+            "line": 194,
+            "type": "arrow",
+            "async": false,
+            "content": "export const getCurrentSection = () => navigationService.getCurrentSection();"
+          },
+          {
+            "name": "goBack",
+            "line": 195,
+            "type": "arrow",
+            "async": false,
+            "content": "export const goBack = () => navigationService.goBack();"
+          },
+          {
+            "name": "onNavigationChange",
+            "line": 196,
+            "type": "arrow",
+            "async": false,
+            "content": "export const onNavigationChange = (callback) => navigationService.on('navigationChanged', callback);"
+          },
+          {
+            "name": "onNavigationReady",
+            "line": 197,
+            "type": "arrow",
+            "async": false,
+            "content": "export const onNavigationReady = (callback) => navigationService.on('navigationReady', callback);"
+          }
+        ],
+        "imports": [],
+        "exports": 6
+      }
+    ],
+    "duplicates": [],
+    "comparisons": []
+  },
+  "recommendations": [],
+  "summary": {
+    "totalFiles": 6,
+    "totalFunctions": 35,
+    "duplicateFunctions": 0,
+    "highPriorityRecommendations": 0,
+    "mediumPriorityRecommendations": 0,
+    "lowPriorityRecommendations": 0
+  }
+}

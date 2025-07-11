@@ -1,0 +1,64 @@
+/* ===== SISTEMA DE SECCIONES SPA ===== */
+
+/* Asegurar que todas las secciones estén ocultas por defecto */
+.section {
+    display: none !important;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.3s ease-in-out;
+}
+
+/* Solo la sección activa debe ser visible */
+.section.active {
+    display: block !important;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Contenedor principal para las secciones */
+.main-content {
+    min-height: 100vh;
+    position: relative;
+}
+
+/* Asegurar que el contenido no haga scroll innecesario */
+body {
+    overflow-x: hidden;
+}
+
+/* Navegación activa */
+.nav-link.active,
+.apple-nav-item.active {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: #6366f1 !important;
+    border-radius: 8px;
+}
+
+/* Animación suave para cambio de secciones */
+@keyframes sectionFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.section.active {
+    animation: sectionFadeIn 0.4s ease-out;
+}
+
+/* Asegurar que cada sección ocupe toda la altura disponible */
+.section {
+    min-height: calc(100vh - 80px);
+    padding-top: 2rem;
+}
+
+/* Ocultar scroll horizontal */
+html, body {
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+}
+
