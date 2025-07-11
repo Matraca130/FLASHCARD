@@ -1109,3 +1109,29 @@ function togglePasswordVisibility() {
 }
 
 
+
+
+// Função para mostrar o modal de login e focar no campo de email/senha
+function showLoginModal() {
+  const loginModal = document.getElementById("login-modal");
+  loginModal.style.display = "flex";
+
+  const emailField = document.getElementById("login-email");
+  const passwordField = document.getElementById("login-password");
+
+  if (emailField) {
+    emailField.focus();
+  } else if (passwordField) {
+    passwordField.focus();
+  }
+}
+
+// Função para esconder o modal de login
+function hideLoginModal() {
+    const loginModal = document.getElementById("login-modal");
+    if (loginModal) {
+        loginModal.style.display = "none";
+    }
+}
+
+
