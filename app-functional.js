@@ -1,6 +1,3 @@
-// StudyingFlash - JavaScript Funcional Reconstruido
-// Versión: 1.0 - Funcionalidad básica completa
-
 class StudyingFlashApp {
     constructor() {
         this.currentSection = 'dashboard';
@@ -314,7 +311,11 @@ class StudyingFlashApp {
     }
 
     loadDecksForStudy() {
-   `
+        const deckSelection = document.getElementById('deck-selection');
+        if (!deckSelection) return;
+
+        if (this.decks.length === 0) {
+            deckSelection.innerHTML = `
                 <div class="empty-state">
                     <p>No tienes decks para estudiar. ¡Crea tu primer deck!</p>
                     <button class="btn btn-primary" onclick="app.showSection('crear')">
@@ -324,7 +325,8 @@ class StudyingFlashApp {
             `;
             return;
         }
-        // deckSelection.innerHTML = `this.decks.map(deck => `
+
+        deckSelection.innerHTML = this.decks.map(deck => `
             <div class="deck-card">
                 <div class="deck-header">
                     <h3 class="deck-title">${deck.name}</h3>
@@ -408,28 +410,6 @@ class StudyingFlashApp {
             this.showSection('estudiar');
         }
 
-        // Obtener el contenedor de la sección de estudiar
-        // Old dynamic HTML injection removed
-        //        // Old dynamic HTML injection removed
-        /        // Old dynamic HTML injection removed
-        /        // Ocultar la sección de selección de decks y mostrar la interfaz de estudio
-        document.getElementById("deck-selection").classList.add("hidden");
-        document.getElementById("study-interface").classList.remove("hidden");
-
-        // Actualizar el nombre del deck y el progreso
-        document.getElementById("study-deck-name").innerText = this.currentStudySession.deckName;
-        document.getElementById("total-cards").innerText = this.currentStudySession.cards.length;
-        this.updateStudyProgress();
-
-        // Cargar la tarjeta ac
-
-                
-                <div class="study-stats">
-                    <span>Correctas: ${this.currentStudySession.correctAnswers}</span>
-                    <span>Total: ${this.currentStudySession.totalAnswered}</span>
-                    <span>Precisión: ${this.currentStudySession.totalAnswered > 0 ? Math.round((this.currentStudySession.correctAnswers / this.currentStudySession.totalAnswered) * 100) : 0}%</span>
-        // `;
-
         // Ocultar la sección de selección de decks y mostrar la interfaz de estudio
         document.getElementById("deck-selection").classList.add("hidden");
         document.getElementById("study-interface").classList.remove("hidden");
@@ -470,26 +450,16 @@ class StudyingFlashApp {
     }
 
     completeStudySession() {
-        const accuracy = Math.round((this.currentStudySession.correctAnswers / this.currentStudySession.totalAnswered) * 100udy-complete">
-                    <h2>🎉 ¡Sesión Completada!</h2>
-                    <div class="final-stats">
-                        <h3>Resultados de: ${this.currentStudySession.deckName}</h3>
-                        <p><strong>Tarjetas estudiadas:</strong> ${this.currentStudySession.totalAnswered}</p>
-                        <p><strong>Respuestas correctas:</strong> ${this.currentStudySession.correctAnswers}</p>
-                        <p><strong>Precisión:</strong> ${accuracy}%</p>
-                    </div>
-                    <div class="completion-actions">
-                        <button class="btn btn-primary" onclick="app.startStudySession(${this.currentStudySession.deckId})">
-                            🔄 Estudiar de Nuevo
-                        </button>
-                        <button class="btn btn-secondary" onclick="app.loadStudySection()">
-                            📚 Volver a Decks
-                        </button>
-                    </div>
-                </div>
-            `;
-        }
-        
+        const accuracy = Math.round((this.currentStudySession.correctAnswers / this.currentStudySession.totalAnswered) * 100);
+
+        document.getElementById("study-interface").classList.add("hidden");
+        document.getElementById("study-summary").classList.remove("hidden");
+
+        document.getElementById("summary-correct").innerText = this.currentStudySession.correctAnswers;
+        document.getElementById("summary-total").innerText = this.currentStudySession.totalAnswered;
+        document.getElementById("summary-accuracy").innerText = accuracy + "%";
+        document.getElementById("summary-points").innerText = this.currentStudySession.points || 0;
+
         this.showNotification(`¡Sesión completada! Precisión: ${accuracy}%`, 'success');
         this.currentStudySession = null;
     }
@@ -610,23 +580,6 @@ class StudyingFlashApp {
     saveStats() {
         localStorage.setItem('studyingflash_stats', JSON.stringify(this.stats));
     }
-}
-
-// I// Inicializar la aplicación cuando el DOM esté listo
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('🌟 DOM cargado, inicializando StudyingFlash...');
-    const app = new StudyingFlashApp();
-    
-    // Exponer app globalmente para debugging y event listeners
-    window.app = app;
-    
-    console.log('✅ App inicializada y expuesta globalmente');
-});
-
-// Hacer la app accesible globalmente para debugging
-window.StudyingFlashApp = StudyingFlashApp;
-
-
 
     updateStudyProgress() {
         const currentCardEl = document.getElementById("current-card");
@@ -640,9 +593,6 @@ window.StudyingFlashApp = StudyingFlashApp;
             progressBarFill.style.width = `${progress}%`;
         }
     }
-
-
-
 
     loadCurrentFlashcard() {
         const currentCard = this.currentStudySession.cards[this.currentStudySession.currentCardIndex];
@@ -659,19 +609,13 @@ window.StudyingFlashApp = StudyingFlashApp;
         this.updateStudyProgress();
     }
 
-
-
-
     flipCard() {
-        document.getElementById("study-flashcard").classList.toggle("flipped");
+        document.getElementById("flashcard").classList.toggle("flipped");
     }
-
-
-
 
     evaluateCard(difficulty) {
         // Ensure the card is flipped to show the answer before evaluating
-        document.getElementById("study-flashcard").classList.add("flipped");
+        document.getElementById("flashcard").classList.add("flipped");
 
         // Update stats based on difficulty
         this.currentStudySession.totalAnswered++;
@@ -715,9 +659,6 @@ window.StudyingFlashApp = StudyingFlashApp;
         document.getElementById("session-points").innerText = this.currentStudySession.points;
     }
 
-
-
-
     finishStudySession() {
         const correct = this.currentStudySession.correctAnswers;
         const total = this.currentStudySession.totalAnswered;
@@ -734,5 +675,32 @@ window.StudyingFlashApp = StudyingFlashApp;
         this.showNotification(`¡Sesión completada! Precisión: ${accuracy}%`, "success");
         this.currentStudySession = null;
     }
+}
+
+// Inicializar la aplicación cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('🌟 DOM cargado, inicializando StudyingFlash...');
+    const app = new StudyingFlashApp();
+    
+    // Exponer app globalmente para debugging y event listeners
+    window.app = app;
+    
+    // Exponer funciones globales para onclick en HTML
+    window.showSection = (sectionName) => app.showSection(sectionName);
+    window.startStudySession = (deckId) => app.startStudySession(deckId);
+    window.editDeck = (deckId) => app.editDeck(deckId);
+    window.deleteDeck = (deckId) => app.deleteDeck(deckId);
+    window.createDeck = () => app.createDeck();
+    window.createFlashcard = () => app.createFlashcard();
+    window.flipCard = () => app.flipCard();
+    window.evaluateCard = (difficulty) => app.evaluateCard(difficulty);
+    window.exitStudySession = () => app.endStudySession();
+    window.startNewSession = () => app.loadStudySection(); // Assuming this is for starting a new session from summary
+
+    console.log('✅ App inicializada y expuesta globalmente');
+});
+
+// Hacer la app accesible globalmente para debugging
+window.StudyingFlashApp = StudyingFlashApp;
 
 
