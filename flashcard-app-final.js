@@ -323,8 +323,8 @@ const FlashcardService = {
     async create(flashcardData) {
         const flashcard = {
             deckId: flashcardData.deckId,
-            front_content: flashcardData.front,
-            back_content: flashcardData.back,
+              front_content: flashcardData.front_content,
+            back_content: flashcardData.back_content,
             difficulty: 1,
             interval: 1,
             easeFactor: 2.5,
@@ -724,11 +724,10 @@ const StudyingFlash = {
         const formData = new FormData(event.target);
         const flashcardData = {
             deckId: formData.get("deckId"),
-            front_content: formData.get("front"),
-            back_content: formData.get("back")
-        };
+            front_content: formData.get("front_content"),
+            back_content: formData.get("back_content");
         
-        if (!flashcardData.deckId || !flashcardData.front || !flashcardData.back) {
+        if (!flashcardData.deckId || !flashcardData.front_content || !flashcardData.back_content) {
             Utils.showNotification("Todos los campos son requeridos", "error");
             return;
         }
