@@ -211,8 +211,8 @@ class StudyingFlashApp {
         const newFlashcard = {
             id: Date.now(),
             deckId: parseInt(deckSelect.value),
-            front: frontInput.value.trim(),
-            back: backInput.value.trim(),
+            front_content: frontInput.value.trim(),
+            back_content: backInput.value.trim(),
             createdAt: new Date().toISOString(),
             difficulty: 0,
             nextReview: new Date().toISOString()
@@ -596,8 +596,8 @@ class StudyingFlashApp {
 
     loadCurrentFlashcard() {
         const currentCard = this.currentStudySession.cards[this.currentStudySession.currentCardIndex];
-        document.getElementById("card-front-text").innerText = currentCard.front;
-        document.getElementById("card-back-text").innerText = currentCard.back;
+        document.getElementById("card-front-text").innerText = currentCard.front_content;
+        document.getElementById("card-back-text").innerText = currentCard.back_content;
         
         // Reset flashcard to front view
         document.getElementById("flashcard").classList.remove("flipped");

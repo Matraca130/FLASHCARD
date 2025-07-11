@@ -323,8 +323,8 @@ const FlashcardService = {
     async create(flashcardData) {
         const flashcard = {
             deckId: flashcardData.deckId,
-            front: flashcardData.front,
-            back: flashcardData.back,
+            front_content: flashcardData.front,
+            back_content: flashcardData.back,
             difficulty: 1,
             interval: 1,
             easeFactor: 2.5,
@@ -724,8 +724,8 @@ const StudyingFlash = {
         const formData = new FormData(event.target);
         const flashcardData = {
             deckId: formData.get("deckId"),
-            front: formData.get("front"),
-            back: formData.get("back")
+            front_content: formData.get("front"),
+            back_content: formData.get("back")
         };
         
         if (!flashcardData.deckId || !flashcardData.front || !flashcardData.back) {
@@ -812,8 +812,8 @@ const StudyingFlash = {
         const flashcardContainer = document.getElementById("flashcard");
         const studyControls = document.getElementById("study-controls");
 
-        if (frontElement) frontElement.textContent = flashcard.front;
-        if (backElement) backElement.textContent = flashcard.back;
+        if (frontElement) frontElement.textContent = flashcard.front_content;
+        if (backElement) backElement.textContent = flashcard.back_content;
         if (progressElement) {
             progressElement.textContent = `${currentIndex + 1} / ${flashcards.length}`;
         }
