@@ -161,9 +161,9 @@ export const FALLBACK_DATA = {
   ],
 
   flashcards: [
-    { id: 1, front: 'Hello', back: 'Hola', deck_id: 1 },
-    { id: 2, front: 'Goodbye', back: 'Adiós', deck_id: 1 },
-    { id: 3, front: '2 + 2', back: '4', deck_id: 2 },
+    { id: 1, front_content: 'Hello', back_content: 'Hola', deck_id: 1 },
+    { id: 2, front_content: 'Goodbye', back_content: 'Adiós', deck_id: 1 },
+    { id: 3, front_content: '2 + 2', back_content: '4', deck_id: 2 },
   ],
 
   user: {
