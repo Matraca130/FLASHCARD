@@ -278,6 +278,12 @@ class StudyingFlashApp {
             case 'estudiar':
                 this.loadStudySection();
                 break;
+            case 'gestionar':
+                this.loadManageSection();
+                break;
+            case 'ranking':
+                this.loadRankingSection();
+                break;
             case 'estadisticas':
                 this.loadStatsSection();
                 break;
@@ -318,6 +324,16 @@ class StudyingFlashApp {
     loadStudySection() {
         Utils.log('Cargando sección estudiar');
         this.updateStudyDecks();
+    }
+
+    loadManageSection() {
+        Utils.log('Cargando sección gestionar');
+        this.updateDecksList();
+    }
+
+    loadRankingSection() {
+        Utils.log('Cargando sección ranking');
+        this.updateRankingSection();
     }
 
     loadStatsSection() {
@@ -786,6 +802,51 @@ class StudyingFlashApp {
         `;
     }
 
+    updateRankingSection() {
+        // Implementar ranking de usuarios/decks
+        const rankingContainer = document.getElementById('ranking-container');
+        if (!rankingContainer) return;
+
+        const rankingStats = this.calculateRankingStats();
+        
+        rankingContainer.innerHTML = `
+            <div class="ranking-grid">
+                <div class="ranking-card">
+                    <h3>🏆 Tu Posición</h3>
+                    <div class="rank-number">#${rankingStats.userRank}</div>
+                    <p>de ${rankingStats.totalUsers} usuarios</p>
+                </div>
+                <div class="ranking-card">
+                    <h3>📚 Decks Completados</h3>
+                    <div class="rank-number">${rankingStats.completedDecks}</div>
+                    <p>decks dominados</p>
+                </div>
+                <div class="ranking-card">
+                    <h3>🔥 Racha Máxima</h3>
+                    <div class="rank-number">${rankingStats.maxStreak}</div>
+                    <p>días consecutivos</p>
+                </div>
+                <div class="ranking-card">
+                    <h3>⭐ Puntuación Total</h3>
+                    <div class="rank-number">${rankingStats.totalScore}</div>
+                    <p>puntos acumulados</p>
+                </div>
+            </div>
+            <div class="leaderboard">
+                <h3>🏅 Tabla de Líderes</h3>
+                <div class="leaderboard-list">
+                    ${rankingStats.topUsers.map((user, index) => `
+                        <div class="leaderboard-item ${user.isCurrentUser ? 'current-user' : ''}">
+                            <span class="rank">#${index + 1}</span>
+                            <span class="username">${user.username}</span>
+                            <span class="score">${user.score} pts</span>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }
+
     calculateDetailedStats() {
         return {
             totalDecks: this.decks.length,
@@ -806,6 +867,46 @@ class StudyingFlashApp {
     getCurrentStreak() {
         // Implementar lógica de racha
         return this.stats.currentStreak || 0;
+    }
+
+    calculateRankingStats() {
+        // Datos simulados para ranking - en producción vendría de API
+        return {
+            userRank: Math.floor(Math.random() * 100) + 1,
+            totalUsers: 1000,
+            completedDecks: this.decks.filter(deck => this.isDeckCompleted(deck.id)).length,
+            maxStreak: this.getMaxStreak(),
+            totalScore: this.calculateTotalScore(),
+            topUsers: [
+                { username: 'StudyMaster', score: 15420, isCurrentUser: false },
+                { username: 'FlashGenius', score: 14890, isCurrentUser: false },
+                { username: 'Tú', score: this.calculateTotalScore(), isCurrentUser: true },
+                { username: 'MemoryPro', score: 12340, isCurrentUser: false },
+                { username: 'CardWizard', score: 11750, isCurrentUser: false }
+            ].sort((a, b) => b.score - a.score)
+        };
+    }
+
+    isDeckCompleted(deckId) {
+        const deckCards = this.flashcards.filter(card => card.deckId === deckId);
+        if (deckCards.length === 0) return false;
+        
+        // Un deck se considera completado si todas sus cartas han sido estudiadas al menos 3 veces
+        return deckCards.every(card => (card.timesStudied || 0) >= 3);
+    }
+
+    getMaxStreak() {
+        // Calcular racha máxima basada en estadísticas guardadas
+        return this.stats.maxStreak || 0;
+    }
+
+    calculateTotalScore() {
+        // Calcular puntuación total basada en actividad
+        const deckPoints = this.decks.length * 100;
+        const cardPoints = this.flashcards.length * 10;
+        const studyPoints = Object.values(this.stats.dailyStudy || {}).reduce((sum, count) => sum + count, 0) * 5;
+        
+        return deckPoints + cardPoints + studyPoints;
     }
 
     updateGlobalStats(sessionStats) {
