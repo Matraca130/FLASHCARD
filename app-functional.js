@@ -1,3 +1,171 @@
+// ===== CONFIGURACIÓN GLOBAL =====
+const CONFIG = {
+    API_BASE_URL: "https://flashcard-u10n.onrender.com/api",
+    STORAGE_PREFIX: "studyingflash_",
+    DEBUG: true
+};
+
+// ===== UTILIDADES GLOBALES =====
+const Utils = {
+    log: (message, data = null) => {
+        if (CONFIG.DEBUG) {
+            console.log(`🔧 [StudyingFlash] ${message}`, data || "");
+        }
+    },
+    
+    error: (message, error = null) => {
+        console.error(`❌ [StudyingFlash] ${message}`, error || "");
+    },
+    
+    showNotification: (message, type = "success") => {
+        // Crear notificación visual
+        const notification = document.createElement("div");
+        notification.className = `notification ${type}`;
+        notification.textContent = message;
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: ${type === "success" ? "#10b981" : "#ef4444"};
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            z-index: 10000;
+            animation: slideIn 0.3s ease;
+        `;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.remove();
+        }, 3000);
+    },
+    
+    formatDate: (date) => {
+        return new Date(date).toLocaleDateString("es-ES");
+    },
+
+    // Función debounce para optimizar búsquedas
+    debounce: (func, delay) => {
+        let timeout;
+        return function(...args) {
+            const context = this;
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(context, args), delay);
+        };
+    },
+
+    generateId: () => {
+        return Date.now().toString(36) + Math.random().toString(36).substr(2);
+    }
+};
+
+// ===== API SERVICE =====
+const ApiService = {
+    // Hacer petición con fallback a localStorage
+    async request(endpoint, options = {}) {
+        const url = `${CONFIG.API_BASE_URL}${endpoint}`;
+        
+        try {
+            Utils.log(`API Request: ${options.method || "GET"} ${url}`);
+            
+            const response = await fetch(url, {
+                headers: {
+                    "Content-Type": "application/json",
+                    ...options.headers
+                },
+                ...options
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            const data = await response.json();
+            Utils.log(`API Response:`, data);
+            return data;
+            
+        } catch (error) {
+            Utils.error(`API Error: ${endpoint}`, error);
+            
+            // Fallback a localStorage para desarrollo
+            return this.fallbackToLocalStorage(endpoint, options);
+        }
+    },
+    
+    // Fallback cuando la API no está disponible
+    fallbackToLocalStorage(endpoint, options) {
+        Utils.log(`Using localStorage fallback for: ${endpoint}`);
+        
+        const method = options.method || "GET";
+        const storageKey = `${CONFIG.STORAGE_PREFIX}${endpoint.replace(/\//g, "_")}`;
+        
+        switch (method) {
+            case "GET":
+                const stored = localStorage.getItem(storageKey);
+                return stored ? JSON.parse(stored) : [];
+                
+            case "POST":
+                const newData = JSON.parse(options.body);
+                newData.id = Utils.generateId();
+                newData.createdAt = new Date().toISOString();
+                
+                const existing = JSON.parse(localStorage.getItem(storageKey) || "[]");
+                existing.push(newData);
+                localStorage.setItem(storageKey, JSON.stringify(existing));
+                
+                return newData;
+                
+            case "PUT":
+                // Actualizar elemento existente
+                const updateData = JSON.parse(options.body);
+                const allItems = JSON.parse(localStorage.getItem(storageKey) || "[]");
+                const index = allItems.findIndex(item => item.id === updateData.id);
+                
+                if (index !== -1) {
+                    allItems[index] = { ...allItems[index], ...updateData };
+                    localStorage.setItem(storageKey, JSON.stringify(allItems));
+                    return allItems[index];
+                }
+                return null;
+                
+            case "DELETE":
+                const deleteId = endpoint.split("/").pop();
+                const items = JSON.parse(localStorage.getItem(storageKey) || "[]");
+                const filtered = items.filter(item => item.id !== deleteId);
+                localStorage.setItem(storageKey, JSON.stringify(filtered));
+                return { success: true };
+                
+            default:
+                return null;
+        }
+    },
+
+    // Métodos específicos para la API
+    async get(endpoint) {
+        return this.request(endpoint, { method: "GET" });
+    },
+
+    async post(endpoint, data) {
+        return this.request(endpoint, {
+            method: "POST",
+            body: JSON.stringify(data)
+        });
+    },
+
+    async put(endpoint, data) {
+        return this.request(endpoint, {
+            method: "PUT",
+            body: JSON.stringify(data)
+        });
+    },
+
+    async delete(endpoint) {
+        return this.request(endpoint, { method: "DELETE" });
+    }
+};
+
+// ===== CLASE PRINCIPAL (MANTENIDA DE app-functional.js) =====
 class StudyingFlashApp {
     constructor() {
         this.currentSection = 'dashboard';
@@ -10,6 +178,7 @@ class StudyingFlashApp {
 
     init() {
         console.log('🚀 StudyingFlash App iniciando...');
+        Utils.log('App inicializando con capacidades API');
         this.setupEventListeners();
         this.showSection('dashboard');
         this.updateStats();
@@ -57,333 +226,345 @@ class StudyingFlashApp {
         }
         
         if (appleMenuBtn) {
-            appleMenuBtn.addEventListener('click', () => this.toggleAppleMenu());
+            appleMenuBtn.addEventListener('click', () => this.toggleMobileMenu());
         }
 
-        console.log('🔗 Event listeners configurados');
+        // Cerrar menú móvil al hacer clic fuera
+        document.addEventListener('click', (e) => {
+            const mobileMenu = document.querySelector('.mobile-menu');
+            const menuBtn = document.getElementById('mobile-menu-btn');
+            
+            if (mobileMenu && mobileMenu.classList.contains('active') && 
+                !mobileMenu.contains(e.target) && !menuBtn.contains(e.target)) {
+                this.closeMobileMenu();
+            }
+        });
     }
 
     showSection(sectionName) {
-        console.log(`📱 Navegando a sección: ${sectionName}`);
+        Utils.log(`Navegando a sección: ${sectionName}`);
         
         // Ocultar todas las secciones
         document.querySelectorAll('.section').forEach(section => {
-            section.classList.remove('active');
             section.style.display = 'none';
         });
 
-        // Mostrar sección seleccionada
+        // Mostrar la sección solicitada
         const targetSection = document.getElementById(sectionName);
         if (targetSection) {
-            targetSection.classList.add('active');
             targetSection.style.display = 'block';
+            this.currentSection = sectionName;
         }
 
         // Actualizar navegación activa
-        document.querySelectorAll('.nav-link').forEach(link => {
+        document.querySelectorAll('[data-section]').forEach(link => {
             link.classList.remove('active');
         });
 
-        document.querySelectorAll('.apple-nav-item').forEach(link => {
-            link.classList.remove('active');
-        });
-
-        // Marcar enlace activo
+        // Marcar como activo el enlace correspondiente
         const activeLinks = document.querySelectorAll(`[data-section="${sectionName}"]`);
         activeLinks.forEach(link => {
             link.classList.add('active');
         });
 
-        this.currentSection = sectionName;
-
         // Cargar contenido específico de la sección
-        this.loadSectionContent(sectionName);
-    }
-
-    loadSectionContent(sectionName) {
-        switch(sectionName) {
+        switch (sectionName) {
             case 'dashboard':
                 this.loadDashboard();
-                break;
-            case 'estudiar':
-                this.loadStudySection();
                 break;
             case 'crear':
                 this.loadCreateSection();
                 break;
-            case 'gestionar':
-                this.loadManageSection();
+            case 'estudiar':
+                this.loadStudySection();
                 break;
-            case 'ranking':
-                this.loadRankingSection();
+            case 'estadisticas':
+                this.loadStatsSection();
                 break;
+            case 'configuracion':
+                this.loadConfigSection();
+                break;
+        }
+
+        // Cerrar menú móvil si está abierto
+        this.closeMobileMenu();
+    }
+
+    toggleMobileMenu() {
+        const mobileMenu = document.querySelector('.mobile-menu');
+        if (mobileMenu) {
+            mobileMenu.classList.toggle('active');
+        }
+    }
+
+    closeMobileMenu() {
+        const mobileMenu = document.querySelector('.mobile-menu');
+        if (mobileMenu) {
+            mobileMenu.classList.remove('active');
         }
     }
 
     loadDashboard() {
-        console.log('📊 Cargando dashboard...');
+        Utils.log('Cargando dashboard');
+        this.updateDecksList();
         this.updateStats();
-        this.loadDashboardDecks();
-    }
-
-    loadStudySection() {
-        console.log('📚 Cargando sección de estudio...');
-        this.loadDecksForStudy();
     }
 
     loadCreateSection() {
-        console.log('➕ Cargando sección de creación...');
-        this.loadDecksForFlashcardCreation();
-        this.updateDeckCountsInUI();
+        Utils.log('Cargando sección crear');
+        this.updateDeckOptions();
     }
 
-    loadManageSection() {
-        console.log('⚙️ Cargando sección de gestión...');
-        this.loadDecksForManagement();
+    loadStudySection() {
+        Utils.log('Cargando sección estudiar');
+        this.updateStudyDecks();
     }
 
-    loadRankingSection() {
-        console.log('🏆 Cargando ranking...');
-        // Implementar ranking más tarde
+    loadStatsSection() {
+        Utils.log('Cargando estadísticas');
+        this.updateStatsSection();
     }
 
-    createDeck() {
+    loadConfigSection() {
+        Utils.log('Cargando configuración');
+        // Configuración específica si es necesaria
+    }
+
+    // ===== GESTIÓN DE DECKS (CON CAPACIDADES API) =====
+    async createDeck() {
         const nameInput = document.getElementById('deck-name');
         const descriptionInput = document.getElementById('deck-description');
-        const publicCheckbox = document.getElementById('deck-public');
+        
+        if (!nameInput || !descriptionInput) {
+            Utils.error('Elementos de formulario no encontrados');
+            return;
+        }
 
-        if (!nameInput || !nameInput.value.trim()) {
-            this.showNotification('Por favor, ingresa un nombre para el deck', 'error');
+        const name = nameInput.value.trim();
+        const description = descriptionInput.value.trim();
+
+        if (!name) {
+            Utils.showNotification('El nombre del deck es requerido', 'error');
             return;
         }
 
         const newDeck = {
-            id: Date.now(),
-            name: nameInput.value.trim(),
-            description: descriptionInput ? descriptionInput.value.trim() : '',
-            isPublic: publicCheckbox ? publicCheckbox.checked : false,
+            id: Utils.generateId(),
+            name: name,
+            description: description,
             createdAt: new Date().toISOString(),
-            cardCount: 0
+            flashcards: [],
+            stats: {
+                total: 0,
+                studied: 0,
+                mastered: 0
+            }
         };
 
-        this.decks.push(newDeck);
-        this.saveDecks();
+        try {
+            // Intentar guardar en API primero
+            const savedDeck = await ApiService.post('/decks', newDeck);
+            Utils.log('Deck guardado en API', savedDeck);
+            
+            // Actualizar localStorage como backup
+            this.decks.push(savedDeck);
+            localStorage.setItem('studyingflash_decks', JSON.stringify(this.decks));
+            
+            Utils.showNotification('Deck creado exitosamente', 'success');
+            
+        } catch (error) {
+            // Fallback a localStorage
+            Utils.log('Usando fallback localStorage para deck');
+            this.decks.push(newDeck);
+            localStorage.setItem('studyingflash_decks', JSON.stringify(this.decks));
+            Utils.showNotification('Deck creado (modo offline)', 'success');
+        }
 
         // Limpiar formulario
         nameInput.value = '';
-        if (descriptionInput) descriptionInput.value = '';
-        if (publicCheckbox) publicCheckbox.checked = false;
+        descriptionInput.value = '';
 
-        this.showNotification(`Deck "${newDeck.name}" creado exitosamente!`, 'success');
-        this.loadCreateSection();
-        this.updateStats();
-        this.updateDeckCountsInUI();
-
-        console.log('✅ Deck creado:', newDeck);
+        // Actualizar UI
+        this.updateDecksList();
+        this.updateDeckOptions();
     }
 
-    createFlashcard() {
+    async createFlashcard() {
         const deckSelect = document.getElementById('flashcard-deck');
-        const frontInput = document.querySelector('textarea#flashcard-front');
-        const backInput = document.querySelector('textarea#flashcard-back');
-
-        console.log('🔍 Elementos encontrados:', {
-            deckSelect: deckSelect ? 'OK' : 'NO ENCONTRADO',
-            frontInput: frontInput ? 'OK' : 'NO ENCONTRADO', 
-            backInput: backInput ? 'OK' : 'NO ENCONTRADO'
-        });
-
-        if (!deckSelect || !deckSelect.value) {
-            this.showNotification('Por favor, selecciona un deck', 'error');
+        const frontInput = document.getElementById('flashcard-front');
+        const backInput = document.getElementById('flashcard-back');
+        
+        if (!deckSelect || !frontInput || !backInput) {
+            Utils.error('Elementos de formulario no encontrados');
             return;
         }
 
-        if (!frontInput || !frontInput.value || !frontInput.value.trim()) {
-            this.showNotification('Por favor, ingresa el frente de la flashcard', 'error');
-            return;
-        }
+        const deckId = deckSelect.value;
+        const front_content = {
+            text: frontInput.value.trim(),
+            image_url: null,
+            audio_url: null,
+            video_url: null
+        };
+        const back_content = {
+            text: backInput.value.trim(),
+            image_url: null,
+            audio_url: null,
+            video_url: null
+        };
 
-        if (!backInput || !backInput.value || !backInput.value.trim()) {
-            this.showNotification('Por favor, ingresa el reverso de la flashcard', 'error');
+        if (!deckId || !front_content.text || !back_content.text) {
+            Utils.showNotification('Todos los campos son requeridos', 'error');
             return;
         }
 
         const newFlashcard = {
-            id: Date.now(),
-            deckId: parseInt(deckSelect.value),
-            front_content: frontInput.value.trim(),
-            back_content: backInput.value.trim(),
-            createdAt: new Date().toISOString()
+            id: Utils.generateId(),
+            deckId: deckId,
+            front_content: front_content,
+            back_content: back_content,
+            createdAt: new Date().toISOString(),
+            algorithm_data: {
+                algorithm_type: 'sm2',
+                ease_factor: 2.5,
+                interval: 1,
+                repetitions: 0,
+                next_review: new Date().toISOString()
+            }
         };
 
-        console.log('✅ Creando flashcard:', newFlashcard);
-
-        this.flashcards.push(newFlashcard);
-        this.saveFlashcards();
-
-        // Actualizar contador de cartas en el deck
-        const deck = this.decks.find(d => d.id === newFlashcard.deckId);
-        if (deck) {
-            deck.cardCount = this.flashcards.filter(f => f.deckId === deck.id).length;
-            this.saveDecks();
+        try {
+            // Intentar guardar en API
+            const savedFlashcard = await ApiService.post('/flashcards', newFlashcard);
+            Utils.log('Flashcard guardado en API', savedFlashcard);
+            
+            // Actualizar localStorage
+            this.flashcards.push(savedFlashcard);
+            localStorage.setItem('studyingflash_flashcards', JSON.stringify(this.flashcards));
+            
+            Utils.showNotification('Flashcard creado exitosamente', 'success');
+            
+        } catch (error) {
+            // Fallback a localStorage
+            Utils.log('Usando fallback localStorage para flashcard');
+            this.flashcards.push(newFlashcard);
+            localStorage.setItem('studyingflash_flashcards', JSON.stringify(this.flashcards));
+            Utils.showNotification('Flashcard creado (modo offline)', 'success');
         }
 
         // Limpiar formulario
         frontInput.value = '';
         backInput.value = '';
 
-        this.showNotification('Flashcard creada exitosamente!', 'success');
-        this.updateStats();
-        this.updateDeckCountsInUI();
-
-        console.log('✅ Flashcard creada:', newFlashcard);
+        // Actualizar estadísticas del deck
+        this.updateDeckStats(deckId);
     }
 
-    updateDeckCountsInUI() {
-        // Actualizar dropdown de selección de deck
-        this.loadDecksForFlashcardCreation();
-        
-        // Actualizar dashboard si está visible
-        if (this.currentSection === 'dashboard') {
-            this.loadDashboardDecks();
+    updateDecksList() {
+        const decksList = document.getElementById('decks-list');
+        if (!decksList) return;
+
+        if (this.decks.length === 0) {
+            decksList.innerHTML = '<p class="no-decks">No tienes decks creados aún. ¡Crea tu primer deck!</p>';
+            return;
         }
-        
-        // Actualizar sección de estudio si está visible
-        if (this.currentSection === 'estudiar') {
-            this.loadDecksForStudy();
-        }
-        
-        // Actualizar sección de gestión si está visible
-        if (this.currentSection === 'gestionar') {
-            this.loadDecksForManagement();
-        }
+
+        decksList.innerHTML = this.decks.map(deck => {
+            const flashcardsCount = this.flashcards.filter(card => card.deckId === deck.id).length;
+            return `
+                <div class="deck-card" data-deck-id="${deck.id}">
+                    <div class="deck-header">
+                        <h3>${deck.name}</h3>
+                        <div class="deck-actions">
+                            <button onclick="app.editDeck('${deck.id}')" class="btn-edit">✏️</button>
+                            <button onclick="app.deleteDeck('${deck.id}')" class="btn-delete">🗑️</button>
+                        </div>
+                    </div>
+                    <p class="deck-description">${deck.description || 'Sin descripción'}</p>
+                    <div class="deck-stats">
+                        <span class="stat">📚 ${flashcardsCount} tarjetas</span>
+                        <span class="stat">📅 ${Utils.formatDate(deck.createdAt)}</span>
+                    </div>
+                    <div class="deck-actions-bottom">
+                        <button onclick="app.startStudySession('${deck.id}')" class="btn-study">Estudiar</button>
+                        <button onclick="app.showSection('crear')" class="btn-add-card">+ Agregar tarjeta</button>
+                    </div>
+                </div>
+            `;
+        }).join('');
     }
 
-    loadDecksForFlashcardCreation() {
+    updateDeckOptions() {
         const deckSelect = document.getElementById('flashcard-deck');
         if (!deckSelect) return;
 
-        deckSelect.innerHTML = '<option value="">Selecciona un deck...</option>';
-        
-        this.decks.forEach(deck => {
-            const option = document.createElement('option');
-            option.value = deck.id;
-            option.textContent = `${deck.name} (${deck.cardCount} cartas)`;
-            deckSelect.appendChild(option);
-        });
-    }
-
-    loadDashboardDecks() {
-        const decksContainer = document.getElementById('dashboard-decks');
-        if (!decksContainer) return;
-
         if (this.decks.length === 0) {
-            decksContainer.innerHTML = `
-                <div class="empty-state">
-                    <p>No tienes decks aún. ¡Crea tu primer deck!</p>
-                    <button class="btn btn-primary" onclick="app.showSection('crear')">
-                        ➕ Crear Primer Deck
-                    </button>
-                </div>
-            `;
+            deckSelect.innerHTML = '<option value="">Primero crea un deck</option>';
+            deckSelect.disabled = true;
             return;
         }
 
-        decksContainer.innerHTML = this.decks.map(deck => `
-            <div class="deck-card">
-                <div class="deck-header">
-                    <h3 class="deck-title">${deck.name}</h3>
-                    <span class="deck-count">${deck.cardCount} cartas</span>
-                </div>
-                <p class="deck-description">${deck.description || 'Sin descripción'}</p>
-                <div class="deck-actions">
-                    <button class="btn btn-primary btn-sm" onclick="app.startStudySession(${deck.id})">
-                        📚 Estudiar
-                    </button>
-                    <button class="btn btn-secondary btn-sm" onclick="app.editDeck(${deck.id})">
-                        ✏️ Editar
-                    </button>
-                </div>
-            </div>
-        `).join('');
+        deckSelect.disabled = false;
+        deckSelect.innerHTML = '<option value="">Selecciona un deck</option>' +
+            this.decks.map(deck => `<option value="${deck.id}">${deck.name}</option>`).join('');
     }
 
-    loadDecksForStudy() {
-        const deckSelection = document.getElementById('deck-selection');
-        if (!deckSelection) return;
+    updateStudyDecks() {
+        const studyDecks = document.getElementById('study-decks');
+        if (!studyDecks) return;
 
         if (this.decks.length === 0) {
-            deckSelection.innerHTML = `
-                <div class="empty-state">
-                    <p>No tienes decks para estudiar. ¡Crea tu primer deck!</p>
-                    <button class="btn btn-primary" onclick="app.showSection('crear')">
-                        ➕ Crear Primer Deck
-                    </button>
-                </div>
-            `;
+            studyDecks.innerHTML = '<p class="no-decks">No tienes decks para estudiar. ¡Crea algunos primero!</p>';
             return;
         }
 
-        deckSelection.innerHTML = this.decks.map(deck => `
-            <div class="deck-card">
-                <div class="deck-header">
-                    <h3 class="deck-title">${deck.name}</h3>
-                    <span class="deck-count">${deck.cardCount} cartas</span>
-                </div>
-                <p class="deck-description">${deck.description || 'Sin descripción'}</p>
-                <button class="btn btn-primary" onclick="app.startStudySession(${deck.id})">
-                    📚 Comenzar Estudio
-                </button>
-            </div>
-        `).join('');
-    }
+        studyDecks.innerHTML = this.decks.map(deck => {
+            const deckFlashcards = this.flashcards.filter(card => card.deckId === deck.id);
+            const readyToReview = deckFlashcards.filter(card => 
+                new Date(card.algorithm_data.next_review) <= new Date()
+            ).length;
 
-    loadDecksForManagement() {
-        const manageDecks = document.getElementById('manage-decks');
-        if (!manageDecks) return;
-
-        if (this.decks.length === 0) {
-            manageDecks.innerHTML = `
-                <div class="empty-state">
-                    <p>No tienes decks para gestionar.</p>
+            return `
+                <div class="study-deck-card">
+                    <h3>${deck.name}</h3>
+                    <p>${deck.description || 'Sin descripción'}</p>
+                    <div class="study-stats">
+                        <span>📚 ${deckFlashcards.length} total</span>
+                        <span>⏰ ${readyToReview} para revisar</span>
+                    </div>
+                    <button onclick="app.startStudySession('${deck.id}')" 
+                            class="btn-study" 
+                            ${deckFlashcards.length === 0 ? 'disabled' : ''}>
+                        ${deckFlashcards.length === 0 ? 'Sin tarjetas' : 'Estudiar'}
+                    </button>
                 </div>
             `;
-            return;
-        }
-
-        manageDecks.innerHTML = this.decks.map(deck => `
-            <div class="deck-card">
-                <div class="deck-header">
-                    <h3 class="deck-title">${deck.name}</h3>
-                    <span class="deck-count">${deck.cardCount} cartas</span>
-                </div>
-                <p class="deck-description">${deck.description || 'Sin descripción'}</p>
-                <div class="deck-actions">
-                    <button class="btn btn-secondary btn-sm" onclick="app.editDeck(${deck.id})">
-                        ✏️ Editar
-                    </button>
-                    <button class="btn btn-danger btn-sm" onclick="app.deleteDeck(${deck.id})">
-                        🗑️ Eliminar
-                    </button>
-                </div>
-            </div>
-        `).join('');
+        }).join('');
     }
 
+    // ===== SESIÓN DE ESTUDIO =====
     startStudySession(deckId) {
-        console.log(`📚 Iniciando sesión de estudio para deck ${deckId}`);
+        Utils.log(`Iniciando sesión de estudio para deck: ${deckId}`);
         
-        // Encontrar el deck
         const deck = this.decks.find(d => d.id === deckId);
         if (!deck) {
-            this.showNotification('Deck no encontrado', 'error');
+            Utils.showNotification('Deck no encontrado', 'error');
             return;
         }
 
-        // Obtener flashcards del deck
-        const deckCards = this.flashcards.filter(card => card.deckId === deckId);
-        if (deckCards.length === 0) {
-            this.showNotification('Este deck no tiene flashcards para estudiar', 'error');
+        const deckFlashcards = this.flashcards.filter(card => card.deckId === deckId);
+        if (deckFlashcards.length === 0) {
+            Utils.showNotification('Este deck no tiene tarjetas', 'error');
+            return;
+        }
+
+        // Filtrar tarjetas que necesitan revisión
+        const cardsToReview = deckFlashcards.filter(card => 
+            new Date(card.algorithm_data.next_review) <= new Date()
+        );
+
+        if (cardsToReview.length === 0) {
+            Utils.showNotification('No hay tarjetas para revisar en este momento', 'info');
             return;
         }
 
@@ -391,301 +572,316 @@ class StudyingFlashApp {
         this.currentStudySession = {
             deckId: deckId,
             deckName: deck.name,
-            cards: [...deckCards],
+            cards: cardsToReview,
             currentCardIndex: 0,
-            showingAnswer: false,
-            correctAnswers: 0,
-            totalAnswered: 0
+            isFlipped: false,
+            stats: {
+                total: cardsToReview.length,
+                correct: 0,
+                incorrect: 0
+            }
         };
 
-        // Mostrar interfaz de estudio
-        this.showStudyInterface();
+        this.showStudyCard();
+        this.showSection('study-session');
     }
 
-    showStudyInterface() {
-        // Cambiar a la sección de estudiar si no estamos ahí
-        if (this.currentSection !== 'estudiar') {
-            this.showSection('estudiar');
+    showStudyCard() {
+        if (!this.currentStudySession) return;
+
+        const session = this.currentStudySession;
+        const currentCard = session.cards[session.currentCardIndex];
+
+        if (!currentCard) {
+            this.endStudySession();
+            return;
         }
 
-        // Ocultar la sección de selección de decks y mostrar la interfaz de estudio
-        document.getElementById("deck-selection").classList.add("hidden");
-        document.getElementById("study-interface").classList.remove("hidden");
-
-        // Actualizar el nombre del deck y el progreso
-        document.getElementById("study-deck-name").innerText = this.currentStudySession.deckName;
-        document.getElementById("total-cards").innerText = this.currentStudySession.cards.length;
-        this.updateStudyProgress();
-
-        // Cargar la tarjeta actual
-        this.loadCurrentFlashcard();
-    }
-
-    revealAnswer() {
-        this.flipCard(); // Flip the card to show the back
-
-        // Show the difficulty buttons
-        document.getElementById("difficulty-buttons").classList.remove("hidden");
-        document.getElementById("reveal-answer-btn").classList.add("hidden");
-    }
-
-    _old_answerCard(isCorrect) {
-        if (isCorrect) {
-            this.currentStudySession.correctAnswers++;
+        // Actualizar UI de la tarjeta
+        const cardContainer = document.getElementById('study-card-container');
+        if (cardContainer) {
+            cardContainer.innerHTML = `
+                <div class="study-card ${session.isFlipped ? 'flipped' : ''}">
+                    <div class="card-front">
+                        <div class="card-content">
+                            ${currentCard.front_content.text}
+                        </div>
+                        <button onclick="app.flipCard()" class="btn-flip">Ver respuesta</button>
+                    </div>
+                    <div class="card-back">
+                        <div class="card-content">
+                            ${currentCard.back_content.text}
+                        </div>
+                        <div class="evaluation-buttons">
+                            <button onclick="app.evaluateCard(1)" class="btn-eval btn-again">Otra vez</button>
+                            <button onclick="app.evaluateCard(2)" class="btn-eval btn-hard">Difícil</button>
+                            <button onclick="app.evaluateCard(3)" class="btn-eval btn-good">Bien</button>
+                            <button onclick="app.evaluateCard(4)" class="btn-eval btn-easy">Fácil</button>
+                        </div>
+                    </div>
+                </div>
+            `;
         }
-        this.currentStudySession.totalAnswered++;
+
+        // Actualizar progreso
+        const progressInfo = document.getElementById('study-progress');
+        if (progressInfo) {
+            progressInfo.innerHTML = `
+                <span>Tarjeta ${session.currentCardIndex + 1} de ${session.total}</span>
+                <span>Deck: ${session.deckName}</span>
+            `;
+        }
+    }
+
+    flipCard() {
+        if (!this.currentStudySession) return;
         
-        // Avanzar a la siguiente tarjeta
-        this.currentStudySession.currentCardIndex++;
-        this.currentStudySession.showingAnswer = false;
-        
-        // Verificar si terminamos todas las tarjetas
-        if (this.currentStudySession.currentCardIndex >= this.currentStudySession.cards.length) {
-            this.completeStudySession();
-        } else {
-            this.showStudyInterface();
-        }
-    }
-
-    completeStudySession() {
-        const accuracy = Math.round((this.currentStudySession.correctAnswers / this.currentStudySession.totalAnswered) * 100);
-
-        document.getElementById("study-interface").classList.add("hidden");
-        document.getElementById("study-summary").classList.remove("hidden");
-
-        document.getElementById("summary-correct").innerText = this.currentStudySession.correctAnswers;
-        document.getElementById("summary-total").innerText = this.currentStudySession.totalAnswered;
-        document.getElementById("summary-accuracy").innerText = accuracy + "%";
-        document.getElementById("summary-points").innerText = this.currentStudySession.points || 0;
-
-        this.showNotification(`¡Sesión completada! Precisión: ${accuracy}%`, 'success');
-        this.currentStudySession = null;
-    }
-
-    endStudySession() {
-        if (confirm('¿Estás seguro de que quieres terminar la sesión de estudio?')) {
-            this.currentStudySession = null;
-            this.loadStudySection();
-        }
-    }
-
-    editDeck(deckId) {
-        console.log(`✏️ Editando deck ${deckId}`);
-        this.showNotification('Función de edición en desarrollo', 'info');
-    }
-
-    deleteDeck(deckId) {
-        if (confirm('¿Estás seguro de que quieres eliminar este deck?')) {
-            this.decks = this.decks.filter(deck => deck.id !== deckId);
-            this.flashcards = this.flashcards.filter(card => card.deckId !== deckId);
-            this.saveDecks();
-            this.saveFlashcards();
-            this.loadSectionContent(this.currentSection);
-            this.updateStats();
-            this.showNotification('Deck eliminado exitosamente', 'success');
-        }
-    }
-
-    updateStats() {
-        const totalCards = this.flashcards.length;
-        const totalDecks = this.decks.length;
-
-        // Actualizar estadísticas en dashboard
-        const totalCardsEl = document.getElementById('total-cards');
-        if (totalCardsEl) {
-            totalCardsEl.textContent = totalCards;
-        }
-
-        // Actualizar otros elementos de estadísticas
-        const elements = {
-            'studied-today': 0,
-            'accuracy': '0%',
-            'streak': 0,
-            'study-time': '0m',
-            'total-progress': '0%'
-        };
-
-        Object.entries(elements).forEach(([id, value]) => {
-            const el = document.getElementById(id);
-            if (el) el.textContent = value;
-        });
-
-        console.log(`📊 Stats actualizadas: ${totalCards} cartas, ${totalDecks} decks`);
-    }
-
-    toggleMobileMenu() {
-        const menu = document.getElementById('mobile-menu');
-        if (menu) {
-            menu.classList.toggle('active');
-        }
-    }
-
-    toggleAppleMenu() {
-        const sidebar = document.getElementById('apple-sidebar');
-        const overlay = document.getElementById('apple-sidebar-overlay');
-        
-        if (sidebar && overlay) {
-            sidebar.classList.toggle('active');
-            overlay.classList.toggle('active');
-        }
-    }
-
-    closeMobileMenu() {
-        const menu = document.getElementById('mobile-menu');
-        const sidebar = document.getElementById('apple-sidebar');
-        const overlay = document.getElementById('apple-sidebar-overlay');
-        
-        if (menu) menu.classList.remove('active');
-        if (sidebar) sidebar.classList.remove('active');
-        if (overlay) overlay.classList.remove('active');
-    }
-
-    showNotification(message, type = 'info') {
-        // Crear notificación temporal
-        const notification = document.createElement('div');
-        notification.className = `notification notification-${type}`;
-        notification.textContent = message;
-        notification.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6'};
-            color: white;
-            padding: 12px 20px;
-            border-radius: 8px;
-            z-index: 10000;
-            font-weight: 500;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        `;
-
-        document.body.appendChild(notification);
-
-        setTimeout(() => {
-            notification.remove();
-        }, 3000);
-
-        console.log(`🔔 Notificación (${type}): ${message}`);
-    }
-
-    saveDecks() {
-        localStorage.setItem('studyingflash_decks', JSON.stringify(this.decks));
-    }
-
-    saveFlashcards() {
-        localStorage.setItem('studyingflash_flashcards', JSON.stringify(this.flashcards));
-    }
-
-    saveStats() {
-        localStorage.setItem('studyingflash_stats', JSON.stringify(this.stats));
-    }
-
-    updateStudyProgress() {
-        const currentCardEl = document.getElementById("current-card");
-        const totalCardsEl = document.getElementById("total-cards");
-        const progressBarFill = document.querySelector("#study-interface .progress-fill");
-
-        if (currentCardEl) currentCardEl.innerText = this.currentStudySession.currentCardIndex + 1;
-        if (totalCardsEl) totalCardsEl.innerText = this.currentStudySession.cards.length;
-        if (progressBarFill) {
-            const progress = (this.currentStudySession.currentCardIndex / this.currentStudySession.cards.length) * 100;
-            progressBarFill.style.width = `${progress}%`;
-        }
-    }
-
-    loadCurrentFlashcard() {
-        const currentCard = this.currentStudySession.cards[this.currentStudySession.currentCardIndex];
-        document.getElementById("card-front-text").innerText = currentCard.front_content;
-        document.getElementById("card-back-text").innerText = currentCard.back_content;
-        
-        // Reset flashcard to front view
-        document.getElementById("flashcard").classList.remove("flipped");
-
-        // Hide answer buttons and show reveal button
-        document.getElementById("reveal-answer-btn").style.display = "block";
-        document.getElementById("answer-buttons").style.display = "none";
-
-        this.updateStudyProgress();
-    }
-
-    flipCard(event) {
-        // Prevent default touch behavior to avoid conflicts with scrolling/zooming
-        if (event && event.type === 'touchend') {
-            event.preventDefault();
-        }
-        document.getElementById("flashcard").classList.toggle("flipped");
+        this.currentStudySession.isFlipped = true;
+        this.showStudyCard();
     }
 
     evaluateCard(difficulty) {
-        // Ensure the card is flipped to show the answer before evaluating
-        document.getElementById("flashcard").classList.add("flipped");
+        if (!this.currentStudySession || !this.currentStudySession.isFlipped) return;
 
-        // Update stats based on difficulty
-        this.currentStudySession.totalAnswered++;
-        let pointsEarned = 0;
+        const session = this.currentStudySession;
+        const currentCard = session.cards[session.currentCardIndex];
 
-        if (difficulty === 0) { // Otra vez
-            // Reinsert card at the end for review
-            this.currentStudySession.cards.push(this.currentStudySession.cards[this.currentStudySession.currentCardIndex]);
-            pointsEarned = 0;
-        } else if (difficulty === 1) { // Difícil
-            this.currentStudySession.correctAnswers++;
-            pointsEarned = 1;
-        } else if (difficulty === 2) { // Bien
-            this.currentStudySession.correctAnswers++;
-            pointsEarned = 2;
-        } else if (difficulty === 3) { // Fácil
-            this.currentStudySession.correctAnswers++;
-            pointsEarned = 3;
-        }
+        // Actualizar algoritmo de repetición espaciada
+        this.updateSpacedRepetition(currentCard, difficulty);
 
-        // Add points to session total
-        if (!this.currentStudySession.points) {
-            this.currentStudySession.points = 0;
-        }
-        this.currentStudySession.points += pointsEarned;
-
-        // Advance to next card
-        this.currentStudySession.currentCardIndex++;
-
-        // Check if session is complete
-        if (this.currentStudySession.currentCardIndex >= this.currentStudySession.cards.length) {
-            this.finishStudySession();
+        // Actualizar estadísticas de la sesión
+        if (difficulty >= 3) {
+            session.stats.correct++;
         } else {
-            this.loadCurrentFlashcard();
+            session.stats.incorrect++;
         }
 
-        // Update UI stats
-        document.getElementById("session-correct").innerText = this.currentStudySession.correctAnswers;
-        document.getElementById("session-total").innerText = this.currentStudySession.totalAnswered;
-        document.getElementById("session-accuracy").innerText = this.currentStudySession.totalAnswered > 0 ? Math.round((this.currentStudySession.correctAnswers / this.currentStudySession.totalAnswered) * 100) + "%": "0%";
-        document.getElementById("session-points").innerText = this.currentStudySession.points;
+        // Avanzar a la siguiente tarjeta
+        session.currentCardIndex++;
+        session.isFlipped = false;
+
+        if (session.currentCardIndex >= session.cards.length) {
+            this.endStudySession();
+        } else {
+            this.showStudyCard();
+        }
     }
 
-    finishStudySession() {
-        const correct = this.currentStudySession.correctAnswers;
-        const total = this.currentStudySession.totalAnswered;
-        const accuracy = total ? Math.round((correct / total) * 100) : 0;
+    updateSpacedRepetition(card, difficulty) {
+        const algorithmData = card.algorithm_data;
+        
+        // Algoritmo SM-2 simplificado
+        if (difficulty >= 3) {
+            algorithmData.repetitions++;
+            algorithmData.ease_factor = Math.max(1.3, 
+                algorithmData.ease_factor + (0.1 - (5 - difficulty) * (0.08 + (5 - difficulty) * 0.02))
+            );
+            
+            if (algorithmData.repetitions === 1) {
+                algorithmData.interval = 1;
+            } else if (algorithmData.repetitions === 2) {
+                algorithmData.interval = 6;
+            } else {
+                algorithmData.interval = Math.round(algorithmData.interval * algorithmData.ease_factor);
+            }
+        } else {
+            algorithmData.repetitions = 0;
+            algorithmData.interval = 1;
+        }
 
-        document.getElementById("summary-correct").innerText = correct;
-        document.getElementById("summary-total").innerText = total;
-        document.getElementById("summary-accuracy").innerText = accuracy + "%";
-        document.getElementById("summary-points").innerText = this.currentStudySession.points || 0;
+        // Calcular próxima revisión
+        const nextReview = new Date();
+        nextReview.setDate(nextReview.getDate() + algorithmData.interval);
+        algorithmData.next_review = nextReview.toISOString();
 
-        document.getElementById("study-interface").classList.add("hidden");
-        document.getElementById("study-summary").classList.remove("hidden");
+        // Guardar cambios
+        this.saveFlashcard(card);
+    }
 
-        this.showNotification(`¡Sesión completada! Precisión: ${accuracy}%`, "success");
+    async saveFlashcard(flashcard) {
+        try {
+            // Intentar guardar en API
+            await ApiService.put(`/flashcards/${flashcard.id}`, flashcard);
+            Utils.log('Flashcard actualizado en API');
+        } catch (error) {
+            Utils.log('Usando fallback localStorage para actualizar flashcard');
+        }
+
+        // Actualizar localStorage
+        const index = this.flashcards.findIndex(card => card.id === flashcard.id);
+        if (index !== -1) {
+            this.flashcards[index] = flashcard;
+            localStorage.setItem('studyingflash_flashcards', JSON.stringify(this.flashcards));
+        }
+    }
+
+    endStudySession() {
+        if (!this.currentStudySession) return;
+
+        const session = this.currentStudySession;
+        
+        // Mostrar resumen de la sesión
+        Utils.showNotification(
+            `Sesión completada: ${session.stats.correct}/${session.stats.total} correctas`, 
+            'success'
+        );
+
+        // Actualizar estadísticas globales
+        this.updateGlobalStats(session.stats);
+
+        // Limpiar sesión
         this.currentStudySession = null;
+
+        // Volver al dashboard
+        this.showSection('dashboard');
+    }
+
+    // ===== ESTADÍSTICAS =====
+    updateStats() {
+        const totalDecks = this.decks.length;
+        const totalFlashcards = this.flashcards.length;
+        const studiedToday = this.getStudiedToday();
+
+        // Actualizar elementos de estadísticas en el dashboard
+        const statsElements = {
+            'total-decks': totalDecks,
+            'total-flashcards': totalFlashcards,
+            'studied-today': studiedToday
+        };
+
+        Object.entries(statsElements).forEach(([id, value]) => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.textContent = value;
+            }
+        });
+    }
+
+    updateStatsSection() {
+        // Implementar estadísticas detalladas
+        const statsContainer = document.getElementById('stats-container');
+        if (!statsContainer) return;
+
+        const stats = this.calculateDetailedStats();
+        
+        statsContainer.innerHTML = `
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Decks Totales</h3>
+                    <div class="stat-number">${stats.totalDecks}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Tarjetas Totales</h3>
+                    <div class="stat-number">${stats.totalFlashcards}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Estudiadas Hoy</h3>
+                    <div class="stat-number">${stats.studiedToday}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Racha Actual</h3>
+                    <div class="stat-number">${stats.currentStreak} días</div>
+                </div>
+            </div>
+        `;
+    }
+
+    calculateDetailedStats() {
+        return {
+            totalDecks: this.decks.length,
+            totalFlashcards: this.flashcards.length,
+            studiedToday: this.getStudiedToday(),
+            currentStreak: this.getCurrentStreak()
+        };
+    }
+
+    getStudiedToday() {
+        const today = new Date().toDateString();
+        return this.flashcards.filter(card => {
+            const lastReview = new Date(card.algorithm_data.next_review);
+            return lastReview.toDateString() === today;
+        }).length;
+    }
+
+    getCurrentStreak() {
+        // Implementar lógica de racha
+        return this.stats.currentStreak || 0;
+    }
+
+    updateGlobalStats(sessionStats) {
+        if (!this.stats.totalSessions) this.stats.totalSessions = 0;
+        if (!this.stats.totalCorrect) this.stats.totalCorrect = 0;
+        if (!this.stats.totalAnswered) this.stats.totalAnswered = 0;
+
+        this.stats.totalSessions++;
+        this.stats.totalCorrect += sessionStats.correct;
+        this.stats.totalAnswered += sessionStats.total;
+        this.stats.lastStudyDate = new Date().toISOString();
+
+        localStorage.setItem('studyingflash_stats', JSON.stringify(this.stats));
+    }
+
+    updateDeckStats(deckId) {
+        const deckFlashcards = this.flashcards.filter(card => card.deckId === deckId);
+        const deck = this.decks.find(d => d.id === deckId);
+        
+        if (deck) {
+            deck.stats = {
+                total: deckFlashcards.length,
+                studied: deckFlashcards.filter(card => card.algorithm_data.repetitions > 0).length,
+                mastered: deckFlashcards.filter(card => card.algorithm_data.repetitions >= 3).length
+            };
+            
+            localStorage.setItem('studyingflash_decks', JSON.stringify(this.decks));
+        }
+    }
+
+    // ===== GESTIÓN DE DECKS =====
+    editDeck(deckId) {
+        const deck = this.decks.find(d => d.id === deckId);
+        if (!deck) return;
+
+        const newName = prompt('Nuevo nombre del deck:', deck.name);
+        if (newName && newName.trim()) {
+            deck.name = newName.trim();
+            localStorage.setItem('studyingflash_decks', JSON.stringify(this.decks));
+            this.updateDecksList();
+            Utils.showNotification('Deck actualizado', 'success');
+        }
+    }
+
+    async deleteDeck(deckId) {
+        if (!confirm('¿Estás seguro de que quieres eliminar este deck y todas sus tarjetas?')) {
+            return;
+        }
+
+        try {
+            // Intentar eliminar de API
+            await ApiService.delete(`/decks/${deckId}`);
+            Utils.log('Deck eliminado de API');
+        } catch (error) {
+            Utils.log('Usando fallback localStorage para eliminar deck');
+        }
+
+        // Eliminar de localStorage
+        this.decks = this.decks.filter(deck => deck.id !== deckId);
+        this.flashcards = this.flashcards.filter(card => card.deckId !== deckId);
+        
+        localStorage.setItem('studyingflash_decks', JSON.stringify(this.decks));
+        localStorage.setItem('studyingflash_flashcards', JSON.stringify(this.flashcards));
+
+        this.updateDecksList();
+        this.updateDeckOptions();
+        Utils.showNotification('Deck eliminado', 'success');
     }
 }
 
-// Inicializar la aplicación cuando el DOM esté listo
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('🌟 DOM cargado, inicializando StudyingFlash...');
-    const app = new StudyingFlashApp();
+// ===== INICIALIZACIÓN =====
+document.addEventListener('DOMContentLoaded', function() {
+    Utils.log('DOM cargado, inicializando app');
     
-    // Exponer app globalmente para debugging y event listeners
-    window.app = app;
+    // Crear instancia global de la app
+    window.app = new StudyingFlashApp();
     
     // Exponer funciones globales para onclick en HTML
     window.showSection = (sectionName) => app.showSection(sectionName);
@@ -698,11 +894,12 @@ document.addEventListener('DOMContentLoaded', () => {
     window.evaluateCard = (difficulty) => app.evaluateCard(difficulty);
     window.exitStudySession = () => app.endStudySession();
     window.startNewSession = () => app.loadStudySection(); // Assuming this is for starting a new session from summary
-
     console.log('✅ App inicializada y expuesta globalmente');
 });
 
 // Hacer la app accesible globalmente para debugging
 window.StudyingFlashApp = StudyingFlashApp;
-
+window.CONFIG = CONFIG;
+window.Utils = Utils;
+window.ApiService = ApiService;
 
