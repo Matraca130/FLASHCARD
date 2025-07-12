@@ -418,31 +418,47 @@ class StudyingFlashApp {
     }
 
     async createFlashcard() {
+        Utils.log('🔧 [StudyingFlash] Iniciando creación de flashcard');
+        
         const deckSelect = document.getElementById('flashcard-deck');
-        const frontInput = document.getElementById('flashcard-front');
-        const backInput = document.getElementById('flashcard-back');
+        const frontInput = document.querySelector('textarea#flashcard-front');
+        const backInput = document.querySelector('textarea#flashcard-back');
+        
+        Utils.log('🔧 [StudyingFlash] Elementos encontrados:', {
+            deckSelect: !!deckSelect,
+            frontInput: !!frontInput,
+            backInput: !!backInput
+        });
         
         if (!deckSelect || !frontInput || !backInput) {
             Utils.error('Elementos de formulario no encontrados');
+            Utils.showNotification('Error: Elementos del formulario no encontrados', 'error');
             return;
         }
 
-        const deckId = deckSelect.value;
+        const deckId = deckSelect?.value || '';
         const front_content = {
-            text: frontInput.value.trim(),
+            text: frontInput?.value?.trim() || '',
             image_url: null,
             audio_url: null,
             video_url: null
         };
         const back_content = {
-            text: backInput.value.trim(),
+            text: backInput?.value?.trim() || '',
             image_url: null,
             audio_url: null,
             video_url: null
         };
 
+        Utils.log('🔧 [StudyingFlash] Datos del formulario:', {
+            deckId: deckId,
+            frontText: front_content.text,
+            backText: back_content.text
+        });
+
         if (!deckId || !front_content.text || !back_content.text) {
             Utils.showNotification('Todos los campos son requeridos', 'error');
+            Utils.log('🔧 [StudyingFlash] Validación fallida - campos requeridos');
             return;
         }
 
@@ -463,19 +479,27 @@ class StudyingFlashApp {
 
         try {
             // PRIORIZAR LOCALSTORAGE - Guardar directamente en localStorage
-            Utils.log('Guardando flashcard en localStorage (modo prioritario)');
+            Utils.log('🔧 [StudyingFlash] Guardando flashcard en localStorage (modo prioritario)');
+            
+            // Asegurar que this.flashcards existe
+            if (!this.flashcards) {
+                this.flashcards = [];
+                Utils.log('🔧 [StudyingFlash] Inicializando array de flashcards');
+            }
+            
             this.flashcards.push(newFlashcard);
             localStorage.setItem('studyingflash_flashcards', JSON.stringify(this.flashcards));
             
             Utils.showNotification('Flashcard creado exitosamente', 'success');
-            Utils.log('Flashcard creado con éxito:', newFlashcard);
+            Utils.log('🔧 [StudyingFlash] Flashcard creado con éxito:', newFlashcard);
             
             // Intentar sincronizar con API en segundo plano (opcional)
             try {
+                Utils.log('🔧 [StudyingFlash] Intentando sincronizar con API...');
                 await ApiService.post('/flashcards', newFlashcard);
-                Utils.log('Flashcard sincronizado con API');
+                Utils.log('🔧 [StudyingFlash] Flashcard sincronizado con API');
             } catch (apiError) {
-                Utils.log('API no disponible, flashcard guardado solo en localStorage');
+                Utils.log('🔧 [StudyingFlash] API no disponible, flashcard guardado solo en localStorage');
             }
             
         } catch (error) {
@@ -485,12 +509,16 @@ class StudyingFlashApp {
         }
 
         // Limpiar formulario
+        Utils.log('🔧 [StudyingFlash] Limpiando formulario');
         frontInput.value = '';
         backInput.value = '';
         deckSelect.value = '';
 
         // Actualizar estadísticas del deck
+        Utils.log('🔧 [StudyingFlash] Actualizando estadísticas del deck');
         this.updateDeckStats(deckId);
+        
+        Utils.log('🔧 [StudyingFlash] Creación de flashcard completada exitosamente');
     }
 
     updateDecksList() {
