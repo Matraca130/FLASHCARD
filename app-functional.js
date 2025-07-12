@@ -644,7 +644,13 @@ class StudyingFlashApp {
         };
 
         this.showStudyCard();
-        this.showSection('study-session');
+        
+        // Mostrar interface de estudo dentro da seção estudiar
+        const deckSelection = document.getElementById('deck-selection');
+        const studyInterface = document.getElementById('study-interface');
+        
+        if (deckSelection) deckSelection.classList.add('hidden');
+        if (studyInterface) studyInterface.classList.remove('hidden');
     }
 
     showStudyCard() {
@@ -659,29 +665,29 @@ class StudyingFlashApp {
         }
 
         // Actualizar UI de la tarjeta
-        const cardContainer = document.getElementById('study-card-container');
-        if (cardContainer) {
-            cardContainer.innerHTML = `
-                <div class="study-card ${session.isFlipped ? 'flipped' : ''}">
-                    <div class="card-front">
-                        <div class="card-content">
-                            ${currentCard.front_content.text}
-                        </div>
-                        <button onclick="app.flipCard()" class="btn-flip">Ver respuesta</button>
-                    </div>
-                    <div class="card-back">
-                        <div class="card-content">
-                            ${currentCard.back_content.text}
-                        </div>
-                        <div class="evaluation-buttons">
-                            <button onclick="app.evaluateCard(1)" class="btn-eval btn-again">Otra vez</button>
-                            <button onclick="app.evaluateCard(2)" class="btn-eval btn-hard">Difícil</button>
-                            <button onclick="app.evaluateCard(3)" class="btn-eval btn-good">Bien</button>
-                            <button onclick="app.evaluateCard(4)" class="btn-eval btn-easy">Fácil</button>
-                        </div>
-                    </div>
-                </div>
-            `;
+        const frontText = document.getElementById('card-front-text');
+        const backText = document.getElementById('card-back-text');
+        const deckName = document.getElementById('study-deck-name');
+        const currentCardSpan = document.getElementById('current-card');
+        const totalCardsSpan = document.getElementById('total-cards');
+        const progressFill = document.getElementById('study-progress');
+        const flashcard = document.getElementById('flashcard');
+
+        if (frontText) frontText.textContent = currentCard.front_content.text;
+        if (backText) backText.textContent = currentCard.back_content.text;
+        if (deckName) deckName.textContent = session.deckName;
+        if (currentCardSpan) currentCardSpan.textContent = session.currentCardIndex + 1;
+        if (totalCardsSpan) totalCardsSpan.textContent = session.cards.length;
+        
+        // Actualizar barra de progreso
+        if (progressFill) {
+            const progress = ((session.currentCardIndex + 1) / session.cards.length) * 100;
+            progressFill.style.width = `${progress}%`;
+        }
+        
+        // Reset flip state
+        if (flashcard) {
+            flashcard.classList.remove('flipped');
         }
 
         // Actualizar progreso
@@ -697,8 +703,12 @@ class StudyingFlashApp {
     flipCard() {
         if (!this.currentStudySession) return;
         
+        const flashcard = document.getElementById('flashcard');
+        if (flashcard) {
+            flashcard.classList.add('flipped');
+        }
+        
         this.currentStudySession.isFlipped = true;
-        this.showStudyCard();
     }
 
     evaluateCard(difficulty) {
@@ -793,8 +803,12 @@ class StudyingFlashApp {
         // Limpiar sesión
         this.currentStudySession = null;
 
-        // Volver al dashboard
-        this.showSection('dashboard');
+        // Volver a la selección de decks
+        const deckSelection = document.getElementById('deck-selection');
+        const studyInterface = document.getElementById('study-interface');
+        
+        if (studyInterface) studyInterface.classList.add('hidden');
+        if (deckSelection) deckSelection.classList.remove('hidden');
     }
 
     // ===== ESTADÍSTICAS =====
