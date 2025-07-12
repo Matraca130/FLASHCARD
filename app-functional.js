@@ -354,6 +354,7 @@ class StudyingFlashApp {
     async createDeck() {
         const nameInput = document.getElementById('deck-name');
         const descriptionInput = document.getElementById('deck-description');
+        const publicCheckbox = document.getElementById('deck-public');
         
         if (!nameInput || !descriptionInput) {
             Utils.error('Elementos de formulario no encontrados');
@@ -362,6 +363,7 @@ class StudyingFlashApp {
 
         const name = nameInput.value.trim();
         const description = descriptionInput.value.trim();
+        const isPublic = publicCheckbox ? publicCheckbox.checked : false;
 
         if (!name) {
             Utils.showNotification('El nombre del deck es requerido', 'error');
@@ -372,6 +374,7 @@ class StudyingFlashApp {
             id: Utils.generateId(),
             name: name,
             description: description,
+            isPublic: isPublic,
             createdAt: new Date().toISOString(),
             flashcards: [],
             stats: {
@@ -382,27 +385,32 @@ class StudyingFlashApp {
         };
 
         try {
-            // Intentar guardar en API primero
-            const savedDeck = await ApiService.post('/decks', newDeck);
-            Utils.log('Deck guardado en API', savedDeck);
-            
-            // Actualizar localStorage como backup
-            this.decks.push(savedDeck);
+            // PRIORIZAR LOCALSTORAGE - Guardar directamente en localStorage
+            Utils.log('Guardando deck en localStorage (modo prioritario)');
+            this.decks.push(newDeck);
             localStorage.setItem('studyingflash_decks', JSON.stringify(this.decks));
             
             Utils.showNotification('Deck creado exitosamente', 'success');
+            Utils.log('Deck creado con éxito:', newDeck);
+            
+            // Intentar sincronizar con API en segundo plano (opcional)
+            try {
+                await ApiService.post('/decks', newDeck);
+                Utils.log('Deck sincronizado con API');
+            } catch (apiError) {
+                Utils.log('API no disponible, deck guardado solo en localStorage');
+            }
             
         } catch (error) {
-            // Fallback a localStorage
-            Utils.log('Usando fallback localStorage para deck');
-            this.decks.push(newDeck);
-            localStorage.setItem('studyingflash_decks', JSON.stringify(this.decks));
-            Utils.showNotification('Deck creado (modo offline)', 'success');
+            Utils.error('Error al crear deck:', error);
+            Utils.showNotification('Error al crear deck', 'error');
+            return;
         }
 
         // Limpiar formulario
         nameInput.value = '';
         descriptionInput.value = '';
+        if (publicCheckbox) publicCheckbox.checked = false;
 
         // Actualizar UI
         this.updateDecksList();
@@ -454,27 +462,32 @@ class StudyingFlashApp {
         };
 
         try {
-            // Intentar guardar en API
-            const savedFlashcard = await ApiService.post('/flashcards', newFlashcard);
-            Utils.log('Flashcard guardado en API', savedFlashcard);
-            
-            // Actualizar localStorage
-            this.flashcards.push(savedFlashcard);
+            // PRIORIZAR LOCALSTORAGE - Guardar directamente en localStorage
+            Utils.log('Guardando flashcard en localStorage (modo prioritario)');
+            this.flashcards.push(newFlashcard);
             localStorage.setItem('studyingflash_flashcards', JSON.stringify(this.flashcards));
             
             Utils.showNotification('Flashcard creado exitosamente', 'success');
+            Utils.log('Flashcard creado con éxito:', newFlashcard);
+            
+            // Intentar sincronizar con API en segundo plano (opcional)
+            try {
+                await ApiService.post('/flashcards', newFlashcard);
+                Utils.log('Flashcard sincronizado con API');
+            } catch (apiError) {
+                Utils.log('API no disponible, flashcard guardado solo en localStorage');
+            }
             
         } catch (error) {
-            // Fallback a localStorage
-            Utils.log('Usando fallback localStorage para flashcard');
-            this.flashcards.push(newFlashcard);
-            localStorage.setItem('studyingflash_flashcards', JSON.stringify(this.flashcards));
-            Utils.showNotification('Flashcard creado (modo offline)', 'success');
+            Utils.error('Error al crear flashcard:', error);
+            Utils.showNotification('Error al crear flashcard', 'error');
+            return;
         }
 
         // Limpiar formulario
         frontInput.value = '';
         backInput.value = '';
+        deckSelect.value = '';
 
         // Actualizar estadísticas del deck
         this.updateDeckStats(deckId);
