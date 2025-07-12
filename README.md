@@ -245,10 +245,11 @@ node scripts/enhanced_agent1_coordinator_fixed.cjs
 **⚠️ CRÍTICO:** Antes de realizar cualquier modificación, TODOS los agentes DEBEN:
 
 1. **Leer archivos base obligatorios:**
-   - ✅ `AGENT_CODING_STANDARDS.md` - Estándares de codificación
-   - ✅ `MANUAL_5_AGENTES_UNIFICADO.md` - Manual completo del sistema
-   - ✅ `AGENT_WORK_PROTOCOL.md` - Protocolo de trabajo
-   - ✅ `UNIFICATION_PROTOCOL.md` - Reglas anti-duplicación
+   - ✅ `AGENT_CODING_STANDARDS.md` - Estándares de codificación y nomenclatura
+   - ✅ `MANUAL_5_AGENTES_UNIFICADO.md` - Manual completo del sistema de agentes
+   - ✅ `DOCUMENTACION_NOMENCLATURA_UNIFICADA.md` - Documentación completa de nomenclatura
+   - ✅ `README_PARA_AGENTES.md` - Guía específica para agentes modificadores
+   - ✅ `INSTRUCCIONES_AGENTE_1_COORDINADOR.md` - Protocolo del coordinador maestro
 
 2. **Seguir nomenclatura unificada:**
    - ✅ Usar estructura `front_content/back_content`
@@ -259,6 +260,36 @@ node scripts/enhanced_agent1_coordinator_fixed.cjs
    - ✅ No crear nuevas duplicaciones
    - ✅ Mantener sintaxis unificada
    - ✅ Validar funcionalidad existente
+
+### **📚 Acceso Rápido para Agentes**
+
+**🎯 Para empezar inmediatamente, los agentes deben leer EN ORDEN:**
+
+1. **📋 [AGENT_CODING_STANDARDS.md](./AGENT_CODING_STANDARDS.md)** - ⚠️ OBLIGATORIO PRIMERO
+   - Nomenclatura de funciones y variables
+   - Sintaxis unificada y estilo de código
+   - Reglas críticas que NUNCA violar
+
+2. **🤖 [MANUAL_5_AGENTES_UNIFICADO.md](./MANUAL_5_AGENTES_UNIFICADO.md)** - Sistema completo
+   - Roles y responsabilidades de cada agente
+   - Comandos de coordinación automática
+   - Ejemplos de asignación de tareas
+
+3. **📖 [README_PARA_AGENTES.md](./README_PARA_AGENTES.md)** - Guía práctica
+   - Proceso de modificación paso a paso
+   - Reglas de deployment automático
+   - Troubleshooting común
+
+4. **📊 [DOCUMENTACION_NOMENCLATURA_UNIFICADA.md](./DOCUMENTACION_NOMENCLATURA_UNIFICADA.md)** - Estructura de datos
+   - Formato `front_content/back_content`
+   - Compatibilidad con formato legacy
+   - Ejemplos prácticos de uso
+
+**⚡ Comando de verificación:**
+```bash
+# Verificar que todos los archivos existen
+ls -la AGENT_CODING_STANDARDS.md MANUAL_5_AGENTES_UNIFICADO.md README_PARA_AGENTES.md DOCUMENTACION_NOMENCLATURA_UNIFICADA.md
+```
 
 ### **🎯 Roles de Agentes Especializados**
 
