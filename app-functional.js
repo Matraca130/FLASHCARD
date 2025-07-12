@@ -571,7 +571,7 @@ class StudyingFlashApp {
     }
 
     updateStudyDecks() {
-        const studyDecks = document.getElementById('study-decks');
+        const studyDecks = document.getElementById('deck-selection');
         if (!studyDecks) return;
 
         if (this.decks.length === 0) {
