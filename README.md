@@ -29,7 +29,7 @@
 ```
 📦 FLASHCARD/
 ├── 📄 index.html                    # Página principal
-├── 📄 flashcard-app-final.js        # Aplicación principal
+├── 📄 app-functional.js        # Aplicación principal
 ├── 📄 flashcards.service.js         # Servicio de flashcards (UNIFICADO)
 ├── 📄 apiClient.js                  # Cliente API
 ├── 📄 store.js                      # Gestión de estado
@@ -82,6 +82,22 @@
 - 📖 **[Nomenclatura Unificada](./DOCUMENTACION_NOMENCLATURA_UNIFICADA.md)** - Guía completa de la estructura unificada
 - 📋 **[Plan de Nomenclatura](./NOMENCLATURA_UNIFICADA_PLAN.md)** - Diseño y justificación de la unificación
 - 🔍 **[Diagnóstico de Integración](./DIAGNOSTICO_INTEGRACION_FLASHCARDS.md)** - Análisis de la integración entre componentes
+
+### **Sistema de 5 Agentes para Unificación**
+- 🤖 **[Manual Completo de 5 Agentes](./MANUAL_5_AGENTES_UNIFICADO.md)** - Sistema completo de coordinación de agentes
+- 📋 **[Manual PDF](./MANUAL_5_AGENTES_UNIFICADO.pdf)** - Versión PDF del manual completo
+- 👑 **[Instrucciones Agente Coordinador](./INSTRUCCIONES_AGENTE_1_COORDINADOR.md)** - Protocolo del agente coordinador maestro
+- 📊 **[Plan de Trabajo 5 Agentes](./PLAN_TRABAJO_5_AGENTES.md)** - Distribución de tareas entre agentes
+- 🌐 **[Plan Agentes HTML](./PLAN_AGENTES_HTML.md)** - Especialización para archivos HTML
+- 🔧 **[Plan de Refactorización](./PLAN_REFACTORIZACION.md)** - Estrategia de refactorización
+- 📈 **[Plan Final 5 Agentes](./PLAN_FINAL_5_AGENTES.md)** - Consolidación final del sistema
+
+### **Archivos de Coordinación JSON**
+- 🔄 **[Distribución de Agentes](./agent_distribution_plan.json)** - Plan detallado de distribución de trabajo
+- 📊 **[Reporte de Coordinación Final](./final_coordination_report.json)** - Reporte consolidado final
+- 🔍 **[Reporte de Coordinación Mejorado](./enhanced_coordination_report.json)** - Análisis detallado de coordinación
+- ⚙️ **[Configuración de Coordinación](./unified_coordination_report.json)** - Configuración unificada
+- 🎯 **[Configuración de Agentes](./.agent-coordination.json)** - Configuración activa de coordinación
 
 ### **Scripts de Migración**
 - 🔧 **[Script de Migración](./migration_script.py)** - Migración automática de base de datos
@@ -210,6 +226,84 @@ python analyze_html_duplicates.py
 # Auditoría de commits
 python audit_commits.py
 ```
+
+### **Sistema de 5 Agentes**
+```bash
+# Coordinación automática de agentes
+node scripts/enhanced_agent1_coordinator_fixed.cjs
+
+# Asignación automática según tarea:
+# "Modificar HTML" → AGENT-2 + AGENT-4 + AGENT-1 + AGENT-5
+# "Optimizar performance" → AGENT-3 + AGENT-2 + AGENT-1 + AGENT-5
+# "Cambiar CSS" → AGENT-5 + AGENT-2 + AGENT-1 + AGENT-4
+```
+
+## 🤖 Instrucciones para Agentes
+
+### **📋 Protocolo Obligatorio para Todos los Agentes**
+
+**⚠️ CRÍTICO:** Antes de realizar cualquier modificación, TODOS los agentes DEBEN:
+
+1. **Leer archivos base obligatorios:**
+   - ✅ `AGENT_CODING_STANDARDS.md` - Estándares de codificación y nomenclatura
+   - ✅ `MANUAL_5_AGENTES_UNIFICADO.md` - Manual completo del sistema de agentes
+   - ✅ `DOCUMENTACION_NOMENCLATURA_UNIFICADA.md` - Documentación completa de nomenclatura
+   - ✅ `README_PARA_AGENTES.md` - Guía específica para agentes modificadores
+   - ✅ `INSTRUCCIONES_AGENTE_1_COORDINADOR.md` - Protocolo del coordinador maestro
+
+2. **Seguir nomenclatura unificada:**
+   - ✅ Usar estructura `front_content/back_content`
+   - ✅ Mantener compatibilidad con formato legacy
+   - ✅ Aplicar convenciones de nombres consistentes
+
+3. **Verificar antes de commit:**
+   - ✅ No crear nuevas duplicaciones
+   - ✅ Mantener sintaxis unificada
+   - ✅ Validar funcionalidad existente
+
+### **📚 Acceso Rápido para Agentes**
+
+**🎯 Para empezar inmediatamente, los agentes deben leer EN ORDEN:**
+
+1. **📋 [AGENT_CODING_STANDARDS.md](./AGENT_CODING_STANDARDS.md)** - ⚠️ OBLIGATORIO PRIMERO
+   - Nomenclatura de funciones y variables
+   - Sintaxis unificada y estilo de código
+   - Reglas críticas que NUNCA violar
+
+2. **🤖 [MANUAL_5_AGENTES_UNIFICADO.md](./MANUAL_5_AGENTES_UNIFICADO.md)** - Sistema completo
+   - Roles y responsabilidades de cada agente
+   - Comandos de coordinación automática
+   - Ejemplos de asignación de tareas
+
+3. **📖 [README_PARA_AGENTES.md](./README_PARA_AGENTES.md)** - Guía práctica
+   - Proceso de modificación paso a paso
+   - Reglas de deployment automático
+   - Troubleshooting común
+
+4. **📊 [DOCUMENTACION_NOMENCLATURA_UNIFICADA.md](./DOCUMENTACION_NOMENCLATURA_UNIFICADA.md)** - Estructura de datos
+   - Formato `front_content/back_content`
+   - Compatibilidad con formato legacy
+   - Ejemplos prácticos de uso
+
+**⚡ Comando de verificación:**
+```bash
+# Verificar que todos los archivos existen
+ls -la AGENT_CODING_STANDARDS.md MANUAL_5_AGENTES_UNIFICADO.md README_PARA_AGENTES.md DOCUMENTACION_NOMENCLATURA_UNIFICADA.md
+```
+
+### **🎯 Roles de Agentes Especializados**
+
+- **AGENTE 1**: Coordinador Maestro - Supervisión general
+- **AGENTE 2**: Frontend/HTML - Interfaces y componentes
+- **AGENTE 3**: Backend/API - Servicios y lógica de negocio
+- **AGENTE 4**: JavaScript/Logic - Funcionalidades y algoritmos
+- **AGENTE 5**: CSS/Styling - Estilos y presentación
+
+### **📊 Sistema de Coordinación**
+- **Locks automáticos** con timeout de 5 minutos
+- **Heartbeat** cada 30 segundos
+- **Merge inteligente** con resolución de conflictos
+- **Reportes de progreso** cada 15 minutos
 
 ## 🎮 Uso de la Aplicación
 
