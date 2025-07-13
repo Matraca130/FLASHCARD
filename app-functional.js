@@ -345,6 +345,10 @@ const ApiService = {
     }
 
     // ===== GESTIÓN DE DECKS (CON CAPACIDADES API) =====
+    /**
+     * Crea un nuevo deck y lo persiste en la API o en localStorage
+     * @returns {Promise<void>}
+     */
     async createDeck() {
         const nameInput = document.getElementById('deck-name');
         const descriptionInput = document.getElementById('deck-description');
@@ -410,6 +414,10 @@ const ApiService = {
         this.updateDeckOptions();
     }
 
+    /**
+     * Crea una nueva flashcard y la guarda usando la API o localStorage
+     * @returns {Promise<void>}
+     */
     async createFlashcard() {
         Utils.log('🔧 [StudyingFlash] Iniciando creación de flashcard');
         
@@ -514,6 +522,9 @@ const ApiService = {
         Utils.log('🔧 [StudyingFlash] Creación de flashcard completada exitosamente');
     }
 
+    /**
+     * Actualiza la lista de decks mostrada en el panel de gestión
+     */
     updateDecksList() {
         const decksList = document.getElementById('decks-list');
         if (!decksList) return;
@@ -548,6 +559,9 @@ const ApiService = {
         }).join('');
     }
 
+    /**
+     * Rellena el selector de decks disponible al crear una flashcard
+     */
     updateDeckOptions() {
         const deckSelect = document.getElementById('flashcard-deck');
         if (!deckSelect) return;
@@ -563,6 +577,9 @@ const ApiService = {
             this.decks.map(deck => `<option value="${deck.id}">${deck.name}</option>`).join('');
     }
 
+    /**
+     * Actualiza la vista de decks disponibles para estudiar
+     */
     updateStudyDecks() {
         const studyDecks = document.getElementById('deck-selection');
         if (!studyDecks) return;
@@ -597,6 +614,10 @@ const ApiService = {
     }
 
     // ===== SESIÓN DE ESTUDIO =====
+    /**
+     * Inicia una sesión de estudio para un deck específico
+     * @param {string} deckId - Identificador del deck a estudiar
+     */
     startStudySession(deckId) {
         Utils.log(`Iniciando sesión de estudio para deck: ${deckId}`);
         
@@ -646,6 +667,9 @@ const ApiService = {
         if (studyInterface) studyInterface.classList.remove('hidden');
     }
 
+    /**
+     * Muestra la tarjeta actual de la sesión de estudio
+     */
     showStudyCard() {
         if (!this.currentStudySession) return;
 
@@ -693,6 +717,9 @@ const ApiService = {
         }
     }
 
+    /**
+     * Voltea la tarjeta actual mostrando la respuesta
+     */
     flipCard() {
         if (!this.currentStudySession) return;
         
@@ -704,6 +731,10 @@ const ApiService = {
         this.currentStudySession.isFlipped = true;
     }
 
+    /**
+     * Registra la evaluación del usuario sobre la tarjeta actual
+     * @param {number} difficulty - Dificultad de 1 (otra vez) a 4 (fácil)
+     */
     evaluateCard(difficulty) {
         if (!this.currentStudySession || !this.currentStudySession.isFlipped) return;
 
@@ -762,6 +793,11 @@ const ApiService = {
         this.saveFlashcard(card);
     }
 
+    /**
+     * Guarda los cambios de una flashcard en la API o en localStorage
+     * @param {Object} flashcard - Flashcard modificada a persistir
+     * @returns {Promise<void>}
+     */
     async saveFlashcard(flashcard) {
         try {
             // Intentar guardar en API
@@ -779,6 +815,9 @@ const ApiService = {
         }
     }
 
+    /**
+     * Finaliza la sesión de estudio actual y muestra un resumen
+     */
     endStudySession() {
         if (!this.currentStudySession) return;
 
@@ -999,6 +1038,11 @@ const ApiService = {
         }
     }
 
+    /**
+     * Elimina un deck y sus tarjetas asociadas
+     * @param {string} deckId - Identificador del deck a eliminar
+     * @returns {Promise<void>}
+     */
     async deleteDeck(deckId) {
         if (!confirm('¿Estás seguro de que quieres eliminar este deck y todas sus tarjetas?')) {
             return;
