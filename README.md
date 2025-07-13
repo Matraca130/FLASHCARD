@@ -29,7 +29,7 @@
 ```
 📦 FLASHCARD/
 ├── 📄 index.html                    # Página principal
-├── 📄 flashcard-app-final.js        # Aplicación principal
+├── 📄 app-functional.js        # Aplicación principal
 ├── 📄 flashcards.service.js         # Servicio de flashcards (UNIFICADO)
 ├── 📄 apiClient.js                  # Cliente API
 ├── 📄 store.js                      # Gestión de estado
