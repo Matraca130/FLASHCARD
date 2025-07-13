@@ -294,7 +294,8 @@ class StudyingFlashApp {
         }
     }
 
-    loadDashboard() {     const mobileMenu = document.querySelector('.mobile-menu');
+    toggleMobileMenu() {
+        const mobileMenu = document.querySelector('.mobile-menu');
         if (mobileMenu) {
             mobileMenu.classList.toggle('active');
         }
