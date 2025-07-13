@@ -48,14 +48,33 @@ class NavigationService {
   }
 
   /**
+   * Valida y normaliza las opciones de navegación
+   * @param {Object} opts - Opciones recibidas
+   * @returns {Object} Opciones normalizadas
+   */
+  sanitizeOptions(opts) {
+    if (!opts || typeof opts !== 'object' || Array.isArray(opts)) {
+      console.warn('NavigationService: opciones inválidas, usando {}');
+      return { force: false };
+    }
+
+    const defaults = { force: false };
+    return { ...defaults, ...opts };
+  }
+
+  /**
    * Navegar a una sección
-   * @param {string} sectionId - ID de la sección
+   * @param {string} sectionId - ID de la sección a mostrar
    * @param {Object} options - Opciones de navegación
+   * @param {boolean} [options.force=false] - Forzar navegación sin comprobar estado
+   * @returns {Promise<boolean>} Resultado de la navegación
    */
   navigateTo(sectionId, options = {}) {
+    const sanitized = this.sanitizeOptions(options);
+
     if (!this.isInitialized) {
       // Agregar a cola de navegaciones pendientes
-      this.pendingNavigations.push({ sectionId, options });
+      this.pendingNavigations.push({ sectionId, options: sanitized });
       return Promise.resolve(false);
     }
 
@@ -71,7 +90,7 @@ class NavigationService {
       }
 
       // Ejecutar navegación
-      const result = window.showSection(sectionId, options);
+      const result = window.showSection(sectionId, sanitized);
       
       if (result !== false) {
         this.currentSection = sectionId;
