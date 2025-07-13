@@ -61,6 +61,7 @@ module.exports = {
     vi: 'readonly',
     cy: 'readonly',
     Cypress: 'readonly',
+    validateFlashcardDataUtil: 'readonly',
   },
   rules: {
     // Error prevention
@@ -105,6 +106,9 @@ module.exports = {
     'venv/**/*',
     '__pycache__/**/*',
     '*.py',
+    'scripts/**/*',
+    'utils/**/*',
+    'store/**/*',
   ],
   overrides: [
     {
