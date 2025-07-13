@@ -359,7 +359,6 @@
         📊 Gráfico de progreso
       </div>
     </section>
-  </main>
   
   <!-- ===== ESTRUCTURA ORIGINAL (DESKTOP) ===== -->
   
@@ -545,9 +544,9 @@
               <div class="chart-header">
                 <h3 class="chart-title">Progreso Semanal</h3>
                 <div class="chart-actions">
-                  <button class="chart-action" onclick="updateChartPeriod('7d')">7D</button>
-                  <button class="chart-action" onclick="updateChartPeriod('30d')">30D</button>
-                  <button class="chart-action" onclick="updateChartPeriod('90d')">90D</button>
+                  <button class="chart-action" onclick="updateChartPeriod(\'7d\')">7D</button>
+                  <button class="chart-action" onclick="updateChartPeriod(\'30d\')">30D</button>
+                  <button class="chart-action" onclick="updateChartPeriod(\'90d\')">90D</button>
                 </div>
               </div>
               <div class="chart-canvas">
@@ -726,7 +725,7 @@
                   <button class="btn btn-primary" onclick="startNewSession()">
                     🔄 Nueva Sesión
                   </button>
-                  <button class="btn btn-secondary" onclick="showSection('dashboard')">
+                  <button class="btn btn-secondary" onclick="showSection(\'dashboard\')">
                     📊 Ver Dashboard
                   </button>
                 </div>
@@ -834,7 +833,7 @@
             <div class="import-export-container">
               <div class="import-section">
                 <h3 class="section-title">📥 Importar Deck</h3>
-                <div class="file-upload-area" id="file-upload-area" onclick="document.getElementById('file-input').click()">
+                <div class="file-upload-area" id="file-upload-area" onclick="document.getElementById(\'file-input\').click()">
                   <div class="upload-icon">📁</div>
                   <div class="upload-text">Haz clic o arrastra un archivo aquí</div>
                   <div class="upload-hint">Formatos soportados: JSON, CSV, TXT</div>
@@ -924,9 +923,9 @@
             
             <!-- Leaderboard Filters -->
             <div class="chart-actions mb-3">
-              <button class="chart-action" onclick="loadLeaderboard('global')">Global</button>
-              <button class="chart-action" onclick="loadLeaderboard('weekly')">Semanal</button>
-              <button class="chart-action" onclick="loadLeaderboard('monthly')">Mensual</button>
+              <button class="chart-action" onclick="loadLeaderboard(\'global\')">Global</button>
+              <button class="chart-action" onclick="loadLeaderboard(\'weekly\')">Semanal</button>
+              <button class="chart-action" onclick="loadLeaderboard(\'monthly\')">Mensual</button>
             </div>
             
             <!-- Leaderboard -->
@@ -1092,10 +1091,6 @@
   <script src="./dashboard-enhanced.js"></script>
 
 
-</body>
-</html>
-
-
   <!-- Footer Section -->
   <footer class="footer">
     <div class="footer-container">
@@ -1138,3 +1133,5 @@
   </footer>
 </body>
 </html>
+
+
