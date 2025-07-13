@@ -3,15 +3,56 @@
  * Funciones de utilidad general para toda la aplicación
  */
 
+import { FormValidator } from './formValidation.js';
 
+export function debounce(func, wait = 300, immediate = false) {
+  let timeout;
+  return function (...args) {
+    const context = this;
+    const later = () => {
+      timeout = null;
+      if (!immediate) func.apply(context, args);
+    };
+    const callNow = immediate && !timeout;
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+    if (callNow) func.apply(context, args);
+  };
+}
 
+export function generateId(prefix = 'id') {
+  return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
+}
+
+export function validateRequiredFields(data, fields) {
+  if (FormValidator && typeof FormValidator.validateRequiredFields === 'function') {
+    return FormValidator.validateRequiredFields(data, fields);
+  }
+  const errors = [];
+  for (const field of fields) {
+    const value = data[field];
+    if (!value || (typeof value === 'string' && !value.trim())) {
+      errors.push(`El campo ${field} es requerido`);
+    }
+  }
+  return { isValid: errors.length === 0, errors };
+}
+
+export function showNotification(
+  message,
+  type = 'info',
+  duration = 3000,
+  title = '',
+  actionText = null,
+  actionCallback = null
+) {
+  const icons = {
     success: '✅',
     error: '❌',
     warning: '⚠️',
     info: 'ℹ️',
   };
 
-  // Create notification element
   const notification = document.createElement('div');
   notification.className = `notification notification-${type}`;
   notification.style.cssText = `
@@ -32,26 +73,14 @@
     border: 1px solid rgba(255, 255, 255, 0.1);
   `;
 
-  // Set background color based on type
-  switch (type) {
-    case 'success':
-      notification.style.background =
-        'linear-gradient(135deg, #10b981, #059669)';
-      break;
-    case 'error':
-      notification.style.background =
-        'linear-gradient(135deg, #ef4444, #dc2626)';
-      break;
-    case 'warning':
-      notification.style.background =
-        'linear-gradient(135deg, #f59e0b, #d97706)';
-      break;
-    default:
-      notification.style.background =
-        'linear-gradient(135deg, #3b82f6, #2563eb)';
-  }
+  const colors = {
+    success: 'linear-gradient(135deg, #10b981, #059669)',
+    error: 'linear-gradient(135deg, #ef4444, #dc2626)',
+    warning: 'linear-gradient(135deg, #f59e0b, #d97706)',
+    info: 'linear-gradient(135deg, #3b82f6, #2563eb)',
+  };
+  notification.style.background = colors[type] || colors.info;
 
-  // Construir contenido de la notificación
   let content = `
     <div style="display: flex; align-items: flex-start; gap: 0.75rem;">
       <span style="font-size: 1.25rem; flex-shrink: 0;">${icons[type]}</span>
@@ -66,10 +95,10 @@
 
   if (actionText && actionCallback) {
     content += `
-      <button onclick="(${actionCallback.toString()})()" 
-              style="margin-top: 0.5rem; background: rgba(255,255,255,0.2); 
-                     border: 1px solid rgba(255,255,255,0.3); color: white; 
-                     padding: 0.25rem 0.75rem; border-radius: 0.375rem; 
+      <button onclick="(${actionCallback.toString()})()"
+              style="margin-top: 0.5rem; background: rgba(255,255,255,0.2);
+                     border: 1px solid rgba(255,255,255,0.3); color: white;
+                     padding: 0.25rem 0.75rem; border-radius: 0.375rem;
                      font-size: 0.8rem; cursor: pointer;">
         ${actionText}
       </button>
@@ -78,8 +107,8 @@
 
   content += `
       </div>
-      <button onclick="this.parentElement.parentElement.remove()" 
-              style="background: none; border: none; color: rgba(255,255,255,0.7); 
+      <button onclick="this.parentElement.parentElement.remove()"
+              style="background: none; border: none; color: rgba(255,255,255,0.7);
                      font-size: 1.2rem; cursor: pointer; padding: 0; margin-left: 0.5rem;">
         ×
       </button>
@@ -89,13 +118,17 @@
   notification.innerHTML = content;
   document.body.appendChild(notification);
 
-  // Animate in
   setTimeout(() => {
     notification.style.transform = 'translateX(0)';
   }, 100);
 
-
-
+  if (duration > 0) {
+    setTimeout(() => {
+      notification.style.transform = 'translateX(100%)';
+      setTimeout(() => notification.remove(), 300);
+    }, duration);
+  }
+}
 
 
 /**
@@ -550,82 +583,39 @@ export function initializeParticles(config = {}) {
     },
     retina_detect: true,
   };
+  const finalConfig = Object.assign({}, defaultConfig, config);
 
-
-  if (typeof particlesJS !== 'undefined') {
+  if (typeof window.particlesJS !== "undefined") {
     try {
-      particlesJS('particles-js', finalConfig);
-      console.error('❌ Error inicializando partículas:', error);
+      window.particlesJS("particles-js", finalConfig);
+      return true;
+    } catch (error) {
+      console.error("❌ Error inicializando partículas:", error);
       return false;
     }
-  } else {
-    console.log('⚠️ particlesJS no disponible');
+  }
 
-/**
- * Inicialización automática de partículas con detección inteligente
- */
+  console.log("⚠️ particlesJS no disponible");
+  return false;
 export function autoInitParticles() {
-  const container = document.getElementById('particles-js');
-
+  const container = document.getElementById("particles-js");
   if (!container) {
-    console.log('📄 Contenedor de partículas no encontrado');
+    console.log("📄 Contenedor de partículas no encontrado");
     return false;
+  }
   const isLowPerformance =
     navigator.hardwareConcurrency < 4 ||
     navigator.deviceMemory < 4 ||
-    /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-    );
-
-  // Configuración adaptativa según el rendimiento
+    /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
   const adaptiveConfig = isLowPerformance
     ? {
-        particles: {
-          number: { value: 25 },
-          line_linked: { enable: false },
-          move: { speed: 0.5 },
-        },
-        interactivity: {
-          events: {
-            onhover: { enable: false },
-            onclick: { enable: false },
-          },
-        },
+        particles: { number: { value: 25 }, line_linked: { enable: false }, move: { speed: 0.5 } },
+        interactivity: { events: { onhover: { enable: false }, onclick: { enable: false } } }
       }
     : {};
-
   return initializeParticles(adaptiveConfig);
 }
 
-/**
- * Función de compatibilidad para mostrar secciones
- * (delegada al sistema de navegación)
- */
-export function showSection(sectionId, options = {}) {
-  // Verificar si el sistema de navegación está disponible
-  if (window.showSection && typeof window.showSection === 'function') {
-    return window.showSection(sectionId, options);
-  // Fallback básico si el sistema de navegación no está disponible
-    '⚠️ Sistema de navegación no disponible, usando fallback básico'
-  );
-
-  if (section) {
-    // Ocultar todas las secciones
-    document.querySelectorAll('[data-section], .section').forEach((s) => {
-      s.style.display = 'none';
-      s.classList.remove('active');
-    });
-
-    // Mostrar la sección solicitada
-    section.style.display = 'block';
-    section.classList.add('active');
-
-    showNotification(`Sección ${sectionId} mostrada`, 'info', 2000);
-    return true;
-  }
-
-  showNotification(`Sección ${sectionId} no encontrada`, 'error', 3000);
-  return false;
-}
 
 /**
  * Función de utilidad para manejar errores globales
@@ -661,7 +651,10 @@ export async function checkConnectivity() {
 }
 
 /**
+ * Obtiene información básica del dispositivo
+ */
 export function getDeviceInfo() {
+  return {
     isMobile: /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
       navigator.userAgent
     ),
@@ -724,7 +717,10 @@ const tryInitParticles = () => {
 };
 
 if (document.readyState !== 'loading') {
+  tryInitParticles();
+} else {
   document.addEventListener('DOMContentLoaded', tryInitParticles);
+}
 
 // Configurar manejo de errores globales
 window.addEventListener('error', (event) => {
