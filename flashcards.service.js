@@ -7,7 +7,6 @@ import { api } from './apiClient.js';
 import { store } from './store.js';
 import { apiWithFallback, performCrudOperation } from './utils/apiHelpers.js';
 import { showNotification, generateId } from './utils/helpers.js';
-import { validateFlashcardData } from './utils/validation.js';
 
 /**
  * Configuración del servicio de flashcards
