@@ -9,7 +9,6 @@ const CONFIG = {
 const Utils = {
     log: (message, data = null) => {
         if (CONFIG.DEBUG) {
-            console.log(`🔧 [StudyingFlash] ${message}`, data || "");
         }
     },
     
@@ -179,13 +178,9 @@ class StudyingFlashApp {
     init() {
         console.log('🚀 StudyingFlash App iniciando...');
         Utils.log('App inicializando con capacidades API');
-        this.setupEventListeners();
         this.showSection('dashboard');
         this.updateStats();
-        console.log('✅ App inicializada correctamente');
-    }
-
-    setupEventListeners() {
+        
         // Navegación principal
         document.querySelectorAll('[data-section]').forEach(link => {
             link.addEventListener('click', (e) => {
@@ -244,17 +239,16 @@ class StudyingFlashApp {
     showSection(sectionName) {
         Utils.log(`Navegando a sección: ${sectionName}`);
         
-        // Ocultar todas las secciones con cssText completo
+        // Ocultar todas las secciones removiendo la clase 'active'
         document.querySelectorAll('.section').forEach(section => {
-            section.style.cssText = 'display: none !important;';
+            section.classList.remove('active');
         });
 
-        // Mostrar la sección solicitada con cssText completo
+        // Mostrar la sección solicitada añadiendo la clase 'active'
         const targetSection = document.getElementById(sectionName);
         if (targetSection) {
-            targetSection.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important;';
+            targetSection.classList.add('active');
             this.currentSection = sectionName;
-            
             // Cargar contenido específico de la sección
             this.loadSectionContent(sectionName);
         } else {
@@ -301,7 +295,8 @@ class StudyingFlashApp {
         }
     }
 
-    loadDashboard() {     const mobileMenu = document.querySelector('.mobile-menu');
+    toggleMobileMenu() {
+        const mobileMenu = document.querySelector('.mobile-menu');
         if (mobileMenu) {
             mobileMenu.classList.toggle('active');
         }
@@ -351,17 +346,22 @@ class StudyingFlashApp {
     }
 
     // ===== GESTIÓN DE DECKS (CON CAPACIDADES API) =====
+    /**
+     * Crea un nuevo deck y lo persiste en la API o en localStorage
+     * @returns {Promise<void>}
+     */
     async createDeck() {
         const nameInput = document.getElementById('deck-name');
         const descriptionInput = document.getElementById('deck-description');
+        const publicCheckbox = document.getElementById('deck-public');
         
         if (!nameInput || !descriptionInput) {
-            Utils.error('Elementos de formulario no encontrados');
             return;
         }
 
         const name = nameInput.value.trim();
         const description = descriptionInput.value.trim();
+        const isPublic = publicCheckbox ? publicCheckbox.checked : false;
 
         if (!name) {
             Utils.showNotification('El nombre del deck es requerido', 'error');
@@ -372,6 +372,7 @@ class StudyingFlashApp {
             id: Utils.generateId(),
             name: name,
             description: description,
+            isPublic: isPublic,
             createdAt: new Date().toISOString(),
             flashcards: [],
             stats: {
@@ -382,59 +383,84 @@ class StudyingFlashApp {
         };
 
         try {
-            // Intentar guardar en API primero
-            const savedDeck = await ApiService.post('/decks', newDeck);
-            Utils.log('Deck guardado en API', savedDeck);
-            
-            // Actualizar localStorage como backup
-            this.decks.push(savedDeck);
+            // PRIORIZAR LOCALSTORAGE - Guardar directamente en localStorage
+            Utils.log('Guardando deck en localStorage (modo prioritario)');
+            this.decks.push(newDeck);
             localStorage.setItem('studyingflash_decks', JSON.stringify(this.decks));
             
             Utils.showNotification('Deck creado exitosamente', 'success');
+            Utils.log('Deck creado con éxito:', newDeck);
+            
+            // Intentar sincronizar con API en segundo plano (opcional)
+            try {
+                await ApiService.post('/decks', newDeck);
+                Utils.log('Deck sincronizado con API');
+            } catch (apiError) {
+                Utils.log('API no disponible, deck guardado solo en localStorage');
+            }
             
         } catch (error) {
-            // Fallback a localStorage
-            Utils.log('Usando fallback localStorage para deck');
-            this.decks.push(newDeck);
-            localStorage.setItem('studyingflash_decks', JSON.stringify(this.decks));
-            Utils.showNotification('Deck creado (modo offline)', 'success');
+            Utils.error('Error al crear deck:', error);
+            Utils.showNotification('Error al crear deck', 'error');
+            return;
         }
 
         // Limpiar formulario
         nameInput.value = '';
         descriptionInput.value = '';
+        if (publicCheckbox) publicCheckbox.checked = false;
 
         // Actualizar UI
         this.updateDecksList();
         this.updateDeckOptions();
     }
 
+    /**
+     * Crea una nueva flashcard y la guarda usando la API o localStorage
+     * @returns {Promise<void>}
+     */
     async createFlashcard() {
+        Utils.log('🔧 [StudyingFlash] Iniciando creación de flashcard');
+        
         const deckSelect = document.getElementById('flashcard-deck');
-        const frontInput = document.getElementById('flashcard-front');
-        const backInput = document.getElementById('flashcard-back');
+        const frontInput = document.querySelector('textarea#flashcard-front');
+        const backInput = document.querySelector('textarea#flashcard-back');
+        
+        Utils.log('🔧 [StudyingFlash] Elementos encontrados:', {
+            deckSelect: !!deckSelect,
+            frontInput: !!frontInput,
+            backInput: !!backInput
+        });
         
         if (!deckSelect || !frontInput || !backInput) {
             Utils.error('Elementos de formulario no encontrados');
+            Utils.showNotification('Error: Elementos del formulario no encontrados', 'error');
             return;
         }
 
-        const deckId = deckSelect.value;
+        const deckId = deckSelect?.value || '';
         const front_content = {
-            text: frontInput.value.trim(),
+            text: frontInput?.value?.trim() || '',
             image_url: null,
             audio_url: null,
             video_url: null
         };
         const back_content = {
-            text: backInput.value.trim(),
+            text: backInput?.value?.trim() || '',
             image_url: null,
             audio_url: null,
             video_url: null
         };
 
+        Utils.log('🔧 [StudyingFlash] Datos del formulario:', {
+            deckId: deckId,
+            frontText: front_content.text,
+            backText: back_content.text
+        });
+
         if (!deckId || !front_content.text || !back_content.text) {
             Utils.showNotification('Todos los campos son requeridos', 'error');
+            Utils.log('🔧 [StudyingFlash] Validación fallida - campos requeridos');
             return;
         }
 
@@ -454,32 +480,52 @@ class StudyingFlashApp {
         };
 
         try {
-            // Intentar guardar en API
-            const savedFlashcard = await ApiService.post('/flashcards', newFlashcard);
-            Utils.log('Flashcard guardado en API', savedFlashcard);
+            // PRIORIZAR LOCALSTORAGE - Guardar directamente en localStorage
+            Utils.log('🔧 [StudyingFlash] Guardando flashcard en localStorage (modo prioritario)');
             
-            // Actualizar localStorage
-            this.flashcards.push(savedFlashcard);
+            // Asegurar que this.flashcards existe
+            if (!this.flashcards) {
+                this.flashcards = [];
+                Utils.log('🔧 [StudyingFlash] Inicializando array de flashcards');
+            }
+            
+            this.flashcards.push(newFlashcard);
             localStorage.setItem('studyingflash_flashcards', JSON.stringify(this.flashcards));
             
             Utils.showNotification('Flashcard creado exitosamente', 'success');
+            Utils.log('🔧 [StudyingFlash] Flashcard creado con éxito:', newFlashcard);
+            
+            // Intentar sincronizar con API en segundo plano (opcional)
+            try {
+                Utils.log('🔧 [StudyingFlash] Intentando sincronizar con API...');
+                await ApiService.post('/flashcards', newFlashcard);
+                Utils.log('🔧 [StudyingFlash] Flashcard sincronizado con API');
+            } catch (apiError) {
+                Utils.log('🔧 [StudyingFlash] API no disponible, flashcard guardado solo en localStorage');
+            }
             
         } catch (error) {
-            // Fallback a localStorage
-            Utils.log('Usando fallback localStorage para flashcard');
-            this.flashcards.push(newFlashcard);
-            localStorage.setItem('studyingflash_flashcards', JSON.stringify(this.flashcards));
-            Utils.showNotification('Flashcard creado (modo offline)', 'success');
+            Utils.error('Error al crear flashcard:', error);
+            Utils.showNotification('Error al crear flashcard', 'error');
+            return;
         }
 
         // Limpiar formulario
+        Utils.log('🔧 [StudyingFlash] Limpiando formulario');
         frontInput.value = '';
         backInput.value = '';
+        deckSelect.value = '';
 
         // Actualizar estadísticas del deck
+        Utils.log('🔧 [StudyingFlash] Actualizando estadísticas del deck');
         this.updateDeckStats(deckId);
+        
+        Utils.log('🔧 [StudyingFlash] Creación de flashcard completada exitosamente');
     }
 
+    /**
+     * Actualiza la lista de decks mostrada en el panel de gestión
+     */
     updateDecksList() {
         const decksList = document.getElementById('decks-list');
         if (!decksList) return;
@@ -514,6 +560,9 @@ class StudyingFlashApp {
         }).join('');
     }
 
+    /**
+     * Rellena el selector de decks disponible al crear una flashcard
+     */
     updateDeckOptions() {
         const deckSelect = document.getElementById('flashcard-deck');
         if (!deckSelect) return;
@@ -529,8 +578,11 @@ class StudyingFlashApp {
             this.decks.map(deck => `<option value="${deck.id}">${deck.name}</option>`).join('');
     }
 
+    /**
+     * Actualiza la vista de decks disponibles para estudiar
+     */
     updateStudyDecks() {
-        const studyDecks = document.getElementById('study-decks');
+        const studyDecks = document.getElementById('deck-selection');
         if (!studyDecks) return;
 
         if (this.decks.length === 0) {
@@ -563,6 +615,10 @@ class StudyingFlashApp {
     }
 
     // ===== SESIÓN DE ESTUDIO =====
+    /**
+     * Inicia una sesión de estudio para un deck específico
+     * @param {string} deckId - Identificador del deck a estudiar
+     */
     startStudySession(deckId) {
         Utils.log(`Iniciando sesión de estudio para deck: ${deckId}`);
         
@@ -603,9 +659,18 @@ class StudyingFlashApp {
         };
 
         this.showStudyCard();
-        this.showSection('study-session');
+        
+        // Mostrar interface de estudo dentro da seção estudiar
+        const deckSelection = document.getElementById('deck-selection');
+        const studyInterface = document.getElementById('study-interface');
+        
+        if (deckSelection) deckSelection.classList.add('hidden');
+        if (studyInterface) studyInterface.classList.remove('hidden');
     }
 
+    /**
+     * Muestra la tarjeta actual de la sesión de estudio
+     */
     showStudyCard() {
         if (!this.currentStudySession) return;
 
@@ -618,29 +683,29 @@ class StudyingFlashApp {
         }
 
         // Actualizar UI de la tarjeta
-        const cardContainer = document.getElementById('study-card-container');
-        if (cardContainer) {
-            cardContainer.innerHTML = `
-                <div class="study-card ${session.isFlipped ? 'flipped' : ''}">
-                    <div class="card-front">
-                        <div class="card-content">
-                            ${currentCard.front_content.text}
-                        </div>
-                        <button onclick="app.flipCard()" class="btn-flip">Ver respuesta</button>
-                    </div>
-                    <div class="card-back">
-                        <div class="card-content">
-                            ${currentCard.back_content.text}
-                        </div>
-                        <div class="evaluation-buttons">
-                            <button onclick="app.evaluateCard(1)" class="btn-eval btn-again">Otra vez</button>
-                            <button onclick="app.evaluateCard(2)" class="btn-eval btn-hard">Difícil</button>
-                            <button onclick="app.evaluateCard(3)" class="btn-eval btn-good">Bien</button>
-                            <button onclick="app.evaluateCard(4)" class="btn-eval btn-easy">Fácil</button>
-                        </div>
-                    </div>
-                </div>
-            `;
+        const frontText = document.getElementById('card-front-text');
+        const backText = document.getElementById('card-back-text');
+        const deckName = document.getElementById('study-deck-name');
+        const currentCardSpan = document.getElementById('current-card');
+        const totalCardsSpan = document.getElementById('total-cards');
+        const progressFill = document.getElementById('study-progress');
+        const flashcard = document.getElementById('flashcard');
+
+        if (frontText) frontText.textContent = currentCard.front_content.text;
+        if (backText) backText.textContent = currentCard.back_content.text;
+        if (deckName) deckName.textContent = session.deckName;
+        if (currentCardSpan) currentCardSpan.textContent = session.currentCardIndex + 1;
+        if (totalCardsSpan) totalCardsSpan.textContent = session.cards.length;
+        
+        // Actualizar barra de progreso
+        if (progressFill) {
+            const progress = ((session.currentCardIndex + 1) / session.cards.length) * 100;
+            progressFill.style.width = `${progress}%`;
+        }
+        
+        // Reset flip state
+        if (flashcard) {
+            flashcard.classList.remove('flipped');
         }
 
         // Actualizar progreso
@@ -653,13 +718,24 @@ class StudyingFlashApp {
         }
     }
 
+    /**
+     * Voltea la tarjeta actual mostrando la respuesta
+     */
     flipCard() {
         if (!this.currentStudySession) return;
         
+        const flashcard = document.getElementById('flashcard');
+        if (flashcard) {
+            flashcard.classList.add('flipped');
+        }
+        
         this.currentStudySession.isFlipped = true;
-        this.showStudyCard();
     }
 
+    /**
+     * Registra la evaluación del usuario sobre la tarjeta actual
+     * @param {number} difficulty - Dificultad de 1 (otra vez) a 4 (fácil)
+     */
     evaluateCard(difficulty) {
         if (!this.currentStudySession || !this.currentStudySession.isFlipped) return;
 
@@ -718,6 +794,11 @@ class StudyingFlashApp {
         this.saveFlashcard(card);
     }
 
+    /**
+     * Guarda los cambios de una flashcard en la API o en localStorage
+     * @param {Object} flashcard - Flashcard modificada a persistir
+     * @returns {Promise<void>}
+     */
     async saveFlashcard(flashcard) {
         try {
             // Intentar guardar en API
@@ -735,6 +816,9 @@ class StudyingFlashApp {
         }
     }
 
+    /**
+     * Finaliza la sesión de estudio actual y muestra un resumen
+     */
     endStudySession() {
         if (!this.currentStudySession) return;
 
@@ -752,8 +836,12 @@ class StudyingFlashApp {
         // Limpiar sesión
         this.currentStudySession = null;
 
-        // Volver al dashboard
-        this.showSection('dashboard');
+        // Volver a la selección de decks
+        const deckSelection = document.getElementById('deck-selection');
+        const studyInterface = document.getElementById('study-interface');
+        
+        if (studyInterface) studyInterface.classList.add('hidden');
+        if (deckSelection) deckSelection.classList.remove('hidden');
     }
 
     // ===== ESTADÍSTICAS =====
@@ -882,7 +970,6 @@ class StudyingFlashApp {
             maxStreak: this.getMaxStreak(),
             totalScore: this.calculateTotalScore(),
             topUsers: [
-                { username: 'StudyMaster', score: 15420, isCurrentUser: false },
                 { username: 'FlashGenius', score: 14890, isCurrentUser: false },
                 { username: 'Tú', score: this.calculateTotalScore(), isCurrentUser: true },
                 { username: 'MemoryPro', score: 12340, isCurrentUser: false },
@@ -955,6 +1042,11 @@ class StudyingFlashApp {
         }
     }
 
+    /**
+     * Elimina un deck y sus tarjetas asociadas
+     * @param {string} deckId - Identificador del deck a eliminar
+     * @returns {Promise<void>}
+     */
     async deleteDeck(deckId) {
         if (!confirm('¿Estás seguro de que quieres eliminar este deck y todas sus tarjetas?')) {
             return;
@@ -1007,4 +1099,162 @@ window.StudyingFlashApp = StudyingFlashApp;
 window.CONFIG = CONFIG;
 window.Utils = Utils;
 window.ApiService = ApiService;
+
+
+
+
+// Função para login com Facebook
+function loginWithFacebook() {
+    Utils.showNotification('Login com Facebook em desenvolvimento', 'info');
+    // Aqui seria implementada a integração com Facebook SDK
+}
+
+// Função para login com Google
+function loginWithGoogle() {
+    Utils.log('Tentativa de login com Google');
+    Utils.showNotification('Login com Google em desenvolvimento', 'info');
+    // Aqui seria implementada a integração com Google OAuth
+}
+
+// Função para mostrar modal de esqueci a senha
+function showForgotPassword() {
+    Utils.log('Mostrando modal de esqueci a senha');
+    // Aqui seria implementado o modal de recuperação de senha
+}
+
+// Função para mostrar modal de registro
+function showRegisterModal() {
+    Utils.log('Mostrando modal de registro');
+    // Esconder modal de login e mostrar modal de registro
+    // Aqui seria implementado o modal de registro separado
+    Utils.showNotification('Modal de registro em desenvolvimento', 'info');
+}
+
+// Melhorar a função de login existente
+function handleLoginForm(event) {
+    event.preventDefault();
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
+    
+    Utils.log('Tentativa de login', { email });
+    
+    // Simulação de login bem-sucedido
+    if (email && password) {
+        Utils.showNotification('Login realizado com sucesso!', 'success');
+        hideLoginModal();
+        // Atualizar interface para usuário logado
+        updateUIForLoggedUser(email);
+    } else {
+        Utils.showNotification('Por favor, preencha todos os campos', 'error');
+    }
+}
+
+// Função para atualizar UI quando usuário está logado
+function updateUIForLoggedUser(email) {
+    // Atualizar botões de login para mostrar usuário logado
+    const loginButtons = document.querySelectorAll('#apple-login-btn, .btn[onclick*="showLoginModal"]');
+    loginButtons.forEach(btn => {
+        btn.textContent = `👤 ${email.split('@')[0]}`;
+        btn.onclick = () => showUserMenu();
+    });
+    
+    // Salvar estado de login
+    localStorage.setItem('studyingflash_user', JSON.stringify({ email, loggedIn: true }));
+}
+
+// Função para mostrar menu do usuário
+function showUserMenu() {
+    Utils.showNotification('Menu do usuário em desenvolvimento', 'info');
+}
+
+function checkUserLogin() {
+    const user = JSON.parse(localStorage.getItem('studyingflash_user') || '{}');
+        updateUIForLoggedUser(user.email);
+    }
+}
+
+// Chamar verificação de login quando a página carregar
+document.addEventListener('DOMContentLoaded', checkUserLogin);
+
+
+
+// Função para alternar a visibilidade da senha
+function togglePasswordVisibility() {
+    const passwordField = document.getElementById("login-password");
+    const toggleIcon = document.querySelector(".input-icon");
+
+    if (passwordField.type === "password") {
+        passwordField.type = "text";
+    } else {
+        passwordField.type = "password";
+        toggleIcon.textContent = "👁️"; // Ícone de olho aberto
+    }
+}
+
+
+
+// Função para mostrar o modal de login e focar no campo de email/senha
+function showLoginModal() {
+  const loginModal = document.getElementById("login-modal");
+  loginModal.style.display = "flex";
+
+  const emailField = document.getElementById("login-email");
+  const passwordField = document.getElementById("login-password");
+
+  if (emailField) {
+    emailField.focus();
+  } else if (passwordField) {
+    passwordField.focus();
+  }
+}
+
+// Função para esconder o modal de login
+function hideLoginModal() {
+    const loginModal = document.getElementById("login-modal");
+    if (loginModal) {
+        loginModal.style.display = "none";
+    }
+}
+/**
+ * Valida la información del usuario antes del registro
+ * @param {Object} userData - Datos del usuario a validar
+ * @param {string} userData.username - Nombre de usuario
+ * @param {string} userData.email - Correo electrónico del usuario
+ * @param {string} [userData.password] - Contraseña a validar (opcional)
+ * @returns {{valid: boolean, error?: string}} Resultado de la validación
+ */
+function validateUser(userData) {
+    if (!userData || typeof userData !== 'object') {
+        return { valid: false, error: 'Datos de usuario faltantes' };
+    }
+
+    const { username, email, password } = userData;
+
+    if (!username || !email) {
+        return { valid: false, error: 'Nombre de usuario y email son requeridos' };
+    }
+
+    const cleanUsername = username.trim();
+    if (cleanUsername.length < 3 || /[^\w]/.test(cleanUsername)) {
+        return { valid: false, error: 'Nombre de usuario inválido' };
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        return { valid: false, error: 'Email inválido' };
+    }
+
+    const bannedDomains = ['tempmail.com', 'dispostable.com'];
+    const domain = email.toLowerCase().split('@').pop();
+    if (bannedDomains.includes(domain)) {
+        return { valid: false, error: 'Dominio de email no permitido' };
+    }
+
+    if (password !== undefined && password.trim().length < 6) {
+        return { valid: false, error: 'La contraseña debe tener al menos 6 caracteres' };
+    }
+
+    return { valid: true };
+}
+
 

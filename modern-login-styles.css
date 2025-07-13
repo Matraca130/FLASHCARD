@@ -1,0 +1,57 @@
+/* Styles for modernized login modal */
+
+/* Input container with icon */
+.input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
+  position: absolute;
+  right: 1rem;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.7);
+  transition: color 0.2s ease;
+}
+
+.input-icon:hover {
+  color: #ffffff;
+}
+
+.modern-input {
+  padding-right: 2.5rem;
+}
+
+.modern-login-btn {
+  width: 100%;
+  margin-top: var(--space-lg);
+}
+
+.forgot-password {
+  text-align: right;
+  margin-top: var(--space-sm);
+}
+
+.social-login {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin-top: var(--space-lg);
+}
+
+.btn-social {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+}
+
+.auth-divider {
+  text-align: center;
+  margin: var(--space-lg) 0;
+}
+
+.create-account-btn {
+  width: 100%;
+}

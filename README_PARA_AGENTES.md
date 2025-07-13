@@ -4,7 +4,7 @@
 
 ### ✅ ARCHIVO PRINCIPAL (ÚNICO A MODIFICAR)
 ```
-flashcard-app-final.js
+app-functional.js
 ```
 **⚠️ IMPORTANTE:** Este es el ÚNICO archivo JavaScript que debe modificarse. NO crear nuevos archivos JS.
 
@@ -12,7 +12,7 @@ flashcard-app-final.js
 ```
 FLASHCARD/
 ├── app.html                    # Archivo HTML principal
-├── flashcard-app-final.js      # ⭐ ÚNICO archivo JavaScript
+├── app-functional.js      # ⭐ ÚNICO archivo JavaScript
 ├── styles.css                  # Estilos CSS
 ├── backup_js/                  # Backup de archivos eliminados
 └── README_PARA_AGENTES.md      # Esta documentación
@@ -38,7 +38,7 @@ FLASHCARD/
 ## 📝 REGLAS PARA MODIFICACIONES
 
 ### ✅ LO QUE SÍ HACER:
-1. **Modificar solo `flashcard-app-final.js`**
+1. **Modificar solo `app-functional.js`**
 2. **Hacer commit después de cada cambio**
 3. **Probar localmente antes de push**
 4. **Usar nombres descriptivos en commits**
@@ -56,7 +56,7 @@ FLASHCARD/
 ### 1. Hacer Cambios
 ```bash
 # Editar el archivo principal
-nano flashcard-app-final.js
+nano app-functional.js
 
 # O usar herramientas de edición
 ```
@@ -69,7 +69,7 @@ nano flashcard-app-final.js
 
 ### 3. Commit y Deploy
 ```bash
-git add flashcard-app-final.js
+git add app-functional.js
 git commit -m "DESCRIPCIÓN_DEL_CAMBIO"
 git push origin main
 ```
@@ -85,7 +85,7 @@ git push origin main
 ### Frontend
 - **Tecnología**: HTML + CSS + JavaScript vanilla
 - **Hosting**: GitHub Pages (estático)
-- **Archivo principal**: `flashcard-app-final.js`
+- **Archivo principal**: `app-functional.js`
 - **Conectividad**: API calls al backend de Render
 
 ### Backend
@@ -100,7 +100,7 @@ git push origin main
 
 ### Si la aplicación no funciona:
 1. **Verificar consola del navegador** (F12)
-2. **Comprobar que solo existe `flashcard-app-final.js`**
+2. **Comprobar que solo existe `app-functional.js`**
 3. **Verificar conectividad con backend**
 4. **Revisar si hay errores de CORS**
 
@@ -113,7 +113,7 @@ git push origin main
 
 ## 📞 CONECTIVIDAD FRONTEND-BACKEND
 
-### Configuración en `flashcard-app-final.js`:
+### Configuración en `app-functional.js`:
 ```javascript
 const CONFIG = {
     API_BASE_URL: 'https://flashcard-u10n.onrender.com/api',

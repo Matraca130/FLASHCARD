@@ -8,7 +8,7 @@
 
 ### **📁 ESTRUCTURA DE ARCHIVOS:**
 ```
-flashcard-app-final.js    ← Archivo principal (NO tocar estructura)
+app-functional.js    ← Archivo principal (NO tocar estructura)
 services/                 ← Servicios modulares
 utils/                    ← Utilidades compartidas
 tests/                    ← Tests organizados
@@ -97,7 +97,7 @@ module.exports = { UserService };
 
 #### **Dependencias Comunes Disponibles:**
 ```javascript
-// Siempre disponibles en flashcard-app-final.js
+// Siempre disponibles en app-functional.js
 - ApiService          ← Para llamadas API
 - AuthService         ← Para autenticación  
 - DeckService         ← Para gestión de mazos
@@ -276,7 +276,7 @@ Utils.log('ℹ️ Información: procesando datos', 'info');
 ### **🚫 PROHIBIDO ABSOLUTAMENTE:**
 
 1. **NO crear funciones sin verificar duplicados**
-2. **NO modificar flashcard-app-final.js sin análisis previo**
+2. **NO modificar app-functional.js sin análisis previo**
 3. **NO usar nombres de variables genéricos** (data, item, temp)
 4. **NO crear archivos sin verificar estructura existente**
 5. **NO hacer commits sin ejecutar limpieza automática**
