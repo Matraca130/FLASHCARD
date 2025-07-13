@@ -1,0 +1,23 @@
+/* Additional tweaks for login modal redesign */
+
+.login-subtitle {
+  margin-bottom: var(--space-lg);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.auth-toggle {
+  margin-top: var(--space-lg);
+  text-align: center;
+}
+
+.auth-toggle button {
+  background: none;
+  border: none;
+  color: var(--primary-200);
+  cursor: pointer;
+  font-weight: var(--font-weight-semibold);
+}
+
+.auth-toggle button:hover {
+  text-decoration: underline;
+}
