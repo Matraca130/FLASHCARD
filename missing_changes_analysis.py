@@ -162,7 +162,36 @@ class MissingChangesAnalyzer:
                         'status': 'missing',
                         'reason': 'Elemento no presente en HTML'
                     }
-    
+
+    def analyze_missing_css_links(self):
+        """Analizar archivos CSS enlazados desde index.html"""
+        print("\n🎨 Analizando hojas de estilo enlazadas...")
+
+        if not os.path.exists('index.html'):
+            print("   ❌ index.html no encontrado")
+            return
+
+        with open('index.html', 'r', encoding='utf-8') as f:
+            html_content = f.read()
+
+        css_links = re.findall(r'href=\"(.+?\\.css)\"', html_content)
+
+        for css_file in css_links:
+            print(f"\n🔍 Verificando: {css_file}")
+
+            if os.path.exists(css_file):
+                print("   ✅ ENCONTRADO: Archivo CSS presente")
+                self.analysis_results[css_file] = {
+                    'status': 'found',
+                    'reason': 'Archivo CSS presente'
+                }
+            else:
+                print("   ❌ NO ENCONTRADO: Archivo CSS faltante")
+                self.analysis_results[css_file] = {
+                    'status': 'missing',
+                    'reason': 'Archivo CSS no existe'
+                }
+
     def analyze_missing_constants(self):
         """Analizar constantes faltantes"""
         print("\n📊 Analizando constantes faltantes...")
@@ -290,6 +319,7 @@ class MissingChangesAnalyzer:
         self.analyze_missing_files()
         self.analyze_missing_functions()
         self.analyze_missing_html_elements()
+        self.analyze_missing_css_links()
         self.analyze_missing_constants()
         
         recovery_rate = self.generate_analysis_report()
