@@ -1,0 +1,1126 @@
+{
+  "coordinator": "AGENT-1-ENHANCED",
+  "timestamp": "2025-07-08T18:26:35.805Z",
+  "executionTime": 1019,
+  "initialState": {
+    "mainFile": {
+      "exists": true,
+      "path": "./flashcard-app-final.js",
+      "size": 38212,
+      "lines": 1153,
+      "hash": "9ea7318a75642bfdc97427919af7720a",
+      "functions": [
+        {
+          "name": "if",
+          "line": 17,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 76,
+          "type": "method"
+        },
+        {
+          "name": "fallbackToLocalStorage",
+          "line": 93,
+          "type": "method"
+        },
+        {
+          "name": "switch",
+          "line": 99,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 121,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 145,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 151,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 153,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 169,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 180,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 183,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 186,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 201,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 206,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 217,
+          "type": "method"
+        },
+        {
+          "name": "logout",
+          "line": 229,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 232,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 235,
+          "type": "method"
+        },
+        {
+          "name": "getAuthToken",
+          "line": 242,
+          "type": "method"
+        },
+        {
+          "name": "setAuthToken",
+          "line": 246,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 247,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 250,
+          "type": "method"
+        },
+        {
+          "name": "removeAuthToken",
+          "line": 255,
+          "type": "method"
+        },
+        {
+          "name": "isAuthenticated",
+          "line": 260,
+          "type": "method"
+        },
+        {
+          "name": "getCurrentUser",
+          "line": 264,
+          "type": "method"
+        },
+        {
+          "name": "calculateNext",
+          "line": 354,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 358,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 360,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 410,
+          "type": "method"
+        },
+        {
+          "name": "calculateAccuracy",
+          "line": 466,
+          "type": "method"
+        },
+        {
+          "name": "calculateStreak",
+          "line": 474,
+          "type": "method"
+        },
+        {
+          "name": "for",
+          "line": 485,
+          "type": "method"
+        },
+        {
+          "name": "calculateStudyTime",
+          "line": 499,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 535,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 540,
+          "type": "method"
+        },
+        {
+          "name": "updateElement",
+          "line": 575,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 577,
+          "type": "method"
+        },
+        {
+          "name": "clearForm",
+          "line": 583,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 585,
+          "type": "method"
+        },
+        {
+          "name": "initializeSections",
+          "line": 622,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 633,
+          "type": "method"
+        },
+        {
+          "name": "setupEventListeners",
+          "line": 653,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 656,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 662,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 687,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 722,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 750,
+          "type": "method"
+        },
+        {
+          "name": "showCurrentFlashcard",
+          "line": 777,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 783,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 795,
+          "type": "method"
+        },
+        {
+          "name": "navigateToSection",
+          "line": 854,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 862,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 872,
+          "type": "method"
+        },
+        {
+          "name": "showSection",
+          "line": 945,
+          "type": "function"
+        },
+        {
+          "name": "if",
+          "line": 956,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 970,
+          "type": "method"
+        },
+        {
+          "name": "switch",
+          "line": 975,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 977,
+          "type": "method"
+        },
+        {
+          "name": "debounce",
+          "line": 997,
+          "type": "function"
+        },
+        {
+          "name": "executedFunction",
+          "line": 999,
+          "type": "function"
+        },
+        {
+          "name": "later",
+          "line": 1000,
+          "type": "arrow"
+        },
+        {
+          "name": "generateActivityHeatmap",
+          "line": 1010,
+          "type": "function"
+        },
+        {
+          "name": "if",
+          "line": 1014,
+          "type": "method"
+        },
+        {
+          "name": "handleCreateDeck",
+          "line": 1044,
+          "type": "function"
+        },
+        {
+          "name": "if",
+          "line": 1051,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 1061,
+          "type": "method"
+        },
+        {
+          "name": "handleCreateFlashcard",
+          "line": 1096,
+          "type": "function"
+        },
+        {
+          "name": "if",
+          "line": 1103,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 1113,
+          "type": "method"
+        }
+      ],
+      "services": [
+        {
+          "name": "ApiService",
+          "line": 60
+        },
+        {
+          "name": "AuthService",
+          "line": 142
+        },
+        {
+          "name": "DeckService",
+          "line": 272
+        },
+        {
+          "name": "FlashcardService",
+          "line": 313
+        },
+        {
+          "name": "StudyService",
+          "line": 393
+        },
+        {
+          "name": "DashboardService",
+          "line": 429
+        }
+      ],
+      "lastModified": "2025-07-08T17:18:08.322Z"
+    },
+    "backupFiles": [],
+    "serviceFiles": [
+      {
+        "name": "NavigationService.js",
+        "path": "services/NavigationService.js",
+        "size": 5322,
+        "lines": 202,
+        "hash": "e880e396db3e70bbbd311d1b66640827",
+        "functions": [
+          {
+            "name": "constructor",
+            "line": 10,
+            "type": "method"
+          },
+          {
+            "name": "if",
+            "line": 11,
+            "type": "method"
+          },
+          {
+            "name": "init",
+            "line": 28,
+            "type": "method"
+          },
+          {
+            "name": "waitForNavigationSystem",
+            "line": 36,
+            "type": "method"
+          },
+          {
+            "name": "checkNavigation",
+            "line": 37,
+            "type": "arrow"
+          },
+          {
+            "name": "navigateTo",
+            "line": 56,
+            "type": "method"
+          },
+          {
+            "name": "if",
+            "line": 57,
+            "type": "method"
+          },
+          {
+            "name": "if",
+            "line": 65,
+            "type": "method"
+          },
+          {
+            "name": "if",
+            "line": 70,
+            "type": "method"
+          },
+          {
+            "name": "if",
+            "line": 77,
+            "type": "method"
+          },
+          {
+            "name": "processPendingNavigations",
+            "line": 93,
+            "type": "method"
+          },
+          {
+            "name": "while",
+            "line": 94,
+            "type": "method"
+          },
+          {
+            "name": "getCurrentSection",
+            "line": 103,
+            "type": "method"
+          },
+          {
+            "name": "goBack",
+            "line": 110,
+            "type": "method"
+          },
+          {
+            "name": "if",
+            "line": 111,
+            "type": "method"
+          },
+          {
+            "name": "clearHistory",
+            "line": 121,
+            "type": "method"
+          },
+          {
+            "name": "on",
+            "line": 130,
+            "type": "method"
+          },
+          {
+            "name": "off",
+            "line": 142,
+            "type": "method"
+          },
+          {
+            "name": "if",
+            "line": 146,
+            "type": "method"
+          },
+          {
+            "name": "emit",
+            "line": 157,
+            "type": "method"
+          },
+          {
+            "name": "isReady",
+            "line": 172,
+            "type": "method"
+          },
+          {
+            "name": "getStats",
+            "line": 179,
+            "type": "method"
+          },
+          {
+            "name": "navigateTo",
+            "line": 193,
+            "type": "arrow"
+          },
+          {
+            "name": "getCurrentSection",
+            "line": 194,
+            "type": "arrow"
+          },
+          {
+            "name": "goBack",
+            "line": 195,
+            "type": "arrow"
+          },
+          {
+            "name": "onNavigationChange",
+            "line": 196,
+            "type": "arrow"
+          },
+          {
+            "name": "onNavigationReady",
+            "line": 197,
+            "type": "arrow"
+          }
+        ],
+        "lastModified": "2025-07-08T16:15:24.062Z"
+      }
+    ],
+    "duplicates": [],
+    "timestamp": 1751999194799
+  },
+  "finalState": {
+    "mainFile": {
+      "exists": true,
+      "path": "./flashcard-app-final.js",
+      "size": 38212,
+      "lines": 1153,
+      "hash": "9ea7318a75642bfdc97427919af7720a",
+      "functions": [
+        {
+          "name": "if",
+          "line": 17,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 76,
+          "type": "method"
+        },
+        {
+          "name": "fallbackToLocalStorage",
+          "line": 93,
+          "type": "method"
+        },
+        {
+          "name": "switch",
+          "line": 99,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 121,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 145,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 151,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 153,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 169,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 180,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 183,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 186,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 201,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 206,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 217,
+          "type": "method"
+        },
+        {
+          "name": "logout",
+          "line": 229,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 232,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 235,
+          "type": "method"
+        },
+        {
+          "name": "getAuthToken",
+          "line": 242,
+          "type": "method"
+        },
+        {
+          "name": "setAuthToken",
+          "line": 246,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 247,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 250,
+          "type": "method"
+        },
+        {
+          "name": "removeAuthToken",
+          "line": 255,
+          "type": "method"
+        },
+        {
+          "name": "isAuthenticated",
+          "line": 260,
+          "type": "method"
+        },
+        {
+          "name": "getCurrentUser",
+          "line": 264,
+          "type": "method"
+        },
+        {
+          "name": "calculateNext",
+          "line": 354,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 358,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 360,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 410,
+          "type": "method"
+        },
+        {
+          "name": "calculateAccuracy",
+          "line": 466,
+          "type": "method"
+        },
+        {
+          "name": "calculateStreak",
+          "line": 474,
+          "type": "method"
+        },
+        {
+          "name": "for",
+          "line": 485,
+          "type": "method"
+        },
+        {
+          "name": "calculateStudyTime",
+          "line": 499,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 535,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 540,
+          "type": "method"
+        },
+        {
+          "name": "updateElement",
+          "line": 575,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 577,
+          "type": "method"
+        },
+        {
+          "name": "clearForm",
+          "line": 583,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 585,
+          "type": "method"
+        },
+        {
+          "name": "initializeSections",
+          "line": 622,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 633,
+          "type": "method"
+        },
+        {
+          "name": "setupEventListeners",
+          "line": 653,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 656,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 662,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 687,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 722,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 750,
+          "type": "method"
+        },
+        {
+          "name": "showCurrentFlashcard",
+          "line": 777,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 783,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 795,
+          "type": "method"
+        },
+        {
+          "name": "navigateToSection",
+          "line": 854,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 862,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 872,
+          "type": "method"
+        },
+        {
+          "name": "showSection",
+          "line": 945,
+          "type": "function"
+        },
+        {
+          "name": "if",
+          "line": 956,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 970,
+          "type": "method"
+        },
+        {
+          "name": "switch",
+          "line": 975,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 977,
+          "type": "method"
+        },
+        {
+          "name": "debounce",
+          "line": 997,
+          "type": "function"
+        },
+        {
+          "name": "executedFunction",
+          "line": 999,
+          "type": "function"
+        },
+        {
+          "name": "later",
+          "line": 1000,
+          "type": "arrow"
+        },
+        {
+          "name": "generateActivityHeatmap",
+          "line": 1010,
+          "type": "function"
+        },
+        {
+          "name": "if",
+          "line": 1014,
+          "type": "method"
+        },
+        {
+          "name": "handleCreateDeck",
+          "line": 1044,
+          "type": "function"
+        },
+        {
+          "name": "if",
+          "line": 1051,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 1061,
+          "type": "method"
+        },
+        {
+          "name": "handleCreateFlashcard",
+          "line": 1096,
+          "type": "function"
+        },
+        {
+          "name": "if",
+          "line": 1103,
+          "type": "method"
+        },
+        {
+          "name": "if",
+          "line": 1113,
+          "type": "method"
+        }
+      ],
+      "services": [
+        {
+          "name": "ApiService",
+          "line": 60
+        },
+        {
+          "name": "AuthService",
+          "line": 142
+        },
+        {
+          "name": "DeckService",
+          "line": 272
+        },
+        {
+          "name": "FlashcardService",
+          "line": 313
+        },
+        {
+          "name": "StudyService",
+          "line": 393
+        },
+        {
+          "name": "DashboardService",
+          "line": 429
+        }
+      ],
+      "lastModified": "2025-07-08T17:18:08.322Z"
+    },
+    "backupFiles": [],
+    "serviceFiles": [
+      {
+        "name": "NavigationService.js",
+        "path": "services/NavigationService.js",
+        "size": 5322,
+        "lines": 202,
+        "hash": "e880e396db3e70bbbd311d1b66640827",
+        "functions": [
+          {
+            "name": "constructor",
+            "line": 10,
+            "type": "method"
+          },
+          {
+            "name": "if",
+            "line": 11,
+            "type": "method"
+          },
+          {
+            "name": "init",
+            "line": 28,
+            "type": "method"
+          },
+          {
+            "name": "waitForNavigationSystem",
+            "line": 36,
+            "type": "method"
+          },
+          {
+            "name": "checkNavigation",
+            "line": 37,
+            "type": "arrow"
+          },
+          {
+            "name": "navigateTo",
+            "line": 56,
+            "type": "method"
+          },
+          {
+            "name": "if",
+            "line": 57,
+            "type": "method"
+          },
+          {
+            "name": "if",
+            "line": 65,
+            "type": "method"
+          },
+          {
+            "name": "if",
+            "line": 70,
+            "type": "method"
+          },
+          {
+            "name": "if",
+            "line": 77,
+            "type": "method"
+          },
+          {
+            "name": "processPendingNavigations",
+            "line": 93,
+            "type": "method"
+          },
+          {
+            "name": "while",
+            "line": 94,
+            "type": "method"
+          },
+          {
+            "name": "getCurrentSection",
+            "line": 103,
+            "type": "method"
+          },
+          {
+            "name": "goBack",
+            "line": 110,
+            "type": "method"
+          },
+          {
+            "name": "if",
+            "line": 111,
+            "type": "method"
+          },
+          {
+            "name": "clearHistory",
+            "line": 121,
+            "type": "method"
+          },
+          {
+            "name": "on",
+            "line": 130,
+            "type": "method"
+          },
+          {
+            "name": "off",
+            "line": 142,
+            "type": "method"
+          },
+          {
+            "name": "if",
+            "line": 146,
+            "type": "method"
+          },
+          {
+            "name": "emit",
+            "line": 157,
+            "type": "method"
+          },
+          {
+            "name": "isReady",
+            "line": 172,
+            "type": "method"
+          },
+          {
+            "name": "getStats",
+            "line": 179,
+            "type": "method"
+          },
+          {
+            "name": "navigateTo",
+            "line": 193,
+            "type": "arrow"
+          },
+          {
+            "name": "getCurrentSection",
+            "line": 194,
+            "type": "arrow"
+          },
+          {
+            "name": "goBack",
+            "line": 195,
+            "type": "arrow"
+          },
+          {
+            "name": "onNavigationChange",
+            "line": 196,
+            "type": "arrow"
+          },
+          {
+            "name": "onNavigationReady",
+            "line": 197,
+            "type": "arrow"
+          }
+        ],
+        "lastModified": "2025-07-08T16:15:24.062Z"
+      }
+    ],
+    "duplicates": [],
+    "timestamp": 1751999195803
+  },
+  "qualityChecks": [
+    {
+      "check": "duplicates_reduction",
+      "status": "WARNING",
+      "details": {
+        "initial": 0,
+        "final": 0,
+        "reduction": 0,
+        "percentage": 0
+      }
+    },
+    {
+      "check": "functionality_preservation",
+      "status": "PASS",
+      "details": {
+        "services": {
+          "initial": 6,
+          "final": 6
+        },
+        "functions": {
+          "initial": 69,
+          "final": 69
+        }
+      }
+    },
+    {
+      "check": "code_integrity",
+      "status": "PASS",
+      "details": {
+        "hasBasicStructure": true,
+        "hasNoMergeConflicts": true,
+        "hasReasonableSize": true,
+        "size": 38212
+      }
+    },
+    {
+      "check": "agent_work_verification",
+      "status": "WARNING",
+      "details": {
+        "completedAgents": 0,
+        "failedAgents": 1,
+        "totalWork": 0,
+        "totalBytesReduced": 0
+      }
+    }
+  ],
+  "duplicatesRemaining": [],
+  "functionalityIssues": [],
+  "impact": {
+    "duplicatesEliminated": 0,
+    "fileSizeChange": 0,
+    "functionsAdded": 0,
+    "servicesAdded": 0
+  },
+  "overallStatus": "WARNING"
+}

@@ -1,0 +1,197 @@
+{
+  "timestamp": "2025-07-08T14:33:08.251296",
+  "total_html_files": 1,
+  "files_analyzed": [
+    "./index.html"
+  ],
+  "duplicates_found": 0,
+  "duplicates": [],
+  "file_details": {
+    "./index.html": {
+      "title": "StudyingFlash - Aplicación Completa Integrada",
+      "meta_tags": [
+        "<meta charset=\"utf-8\"/>",
+        "<meta content=\"width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes, viewport-fit=cover\" name=\"viewport\"/>",
+        "<meta content=\"StudyingFlash - Aplicación de flashcards con repetición espaciada para optimizar tu aprendizaje\" name=\"description\"/>",
+        "<meta content=\"#2563eb\" name=\"theme-color\"/>",
+        "<meta content=\"yes\" name=\"mobile-web-app-capable\"/>",
+        "<meta content=\"default\" name=\"apple-mobile-web-app-status-bar-style\"/>",
+        "<meta content=\"StudyingFlash\" name=\"apple-mobile-web-app-title\"/>",
+        "<meta content=\"#6366f1\" name=\"theme-color\"/>",
+        "<meta content=\"yes\" name=\"mobile-web-app-capable\"/>",
+        "<meta content=\"black-translucent\" name=\"apple-mobile-web-app-status-bar-style\"/>"
+      ],
+      "css_links": [
+        "./styles.css",
+        "./meta-dark-theme.css",
+        "./responsive.css",
+        "./apple-mobile.css",
+        "https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+      ],
+      "script_tags": [
+        "https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js",
+        "https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js",
+        "https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js",
+        "https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/gsap.min.js",
+        "\n    import * as AppInitializer from './services/appInitializer.js';\n    import * as AuthService from './services/auth.service.js';\n    import * as DashboardService from './services/dashboard.service.js';\n    import * as StudyService from './services/study.service.js';\n    import * as CreateService from './services/create.service.js';\n    import * as ManageService from './services/manage.service.js';\n    import * as FlashcardsService from './services/flashcards.service.js';\n    import * as StorageService from './services/storage.service.js';\n    import * as NavigationService from './services/NavigationService.js';\n    import * as GamificationService from './services/gamification.service.js';\n\n    // ===== GLOBAL VARIABLES =====\n    let currentUser = null;\n    let currentDeck = null;\n    let currentCards = [];\n    let currentCardIndex = 0;\n    let isCardFlipped = false;\n    let sessionStats = {\n      correct: 0,\n      total: 0,\n      points: 0\n    };\n    let spacedRepetitionData = {};\n    let gamificationData = {\n      points: 0,\n      level: 1,\n      streak: 0,\n      achievements: []\n    };\n    let editingFlashcardId = null;\n    let editingDeckId = null;\n    let confirmationCallback = nue\n\n        \n      } catch (error) {\n        console.error('Error loading manage decks:', error);\n        showNotification('Error al cargar decks para gestion    \n\n    \n\n    \n\n    \n\n    \n\n    \n\n    \n\n    \n\n    \n\n    \n\n    \n\n    \n\n    \n s[0]);\n      }\n    }\n    \n\n    \n\n    \n\n    \n\n    \n\n\n    \n\n      const allAchievements = [\n        { id: 'first_session', title: 'Primera Sesión', description: 'Completa tu primera sesión de estudio', icon: 'assets/icons/achievements/first-session.png', points: 50 },\n        { id: 'perfect_session', title: 'Sesión Perfecta', description: 'Responde todas las cartas correctamente', icon: 'assets/icons/achievements/perfect-session.png', points: 100 },\n        { id: 'speed_demon', title: 'Demonio de la Velocidad', description: 'Completa una sesión en menos de 2 minutos', icon: 'assets/icons/achievements/speed-demon.png', points: 75 },\n        { id: 'streak_3', title: 'Racha de 3', description: 'Estudia 3 días consecutivos', icon: 'assets/icons/ui-elements/points-star.png', points: 150 },\n        { id: 'streak_7', title: 'Semana Completa', description: 'Estudia 7 días consecutivos', icon: '📅', points: 300 },\n        { id: 'points_100', title: 'Centurión', description: 'Acumula 100 puntos', icon: 'assets/icons/achievements/first-session.png', points: 50 },\n        { id: 'points_500', title: 'Guerrero', description: 'Acumula 500 puntos', icon: '⚔️', points: 100 },\n        { id: 'points_1000', title: 'Campeón', description: 'Acumula 1000 puntos', icon: 'assets/icons/achievements/crown-achievement.png', points: 200 },\n        { id: 'level_5', title: 'Experto', description: 'Alcanza el nivel 5', icon: 'assets/icons/achievements/first-session.png', points: 250 },\n        { id: 'level_10', title: 'Maestro', description: 'Alcanza el nivel 10', icon: 'assets/icons/achievements/perfect-session.png', points: 500 },\n        { id: 'cards_100', title: 'Estudioso', description: 'Estudia 100 flashcards', icon: 'assets/icons/individual/study-icon.png', points: 100 },\n        { id: 'cards_500', title: 'Erudito', description: 'Estudia 500 flashcards', icon: '🧠', points: 200 },\n        { id: 'deck_creator', title: 'Creador', description: 'Crea tu primer deck', icon: '🎨', points: 75 },\n        { id: 'social_butterfly', title: 'Mariposa Social', description: 'Comparte un deck público', icon: '🦋', points: 100 },\n        { id: 'night_owl', title: 'Búho Nocturno', description: 'Estudia después de las 10 PM', icon: '🦉', points: 50 }\n      ];\n      \n\n    \n\n    \n\n    \n\n    \n\n    \n\n    \n\n    \n\n    \n\n    \n\n    \n\n    \n\n    \n\n    \n\n\n\n    \n\n    \n\n    \n  "
+      ],
+      "inline_styles": [
+        "\n    /* Estilos para accesibilidad - Screen Reader Only */\n    .sr-only {\n      position: absolute;\n      width: 1px;\n      height: 1px;\n      padding: 0;\n      margin: -1px;\n      overflow: hidden;\n      clip: rect(0, 0, 0, 0);\n      white-space: nowrap;\n      border: 0;\n    }\n    \n    .icon {\n      width: 20px;\n      height: 20px;\n      display: inline-block;\n      vertical-align: middle;\n      margin-right: 8px;\n    }\n    \n    .logo-icon {\n      width: 28px;\n      height: 28px;\n      margin-right: 10px;\n    }\n    \n    .nav-link .icon {\n      transition: transform 0.2s ease;\n    }\n    \n    .nav-link:hover .icon {\n      transform: scale(1.1);\n    }\n    \n    .nav-link.active .icon {\n      color: #6366f1;\n    }\n  "
+      ],
+      "body_classes": [],
+      "sections": [
+        "apple-sidebar-overlay",
+        "particles-js",
+        "user-level",
+        "user-points",
+        "dashboard",
+        "dashboard-stats",
+        "total-cards",
+        "total-cards-change",
+        "studied-today",
+        "studied-today-change",
+        "accuracy",
+        "accuracy-change",
+        "streak",
+        "streak-change",
+        "study-time",
+        "study-time-change",
+        "total-progress",
+        "total-progress-change",
+        "activity-heatmap",
+        "dashboard-decks",
+        "dashboard-decks-list",
+        "estudiar",
+        "deck-selection",
+        "study-interface",
+        "study-progress",
+        "flashcard",
+        "flashcard-front",
+        "flashcard-back",
+        "study-controls",
+        "session-correct",
+        "session-total",
+        "session-accuracy",
+        "session-points",
+        "study-summary",
+        "summary-correct",
+        "summary-total",
+        "summary-accuracy",
+        "summary-points",
+        "crear",
+        "gestionar",
+        "file-upload-area",
+        "export-options",
+        "search-results",
+        "manage-decks",
+        "ranking",
+        "user-total-points",
+        "user-current-level",
+        "user-current-streak",
+        "user-achievements-count",
+        "level-progress-bar",
+        "achievements-grid",
+        "login-modal",
+        "edit-flashcard-modal",
+        "edit-deck-modal",
+        "confirmation-modal",
+        "achievement-notification",
+        "achievement-icon",
+        "achievement-title",
+        "achievement-description"
+      ],
+      "forms": [
+        "deck-form",
+        "flashcard-form",
+        "loginForm",
+        "registerForm"
+      ],
+      "buttons": [
+        "logout",
+        "create-deck",
+        "create-flashcard"
+      ],
+      "navigation": [
+        "#",
+        "#",
+        "#",
+        "#",
+        "#",
+        "#",
+        "#",
+        "#",
+        "#",
+        "#",
+        "#",
+        "#",
+        "#"
+      ],
+      "images": [],
+      "total_elements": 570,
+      "file_size": 49752,
+      "line_count": 1206
+    }
+  },
+  "agent_distribution": {
+    "agent_1": {
+      "role": "Coordinador HTML",
+      "responsibility": "Verificación y coordinación general",
+      "files": [
+        "./index.html"
+      ],
+      "tasks": [
+        "Verificar duplicados",
+        "Coordinar otros agentes",
+        "Validar resultado final"
+      ]
+    },
+    "agent_2": {
+      "role": "Aplicación Principal",
+      "responsibility": "index.html y estructura principal",
+      "files": [
+        "./index.html"
+      ],
+      "tasks": [
+        "Consolidar estructura principal",
+        "Eliminar elementos duplicados"
+      ]
+    },
+    "agent_3": {
+      "role": "Aplicaciones Secundarias",
+      "responsibility": "app.html y archivos secundarios",
+      "files": [],
+      "tasks": [
+        "Analizar necesidad de app.html",
+        "Consolidar o eliminar"
+      ]
+    },
+    "agent_4": {
+      "role": "Herramientas y Utilidades",
+      "responsibility": "tools/ y archivos de utilidad",
+      "files": [],
+      "tasks": [
+        "Revisar herramientas",
+        "Eliminar duplicados de utilidades"
+      ]
+    },
+    "agent_5": {
+      "role": "Limpieza y Validación",
+      "responsibility": "CSS, JS inline y validación final",
+      "files": [
+        "./index.html"
+      ],
+      "tasks": [
+        "Limpiar CSS duplicado",
+        "Consolidar JS inline",
+        "Validar HTML"
+      ]
+    }
+  },
+  "summary": {
+    "critical_duplicates": 0,
+    "high_duplicates": 0,
+    "medium_duplicates": 0,
+    "total_file_size": 49752,
+    "total_elements": 570
+  }
+}

@@ -1,0 +1,472 @@
+name: Enterprise Testing Suite
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  frontend-tests:
+    name: Frontend Testing & Validation
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: |
+        npm ci
+        npm install --save-dev @eslint/js globals
+
+    - name: Syntax validation
+      run: |
+        echo "🔍 Validating JavaScript syntax..."
+
+        # Check all JS files for syntax errors
+        for file in $(find . -name "*.js" -not -path "./node_modules/*" -not -path "./dist/*" -not -path "./build/*"); do
+          echo "Checking $file..."
+          node -c "$file" || exit 1
+        done
+
+        echo "✅ All JavaScript files have valid syntax"
+
+    - name: ESLint configuration check
+      run: |
+        echo "🔧 Checking ESLint configuration..."
+        
+        # Verify ESLint config exists
+        if [ -f "eslint.config.js" ]; then
+          echo "✅ ESLint v9 config found (eslint.config.js)"
+        elif [ -f ".eslintrc.js" ]; then
+          echo "✅ ESLint legacy config found (.eslintrc.js)"
+        else
+          echo "❌ No ESLint configuration found"
+          exit 1
+        fi
+        
+        # Test ESLint configuration
+        npx eslint --print-config index.html > /dev/null || {
+          echo "⚠️ ESLint config test failed, using fallback"
+        }
+
+    - name: Linting
+      run: |
+        echo "📝 Running ESLint..."
+        
+        # Try ESLint with error handling
+        npm run lint || {
+          echo "⚠️ ESLint failed with current config, trying fallback..."
+          
+          # Fallback to basic linting
+          npx eslint . --config .eslintrc.js --max-warnings=200 || {
+            echo "❌ ESLint failed completely"
+            exit 1
+          }
+        }
+
+    - name: Frontend tests
+      run: |
+        echo "🧪 Running frontend tests..."
+        if [ -f "package.json" ] && grep -q "\"test\"" package.json; then
+          npm test
+        else
+          echo "⚠️ No test script found in package.json"
+        fi
+
+    - name: Build test
+      run: |
+        echo "🔨 Testing build process..."
+        if [ -f "package.json" ] && grep -q "\"build\"" package.json; then
+          npm run build
+        else
+          echo "⚠️ No build script found in package.json"
+        fi
+
+    - name: Performance analysis
+      run: |
+        echo "⚡ Performance analysis..."
+
+        # Bundle size analysis
+        if [ -d "dist" ] || [ -d "build" ]; then
+          echo "📦 Bundle size analysis:"
+          du -sh dist/ build/ 2>/dev/null || echo "No build directory found"
+        fi
+
+        # File size analysis
+        echo "📊 Performance analysis..."
+
+        # Total bundle size
+        total_size=$(find . -name "*.js" -not -path "./node_modules/*" -exec cat {} \; | wc -c)
+        echo "Total JavaScript size: $total_size bytes"
+
+        # Individual file sizes
+        echo "Large files (>50KB):"
+        find . -name "*.js" -not -path "./node_modules/*" -size +50k -exec ls -lh {} \;
+
+        # CSS size
+        css_size=$(find . -name "*.css" -exec cat {} \; | wc -c)
+        echo "Total CSS size: $css_size bytes"
+
+        # HTML size
+        if [ -f "index.html" ]; then
+          html_size=$(wc -c < index.html)
+          echo "HTML size: $html_size bytes"
+
+          if [ $html_size -gt 500000 ]; then
+            echo "⚠️ HTML file is very large (>500KB)"
+          fi
+        fi
+
+    - name: Complexity analysis
+      run: |
+        echo "🧮 Code complexity analysis..."
+
+        # Function complexity (rough estimate)
+        complex_functions=$(grep -r "if.*if.*if\|for.*for\|while.*while" --include="*.js" --exclude-dir=node_modules . | wc -l)
+        echo "Potentially complex functions: $complex_functions"
+
+        # Nested callbacks
+        nested_callbacks=$(grep -r "function.*function.*function" --include="*.js" --exclude-dir=node_modules . | wc -l)
+        echo "Deeply nested functions: $nested_callbacks"
+
+  browser-compatibility:
+    name: Browser Compatibility Tests
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Modern JavaScript features check
+      run: |
+        echo "🌐 Browser compatibility analysis..."
+
+        # Check for modern JS features that might need polyfills
+        if grep -r "async\|await\|=>" --include="*.js" --exclude-dir=node_modules .; then
+          echo "✅ Modern JavaScript features detected"
+        fi
+
+        # Check for ES6+ features
+        if grep -r "const\|let\|class\|import\|export" --include="*.js" --exclude-dir=node_modules .; then
+          echo "✅ ES6+ features detected"
+        fi
+
+        # Check for potential IE compatibility issues
+        if grep -r "fetch\|Promise\|Map\|Set" --include="*.js" --exclude-dir=node_modules .; then
+          echo "⚠️ Features that may need polyfills for older browsers"
+        fi
+
+  accessibility-tests:
+    name: Accessibility Testing
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Accessibility audit
+      run: |
+        echo "♿ Accessibility analysis..."
+
+        # Check for alt attributes
+        if grep -r "img.*alt=" --include="*.html" .; then
+          echo "✅ Alt attributes found"
+        else
+          echo "⚠️ No alt attributes detected"
+        fi
+
+        # Check for ARIA labels
+        if grep -r "aria-" --include="*.html" --include="*.js" .; then
+          echo "✅ ARIA attributes found"
+        else
+          echo "⚠️ No ARIA attributes detected"
+        fi
+
+        # Check for semantic HTML
+        if grep -r "<nav\|<main\|<section\|<article\|<header\|<footer" --include="*.html" .; then
+          echo "✅ Semantic HTML elements found"
+        else
+          echo "⚠️ Limited semantic HTML detected"
+        fi
+
+  performance-tests:
+    name: Performance Testing
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Performance audit
+      run: |
+        echo "⚡ Performance analysis..."
+
+        # Check for performance anti-patterns
+        if grep -r "document.getElementById.*loop\|querySelector.*loop" --include="*.js" --exclude-dir=node_modules .; then
+          echo "⚠️ Potential DOM query performance issues"
+        else
+          echo "✅ No obvious DOM performance issues"
+        fi
+
+        # Check for large images
+        if find . -name "*.jpg" -o -name "*.png" -o -name "*.gif" | xargs ls -la 2>/dev/null | awk '$5 > 1000000'; then
+          echo "⚠️ Large images detected (>1MB)"
+        else
+          echo "✅ No excessively large images"
+        fi
+
+        # Check for unused CSS
+        echo "📊 CSS analysis..."
+        css_files=$(find . -name "*.css" | wc -l)
+        echo "CSS files: $css_files"
+
+        # Check for inline styles
+        if grep -r "style=" --include="*.html" --include="*.js" .; then
+          echo "⚠️ Inline styles detected"
+        else
+          echo "✅ No inline styles detected"
+        fi
+
+  security-tests:
+    name: Security Testing
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: 🔒 Security scan
+      run: |
+        echo "🔒 Security pre-deployment scan..."
+        # Escanear SOLO archivos fuente, NO el JS minificado
+        git ls-files '*.js' ':!:dist/**' ':!:index-*' \
+          | xargs grep -i -E "api.*key\s*=" -n \
+          | grep -v "placeholder|example|test" && {
+              echo "❌ Potential API keys found in code"
+              exit 1
+          } || echo "✅ Security scan passed"
+
+    - name: Content Security Policy check
+      run: |
+        echo "🛡️ CSP analysis..."
+
+        if grep -r "Content-Security-Policy\|CSP" --include="*.html" .; then
+          echo "✅ CSP headers found"
+        else
+          echo "⚠️ No CSP headers detected"
+        fi
+
+  scalability-tests:
+    name: Scalability Assessment
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Architecture analysis
+      run: |
+        echo "🏗️ Scalability analysis..."
+
+        # Check for modular structure
+        if [ -d "components" ] || [ -d "modules" ] || [ -d "services" ]; then
+          echo "✅ Modular architecture detected"
+        else
+          echo "⚠️ Consider implementing modular architecture"
+        fi
+
+        # Check for configuration management
+        if [ -f ".env.example" ] || [ -f "config.js" ] || [ -f "config.json" ]; then
+          echo "✅ Configuration management found"
+        else
+          echo "⚠️ Consider implementing configuration management"
+        fi
+
+        # Check for API abstraction
+        if grep -r "fetch\|axios\|api" --include="*.js" --exclude-dir=node_modules . | head -5; then
+          echo "✅ API calls detected"
+        fi
+
+        # Database analysis
+        if grep -r "localStorage\|sessionStorage\|indexedDB" --include="*.js" --exclude-dir=node_modules .; then
+          echo "✅ Client-side storage detected"
+        fi
+
+        # Check for state management
+        if grep -r "state\|store\|reducer" --include="*.js" --exclude-dir=node_modules .; then
+          echo "✅ State management patterns detected"
+        fi
+
+  backend-tests:
+    name: Backend Testing & Validation
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: [3.9, 3.11]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Cache pip dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements*.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install -r requirements-test.txt
+        pip install -r requirements-monitoring.txt
+
+    - name: Install project in editable mode
+      run: |
+        pip install -e .
+
+    - name: Set up environment variables for testing
+      run: |
+        echo "FLASK_ENV=testing" >> $GITHUB_ENV
+        echo "JWT_SECRET_KEY=test-secret-key" >> $GITHUB_ENV
+        echo "SECRET_KEY=test-secret-key" >> $GITHUB_ENV
+        echo "TESTING=true" >> $GITHUB_ENV
+        # No configurar DATABASE_URL para usar SQLite por defecto
+
+    - name: Run backend linting
+      run: |
+        pip install flake8
+        # Solo errores críticos que pueden romper funcionalidad
+        flake8 backend_app --count --select=E9,F63,F7,F82 --show-source --statistics
+        # Linting completo pero sin fallar el build por warnings menores
+        flake8 backend_app --count --exit-zero --max-complexity=20 --max-line-length=130 --ignore=E722,E402,W503,C901,E501 --statistics
+
+    - name: Run unit tests
+      run: |
+        pytest tests/unit/ -v --cov=backend_app --cov-report=xml --cov-report=term-missing
+
+    - name: Run integration tests
+      run: |
+        pytest tests/integration/ -v
+
+    - name: Upload coverage reports
+      uses: codecov/codecov-action@v3
+      if: matrix.python-version == '3.11'
+      with:
+        file: ./coverage.xml
+        flags: backend
+        name: backend-coverage
+
+  api-tests:
+    name: API Testing
+    runs-on: ubuntu-latest
+    needs: backend-tests
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: API endpoint analysis
+      run: |
+        echo "🔌 API analysis..."
+
+        # Check for API routes
+        if grep -r "route\|endpoint\|api" --include="*.py" --exclude-dir=__pycache__ backend_app/ | head -10; then
+          echo "✅ API endpoints detected"
+        fi
+
+        # Check for API documentation
+        if grep -r "swagger\|openapi\|@api" --include="*.py" --exclude-dir=__pycache__ .; then
+          echo "✅ API documentation found"
+        else
+          echo "⚠️ Consider adding API documentation"
+        fi
+
+        # Check for error handling
+        if grep -r "try:\|except\|raise" --include="*.py" --exclude-dir=__pycache__ backend_app/ | head -5; then
+          echo "✅ Error handling detected"
+        fi
+
+        # Check for validation
+        if grep -r "validate\|schema" --include="*.py" --exclude-dir=__pycache__ backend_app/ | head -5; then
+          echo "✅ Input validation detected"
+        fi
+
+        # Check for authentication
+        if grep -r "auth\|jwt\|token" --include="*.py" --exclude-dir=__pycache__ backend_app/ | head -5; then
+          echo "✅ Authentication mechanisms detected"
+        fi
+
+        # Check for rate limiting
+        if grep -r "limit\|throttle" --include="*.py" --exclude-dir=__pycache__ backend_app/ | head -5; then
+          echo "✅ Rate limiting detected"
+        else
+          echo "⚠️ Consider implementing rate limiting"
+        fi
+
+        # API calls
+        api_calls=$(grep -r "fetch(\|XMLHttpRequest" --include="*.js" --exclude-dir=node_modules . | wc -l)
+        echo "API calls: $api_calls"
+
+  integration-tests:
+    name: Integration Testing
+    runs-on: ubuntu-latest
+    needs: [frontend-tests, backend-tests]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Integration analysis
+      run: |
+        echo "🔗 Integration analysis..."
+
+        # Check for frontend-backend integration
+        if grep -r "localhost:\|127.0.0.1\|api/" --include="*.js" --exclude-dir=node_modules .; then
+          echo "✅ Frontend-backend integration detected"
+        fi
+
+        # Check for CORS configuration
+        if grep -r "CORS\|cors" --include="*.py" --include="*.js" .; then
+          echo "✅ CORS configuration found"
+        else
+          echo "⚠️ CORS configuration not detected"
+        fi
+
+        # Check for environment configuration
+        if [ -f ".env.example" ]; then
+          echo "✅ Environment configuration template found"
+        else
+          echo "⚠️ Consider adding .env.example"
+        fi
+
+        # Database integration
+        if grep -r "database\|db\|sql" --include="*.py" --exclude-dir=__pycache__ .; then
+          echo "✅ Database integration detected"
+        fi
+

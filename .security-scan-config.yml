@@ -1,0 +1,112 @@
+# Configuración de Security Scan - FLASHCARD
+# Archivo de configuración para detección inteligente de vulnerabilidades
+
+# Patrones de credenciales hardcodeadas a detectar
+hardcoded_patterns:
+  # Patrones críticos que SIEMPRE deben fallar el build
+  critical:
+    - pattern: "(password|pwd)\\s*=\\s*[\"'][^\"']{3,}[\"']"
+      description: "Contraseña hardcodeada detectada"
+      severity: "critical"
+    
+    - pattern: "(api[_-]?key|apikey)\\s*=\\s*[\"'][^\"']{10,}[\"']"
+      description: "API Key hardcodeada detectada"
+      severity: "critical"
+    
+    - pattern: "(secret[_-]?key|secretkey)\\s*=\\s*[\"'][^\"']{10,}[\"']"
+      description: "Secret Key hardcodeada detectada"
+      severity: "critical"
+    
+    - pattern: "(access[_-]?token|accesstoken)\\s*=\\s*[\"'][^\"']{20,}[\"']"
+      description: "Access Token hardcodeado detectado"
+      severity: "critical"
+    
+    - pattern: "Bearer\\s+[A-Za-z0-9\\-_]{20,}"
+      description: "Bearer token hardcodeado detectado"
+      severity: "critical"
+
+  # Patrones de advertencia que NO fallan el build pero se reportan
+  warning:
+    - pattern: "console\\.log.*password"
+      description: "Posible logging de contraseña"
+      severity: "warning"
+    
+    - pattern: "alert.*password"
+      description: "Posible exposición de contraseña en alert"
+      severity: "warning"
+
+# Archivos y directorios a excluir del scan
+exclusions:
+  directories:
+    - "node_modules"
+    - ".git"
+    - "dist"
+    - "build"
+    - "coverage"
+    - ".nyc_output"
+  
+  files:
+    - "*.min.js"
+    - "*.test.js"
+    - "*.spec.js"
+    - "package-lock.json"
+    - "yarn.lock"
+  
+  # Patrones de contenido a ignorar (contexto legítimo)
+  content_exceptions:
+    - "placeholder"
+    - "example"
+    - "demo"
+    - "test"
+    - "mock"
+    - "validation"
+    - "confirm"
+    - "!=="
+    - "==="
+    - "typeof"
+
+# Configuración de funciones peligrosas
+dangerous_functions:
+  critical:
+    - pattern: "eval\\s*\\("
+      description: "Uso de eval() detectado - riesgo de inyección de código"
+      severity: "critical"
+    
+    - pattern: "Function\\s*\\("
+      description: "Constructor Function() detectado - riesgo de inyección"
+      severity: "critical"
+  
+  warning:
+    - pattern: "innerHTML\\s*="
+      description: "Uso de innerHTML - considerar textContent o sanitización"
+      severity: "warning"
+    
+    - pattern: "document\\.write\\s*\\("
+      description: "Uso de document.write - práctica desaconsejada"
+      severity: "warning"
+
+# Configuración de URLs y endpoints
+url_patterns:
+  warning:
+    - pattern: "http://[^/\\s]+"
+      description: "URL HTTP no segura detectada - considerar HTTPS"
+      severity: "warning"
+    
+    - pattern: "localhost:\\d+"
+      description: "URL localhost hardcodeada - usar variables de entorno"
+      severity: "warning"
+
+# Configuración de reporting
+reporting:
+  format: "detailed"
+  include_context: true
+  max_context_lines: 3
+  group_by_severity: true
+
+# Configuración de comportamiento
+behavior:
+  fail_on_critical: true
+  fail_on_warning: false
+  continue_on_error: false
+  verbose: true
+

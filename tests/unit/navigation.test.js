@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from '';
 
 // Mock DOM elements
 const mockElement = {
@@ -8,7 +8,7 @@ const mockElement = {
     add: vi.fn(),
     remove: vi.fn(),
     contains: vi.fn(),
-    toggle: vi.fn()
+    toggle: vi.fn(),
   },
   style: {},
   innerHTML: '',
@@ -16,7 +16,7 @@ const mockElement = {
   getAttribute: vi.fn(),
   setAttribute: vi.fn(),
   querySelector: vi.fn(),
-  querySelectorAll: vi.fn(() => [])
+  querySelectorAll: vi.fn(() => []),
 };
 
 // Mock document
@@ -27,7 +27,7 @@ global.document = {
   querySelector: vi.fn(() => mockElement),
   querySelectorAll: vi.fn(() => [mockElement]),
   getElementById: vi.fn(() => mockElement),
-  createElement: vi.fn(() => mockElement)
+  createElement: vi.fn(() => mockElement),
 };
 
 // Mock window
@@ -35,11 +35,11 @@ global.window = {
   ...window,
   APP_CONFIG: {
     features: {
-      debugging: false
-    }
+      debugging: false,
+    },
   },
   addEventListener: vi.fn(),
-  removeEventListener: vi.fn()
+  removeEventListener: vi.fn(),
 };
 
 describe('Navigation System', () => {
@@ -61,8 +61,8 @@ describe('Navigation System', () => {
         animations: {
           enabled: true,
           duration: 300,
-          easing: 'ease-in-out'
-        }
+          easing: 'ease-in-out',
+        },
       };
 
       expect(mockNavigationSystem.isInitialized).toBe(false);
@@ -75,22 +75,25 @@ describe('Navigation System', () => {
 
     it('should handle document ready state correctly', () => {
       document.readyState = 'loading';
-      
+
       // Simulate NavigationSystem initialization
       if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', vi.fn());
       }
-      
-      expect(document.addEventListener).toHaveBeenCalledWith('DOMContentLoaded', expect.any(Function));
+
+      expect(document.addEventListener).toHaveBeenCalledWith(
+        'DOMContentLoaded',
+        expect.any(Function)
+      );
     });
 
     it('should setup navigation when document is ready', () => {
       document.readyState = 'complete';
-      
+
       // Simulate setup process
       const sections = document.querySelectorAll('section');
       const navLinks = document.querySelectorAll('nav a');
-      
+
       expect(document.querySelectorAll).toHaveBeenCalledWith('section');
       expect(document.querySelectorAll).toHaveBeenCalledWith('nav a');
     });
@@ -99,39 +102,43 @@ describe('Navigation System', () => {
   describe('Navigation Utilities', () => {
     it('should handle section visibility', () => {
       const section = mockElement;
-      
+
       // Test show section
       section.classList.add('active');
       section.style.display = 'block';
-      
+
       expect(section.classList.add).toHaveBeenCalledWith('active');
     });
 
     it('should handle navigation link states', () => {
       const navLink = mockElement;
-      
+
       // Test active link
       navLink.classList.add('active');
-      
+
       expect(navLink.classList.add).toHaveBeenCalledWith('active');
     });
   });
 
   describe('Error Handling', () => {
     it('should handle initialization errors gracefully', () => {
-      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-      
+      const consoleSpy = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
+
       try {
         // Simulate an error during initialization
         throw new Error('Navigation initialization failed');
       } catch (error) {
         console.error('❌ Error in init:', error);
       }
-      
-      expect(consoleSpy).toHaveBeenCalledWith('❌ Error in init:', expect.any(Error));
-      
+
+      expect(consoleSpy).toHaveBeenCalledWith(
+        '❌ Error in init:',
+        expect.any(Error)
+      );
+
       consoleSpy.mockRestore();
     });
   });
 });
-

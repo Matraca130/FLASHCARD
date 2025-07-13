@@ -1,6 +1,6 @@
-import js from '@eslint/js';
-import globals from 'globals';
-import cypress from 'eslint-plugin-cypress';
+import js from '';
+import  from '';
+import cypress from '';
 
 export default [
   js.configs.recommended,
@@ -20,17 +20,17 @@ export default [
       'backend_app/**/*',
       'venv/**/*',
       '__pycache__/**/*',
-      '*.py'
-    ]
+      '*.py',
+    ],
   },
   {
     languageOptions: {
-      ecmaVersion: 2022,
+      ecmaVersion: 2023,
       sourceType: 'module',
-      globals: {
-        ...globals.browser,
-        ...globals.node,
-        // Node 20+ globals
+      : {
+        ....browser,
+        ....node,
+        // Node 20+ 
         FormData: 'readonly',
         AbortController: 'readonly',
         AbortSignal: 'readonly',
@@ -42,58 +42,61 @@ export default [
         Headers: 'readonly',
         URL: 'readonly',
         URLSearchParams: 'readonly',
+        structuredClone: 'readonly',
         // Third-party libraries
         Chart: 'readonly',
         particlesJS: 'readonly',
-        gsap: 'readonly'
-      }
+        gsap: 'readonly',
+      },
     },
     rules: {
       // Error prevention
-      'no-unused-vars': ['warn', { 
-        argsIgnorePattern: '^_',
-        varsIgnorePattern: '^_' 
-      }],
+      'no-unused-vars': [
+        'warn',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+        },
+      ],
       'no-undef': 'error',
       'no-console': 'off', // Allow console for debugging
-      
+
       // Code quality
       'prefer-const': 'warn',
       'no-var': 'warn',
-      'eqeqeq': ['warn', 'always'],
-      
+      eqeqeq: ['warn', 'always'],
+
       // Best practices
-      'curly': ['warn', 'all'],
+      curly: ['warn', 'all'],
       'dot-notation': 'warn',
       'no-eval': 'error',
       'no-implied-eval': 'error',
-      
+
       // Case declarations - require braces
       'no-case-declarations': 'error',
-      
-      // Style (basic)
-      'indent': ['warn', 2, { SwitchCase: 1 }],
-      'quotes': ['warn', 'single', { avoidEscape: true }],
-      'semi': ['warn', 'always']
-    }
+
+      indent: ['warn', 2, { SwitchCase: 1 }],
+      quotes: ['warn', 'single', { avoidEscape: true }],
+      semi: ['warn', 'always'],
+    },
   },
   {
     // Specific rules for service files
     files: ['**/*.service.js'],
     rules: {
-      'no-unused-vars': 'off' // Services may export functions not used in same file
-    }
+      'no-unused-vars': 'off', // Services may export functions not used in same file
+    },
   },
   {
     // Cypress test files
     files: ['cypress/**/*.js', '**/*.cy.js', '**/*.spec.js'],
     plugins: {
-      cypress
+      cypress,
     },
     languageOptions: {
-      globals: {
-        ...globals.browser,
-        // Cypress globals
+      : {
+        ....browser,
+        // Cypress 
         cy: 'readonly',
         Cypress: 'readonly',
         describe: 'readonly',
@@ -104,22 +107,22 @@ export default [
         afterEach: 'readonly',
         expect: 'readonly',
         assert: 'readonly',
-        context: 'readonly'
-      }
+        context: 'readonly',
+      },
     },
     rules: {
       ...cypress.configs.recommended.rules,
       'no-unused-vars': 'off',
-      'no-undef': 'off' // Cypress globals are defined above
-    }
+      'no-undef': 'off', // Cypress  are defined above
+    },
   },
   {
     // Vitest test files
     files: ['tests/**/*.js', '**/*.test.js'],
     languageOptions: {
-      globals: {
-        ...globals.node,
-        // Vitest globals
+      : {
+        ....node,
+        // Vitest 
         describe: 'readonly',
         it: 'readonly',
         test: 'readonly',
@@ -128,26 +131,25 @@ export default [
         afterEach: 'readonly',
         beforeAll: 'readonly',
         afterAll: 'readonly',
-        vi: 'readonly'
-      }
+        vi: 'readonly',
+      },
     },
     rules: {
       'no-unused-vars': 'off',
-      'no-undef': 'off'
-    }
+      'no-undef': 'off',
+    },
   },
   {
     // Config files
     files: ['*.config.js', 'vite.config.js', 'vitest.config.js'],
     languageOptions: {
       sourceType: 'module',
-      globals: {
-        ...globals.node
-      }
+      : {
+        ....node,
+      },
     },
     rules: {
-      'no-undef': 'off' // Config files may use build-time variables
-    }
-  }
+      'no-undef': 'off', // Config files may use build-time variables
+    },
+  },
 ];
-

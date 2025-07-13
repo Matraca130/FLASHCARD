@@ -3,7 +3,7 @@
  * Mejora la experiencia de usuario durante operaciones asíncronas
  */
 
-import { showNotification } from './helpers.js';
+
 
 /**
  * Muestra un indicador de carga en un botón
@@ -12,22 +12,25 @@ import { showNotification } from './helpers.js';
  * @returns {Function} - Función para restaurar el estado original
  */
 export function showButtonLoading(buttonSelector, loadingText = 'Cargando...') {
-  const button = typeof buttonSelector === 'string' 
-    ? document.querySelector(buttonSelector) 
-    : buttonSelector;
-    
-  if (!button) {return () => {};}
-  
+  const button =
+    typeof buttonSelector === 'string'
+      ? document.querySelector(buttonSelector)
+      : buttonSelector;
+
+  if (!button) {
+    return () => {};
+  }
+
   // Guardar estado original
   const originalText = button.textContent;
   const originalDisabled = button.disabled;
-  
+
   // Aplicar estado de carga
   button.textContent = `⏳ ${loadingText}`;
   button.disabled = true;
   button.style.opacity = '0.7';
   button.style.cursor = 'not-allowed';
-  
+
   // Retornar función para restaurar
   return () => {
     button.textContent = originalText;
@@ -44,12 +47,15 @@ export function showButtonLoading(buttonSelector, loadingText = 'Cargando...') {
  * @returns {Function} - Función para ocultar el overlay
  */
 export function showLoadingOverlay(containerSelector, message = 'Cargando...') {
-  const container = typeof containerSelector === 'string' 
-    ? document.querySelector(containerSelector) 
-    : containerSelector;
-    
-  if (!container) {return () => {};}
-  
+  const container =
+    typeof containerSelector === 'string'
+      ? document.querySelector(containerSelector)
+      : containerSelector;
+
+  if (!container) {
+    return () => {};
+  }
+
   // Crear overlay
   const overlay = document.createElement('div');
   overlay.className = 'loading-overlay';
@@ -66,7 +72,7 @@ export function showLoadingOverlay(containerSelector, message = 'Cargando...') {
     z-index: 1000;
     border-radius: inherit;
   `;
-  
+
   // Crear contenido del overlay
   overlay.innerHTML = `
     <div style="background: white; padding: 2rem; border-radius: 0.75rem; 
@@ -77,7 +83,7 @@ export function showLoadingOverlay(containerSelector, message = 'Cargando...') {
       <div style="color: #374151; font-weight: 500;">${message}</div>
     </div>
   `;
-  
+
   // Agregar animación de spin
   if (!document.getElementById('loading-styles')) {
     const style = document.createElement('style');
@@ -90,15 +96,14 @@ export function showLoadingOverlay(containerSelector, message = 'Cargando...') {
     `;
     document.head.appendChild(style);
   }
-  
-  // Asegurar que el contenedor tenga position relative
+
   const originalPosition = container.style.position;
   if (!originalPosition || originalPosition === 'static') {
     container.style.position = 'relative';
   }
-  
+
   container.appendChild(overlay);
-  
+
   // Retornar función para ocultar
   return () => {
     if (overlay.parentNode) {
@@ -117,24 +122,27 @@ export function showLoadingOverlay(containerSelector, message = 'Cargando...') {
  * @param {string} message - Mensaje de feedback
  */
 export function showFieldValidation(fieldSelector, isValid, message = '') {
-  const field = typeof fieldSelector === 'string' 
-    ? document.querySelector(fieldSelector) 
-    : fieldSelector;
-    
-  if (!field) {return;}
-  
+  const field =
+    typeof fieldSelector === 'string'
+      ? document.querySelector(fieldSelector)
+      : fieldSelector;
+
+  if (!field) {
+    return;
+  }
+
   // Remover clases de validación anteriores
   field.classList.remove('field-valid', 'field-invalid');
-  
+
   // Remover mensaje anterior si existe
   const existingMessage = field.parentNode.querySelector('.validation-message');
   if (existingMessage) {
     existingMessage.remove();
   }
-  
+
   // Agregar nueva clase de validación
   field.classList.add(isValid ? 'field-valid' : 'field-invalid');
-  
+
   // Agregar estilos de validación si no existen
   if (!document.getElementById('validation-styles')) {
     const style = document.createElement('style');
@@ -164,7 +172,7 @@ export function showFieldValidation(fieldSelector, isValid, message = '') {
     `;
     document.head.appendChild(style);
   }
-  
+
   // Agregar mensaje si se proporciona
   if (message) {
     const messageElement = document.createElement('div');
@@ -173,7 +181,7 @@ export function showFieldValidation(fieldSelector, isValid, message = '') {
       <span>${isValid ? '✓' : '✗'}</span>
       <span>${message}</span>
     `;
-    
+
     field.parentNode.appendChild(messageElement);
   }
 }
@@ -200,7 +208,7 @@ export function showProgressToast(message, steps = 1) {
     max-width: 400px;
     border: 1px solid rgba(0, 0, 0, 0.1);
   `;
-  
+
   toast.innerHTML = `
     <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
       <div style="width: 20px; height: 20px; border: 2px solid #f3f4f6; 
@@ -216,39 +224,49 @@ export function showProgressToast(message, steps = 1) {
       Paso 0 de ${steps}
     </div>
   `;
-  
+
   document.body.appendChild(toast);
-  
-  let currentStep = 0;
-  
+
   return {
     updateProgress: (step, newMessage = null) => {
-      currentStep = step;
       const percentage = (step / steps) * 100;
-      
+
       const progressBar = toast.querySelector('.progress-bar');
       const progressText = toast.querySelector('.progress-text');
       const messageElement = toast.querySelector('.progress-message');
-      
-      if (progressBar) {progressBar.style.width = `${percentage}%`;}
-      if (progressText) {progressText.textContent = `Paso ${step} de ${steps}`;}
-      if (newMessage && messageElement) {messageElement.textContent = newMessage;}
+
+      if (progressBar) {
+        progressBar.style.width = `${percentage}%`;
+      }
+      if (progressText) {
+        progressText.textContent = `Paso ${step} de ${steps}`;
+      }
+      if (newMessage && messageElement) {
+        messageElement.textContent = newMessage;
+      }
     },
-    
+
     complete: (finalMessage = 'Completado') => {
       const progressBar = toast.querySelector('.progress-bar');
       const progressText = toast.querySelector('.progress-text');
       const messageElement = toast.querySelector('.progress-message');
       const spinner = toast.querySelector('[style*="animation"]');
-      
+
       if (progressBar) {
         progressBar.style.width = '100%';
-        progressBar.style.background = 'linear-gradient(90deg, #10b981, #059669)';
+        progressBar.style.background =
+          'linear-gradient(90deg, #10b981, #059669)';
       }
-      if (progressText) {progressText.textContent = 'Completado';}
-      if (messageElement) {messageElement.textContent = finalMessage;}
-      if (spinner) {spinner.style.display = 'none';}
-      
+      if (progressText) {
+        progressText.textContent = 'Completado';
+      }
+      if (messageElement) {
+        messageElement.textContent = finalMessage;
+      }
+      if (spinner) {
+        spinner.style.display = 'none';
+      }
+
       // Auto-remove after 2 seconds
       setTimeout(() => {
         if (toast.parentNode) {
@@ -261,38 +279,14 @@ export function showProgressToast(message, steps = 1) {
         }
       }, 2000);
     },
-    
-    error: (errorMessage = 'Error en la operación') => {
-      const progressBar = toast.querySelector('.progress-bar');
-      const progressText = toast.querySelector('.progress-text');
-      const messageElement = toast.querySelector('.progress-message');
-      const spinner = toast.querySelector('[style*="animation"]');
-      
-      if (progressBar) {
-        progressBar.style.background = 'linear-gradient(90deg, #ef4444, #dc2626)';
-      }
-      if (progressText) {progressText.textContent = 'Error';}
-      if (messageElement) {messageElement.textContent = errorMessage;}
-      if (spinner) {spinner.style.display = 'none';}
-      
-      // Auto-remove after 3 seconds
-      setTimeout(() => {
-        if (toast.parentNode) {
-          toast.style.transform = 'translateX(100%)';
-          setTimeout(() => {
-            if (toast.parentNode) {
-              toast.parentNode.removeChild(toast);
-            }
-          }, 300);
-        }
-      }, 3000);
-    },
-    
+
+
+
     remove: () => {
       if (toast.parentNode) {
         toast.parentNode.removeChild(toast);
       }
-    }
+    },
   };
 }
 
@@ -308,42 +302,39 @@ export async function withLoadingFeedback(operation, options = {}) {
     containerSelector = null,
     loadingText = 'Procesando...',
     successMessage = 'Operación completada',
-    errorMessage = 'Error en la operación'
+    errorMessage = 'Error en la operación',
   } = options;
-  
+
   let restoreButton = () => {};
   let hideOverlay = () => {};
-  
+
   try {
     // Mostrar indicadores de carga
     if (buttonSelector) {
       restoreButton = showButtonLoading(buttonSelector, loadingText);
     }
-    
+
     if (containerSelector) {
       hideOverlay = showLoadingOverlay(containerSelector, loadingText);
     }
-    
+
     // Ejecutar operación
     const result = await operation();
-    
+
     // Mostrar mensaje de éxito
     if (successMessage) {
       showNotification(successMessage, 'success');
     }
-    
+
     return result;
-    
   } catch (error) {
     // Mostrar mensaje de error
     const finalErrorMessage = error.message || errorMessage;
     showNotification(finalErrorMessage, 'error');
     throw error;
-    
   } finally {
     // Restaurar estados
     restoreButton();
     hideOverlay();
   }
 }
-

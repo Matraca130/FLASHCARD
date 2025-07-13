@@ -1,0 +1,226 @@
+name: Automatic Rollback
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_version:
+        description: 'Version to rollback to (leave empty for previous)'
+        required: false
+        type: string
+      reason:
+        description: 'Reason for rollback'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+  actions: read
+
+jobs:
+  rollback-preparation:
+    name: Prepare Rollback
+    runs-on: ubuntu-latest
+    
+    outputs:
+      rollback-version: ${{ steps.version.outputs.version }}
+      rollback-commit: ${{ steps.version.outputs.commit }}
+      artifacts-found: ${{ steps.artifacts.outputs.found }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 50  # Get more history for rollback options
+    
+    - name: Determine rollback target
+      id: version
+      run: |
+        echo "🔍 Determining rollback target..."
+        
+        TARGET_VERSION="${{ github.event.inputs.target_version }}"
+        
+        if [ -z "$TARGET_VERSION" ]; then
+          # Find the previous successful deployment
+          echo "Finding previous successful deployment..."
+          
+          # Get the last 10 commits
+          git log --oneline -10 > recent_commits.txt
+          cat recent_commits.txt
+          
+          # For now, use the previous commit
+          PREVIOUS_COMMIT=$(git log --oneline -2 | tail -1 | cut -d' ' -f1)
+          ROLLBACK_VERSION=$(date +%Y.%m.%d.%H%M)-rollback
+          
+          echo "version=$ROLLBACK_VERSION" >> $GITHUB_OUTPUT
+          echo "commit=$PREVIOUS_COMMIT" >> $GITHUB_OUTPUT
+          
+          echo "Rollback target: $ROLLBACK_VERSION (commit: $PREVIOUS_COMMIT)"
+        else
+          echo "version=$TARGET_VERSION" >> $GITHUB_OUTPUT
+          echo "commit=manual" >> $GITHUB_OUTPUT
+          echo "Using specified version: $TARGET_VERSION"
+        fi
+    
+    - name: Check for existing artifacts
+      id: artifacts
+      run: |
+        echo "🔍 Checking for existing build artifacts..."
+        
+        # In a real scenario, you would check for stored artifacts
+        # For now, we'll assume we need to rebuild
+        echo "found=false" >> $GITHUB_OUTPUT
+        echo "No pre-built artifacts found, will rebuild from commit"
+    
+    - name: Rollback validation
+      run: |
+        echo "✅ Rollback preparation completed"
+        echo "Target version: ${{ steps.version.outputs.version }}"
+        echo "Target commit: ${{ steps.version.outputs.commit }}"
+        echo "Reason: ${{ github.event.inputs.reason }}"
+
+  execute-rollback:
+    name: Execute Rollback
+    runs-on: ubuntu-latest
+    needs: rollback-preparation
+    
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    
+    steps:
+    - name: Checkout rollback target
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ needs.rollback-preparation.outputs.rollback-commit != 'manual' && needs.rollback-preparation.outputs.rollback-commit || github.sha }}
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: |
+        echo "📦 Installing dependencies for rollback..."
+        npm ci
+    
+    - name: Build rollback version
+      run: |
+        echo "🔨 Building rollback version..."
+        
+        # Build the rollback version
+        npm run build || {
+          echo "❌ Build failed for rollback target"
+          exit 1
+        }
+        
+        # Verify build
+        if [ ! -d "dist" ] || [ ! -f "dist/index.html" ]; then
+          echo "❌ Build verification failed"
+          exit 1
+        fi
+        
+        echo "✅ Rollback build completed successfully"
+    
+    - name: Create rollback manifest
+      run: |
+        echo "📋 Creating rollback manifest..."
+        cat > rollback-manifest.json << EOF
+        {
+          "rollback_version": "${{ needs.rollback-preparation.outputs.rollback-version }}",
+          "rollback_timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+          "rollback_commit": "${{ needs.rollback-preparation.outputs.rollback-commit }}",
+          "rollback_reason": "${{ github.event.inputs.reason }}",
+          "rollback_initiated_by": "${{ github.actor }}",
+          "original_deployment": {
+            "commit": "${{ github.sha }}",
+            "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          }
+        }
+        EOF
+        
+        echo "Rollback manifest:"
+        cat rollback-manifest.json
+        
+        # Add manifest to dist
+        cp rollback-manifest.json dist/
+    
+    - name: Setup Pages
+      uses: actions/configure-pages@v5
+    
+    - name: Upload rollback artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: './dist'
+    
+    - name: Deploy rollback
+      id: deployment
+      uses: actions/deploy-pages@v4
+    
+    - name: Verify rollback deployment
+      run: |
+        echo "🔍 Verifying rollback deployment..."
+        
+        # Wait for deployment
+        sleep 30
+        
+        SITE_URL="${{ steps.deployment.outputs.page_url }}"
+        echo "Testing rollback site: $SITE_URL"
+        
+        # Basic connectivity test
+        if curl -s -o /dev/null -w "%{http_code}" "$SITE_URL" | grep -q "200"; then
+          echo "✅ Rollback site is accessible"
+        else
+          echo "❌ Rollback site verification failed"
+          exit 1
+        fi
+        
+        # Check for rollback manifest
+        if curl -s "$SITE_URL/rollback-manifest.json" | grep -q "rollback_version"; then
+          echo "✅ Rollback manifest found"
+        else
+          echo "⚠️ Rollback manifest not accessible"
+        fi
+
+  post-rollback:
+    name: Post-Rollback Actions
+    runs-on: ubuntu-latest
+    needs: [rollback-preparation, execute-rollback]
+    if: always()
+    
+    steps:
+    - name: Rollback notification
+      run: |
+        echo "📢 Rollback Notification"
+        echo "======================="
+        echo "Status: ${{ needs.execute-rollback.result }}"
+        echo "Version: ${{ needs.rollback-preparation.outputs.rollback-version }}"
+        echo "Commit: ${{ needs.rollback-preparation.outputs.rollback-commit }}"
+        echo "Reason: ${{ github.event.inputs.reason }}"
+        echo "Initiated by: ${{ github.actor }}"
+        echo "Timestamp: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+        
+        if [ "${{ needs.execute-rollback.result }}" = "success" ]; then
+          echo "🎉 Rollback completed successfully!"
+          echo "Site URL: ${{ needs.execute-rollback.outputs.page_url }}"
+        else
+          echo "❌ Rollback failed - manual intervention required"
+        fi
+    
+    - name: Create rollback issue
+      if: needs.execute-rollback.result == 'failure'
+      run: |
+        echo "📝 Rollback failed - would create GitHub issue here"
+        echo "Title: Automatic Rollback Failed - ${{ github.event.inputs.reason }}"
+        echo "Body: Rollback to version ${{ needs.rollback-preparation.outputs.rollback-version }} failed"
+        echo "Labels: rollback, urgent, deployment"
+    
+    - name: Update deployment status
+      run: |
+        echo "📊 Deployment Status Update"
+        echo "Current deployment status: ROLLBACK"
+        echo "Previous version restored: ${{ needs.rollback-preparation.outputs.rollback-version }}"
+        echo "Rollback reason: ${{ github.event.inputs.reason }}"
+

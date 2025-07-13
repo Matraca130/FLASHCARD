@@ -1,0 +1,293 @@
+name: Enterprise Deployment
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+        - production
+        - staging
+
+# Evitar deployments concurrentes
+concurrency:
+  group: enterprise-deployment-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  pre-deployment-checks:
+    name: Pre-deployment Validation
+    runs-on: ubuntu-latest
+    
+    outputs:
+      deploy-ready: ${{ steps.validation.outputs.ready }}
+      version: ${{ steps.version.outputs.version }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: |
+        npm ci
+        npm install --save-dev @eslint/js
+    
+    - name: Run critical tests
+      id: tests
+      run: |
+        echo "🧪 Running critical pre-deployment tests..."
+        
+        # Syntax validation
+        for file in $(find . -name "*.js" -not -path "./node_modules/*"); do
+          node -c "$file" || exit 1
+        done
+        
+        # Linting (allow warnings but not errors)
+        npm run lint || exit 1
+        
+        echo "✅ All critical tests passed"
+        echo "tests-passed=true" >> $GITHUB_OUTPUT
+    
+    - name: Security scan
+      run: |
+        echo "🔒 Security pre-deployment scan..."
+        
+        # Check for secrets (excluding comparisons and validations)
+        if grep -ri "password\s*=\s*['\"][^'\"]*['\"]" --include="*.js" --exclude-dir=node_modules . | grep -v "placeholder\|example\|test\|validation"; then
+          echo "❌ Potential hardcoded passwords found in code"
+          exit 1
+        fi
+        
+        if grep -ri "api.*key\s*=\s*['\"][^'\"]*['\"]" --include="*.js" --exclude-dir=node_modules . | grep -v "placeholder\|example\|test"; then
+          echo "❌ Potential API keys found in code"
+          exit 1
+        fi
+        
+        if grep -ri "secret\s*=\s*['\"][^'\"]*['\"]" --include="*.js" --exclude-dir=node_modules . | grep -v "placeholder\|example\|test"; then
+          echo "❌ Potential secrets found in code"
+          exit 1
+        fi
+        
+        # Check for eval
+        if grep -r "eval(" --include="*.js" --exclude-dir=node_modules .; then
+          echo "❌ eval() usage found - security risk"
+          exit 1
+        fi
+        
+        echo "✅ Security scan passed"
+    
+    - name: Generate version
+      id: version
+      run: |
+        VERSION=$(date +%Y.%m.%d.%H%M)
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "Generated version: $VERSION"
+    
+    - name: Validation summary
+      id: validation
+      run: |
+        echo "ready=true" >> $GITHUB_OUTPUT
+        echo "✅ Pre-deployment validation completed successfully"
+
+  build-and-optimize:
+    name: Build & Optimization
+    runs-on: ubuntu-latest
+    needs: pre-deployment-checks
+    if: needs.pre-deployment-checks.outputs.deploy-ready == 'true'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Build optimization
+      run: |
+        echo "🔨 Building and optimizing..."
+        
+        # Run Vite build to generate dist/
+        npm run build
+        
+        # Verify dist directory was created
+        if [ ! -d "dist" ]; then
+          echo "❌ dist directory not created by build"
+          exit 1
+        fi
+        
+        echo "✅ Build completed, dist/ directory created"
+        ls -la dist/
+    
+    - name: Generate deployment manifest
+      run: |
+        echo "📋 Generating deployment manifest..."
+        cat > deployment-manifest.json << EOF
+        {
+          "version": "${{ needs.pre-deployment-checks.outputs.version }}",
+          "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+          "commit": "${{ github.sha }}",
+          "branch": "${{ github.ref_name }}",
+          "environment": "${{ github.event.inputs.environment || 'production' }}",
+          "files": {
+            "html": $(find . -name "*.html" -not -path "./node_modules/*" | wc -l),
+            "js": $(find . -name "*.js" -not -path "./node_modules/*" | wc -l),
+            "css": $(find . -name "*.css" -not -path "./node_modules/*" | wc -l)
+          }
+        }
+        EOF
+        
+        echo "Deployment manifest:"
+        cat deployment-manifest.json
+    
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-artifacts-${{ needs.pre-deployment-checks.outputs.version }}
+        path: dist/
+        retention-days: 30
+
+  deploy-to-pages:
+    name: Deploy to GitHub Pages
+    runs-on: ubuntu-latest
+    needs: [pre-deployment-checks, build-and-optimize]
+    
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: build-artifacts-${{ needs.pre-deployment-checks.outputs.version }}
+        path: ./dist
+    
+    - name: Setup Pages
+      uses: actions/configure-pages@v5
+    
+    - name: Prepare deployment
+      run: |
+        echo "🚀 Preparing deployment from dist/..."
+        
+        # Verify dist directory exists (where artifacts were downloaded)
+        if [ ! -d "dist" ]; then
+          echo "❌ dist directory not found"
+          exit 1
+        fi
+        
+        # Verify critical files exist in dist
+        if [ ! -f "dist/index.html" ]; then
+          echo "❌ index.html not found in dist/"
+          exit 1
+        fi
+        
+        echo "✅ Deployment prepared from dist/"
+        echo "Files in dist/:"
+        ls -la dist/
+    
+    - name: Upload to Pages
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: './dist'
+    
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
+
+  post-deployment:
+    name: Post-deployment Verification
+    runs-on: ubuntu-latest
+    needs: [pre-deployment-checks, deploy-to-pages]
+    if: always()
+    
+    steps:
+    - name: Verify deployment
+      run: |
+        echo "🔍 Post-deployment verification..."
+        
+        # Wait for deployment to be available
+        sleep 30
+        
+        # Basic connectivity test
+        SITE_URL="${{ steps.deployment.outputs.page_url || 'https://matraca130.github.io/FLASHCARD/' }}"
+        echo "Testing site: $SITE_URL"
+        
+        # Check if site responds
+        if curl -s -o /dev/null -w "%{http_code}" "$SITE_URL" | grep -q "200"; then
+          echo "✅ Site is accessible"
+        else
+          echo "⚠️ Site may not be fully available yet"
+        fi
+    
+    - name: Performance check
+      run: |
+        echo "⚡ Basic performance check..."
+        
+        SITE_URL="${{ steps.deployment.outputs.page_url || 'https://matraca130.github.io/FLASHCARD/' }}"
+        
+        # Measure response time
+        response_time=$(curl -o /dev/null -s -w "%{time_total}" "$SITE_URL")
+        echo "Response time: ${response_time}s"
+        
+        # Check if response time is reasonable
+        if (( $(echo "$response_time < 3.0" | bc -l) )); then
+          echo "✅ Good response time"
+        else
+          echo "⚠️ Slow response time"
+        fi
+    
+    - name: Deployment summary
+      run: |
+        echo "📊 Deployment Summary"
+        echo "===================="
+        echo "Version: ${{ needs.pre-deployment-checks.outputs.version }}"
+        echo "Commit: ${{ github.sha }}"
+        echo "Environment: ${{ github.event.inputs.environment || 'production' }}"
+        echo "Status: ${{ job.status }}"
+        echo "URL: ${{ steps.deployment.outputs.page_url || 'https://matraca130.github.io/FLASHCARD/' }}"
+        
+        if [ "${{ needs.deploy-to-pages.result }}" = "success" ]; then
+          echo "🎉 Deployment completed successfully!"
+        else
+          echo "❌ Deployment failed"
+        fi
+
+  rollback:
+    name: Rollback (Manual)
+    runs-on: ubuntu-latest
+    if: failure() && github.event_name == 'workflow_dispatch'
+    
+    steps:
+    - name: Rollback notification
+      run: |
+        echo "🔄 Rollback procedure would be initiated here"
+        echo "Manual intervention may be required"
+        echo "Check previous successful deployment artifacts"
+

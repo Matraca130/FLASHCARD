@@ -1,0 +1,144 @@
+name: Python Linting & Code Quality
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'backend_app/**/*.py'
+      - 'scripts/**/*.py'
+      - '.flake8'
+      - 'requirements*.txt'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'backend_app/**/*.py'
+      - 'scripts/**/*.py'
+      - '.flake8'
+      - 'requirements*.txt'
+
+jobs:
+  linting:
+    name: Python Code Quality Check
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: 🐍 Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+        
+    - name: 📦 Install linting tools
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 autopep8 black isort
+        
+    - name: 🔍 Check Python syntax
+      run: |
+        echo "🔍 Verificando sintaxis Python..."
+        python -m py_compile backend_app/**/*.py || {
+          echo "❌ Errores de sintaxis encontrados"
+          exit 1
+        }
+        echo "✅ Sintaxis Python correcta"
+        
+    - name: 🔧 Run Flake8 (Critical Errors Only)
+      run: |
+        echo "🔍 Ejecutando Flake8 - Errores Críticos..."
+        flake8 backend_app/ --config=.flake8 --select=E999,W504,E111,E112,E113,E114,E115,E116 --statistics
+        
+    - name: 📊 Run Flake8 (Full Report)
+      continue-on-error: true
+      run: |
+        echo "📊 Reporte completo de Flake8..."
+        flake8 backend_app/ --config=.flake8 --statistics --tee --output-file=flake8-report.txt
+        
+    - name: 📋 Upload Flake8 Report
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: flake8-report
+        path: flake8-report.txt
+        retention-days: 30
+        
+    - name: 🎯 Check for Critical Issues
+      run: |
+        echo "🎯 Verificando problemas críticos..."
+        
+        # Contar errores críticos
+        CRITICAL_ERRORS=$(flake8 backend_app/ --select=E999,W504,E111,E112,E113,E114,E115,E116 --count --quiet)
+        
+        if [ "$CRITICAL_ERRORS" -gt 0 ]; then
+          echo "❌ $CRITICAL_ERRORS errores críticos encontrados"
+          echo "🔧 Ejecuta 'python scripts/fix-linting.py' para corregir automáticamente"
+          exit 1
+        else
+          echo "✅ No se encontraron errores críticos"
+        fi
+        
+    - name: 📈 Code Quality Summary
+      if: always()
+      run: |
+        echo "📈 RESUMEN DE CALIDAD DE CÓDIGO"
+        echo "================================"
+        
+        # Estadísticas generales
+        TOTAL_LINES=$(find backend_app -name "*.py" -exec wc -l {} + | tail -1 | awk '{print $1}')
+        TOTAL_FILES=$(find backend_app -name "*.py" | wc -l)
+        
+        echo "📁 Archivos Python: $TOTAL_FILES"
+        echo "📄 Líneas de código: $TOTAL_LINES"
+        
+        # Errores por categoría
+        echo ""
+        echo "🔍 ERRORES POR CATEGORÍA:"
+        flake8 backend_app/ --statistics --quiet | head -20 || echo "No hay errores"
+        
+        echo ""
+        echo "✅ Verificación de calidad completada"
+
+  auto-fix:
+    name: Auto-fix Linting Issues
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: linting
+    continue-on-error: true
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: 🐍 Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: 📦 Install tools
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 autopep8 black isort
+        
+    - name: 🔧 Auto-fix issues
+      run: |
+        echo "🔧 Intentando corrección automática..."
+        python scripts/fix-linting.py
+        
+    - name: 📝 Commit fixes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        
+        if git diff --quiet; then
+          echo "✅ No hay cambios para hacer commit"
+        else
+          git add -A
+          git commit -m "🔧 Auto-fix: Corregir errores de linting automáticamente"
+          git push
+          echo "✅ Correcciones automáticas aplicadas"
+        fi
+

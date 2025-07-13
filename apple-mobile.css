@@ -388,9 +388,7 @@
     display: none;
   }
   
-  /* Restaurar comportamiento original de secciones en desktop */
-  .section {
-    display: block !important; /* Forzar visibilidad en desktop */
-  }
+  /* Mantener comportamiento de secciones según clases */
+  /* Las reglas globales controlan la visibilidad */
 }
 

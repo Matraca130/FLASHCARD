@@ -1,0 +1,249 @@
+{
+  "timestamp": "2025-07-08T19:36:53.272Z",
+  "systemId": "AUTO-CLEANUP",
+  "executionTime": 77,
+  "results": {
+    "obsoleteFunctions": [],
+    "deadCode": [
+      {
+        "file": "flashcard-app-final.js",
+        "line": 2,
+        "content": "console.log('🚀 Iniciando StudyingFlash - Versión Integrada Completa');",
+        "reason": "Código comentado o debug obsoleto"
+      },
+      {
+        "file": "flashcard-app-final.js",
+        "line": 13,
+        "content": "console.log(`🔧 [StudyingFlash] ${message}`, data || '');",
+        "reason": "Código comentado o debug obsoleto"
+      },
+      {
+        "file": "flashcard-app-final.js",
+        "line": 258,
+        "content": "// Intentar obtener usuario del localStorage o estado global",
+        "reason": "Código comentado o debug obsoleto"
+      },
+      {
+        "file": "flashcard-app-final.js",
+        "line": 346,
+        "content": "// quality: 0-5 (0=total blackout, 5=perfect response)",
+        "reason": "Código comentado o debug obsoleto"
+      },
+      {
+        "file": "flashcard-app-final.js",
+        "line": 489,
+        "content": "// Estimar tiempo de estudio (2 minutos por flashcard revisada hoy)",
+        "reason": "Código comentado o debug obsoleto"
+      },
+      {
+        "file": "flashcard-app-final.js",
+        "line": 918,
+        "content": "console.log('✅ StudyingFlash - Versión Integrada Completa Cargada');",
+        "reason": "Código comentado o debug obsoleto"
+      },
+      {
+        "file": "flashcard-app-final.js",
+        "line": 919,
+        "content": "console.log('🔗 Conectado con Render Backend:', CONFIG.API_BASE_URL);",
+        "reason": "Código comentado o debug obsoleto"
+      },
+      {
+        "file": "flashcard-app-final.js",
+        "line": 920,
+        "content": "console.log('📱 Funcionalidades disponibles:');",
+        "reason": "Código comentado o debug obsoleto"
+      },
+      {
+        "file": "flashcard-app-final.js",
+        "line": 921,
+        "content": "console.log('  - Crear y gestionar decks');",
+        "reason": "Código comentado o debug obsoleto"
+      },
+      {
+        "file": "flashcard-app-final.js",
+        "line": 922,
+        "content": "console.log('  - Crear y gestionar flashcards');",
+        "reason": "Código comentado o debug obsoleto"
+      },
+      {
+        "file": "flashcard-app-final.js",
+        "line": 923,
+        "content": "console.log('  - Estudiar con algoritmo SM-2');",
+        "reason": "Código comentado o debug obsoleto"
+      },
+      {
+        "file": "flashcard-app-final.js",
+        "line": 928,
+        "content": "// Agregar clase active a la sección seleccionada Y forzar display block",
+        "reason": "Código comentado o debug obsoleto"
+      },
+      {
+        "file": "flashcard-app-final.js",
+        "line": 976,
+        "content": "// Función generateActivityHeatmap para el dashboard",
+        "reason": "Código comentado o debug obsoleto"
+      },
+      {
+        "file": "flashcard-app-final.js",
+        "line": 1109,
+        "content": "// Exponer funciones globalmente para compatibilidad con HTML",
+        "reason": "Código comentado o debug obsoleto"
+      },
+      {
+        "file": "scripts/integrity_check.js",
+        "line": 276,
+        "content": "console.log('\\n=== RESUMEN DE INTEGRIDAD ===');",
+        "reason": "Código comentado o debug obsoleto"
+      },
+      {
+        "file": "scripts/integrity_check.js",
+        "line": 277,
+        "content": "console.log(`Advertencias: ${report.summary.warnings}`);",
+        "reason": "Código comentado o debug obsoleto"
+      },
+      {
+        "file": "scripts/integrity_check.js",
+        "line": 278,
+        "content": "console.log('\\n❌ ERRORES ENCONTRADOS:');",
+        "reason": "Código comentado o debug obsoleto"
+      },
+      {
+        "file": "scripts/integrity_check.js",
+        "line": 280,
+        "content": "console.log('\\n⚠️  ADVERTENCIAS:');",
+        "reason": "Código comentado o debug obsoleto"
+      },
+      {
+        "file": "scripts/integrity_check.js",
+        "line": 283,
+        "content": "console.log('\\n✅ INTEGRIDAD VERIFICADA - TODO CORRECTO');",
+        "reason": "Código comentado o debug obsoleto"
+      },
+      {
+        "file": "scripts/master_coordinator.js",
+        "line": 169,
+        "content": "// Prioridad 1: Ejecutar secuencialmente (solo Agente 1)",
+        "reason": "Código comentado o debug obsoleto"
+      },
+      {
+        "file": "scripts/master_coordinator.js",
+        "line": 302,
+        "content": "console.log('\\n=== RESUMEN FINAL DE COORDINACIÓN ===');",
+        "reason": "Código comentado o debug obsoleto"
+      },
+      {
+        "file": "scripts/master_coordinator.js",
+        "line": 303,
+        "content": "console.log(`Tiempo total de ejecución: ${Math.round(masterReport.totalExecutionTime / 1000)} segundos`);",
+        "reason": "Código comentado o debug obsoleto"
+      },
+      {
+        "file": "scripts/master_coordinator.js",
+        "line": 304,
+        "content": "console.log(`Agentes saltados: ${masterReport.summary.skipped}`);",
+        "reason": "Código comentado o debug obsoleto"
+      },
+      {
+        "file": "store/store.js",
+        "line": 101,
+        "content": "// Re-exportar el store principal para casos que lo necesiten",
+        "reason": "Código comentado o debug obsoleto"
+      },
+      {
+        "file": "store/store.js",
+        "line": 106,
+        "content": "console.log(`",
+        "reason": "Código comentado o debug obsoleto"
+      },
+      {
+        "file": "utils/apiHelpers.js",
+        "line": 125,
+        "content": "console.log(",
+        "reason": "Código comentado o debug obsoleto"
+      },
+      {
+        "file": "utils/helpers.js",
+        "line": 637,
+        "content": "console.log('✅ Partículas inicializadas exitosamente');",
+        "reason": "Código comentado o debug obsoleto"
+      },
+      {
+        "file": "utils/helpers.js",
+        "line": 642,
+        "content": "console.log('⚠️ particlesJS no disponible');",
+        "reason": "Código comentado o debug obsoleto"
+      },
+      {
+        "file": "utils/helpers.js",
+        "line": 652,
+        "content": "console.log('📄 Contenedor de partículas no encontrado');",
+        "reason": "Código comentado o debug obsoleto"
+      },
+      {
+        "file": "utils/helpers.js",
+        "line": 686,
+        "content": "// Verificar si el sistema de navegación está disponible",
+        "reason": "Código comentado o debug obsoleto"
+      },
+      {
+        "file": "utils/helpers.js",
+        "line": 690,
+        "content": "// Fallback básico si el sistema de navegación no está disponible",
+        "reason": "Código comentado o debug obsoleto"
+      },
+      {
+        "file": "utils/helpers.js",
+        "line": 727,
+        "content": "// Enviar error a servicio de logging si está disponible",
+        "reason": "Código comentado o debug obsoleto"
+      },
+      {
+        "file": "utils/helpers.js",
+        "line": 743,
+        "content": "console.log('🔌 Sin conectividad con el servidor');",
+        "reason": "Código comentado o debug obsoleto"
+      },
+      {
+        "file": "utils/helpers.js",
+        "line": 788,
+        "content": "// Exponer funciones globalmente para compatibilidad con código legacy",
+        "reason": "Código comentado o debug obsoleto"
+      },
+      {
+        "file": "utils/helpers.js",
+        "line": 806,
+        "content": "// Auto-inicializar partículas cuando el DOM esté listo",
+        "reason": "Código comentado o debug obsoleto"
+      },
+      {
+        "file": "utils/helpers.js",
+        "line": 835,
+        "content": "console.log(",
+        "reason": "Código comentado o debug obsoleto"
+      },
+      {
+        "file": "utils/lazy-loader.js",
+        "line": 212,
+        "content": "console.log(`[LazyLoader] Module loaded successfully: ${modulePath}`);",
+        "reason": "Código comentado o debug obsoleto"
+      },
+      {
+        "file": "utils/lazy-loader.js",
+        "line": 228,
+        "content": "// Verificar que el módulo tenga la función de inicialización esperada",
+        "reason": "Código comentado o debug obsoleto"
+      }
+    ],
+    "unusedFiles": [],
+    "duplicateConfigs": [],
+    "brokenReferences": []
+  },
+  "summary": {
+    "totalCleaned": 38,
+    "obsoleteFunctions": 0,
+    "deadCodeLines": 38,
+    "unusedFiles": 0,
+    "duplicateConfigs": 0,
+    "brokenReferences": 0
+  }
+}

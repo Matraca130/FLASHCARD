@@ -1,122 +1,147 @@
 /**
  * STORE/STORE.JS - COMPATIBILIDAD Y RE-EXPORTACIÓN
- * ================================================
- * 
- * Este archivo mantiene compatibilidad con imports que usan 'store/store.js'
- * mientras redirige al sistema de store refactorizado principal
+ * =================================================
+ * Implementa un store sencillo y mantiene compatibilidad con la API previa.
  */
 
-// Importar el store refactorizado principal
-import store, { StudyingFlashStore, simpleStore } from '../store.js';
+// Implementación básica de un store reactivo
+export function createSimpleStore(initialState = {}) {
+  let state = { ...initialState };
+  const listeners = new Set();
 
-/**
- * CLASE DE COMPATIBILIDAD
- * =======================
- * 
- * Mantiene la interfaz original para código legacy
- */
-class LegacyStore {
-  constructor() {
-    // Usar el store refactorizado como backend
-    this.store = store;
-    
-    // Mantener compatibilidad con la interfaz original
-    this.state = this.store.getState();
-    this.listeners = [];
-    
-    // Suscribirse a cambios del store principal
-    this.store.subscribe((newState) => {
-      this.state = newState;
-      this.notifyListeners();
-    });
-    
-    console.log('🔄 LegacyStore inicializado - Redirigiendo al store refactorizado');
+  function getState() {
+    return state;
   }
 
-  /**
-   * Métodos de compatibilidad con la interfaz original
-   */
+  function setState(partial) {
+    state = { ...state, ...partial };
+    listeners.forEach((l) => l(state));
+  }
+
+  function subscribe(listener) {
+    listeners.add(listener);
+    return () => listeners.delete(listener);
+  }
+
+  return { getState, setState, subscribe };
+}
+
+export const simpleStore = createSimpleStore();
+
+export class StudyingFlashStore {
+  constructor(initialState = {}) {
+    this.store = createSimpleStore(initialState);
+  }
+  getState() {
+    return this.store.getState();
+  }
+  setState(state) {
+    this.store.setState(state);
+  }
+  subscribe(listener) {
+    return this.store.subscribe(listener);
+  }
+}
+
+// Store principal de la aplicación
+const store = createSimpleStore({
+  user: null,
+  decks: [],
+  flashcards: [],
+  studySession: {},
+});
+
+// Métodos de conveniencia
+store.setUser = (user) => store.setState({ user });
+store.setDecks = (decks) => store.setState({ decks });
+store.addDeck = (deck) => store.setState({ decks: [...store.getState().decks, deck] });
+store.updateDeck = (id, updates) => {
+  const decks = store.getState().decks.map((d) => (d.id === id ? { ...d, ...updates } : d));
+  store.setState({ decks });
+};
+store.deleteDeck = (id) => {
+  const decks = store.getState().decks.filter((d) => d.id !== id);
+  store.setState({ decks });
+};
+store.dispatch = (action, payload) => {
+  switch (action) {
+    case 'flashcard/add':
+      store.setState({ flashcards: [...store.getState().flashcards, payload] });
+      break;
+    case 'flashcard/update':
+      store.setState({
+        flashcards: store.getState().flashcards.map((f) => (f.id === payload.id ? payload : f)),
+      });
+      break;
+    case 'review/add':
+      store.setState({ reviews: [...(store.getState().reviews || []), payload] });
+      break;
+    case 'studySession/updateProgress':
+      store.setState({ studySession: { ...(store.getState().studySession || {}), ...payload } });
+      break;
+    default:
+      store.setState(payload);
+  }
+};
+
+// === Compatibilidad legacy ===
+class LegacyStore {
+  constructor() {
+    this.store = store;
+    this.state = this.store.getState();
+    this.listeners = [];
+    this.unsubscribe = this.store.subscribe((s) => {
+      this.state = s;
+      this.notifyListeners();
+    });
+  }
+
   getState() {
     return this.store.getState();
   }
 
   setState(newState) {
-    return this.store.setState(newState, { source: 'legacy' });
+    this.store.setState(newState);
   }
 
   subscribe(listener) {
     this.listeners.push(listener);
     return () => {
-      this.listeners = this.listeners.filter(l => l !== listener);
+      this.listeners = this.listeners.filter((l) => l !== listener);
     };
   }
 
   notifyListeners() {
-    this.listeners.forEach(listener => {
+    this.listeners.forEach((l) => {
       try {
-        listener(this.state);
-      } catch (error) {
-        console.error('[LegacyStore] Error en listener:', error);
+        l(this.state);
+      } catch (e) {
+        console.error('[LegacyStore] Error en listener:', e);
       }
     });
   }
 
-  /**
-   * Métodos específicos de compatibilidad
-   */
   setUser(user) {
-    return this.store.setUser(user);
+    return store.setUser(user);
   }
-
   setDecks(decks) {
-    return this.store.setDecks(decks);
+    return store.setDecks(decks);
   }
-
   addDeck(deck) {
-    return this.store.addDeck(deck);
+    return store.addDeck(deck);
   }
-
-  updateDeck(deckId, updates) {
-    return this.store.updateDeck(deckId, updates);
+  updateDeck(id, updates) {
+    return store.updateDeck(id, updates);
   }
-
-  deleteDeck(deckId) {
-    return this.store.deleteDeck(deckId);
+  deleteDeck(id) {
+    return store.deleteDeck(id);
   }
 }
 
-/**
- * EXPORTACIONES
- * =============
- */
-
-// Crear instancia de compatibilidad
 const legacyStore = new LegacyStore();
-
-// Exportar como default para compatibilidad
 export default legacyStore;
+export { legacyStore as store, store as mainStore, StudyingFlashStore, simpleStore };
 
-// Exportar también como named export
-export { legacyStore as store };
-
-// Re-exportar el store principal para casos que lo necesiten
-export { store as mainStore, StudyingFlashStore, simpleStore };
-
-/**
- * MENSAJE DE MIGRACIÓN
- * ====================
- */
-console.log(`
-🔄 AVISO DE MIGRACIÓN:
-Este archivo (store/store.js) redirige al sistema de store refactorizado.
-Considera migrar tus imports a:
-  import store from './store.js'
-  
-El store refactorizado ofrece:
-✅ Mejor rendimiento
-✅ Más funcionalidades
-✅ Mejor debugging
-✅ Persistencia automática
-✅ Validación de estado
-`);
-
+console.log(
+  `ℹ️ Migración de store completada. Importa el nuevo store con:\n  import store from './store/store.js';`
+);

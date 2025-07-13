@@ -1,0 +1,21 @@
+[build]
+  # Force static deployment - no build command
+  command = ""
+  # Publish from root directory
+  publish = "."
+
+[build.environment]
+  # Disable automatic dependency detection
+  NETLIFY_SKIP_DEPENDENCY_INSTALL = "true"
+  # Force Node.js runtime to avoid Python detection
+  NODE_VERSION = "18"
+
+[[headers]]
+  # Apply headers to all files
+  for = "/*"
+  [headers.values]
+    # Enable CORS for API calls to Render backend
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
+    Access-Control-Allow-Headers = "Content-Type, Authorization"
+

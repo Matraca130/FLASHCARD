@@ -1,136 +1,73 @@
 /**
- * Utilidades de Validación Comunes
- * Elimina duplicación de validaciones en toda la aplicación
+ * Validación genérica de campos requeridos
+ * @param {Object} data - Objeto con datos a validar
+ * @param {string[]} fields - Campos requeridos
+ * @returns {{isValid:boolean, errors:string[]}}
  */
-
-import { showNotification } from './helpers.js';
-
-/**
- * Valida que todos los campos requeridos estén completos
- * @param {Object} fields - Objeto con los campos a validar
- * @param {string} customMessage - Mensaje personalizado (opcional)
- * @returns {boolean} - true si todos los campos son válidos
- */
-export function validateRequiredFields(fields, customMessage = 'Por favor, completa todos los campos') {
-  const emptyFields = Object.entries(fields).filter(([key, value]) => {
-    return !value || (typeof value === 'string' && value.trim() === '');
-  });
-
-  if (emptyFields.length > 0) {
-    showNotification(customMessage, 'error');
-    return false;
+export function validateRequiredFields(data, fields) {
+  const errors = [];
+  for (const field of fields) {
+    const value = data[field];
+    if (value === undefined || value === null || (typeof value === 'string' && !value.trim())) {
+      errors.push(`El campo ${field} es requerido`);
+    }
   }
-  
-  return true;
+  return { isValid: errors.length === 0, errors };
 }
 
 /**
- * Valida credenciales de login
- * @param {string} email - Email del usuario
- * @param {string} password - Contraseña del usuario
- * @returns {boolean} - true si las credenciales son válidas
+ * Valida datos de una flashcard
+ * @param {Object} data - Datos de la flashcard
+ * @param {boolean} [isUpdate=false] - Si es una actualización
+ * @param {Object} [config={}] - Configuración de validación
+ * @returns {{isValid:boolean, errors:string[]}}
  */
-export function validateLoginCredentials(email, password) {
-  return validateRequiredFields(
-    { email, password },
-    'Por favor, ingresa email y contraseña'
-  );
-}
+export function validateFlashcardData(data, isUpdate = false, config = {}) {
+  const {
+    maxTextLength = 5000,
+    supportedAlgorithms = ['fsrs', 'sm2', 'ultra_sm2', 'anki'],
+  } = config;
 
-/**
- * Valida datos de flashcard
- * @param {string} deckId - ID del deck
- * @param {string} front - Texto del frente
- * @param {string} back - Texto del reverso
- * @returns {boolean} - true si los datos son válidos
- */
-export function validateFlashcardData(deckId, front, back) {
-  return validateRequiredFields(
-    { deckId, front, back },
-    'Por favor, completa todos los campos de la flashcard'
-  );
-}
+  const errors = [];
 
-/**
- * Valida datos de deck
- * @param {string} name - Nombre del deck
- * @param {string} description - Descripción del deck (opcional)
- * @returns {boolean} - true si los datos son válidos
- */
-export function validateDeckData(name, description = '') {
-  if (!name || name.trim() === '') {
-    showNotification('El nombre del deck es requerido', 'error');
-    return false;
+  if (!isUpdate && !data.deck_id) {
+    errors.push('deck_id es requerido');
   }
-  
-  if (name.length < 3) {
-    showNotification('El nombre del deck debe tener al menos 3 caracteres', 'error');
-    return false;
-  }
-  
-  if (name.length > 50) {
-    showNotification('El nombre del deck no puede exceder 50 caracteres', 'error');
-    return false;
-  }
-  
-  return true;
-}
 
-/**
- * Valida formato de email
- * @param {string} email - Email a validar
- * @returns {boolean} - true si el email es válido
- */
-export function validateEmail(email) {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  
-  if (!email || !emailRegex.test(email)) {
-    showNotification('Por favor, ingresa un email válido', 'error');
-    return false;
-  }
-  
-  return true;
-}
+  const frontContent = data.front_content || {
+    text: data.front || data.front_text,
+    image_url: data.front_image_url,
+    audio_url: data.front_audio_url,
+  };
 
-/**
- * Valida fortaleza de contraseña
- * @param {string} password - Contraseña a validar
- * @returns {boolean} - true si la contraseña es válida
- */
-export function validatePassword(password) {
-  if (!password || password.length < 6) {
-    showNotification('La contraseña debe tener al menos 6 caracteres', 'error');
-    return false;
+  if (!frontContent.text && !frontContent.image_url && !frontContent.audio_url) {
+    errors.push('El contenido frontal debe tener al menos texto, imagen o audio');
   }
-  
-  return true;
-}
 
-/**
- * Valida datos de registro
- * @param {string} email - Email del usuario
- * @param {string} password - Contraseña del usuario
- * @param {string} confirmPassword - Confirmación de contraseña
- * @returns {boolean} - true si todos los datos son válidos
- */
-export function validateRegistrationData(email, password, confirmPassword) {
-  if (!validateRequiredFields({ email, password, confirmPassword })) {
-    return false;
-  }
-  
-  if (!validateEmail(email)) {
-    return false;
-  }
-  
-  if (!validatePassword(password)) {
-    return false;
-  }
-  
-  if (password !== confirmPassword) {
-    showNotification('Las contraseñas no coinciden', 'error');
-    return false;
-  }
-  
-  return true;
-}
+  const backContent = data.back_content || {
+    text: data.back || data.back_text,
+    image_url: data.back_image_url,
+    audio_url: data.back_audio_url,
+  };
 
+  if (!backContent.text && !backContent.image_url && !backContent.audio_url) {
+    errors.push('El contenido posterior debe tener al menos texto, imagen o audio');
+  }
+
+  if (frontContent.text && frontContent.text.length > maxTextLength) {
+    errors.push(`Texto frontal demasiado largo (máximo ${maxTextLength} caracteres)`);
+  }
+  if (backContent.text && backContent.text.length > maxTextLength) {
+    errors.push(`Texto posterior demasiado largo (máximo ${maxTextLength} caracteres)`);
+  }
+
+  if (data.difficulty && !['easy', 'normal', 'hard'].includes(data.difficulty)) {
+    errors.push('Dificultad debe ser: easy, normal o hard');
+  }
+
+  if (data.algorithm_type && !supportedAlgorithms.includes(data.algorithm_type)) {
+    errors.push(`Algoritmo no soportado. Opciones: ${supportedAlgorithms.join(', ')}`);
+  }
+
+  return { isValid: errors.length === 0, errors };
+}
