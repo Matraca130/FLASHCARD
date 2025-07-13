@@ -7,7 +7,7 @@ import { api } from './apiClient.js';
 import { store } from './store.js';
 import { apiWithFallback, performCrudOperation } from './utils/apiHelpers.js';
 import { showNotification, generateId } from './utils/helpers.js';
-import { validateFlashcardData } from './utils/validation.js';
+import { validateFlashcardData as validateFlashcardDataUtil } from './utils/validation.js';
 
 /**
  * Configuración del servicio de flashcards
@@ -52,7 +52,11 @@ class FlashcardService {
   async createFlashcard(flashcardData) {
     try {
       // Validar datos de entrada
-      const validationResult = this.validateFlashcardData(flashcardData);
+      const validationResult = validateFlashcardDataUtil(
+        flashcardData,
+        false,
+        FLASHCARD_CONFIG
+      );
       if (!validationResult.isValid) {
         throw new Error(validationResult.errors.join(', '));
       }
@@ -64,7 +68,10 @@ class FlashcardService {
       const processedData = await this.processMultimediaContent(unifiedData);
 
       // Crear flashcard en el backend
-      const response = await api.post('/api/flashcards', processedData);
+      const response = await api('/api/flashcards', {
+        method: 'POST',
+        body: processedData
+      });
 
       if (response.success) {
         // Actualizar cache local
@@ -123,7 +130,8 @@ class FlashcardService {
       }
 
       // Obtener del backend
-      const response = await api.get(`/api/flashcards/${flashcardId}`, {
+      const response = await api(`/api/flashcards/${flashcardId}`, {
+        method: 'GET',
         params: {
           format: 'unified', // Siempre pedimos formato unificado
           include_content: includeContent
@@ -159,7 +167,8 @@ class FlashcardService {
         format = this.currentFormat
       } = options;
 
-      const response = await api.get('/api/flashcards/due', {
+      const response = await api('/api/flashcards/due', {
+        method: 'GET',
         params: {
           deck_id: deckId,
           limit: limit,
@@ -201,7 +210,11 @@ class FlashcardService {
   async updateFlashcard(flashcardId, updateData) {
     try {
       // Validar datos de actualización
-      const validationResult = this.validateFlashcardData(updateData, true);
+      const validationResult = validateFlashcardDataUtil(
+        updateData,
+        true,
+        FLASHCARD_CONFIG
+      );
       if (!validationResult.isValid) {
         throw new Error(validationResult.errors.join(', '));
       }
@@ -213,7 +226,10 @@ class FlashcardService {
       const processedData = await this.processMultimediaContent(unifiedData);
 
       // Actualizar en el backend
-      const response = await api.put(`/api/flashcards/${flashcardId}`, processedData);
+      const response = await api(`/api/flashcards/${flashcardId}`, {
+        method: 'PUT',
+        body: processedData
+      });
 
       if (response.success) {
         // Actualizar cache
@@ -255,11 +271,14 @@ class FlashcardService {
         throw new Error('Rating debe estar entre 1 y 4');
       }
 
-      const response = await api.post(`/api/flashcards/${flashcardId}/review`, {
-        rating,
-        response_time: responseTime,
-        algorithm_type: algorithmType,
-        session_id: sessionId
+      const response = await api(`/api/flashcards/${flashcardId}/review`, {
+        method: 'POST',
+        body: {
+          rating,
+          response_time: responseTime,
+          algorithm_type: algorithmType,
+          session_id: sessionId
+        }
       });
 
       if (response.success) {
@@ -315,7 +334,8 @@ class FlashcardService {
         format = this.currentFormat
       } = searchOptions;
 
-      const response = await api.get('/api/flashcards/search', {
+      const response = await api('/api/flashcards/search', {
+        method: 'GET',
         params: {
           q: query,
           deck_id: deckId,
@@ -556,7 +576,9 @@ class FlashcardService {
     formData.append('type', 'flashcard');
 
     // Subir al backend
-    const response = await api.post('/api/upload/image', formData, {
+    const response = await api('/api/upload/image', {
+      method: 'POST',
+      body: formData,
       headers: {
         'Content-Type': 'multipart/form-data'
       }
@@ -586,7 +608,9 @@ class FlashcardService {
     formData.append('type', 'flashcard');
 
     // Subir al backend
-    const response = await api.post('/api/upload/audio', formData, {
+    const response = await api('/api/upload/audio', {
+      method: 'POST',
+      body: formData,
       headers: {
         'Content-Type': 'multipart/form-data'
       }
@@ -608,58 +632,7 @@ class FlashcardService {
    * @returns {Object} - Resultado de validación
    */
   validateFlashcardData(data, isUpdate = false) {
-    const errors = [];
-
-    // Validar deck_id (requerido para creación)
-    if (!isUpdate && !data.deck_id) {
-      errors.push('deck_id es requerido');
-    }
-
-    // Validar contenido frontal
-    const frontContent = data.front_content || {
-      text: data.front || data.front_text,
-      image_url: data.front_image_url,
-      audio_url: data.front_audio_url
-    };
-
-    if (!frontContent.text && !frontContent.image_url && !frontContent.audio_url) {
-      errors.push('El contenido frontal debe tener al menos texto, imagen o audio');
-    }
-
-    // Validar contenido posterior
-    const backContent = data.back_content || {
-      text: data.back || data.back_text,
-      image_url: data.back_image_url,
-      audio_url: data.back_audio_url
-    };
-
-    if (!backContent.text && !backContent.image_url && !backContent.audio_url) {
-      errors.push('El contenido posterior debe tener al menos texto, imagen o audio');
-    }
-
-    // Validar longitud de texto
-    if (frontContent.text && frontContent.text.length > FLASHCARD_CONFIG.maxTextLength) {
-      errors.push(`Texto frontal demasiado largo (máximo ${FLASHCARD_CONFIG.maxTextLength} caracteres)`);
-    }
-
-    if (backContent.text && backContent.text.length > FLASHCARD_CONFIG.maxTextLength) {
-      errors.push(`Texto posterior demasiado largo (máximo ${FLASHCARD_CONFIG.maxTextLength} caracteres)`);
-    }
-
-    // Validar dificultad
-    if (data.difficulty && !['easy', 'normal', 'hard'].includes(data.difficulty)) {
-      errors.push('Dificultad debe ser: easy, normal o hard');
-    }
-
-    // Validar algoritmo
-    if (data.algorithm_type && !FLASHCARD_CONFIG.supportedAlgorithms.includes(data.algorithm_type)) {
-      errors.push(`Algoritmo no soportado. Opciones: ${FLASHCARD_CONFIG.supportedAlgorithms.join(', ')}`);
-    }
-
-    return {
-      isValid: errors.length === 0,
-      errors
-    };
+    return validateFlashcardDataUtil(data, isUpdate, FLASHCARD_CONFIG);
   }
 
   // ========== MÉTODOS DE CACHE ==========
