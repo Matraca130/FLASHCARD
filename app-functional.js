@@ -9,7 +9,6 @@ const CONFIG = {
 const Utils = {
     log: (message, data = null) => {
         if (CONFIG.DEBUG) {
-            console.log(`🔧 [StudyingFlash] ${message}`, data || "");
         }
     },
     
@@ -166,7 +165,6 @@ const ApiService = {
 };
 
 // ===== CLASE PRINCIPAL (MANTENIDA DE app-functional.js) =====
-class StudyingFlashApp {
     constructor() {
         this.currentSection = 'dashboard';
         this.decks = JSON.parse(localStorage.getItem('studyingflash_decks') || '[]');
@@ -179,13 +177,11 @@ class StudyingFlashApp {
     init() {
         console.log('🚀 StudyingFlash App iniciando...');
         Utils.log('App inicializando con capacidades API');
-        this.setupEventListeners();
         this.showSection('dashboard');
         this.updateStats();
         console.log('✅ App inicializada correctamente');
     }
 
-    setupEventListeners() {
         // Navegación principal
         document.querySelectorAll('[data-section]').forEach(link => {
             link.addEventListener('click', (e) => {
@@ -248,13 +244,11 @@ class StudyingFlashApp {
         document.querySelectorAll('.section').forEach(section => {
             section.style.cssText = 'display: none !important;';
         });
-
         // Mostrar la sección solicitada con cssText completo
         const targetSection = document.getElementById(sectionName);
         if (targetSection) {
             targetSection.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important;';
             this.currentSection = sectionName;
-            
             // Cargar contenido específico de la sección
             this.loadSectionContent(sectionName);
         } else {
@@ -357,7 +351,6 @@ class StudyingFlashApp {
         const publicCheckbox = document.getElementById('deck-public');
         
         if (!nameInput || !descriptionInput) {
-            Utils.error('Elementos de formulario no encontrados');
             return;
         }
 
@@ -824,7 +817,6 @@ class StudyingFlashApp {
             'studied-today': studiedToday
         };
 
-        Object.entries(statsElements).forEach(([id, value]) => {
             const element = document.getElementById(id);
             if (element) {
                 element.textContent = value;
@@ -937,7 +929,6 @@ class StudyingFlashApp {
             maxStreak: this.getMaxStreak(),
             totalScore: this.calculateTotalScore(),
             topUsers: [
-                { username: 'StudyMaster', score: 15420, isCurrentUser: false },
                 { username: 'FlashGenius', score: 14890, isCurrentUser: false },
                 { username: 'Tú', score: this.calculateTotalScore(), isCurrentUser: true },
                 { username: 'MemoryPro', score: 12340, isCurrentUser: false },
@@ -959,13 +950,11 @@ class StudyingFlashApp {
         return this.stats.maxStreak || 0;
     }
 
-    calculateTotalScore() {
         // Calcular puntuación total basada en actividad
         const deckPoints = this.decks.length * 100;
         const cardPoints = this.flashcards.length * 10;
         const studyPoints = Object.values(this.stats.dailyStudy || {}).reduce((sum, count) => sum + count, 0) * 5;
         
-        return deckPoints + cardPoints + studyPoints;
     }
 
     updateGlobalStats(sessionStats) {
@@ -1065,11 +1054,9 @@ window.ApiService = ApiService;
 
 
 
-// ===== FUNÇÕES PARA O NOVO MODAL DE LOGIN =====
 
 // Função para login com Facebook
 function loginWithFacebook() {
-    Utils.log('Tentativa de login com Facebook');
     Utils.showNotification('Login com Facebook em desenvolvimento', 'info');
     // Aqui seria implementada a integração com Facebook SDK
 }
@@ -1084,7 +1071,6 @@ function loginWithGoogle() {
 // Função para mostrar modal de esqueci a senha
 function showForgotPassword() {
     Utils.log('Mostrando modal de esqueci a senha');
-    Utils.showNotification('Funcionalidade de recuperação de senha em desenvolvimento', 'info');
     // Aqui seria implementado o modal de recuperação de senha
 }
 
@@ -1092,7 +1078,6 @@ function showForgotPassword() {
 function showRegisterModal() {
     Utils.log('Mostrando modal de registro');
     // Esconder modal de login e mostrar modal de registro
-    hideLoginModal();
     // Aqui seria implementado o modal de registro separado
     Utils.showNotification('Modal de registro em desenvolvimento', 'info');
 }
@@ -1100,17 +1085,14 @@ function showRegisterModal() {
 // Melhorar a função de login existente
 function handleLoginForm(event) {
     event.preventDefault();
-    
     const email = document.getElementById('login-email').value;
     const password = document.getElementById('login-password').value;
     
     Utils.log('Tentativa de login', { email });
     
     // Simulação de login bem-sucedido
-    if (email && password) {
         Utils.showNotification('Login realizado com sucesso!', 'success');
         hideLoginModal();
-        
         // Atualizar interface para usuário logado
         updateUIForLoggedUser(email);
     } else {
@@ -1136,10 +1118,8 @@ function showUserMenu() {
     Utils.showNotification('Menu do usuário em desenvolvimento', 'info');
 }
 
-// Verificar se usuário já está logado ao carregar a página
 function checkUserLogin() {
     const user = JSON.parse(localStorage.getItem('studyingflash_user') || '{}');
-    if (user.loggedIn && user.email) {
         updateUIForLoggedUser(user.email);
     }
 }
@@ -1156,13 +1136,11 @@ function togglePasswordVisibility() {
 
     if (passwordField.type === "password") {
         passwordField.type = "text";
-        toggleIcon.textContent = "🙈"; // Ícone de olho fechado
     } else {
         passwordField.type = "password";
         toggleIcon.textContent = "👁️"; // Ícone de olho aberto
     }
 }
-
 
 
 
@@ -1187,6 +1165,47 @@ function hideLoginModal() {
     if (loginModal) {
         loginModal.style.display = "none";
     }
+}
+/**
+ * Valida la información del usuario antes del registro
+ * @param {Object} userData - Datos del usuario a validar
+ * @param {string} userData.username - Nombre de usuario
+ * @param {string} userData.email - Correo electrónico del usuario
+ * @param {string} [userData.password] - Contraseña a validar (opcional)
+ * @returns {{valid: boolean, error?: string}} Resultado de la validación
+ */
+function validateUser(userData) {
+    if (!userData || typeof userData !== 'object') {
+        return { valid: false, error: 'Datos de usuario faltantes' };
+    }
+
+    const { username, email, password } = userData;
+
+    if (!username || !email) {
+        return { valid: false, error: 'Nombre de usuario y email son requeridos' };
+    }
+
+    const cleanUsername = username.trim();
+    if (cleanUsername.length < 3 || /[^\w]/.test(cleanUsername)) {
+        return { valid: false, error: 'Nombre de usuario inválido' };
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        return { valid: false, error: 'Email inválido' };
+    }
+
+    const bannedDomains = ['tempmail.com', 'dispostable.com'];
+    const domain = email.toLowerCase().split('@').pop();
+    if (bannedDomains.includes(domain)) {
+        return { valid: false, error: 'Dominio de email no permitido' };
+    }
+
+    if (password !== undefined && password.trim().length < 6) {
+        return { valid: false, error: 'La contraseña debe tener al menos 6 caracteres' };
+    }
+
+    return { valid: true };
 }
 
 
