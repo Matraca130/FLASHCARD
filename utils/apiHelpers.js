@@ -3,7 +3,7 @@
  * Elimina duplicación en llamadas API con fallback
  */
 
-import ApiClient from '../apiClient.js';
+import { api } from '../apiClient.js';
 import { showNotification } from './helpers.js';
 
 /**
@@ -21,7 +21,7 @@ export async function apiWithFallback(
   showFallbackMessage = true
 ) {
   try {
-    const data = await ApiClient.request(endpoint, options);
+    const data = await api(endpoint, options);
 
     // Si la API devuelve un error, usar fallback
     if (data && data.error) {
@@ -61,7 +61,7 @@ export async function multipleApiWithFallback(apiCalls) {
 
 /**
  * Wrapper para operaciones CRUD con manejo de errores estándar
- * @param {Function} operation - Función que realiza la operación (debe retornar una promesa con el resultado de ApiClient)
+ * @param {Function} operation - Función que realiza la operación (debe retornar una promesa con el resultado de api)
  * @param {string} successMessage - Mensaje de éxito
  * @param {string} errorMessage - Mensaje de error
  * @returns {Promise<any>} - Resultado de la operación
@@ -107,7 +107,7 @@ export async function loadDataWithRetry(
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-      const result = await ApiClient.get(endpoint);
+      const result = await api(endpoint);
 
       if (result && !result.error) {
         return result.data;
