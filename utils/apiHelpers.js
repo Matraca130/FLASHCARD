@@ -3,8 +3,8 @@
  * Elimina duplicación en llamadas API con fallback
  */
 
-import { ApiClient } from '';
-import { showNotification } from '';
+import ApiClient from '../apiClient.js';
+import { showNotification } from './helpers.js';
 
 /**
  * Realiza una llamada API con fallback a datos locales
@@ -31,7 +31,9 @@ export async function apiWithFallback(
     return data.data; // Retorna solo los datos, no el objeto completo de respuesta
   } catch (error) {
     if (showFallbackMessage) {
-        `API no disponible para ${endpoint}, usando datos de ejemplo. Error: ${error.message}`
+      showNotification(
+        `API no disponible para ${endpoint}, usando datos de ejemplo. Error: ${error.message}`,
+        'warning'
       );
     }
 
@@ -116,12 +118,16 @@ export async function loadDataWithRetry(
       lastError = error;
 
       if (attempt < maxRetries) {
+        showNotification(
+          `Intento ${attempt} fallido. Reintentando...`,
+          'warning',
+          2000
         );
         await new Promise((resolve) => setTimeout(resolve, retryDelay));
       }
     }
   }
-
+  showNotification(`Usando datos de respaldo para ${endpoint}`, 'info');
   return fallbackData;
 }
 
