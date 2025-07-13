@@ -53,6 +53,12 @@ class NavigationService {
    * @param {Object} options - Opciones de navegación
    */
   navigateTo(sectionId, options = {}) {
+    // Validar opciones recibidas
+    if (!options || typeof options !== 'object' || Array.isArray(options)) {
+      console.warn('NavigationService: opciones inválidas, usando {}');
+      options = {};
+    }
+
     if (!this.isInitialized) {
       // Agregar a cola de navegaciones pendientes
       this.pendingNavigations.push({ sectionId, options });
