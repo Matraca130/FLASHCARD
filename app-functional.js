@@ -165,6 +165,7 @@ const ApiService = {
 };
 
 // ===== CLASE PRINCIPAL (MANTENIDA DE app-functional.js) =====
+class StudyingFlashApp {
     constructor() {
         this.currentSection = 'dashboard';
         this.decks = JSON.parse(localStorage.getItem('studyingflash_decks') || '[]');
@@ -179,9 +180,7 @@ const ApiService = {
         Utils.log('App inicializando con capacidades API');
         this.showSection('dashboard');
         this.updateStats();
-        console.log('✅ App inicializada correctamente');
-    }
-
+        
         // Navegación principal
         document.querySelectorAll('[data-section]').forEach(link => {
             link.addEventListener('click', (e) => {
@@ -856,6 +855,7 @@ const ApiService = {
             'studied-today': studiedToday
         };
 
+        Object.entries(statsElements).forEach(([id, value]) => {
             const element = document.getElementById(id);
             if (element) {
                 element.textContent = value;
@@ -989,11 +989,13 @@ const ApiService = {
         return this.stats.maxStreak || 0;
     }
 
+    calculateTotalScore() {
         // Calcular puntuación total basada en actividad
         const deckPoints = this.decks.length * 100;
         const cardPoints = this.flashcards.length * 10;
         const studyPoints = Object.values(this.stats.dailyStudy || {}).reduce((sum, count) => sum + count, 0) * 5;
         
+        return deckPoints + cardPoints + studyPoints;
     }
 
     updateGlobalStats(sessionStats) {
@@ -1135,6 +1137,7 @@ function handleLoginForm(event) {
     Utils.log('Tentativa de login', { email });
     
     // Simulação de login bem-sucedido
+    if (email && password) {
         Utils.showNotification('Login realizado com sucesso!', 'success');
         hideLoginModal();
         // Atualizar interface para usuário logado
