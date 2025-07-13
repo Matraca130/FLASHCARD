@@ -293,17 +293,34 @@ class StudyingFlashApp {
                 Utils.log(`Sección ${sectionName} no tiene carga específica`);
         }
     }
-
-    loadDashboard() {     const mobileMenu = document.querySelector('.mobile-menu');
-        if (mobileMenu) {
-            mobileMenu.classList.toggle('active');
-        }
-    }
-
     closeMobileMenu() {
         const mobileMenu = document.querySelector('.mobile-menu');
         if (mobileMenu) {
             mobileMenu.classList.remove('active');
+        }
+    }
+
+    toggleMobileMenu() {
+        const mobileMenu = document.getElementById('mobile-menu');
+        const appleSidebar = document.getElementById('apple-sidebar');
+        const overlay = document.getElementById('apple-sidebar-overlay');
+        const menuBtn = document.getElementById('mobile-menu-btn');
+        const appleMenuBtn = document.getElementById('apple-menu-btn');
+
+        if (mobileMenu) {
+            mobileMenu.classList.toggle('active');
+        }
+        if (appleSidebar) {
+            appleSidebar.classList.toggle('active');
+        }
+        if (overlay) {
+            overlay.classList.toggle('active');
+        }
+        if (menuBtn) {
+            menuBtn.classList.toggle('active');
+        }
+        if (appleMenuBtn) {
+            appleMenuBtn.classList.toggle('active');
         }
     }
 
@@ -1167,6 +1184,7 @@ function showUserMenu() {
 
 function checkUserLogin() {
     const user = JSON.parse(localStorage.getItem('studyingflash_user') || '{}');
+    if (user && user.loggedIn) {
         updateUIForLoggedUser(user.email);
     }
 }
