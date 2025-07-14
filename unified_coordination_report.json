@@ -1,77 +1,94 @@
 {
-  "timestamp": "2025-07-08T20:44:46.297Z",
+  "timestamp": "2025-07-14T07:39:06.107Z",
   "coordinator": "AGENT-1-UNIFIED",
   "status": "WARNING",
-  "totalIssues": 7,
+  "totalIssues": 11,
   "verification": {
     "duplicates": [
       {
         "type": "DUPLICATE_FUNCTION",
-        "name": "debounce",
+        "name": "createFlashcard",
         "files": [
-          "flashcard-app-final.js",
-          "utils/helpers.js"
+          "app-functional.js",
+          "backup_original/flashcards.service.js"
         ],
         "severity": "HIGH"
       },
       {
         "type": "DUPLICATE_FUNCTION",
-        "name": "executedFunction",
+        "name": "onclick",
         "files": [
-          "flashcard-app-final.js",
-          "utils/helpers.js"
+          "app-functional.js",
+          "backup_original/flashcards.service.js"
         ],
         "severity": "HIGH"
       },
       {
         "type": "DUPLICATE_FUNCTION",
-        "name": "showNotification",
+        "name": "onclick",
         "files": [
-          "flashcard-app-final.js",
-          "utils/helpers.js"
+          "app-functional.js",
+          "backup_original/flashcards.service.js"
         ],
         "severity": "HIGH"
       },
       {
         "type": "DUPLICATE_FUNCTION",
-        "name": "formatDate",
+        "name": "x",
         "files": [
-          "flashcard-app-final.js",
-          "utils/helpers.js"
+          "dashboard-enhanced.js",
+          "dashboard-enhanced.js"
         ],
         "severity": "HIGH"
       },
       {
         "type": "DUPLICATE_FUNCTION",
-        "name": "generateId",
+        "name": "showSection",
         "files": [
-          "flashcard-app-final.js",
-          "utils/helpers.js"
-        ],
-        "severity": "HIGH"
-      },
-      {
-        "type": "DUPLICATE_FUNCTION",
-        "name": "later",
-        "files": [
-          "flashcard-app-final.js",
-          "utils/helpers.js"
-        ],
-        "severity": "HIGH"
-      },
-      {
-        "type": "DUPLICATE_FUNCTION",
-        "name": "error",
-        "files": [
-          "flashcard-app-final.js",
-          "utils/loading.js"
+          "app-functional.js",
+          "mobile-fixes.js"
         ],
         "severity": "HIGH"
       }
     ],
-    "communication": [],
-    "fileStructure": []
+    "communication": [
+      {
+        "type": "BROKEN_IMPORT",
+        "file": "build-script.js",
+        "import": "vite",
+        "severity": "HIGH"
+      },
+      {
+        "type": "BROKEN_IMPORT",
+        "file": "build-script.js",
+        "import": "fs",
+        "severity": "HIGH"
+      },
+      {
+        "type": "BROKEN_IMPORT",
+        "file": "tests/unit/navigation.test.js",
+        "import": "vitest",
+        "severity": "HIGH"
+      }
+    ],
+    "fileStructure": [
+      {
+        "type": "MISSING_FILE",
+        "file": "flashcard-app-final.js",
+        "severity": "MEDIUM"
+      },
+      {
+        "type": "MISSING_FILE",
+        "file": "utils/helpers.js",
+        "severity": "MEDIUM"
+      },
+      {
+        "type": "MISSING_FILE",
+        "file": "utils/formValidation.js",
+        "severity": "MEDIUM"
+      }
+    ]
   },
-  "executionTime": 34,
+  "executionTime": 22,
   "instructionsGenerated": 5
 }
