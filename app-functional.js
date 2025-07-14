@@ -313,16 +313,242 @@ class StudyingFlashApp {
         Utils.log('Cargando dashboard');
         this.updateDecksList();
         this.updateStats();
+        
+        // ✨ MEJORA: Mostrar acciones rápidas contextuales
+        this.showQuickActions();
+    }
+
+    /**
+     * ✨ MEJORA: Mostrar acciones rápidas en el dashboard
+     */
+    showQuickActions() {
+        const dashboardStats = document.getElementById('dashboard-stats');
+        if (!dashboardStats) return;
+
+        // Buscar o crear contenedor de acciones rápidas
+        let quickActions = document.getElementById('quick-actions');
+        if (!quickActions) {
+            quickActions = document.createElement('div');
+            quickActions.id = 'quick-actions';
+            quickActions.className = 'quick-actions-container';
+            quickActions.style.cssText = `
+                margin-top: 20px;
+                display: flex;
+                gap: 15px;
+                flex-wrap: wrap;
+            `;
+            dashboardStats.appendChild(quickActions);
+        }
+
+        // Generar acciones contextuales basadas en el estado actual
+        const actions = this.generateContextualActions();
+        
+        quickActions.innerHTML = actions.map(action => `
+            <button class="quick-action-btn" onclick="${action.onClick}" style="
+                background: ${action.color || '#6366f1'};
+                color: white;
+                border: none;
+                padding: 10px 15px;
+                border-radius: 8px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                transition: transform 0.2s ease;
+            " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                <span>${action.icon}</span>
+                <span>${action.text}</span>
+            </button>
+        `).join('');
+    }
+
+    /**
+     * ✨ MEJORA: Generar acciones contextuales según el estado actual
+     */
+    generateContextualActions() {
+        const actions = [];
+
+        // Si no hay decks, prioritizar creación
+        if (this.decks.length === 0) {
+            actions.push({
+                icon: '➕',
+                text: 'Crear tu primer deck',
+                onClick: "app.showSection('crear')",
+                color: '#10b981'
+            });
+        } else {
+            // Si hay decks pero pocas flashcards
+            const avgFlashcardsPerDeck = this.flashcards.length / this.decks.length;
+            if (avgFlashcardsPerDeck < 5) {
+                actions.push({
+                    icon: '📝',
+                    text: 'Agregar más flashcards',
+                    onClick: "app.showSection('crear')",
+                    color: '#f59e0b'
+                });
+            }
+        }
+
+        // Si hay contenido para estudiar
+        const readyToStudy = this.flashcards.filter(card => 
+            new Date(card.algorithm_data.next_review) <= new Date()
+        ).length;
+        
+        if (readyToStudy > 0) {
+            actions.push({
+                icon: '📚',
+                text: `Estudiar ${readyToStudy} tarjetas`,
+                onClick: "app.showSection('estudiar')",
+                color: '#8b5cf6'
+            });
+        }
+
+        // Si hay decks para gestionar
+        if (this.decks.length > 0) {
+            actions.push({
+                icon: '⚙️',
+                text: 'Gestionar decks',
+                onClick: "app.showSection('gestionar')",
+                color: '#6b7280'
+            });
+        }
+
+        return actions;
     }
 
     loadCreateSection() {
         Utils.log('Cargando sección crear');
         this.updateDeckOptions();
+        
+        // ✨ MEJORA: Mostrar guía contextual
+        this.showCreationGuidance();
+    }
+
+    /**
+     * ✨ MEJORA: Mostrar guía contextual en la sección crear
+     */
+    showCreationGuidance() {
+        const createSection = document.getElementById('crear');
+        if (!createSection) return;
+
+        // Buscar o crear contenedor de guía
+        let guidance = document.getElementById('creation-guidance');
+        if (!guidance) {
+            guidance = document.createElement('div');
+            guidance.id = 'creation-guidance';
+            guidance.className = 'creation-guidance';
+            guidance.style.cssText = `
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                padding: 20px;
+                border-radius: 12px;
+                margin-bottom: 20px;
+                text-align: center;
+            `;
+            
+            const cardHeader = createSection.querySelector('.card-header');
+            if (cardHeader) {
+                cardHeader.insertAdjacentElement('afterend', guidance);
+            }
+        }
+
+        // Generar mensaje de guía basado en el estado actual
+        const message = this.generateCreationGuidanceMessage();
+        guidance.innerHTML = `
+            <h3 style="margin: 0 0 10px 0;">${message.title}</h3>
+            <p style="margin: 0; opacity: 0.9;">${message.description}</p>
+        `;
+    }
+
+    /**
+     * ✨ MEJORA: Generar mensaje de guía según el estado
+     */
+    generateCreationGuidanceMessage() {
+        if (this.decks.length === 0) {
+            return {
+                title: '🎯 ¡Empecemos con tu primer deck!',
+                description: 'Crea un deck para organizar tus flashcards por tema. Por ejemplo: "Vocabulario Inglés" o "Historia Universal".'
+            };
+        }
+
+        const emptyDecks = this.decks.filter(deck => 
+            this.flashcards.filter(card => card.deckId === deck.id).length === 0
+        );
+
+        if (emptyDecks.length > 0) {
+            return {
+                title: `📚 Agrega flashcards a "${emptyDecks[0].name}"`,
+                description: 'Ya tienes decks creados. ¡Ahora agrega flashcards para comenzar a estudiar!'
+            };
+        }
+
+        return {
+            title: '🚀 ¡Sigue creando contenido!',
+            description: 'Puedes crear más decks o agregar flashcards a los existentes. ¡Mientras más contenido, mejor será tu aprendizaje!'
+        };
     }
 
     loadStudySection() {
         Utils.log('Cargando sección estudiar');
         this.updateStudyDecks();
+        
+        // ✨ MEJORA: Mostrar estadísticas de estudio y motivación
+        this.showStudyMotivation();
+    }
+
+    /**
+     * ✨ MEJORA: Mostrar motivación y estadísticas en sección de estudio
+     */
+    showStudyMotivation() {
+        const studySection = document.getElementById('estudiar');
+        if (!studySection) return;
+
+        // Buscar o crear contenedor de motivación
+        let motivation = document.getElementById('study-motivation');
+        if (!motivation) {
+            motivation = document.createElement('div');
+            motivation.id = 'study-motivation';
+            motivation.className = 'study-motivation';
+            motivation.style.cssText = `
+                background: linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%);
+                color: white;
+                padding: 20px;
+                border-radius: 12px;
+                margin-bottom: 20px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+            `;
+            
+            const cardHeader = studySection.querySelector('.card-header');
+            if (cardHeader) {
+                cardHeader.insertAdjacentElement('afterend', motivation);
+            }
+        }
+
+        const readyToStudy = this.flashcards.filter(card => 
+            new Date(card.algorithm_data.next_review) <= new Date()
+        ).length;
+
+        const todayGoal = 20; // Meta diaria
+        const studiedToday = this.getStudiedToday();
+        const progressPercent = Math.min((studiedToday / todayGoal) * 100, 100);
+
+        motivation.innerHTML = `
+            <div>
+                <h3 style="margin: 0 0 5px 0;">🎯 ¡Es hora de estudiar!</h3>
+                <p style="margin: 0; opacity: 0.9;">
+                    ${readyToStudy} tarjetas listas • ${studiedToday}/${todayGoal} estudiadas hoy
+                </p>
+            </div>
+            <div style="text-align: right;">
+                <div style="width: 60px; height: 60px; border-radius: 50%; border: 3px solid rgba(255,255,255,0.3); display: flex; align-items: center; justify-content: center; position: relative;">
+                    <span style="font-size: 18px; font-weight: bold;">${Math.round(progressPercent)}%</span>
+                    <div style="position: absolute; top: -3px; left: -3px; width: 60px; height: 60px; border-radius: 50%; border: 3px solid transparent; border-top-color: white; transform: rotate(${progressPercent * 3.6}deg); transition: transform 0.3s ease;"></div>
+                </div>
+            </div>
+        `;
     }
 
     loadManageSection() {
@@ -413,6 +639,15 @@ class StudyingFlashApp {
         // Actualizar UI
         this.updateDecksList();
         this.updateDeckOptions();
+        
+        // ✨ MEJORA: Actualizar dashboard inmediatamente
+        this.updateStats();
+        this.showDashboardNotification(`📚 Deck "${name}" creado exitosamente`, 'success');
+        
+        // Si estamos en dashboard, refrescar las estadísticas visualmente
+        if (this.currentSection === 'dashboard') {
+            this.refreshDashboardDisplay();
+        }
     }
 
     /**
@@ -519,6 +754,15 @@ class StudyingFlashApp {
         // Actualizar estadísticas del deck
         Utils.log('🔧 [StudyingFlash] Actualizando estadísticas del deck');
         this.updateDeckStats(deckId);
+        
+        // ✨ MEJORA: Actualizar dashboard inmediatamente
+        this.updateStats();
+        this.showDashboardNotification(`📝 Flashcard agregado al deck`, 'success');
+        
+        // Si estamos en dashboard, refrescar las estadísticas visualmente
+        if (this.currentSection === 'dashboard') {
+            this.refreshDashboardDisplay();
+        }
         
         Utils.log('🔧 [StudyingFlash] Creación de flashcard completada exitosamente');
     }
@@ -824,14 +1068,36 @@ class StudyingFlashApp {
 
         const session = this.currentStudySession;
         
-        // Mostrar resumen de la sesión
+        // ✨ MEJORA: Actualizar estadísticas de sesión
+        if (!this.stats.sessionsCompleted) this.stats.sessionsCompleted = 0;
+        this.stats.sessionsCompleted++;
+        
+        // Actualizar estadísticas diarias
+        const today = new Date().toDateString();
+        if (!this.stats.dailyStudy) this.stats.dailyStudy = {};
+        if (!this.stats.dailyStudy[today]) this.stats.dailyStudy[today] = 0;
+        this.stats.dailyStudy[today] += session.stats.correct + session.stats.incorrect;
+        
+        // Guardar estadísticas
+        localStorage.setItem('studyingflash_stats', JSON.stringify(this.stats));
+
+        // Mostrar resumen de la sesión con más detalles
+        const accuracy = session.stats.total > 0 ? Math.round((session.stats.correct / session.stats.total) * 100) : 0;
+        const pointsEarned = session.stats.correct * 10;
+        
         Utils.showNotification(
-            `Sesión completada: ${session.stats.correct}/${session.stats.total} correctas`, 
+            `✅ Sesión completada: ${session.stats.correct}/${session.stats.total} correctas (${accuracy}%) - ${pointsEarned} puntos ganados`, 
             'success'
         );
 
+        // ✨ MEJORA: Mostrar notificación de logros si aplica
+        this.checkAndShowAchievements();
+
         // Actualizar estadísticas globales
         this.updateGlobalStats(session.stats);
+
+        // ✨ MEJORA: Actualizar dashboard automáticamente
+        this.updateStats();
 
         // Limpiar sesión
         this.currentStudySession = null;
@@ -842,6 +1108,39 @@ class StudyingFlashApp {
         
         if (studyInterface) studyInterface.classList.add('hidden');
         if (deckSelection) deckSelection.classList.remove('hidden');
+        
+        // ✨ MEJORA: Refrescar motivación de estudio
+        this.showStudyMotivation();
+    }
+
+    /**
+     * ✨ MEJORA: Verificar y mostrar logros desbloqueados
+     */
+    checkAndShowAchievements() {
+        const achievements = [];
+        
+        // Primer sesión
+        if (this.stats.sessionsCompleted === 1) {
+            achievements.push({
+                title: '🎯 Primera Sesión',
+                description: '¡Completaste tu primera sesión de estudio!'
+            });
+        }
+        
+        // 10 sesiones
+        if (this.stats.sessionsCompleted === 10) {
+            achievements.push({
+                title: '🔥 Estudiante Dedicado',
+                description: '¡10 sesiones completadas!'
+            });
+        }
+        
+        // Mostrar logros
+        achievements.forEach(achievement => {
+            setTimeout(() => {
+                Utils.showNotification(`🏆 ${achievement.title}: ${achievement.description}`, 'success');
+            }, 1000);
+        });
     }
 
     // ===== ESTADÍSTICAS =====
@@ -849,20 +1148,181 @@ class StudyingFlashApp {
         const totalDecks = this.decks.length;
         const totalFlashcards = this.flashcards.length;
         const studiedToday = this.getStudiedToday();
+        const accuracy = this.calculateAccuracy();
+        const streak = this.getCurrentStreak();
+        const totalProgress = this.calculateTotalProgress();
 
         // Actualizar elementos de estadísticas en el dashboard
         const statsElements = {
-            'total-decks': totalDecks,
-            'total-flashcards': totalFlashcards,
-            'studied-today': studiedToday
+            'total-cards': totalFlashcards,
+            'studied-today': studiedToday,
+            'accuracy': `${accuracy}%`,
+            'streak': streak,
+            'total-progress': `${totalProgress}%`
         };
 
         Object.entries(statsElements).forEach(([id, value]) => {
             const element = document.getElementById(id);
             if (element) {
                 element.textContent = value;
+                // Agregar animación visual para cambios
+                element.style.transform = 'scale(1.1)';
+                setTimeout(() => {
+                    element.style.transform = 'scale(1)';
+                }, 200);
             }
         });
+
+        // Actualizar también estadísticas específicas del ranking
+        this.updateRankingStats();
+    }
+
+    calculateAccuracy() {
+        if (this.flashcards.length === 0) return 0;
+        
+        const studiedCards = this.flashcards.filter(card => 
+            card.algorithm_data && card.algorithm_data.repetitions > 0
+        );
+        
+        if (studiedCards.length === 0) return 0;
+        
+        const correctAnswers = studiedCards.filter(card => 
+            card.algorithm_data.repetitions >= 2
+        ).length;
+        
+        return Math.round((correctAnswers / studiedCards.length) * 100);
+    }
+
+    calculateTotalProgress() {
+        if (this.decks.length === 0) return 0;
+        
+        const totalCards = this.flashcards.length;
+        if (totalCards === 0) return 0;
+        
+        const masteredCards = this.flashcards.filter(card => 
+            card.algorithm_data && card.algorithm_data.repetitions >= 3
+        ).length;
+        
+        return Math.round((masteredCards / totalCards) * 100);
+    }
+
+    updateRankingStats() {
+        const userTotalPoints = document.getElementById('user-total-points');
+        const userCurrentLevel = document.getElementById('user-current-level');
+        const userCurrentStreak = document.getElementById('user-current-streak');
+        const userAchievementsCount = document.getElementById('user-achievements-count');
+
+        if (userTotalPoints) {
+            userTotalPoints.textContent = this.calculateTotalScore();
+        }
+        if (userCurrentLevel) {
+            userCurrentLevel.textContent = this.calculateCurrentLevel();
+        }
+        if (userCurrentStreak) {
+            userCurrentStreak.textContent = this.getCurrentStreak();
+        }
+        if (userAchievementsCount) {
+            userAchievementsCount.textContent = this.getAchievementsCount();
+        }
+    }
+
+    /**
+     * ✨ MEJORA: Mostrar notificación específica del dashboard
+     */
+    showDashboardNotification(message, type = 'success') {
+        Utils.showNotification(message, type);
+        
+        // También actualizar cualquier indicador visual en el dashboard
+        const indicator = document.createElement('div');
+        indicator.className = 'dashboard-update-indicator';
+        indicator.textContent = '●';
+        indicator.style.cssText = `
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            background: ${type === 'success' ? '#10b981' : '#ef4444'};
+            color: white;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            z-index: 9999;
+            animation: pulse 0.5s ease infinite;
+        `;
+        
+        document.body.appendChild(indicator);
+        setTimeout(() => {
+            indicator.remove();
+        }, 2000);
+    }
+
+    /**
+     * ✨ MEJORA: Refrescar la visualización del dashboard
+     */
+    refreshDashboardDisplay() {
+        // Animar las tarjetas de estadísticas para mostrar que se actualizaron
+        const statCards = document.querySelectorAll('.stat-card');
+        statCards.forEach((card, index) => {
+            setTimeout(() => {
+                card.style.transform = 'translateY(-5px)';
+                card.style.boxShadow = '0 8px 25px rgba(0,0,0,0.15)';
+                setTimeout(() => {
+                    card.style.transform = 'translateY(0)';
+                    card.style.boxShadow = '0 4px 15px rgba(0,0,0,0.1)';
+                }, 300);
+            }, index * 100);
+        });
+    }
+
+    calculateCurrentLevel() {
+        const totalScore = this.calculateTotalScore();
+        return Math.floor(totalScore / 1000) + 1;
+    }
+
+    getAchievementsCount() {
+        let count = 0;
+        
+        // Logro: Primer deck
+        if (this.decks.length >= 1) count++;
+        
+        // Logro: Primera flashcard
+        if (this.flashcards.length >= 1) count++;
+        
+        // Logro: 10 flashcards
+        if (this.flashcards.length >= 10) count++;
+        
+        // Logro: Sesión de estudio
+        if (this.stats.sessionsCompleted >= 1) count++;
+        
+        return count;
+    }
+
+    updateStatsSection() {
+        // Implementar estadísticas detalladas
+        const statsContainer = document.getElementById('stats-container');
+        if (!statsContainer) return;
+
+        const stats = this.calculateDetailedStats();
+        
+        statsContainer.innerHTML = `
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Decks Totales</h3>
+                    <div class="stat-number">${stats.totalDecks}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Tarjetas Totales</h3>
+                    <div class="stat-number">${stats.totalFlashcards}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Estudiadas Hoy</h3>
+                    <div class="stat-number">${stats.studiedToday}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Racha Actual</h3>
+                    <div class="stat-number">${stats.currentStreak} días</div>
+                </div>
+            </div>
+        `;
     }
 
     updateStatsSection() {
@@ -1169,6 +1629,7 @@ function showUserMenu() {
 
 function checkUserLogin() {
     const user = JSON.parse(localStorage.getItem('studyingflash_user') || '{}');
+    if (user.email) {
         updateUIForLoggedUser(user.email);
     }
 }

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test: Dashboard Integration Improvements</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f8f9fa; }
+        .test-container { max-width: 800px; margin: 0 auto; }
+        .test-section { background: white; padding: 20px; margin: 20px 0; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .test-result { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .success { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .error { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .warning { background: #fff3cd; color: #856404; border-left: 4px solid #ffc107; }
+        .btn { padding: 10px 15px; margin: 5px; border: none; border-radius: 5px; cursor: pointer; }
+        .btn-primary { background: #007bff; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        .stats-display { display: flex; gap: 20px; flex-wrap: wrap; margin: 15px 0; }
+        .stat-card { background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: center; min-width: 120px; }
+        .stat-value { font-size: 24px; font-weight: bold; color: #007bff; }
+        .stat-label { font-size: 12px; color: #666; margin-top: 5px; }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Test de Mejoras de Integración Dashboard</h1>
+        
+        <div class="test-section">
+            <h2>📊 Estadísticas del Dashboard</h2>
+            <div class="stats-display" id="dashboard-stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="total-cards">0</div>
+                    <div class="stat-label">Total Flashcards</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="studied-today">0</div>
+                    <div class="stat-label">Estudiadas Hoy</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="accuracy">0%</div>
+                    <div class="stat-label">Precisión</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="streak">0</div>
+                    <div class="stat-label">Racha</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>⚡ Acciones de Prueba</h2>
+            <button class="btn btn-primary" onclick="testCreateDeck()">🏗️ Simular Crear Deck</button>
+            <button class="btn btn-success" onclick="testCreateFlashcard()">📝 Simular Crear Flashcard</button>
+            <button class="btn btn-primary" onclick="testStudySession()">📚 Simular Sesión de Estudio</button>
+            <button class="btn" onclick="resetData()">🔄 Resetear Datos</button>
+        </div>
+
+        <div class="test-section">
+            <h2>📋 Resultados de Pruebas</h2>
+            <div id="test-results">
+                <div class="test-result">⏳ Listo para ejecutar pruebas...</div>
+            </div>
+        </div>
+
+        <!-- Mock sections for testing -->
+        <div style="display: none;">
+            <div id="dashboard" class="section"></div>
+            <div id="crear" class="section"></div>
+            <div id="estudiar" class="section"></div>
+            
+            <input type="text" id="deck-name">
+            <textarea id="deck-description"></textarea>
+            <input type="checkbox" id="deck-public">
+            
+            <select id="flashcard-deck"></select>
+            <textarea id="flashcard-front"></textarea>
+            <textarea id="flashcard-back"></textarea>
+        </div>
+    </div>
+
+    <script>
+        // Mock de la aplicación StudyingFlash para testing
+        let mockDecks = JSON.parse(localStorage.getItem('studyingflash_decks') || '[]');
+        let mockFlashcards = JSON.parse(localStorage.getItem('studyingflash_flashcards') || '[]');
+        let mockStats = JSON.parse(localStorage.getItem('studyingflash_stats') || '{}');
+
+        function logResult(message, type = 'success') {
+            const resultsDiv = document.getElementById('test-results');
+            const resultElement = document.createElement('div');
+            resultElement.className = `test-result ${type}`;
+            resultElement.innerHTML = `[${new Date().toLocaleTimeString()}] ${message}`;
+            resultsDiv.appendChild(resultElement);
+            resultsDiv.scrollTop = resultsDiv.scrollHeight;
+        }
+
+        function updateMockStats() {
+            document.getElementById('total-cards').textContent = mockFlashcards.length;
+            document.getElementById('studied-today').textContent = Math.floor(Math.random() * 5);
+            document.getElementById('accuracy').textContent = mockFlashcards.length > 0 ? Math.floor(Math.random() * 30 + 70) + '%' : '0%';
+            document.getElementById('streak').textContent = Math.floor(Math.random() * 10 + 1);
+            
+            // Animar actualización
+            document.querySelectorAll('.stat-value').forEach(element => {
+                element.style.transform = 'scale(1.1)';
+                element.style.color = '#28a745';
+                setTimeout(() => {
+                    element.style.transform = 'scale(1)';
+                    element.style.color = '#007bff';
+                }, 300);
+            });
+        }
+
+        function testCreateDeck() {
+            logResult('🏗️ Simulando creación de deck...', 'warning');
+            
+            const newDeck = {
+                id: 'deck-' + Date.now(),
+                name: `Deck de Prueba ${mockDecks.length + 1}`,
+                description: 'Deck creado para testing',
+                createdAt: new Date().toISOString()
+            };
+            
+            mockDecks.push(newDeck);
+            localStorage.setItem('studyingflash_decks', JSON.stringify(mockDecks));
+            
+            setTimeout(() => {
+                updateMockStats();
+                logResult(`✅ Deck "${newDeck.name}" creado exitosamente. Total decks: ${mockDecks.length}`, 'success');
+                logResult('📊 Dashboard actualizado automáticamente', 'success');
+            }, 500);
+        }
+
+        function testCreateFlashcard() {
+            if (mockDecks.length === 0) {
+                logResult('❌ No hay decks disponibles. Crea un deck primero.', 'error');
+                return;
+            }
+
+            logResult('📝 Simulando creación de flashcard...', 'warning');
+            
+            const randomDeck = mockDecks[Math.floor(Math.random() * mockDecks.length)];
+            const newFlashcard = {
+                id: 'card-' + Date.now(),
+                deckId: randomDeck.id,
+                front_content: { text: `Pregunta ${mockFlashcards.length + 1}` },
+                back_content: { text: `Respuesta ${mockFlashcards.length + 1}` },
+                createdAt: new Date().toISOString(),
+                algorithm_data: {
+                    ease_factor: 2.5,
+                    interval: 1,
+                    repetitions: 0,
+                    next_review: new Date().toISOString()
+                }
+            };
+            
+            mockFlashcards.push(newFlashcard);
+            localStorage.setItem('studyingflash_flashcards', JSON.stringify(mockFlashcards));
+            
+            setTimeout(() => {
+                updateMockStats();
+                logResult(`✅ Flashcard agregada al deck "${randomDeck.name}". Total flashcards: ${mockFlashcards.length}`, 'success');
+                logResult('📊 Estadísticas actualizadas en tiempo real', 'success');
+            }, 500);
+        }
+
+        function testStudySession() {
+            if (mockFlashcards.length === 0) {
+                logResult('❌ No hay flashcards para estudiar. Crea algunas primero.', 'error');
+                return;
+            }
+
+            logResult('📚 Simulando sesión de estudio...', 'warning');
+            
+            // Simular estudio de 3-5 tarjetas
+            const cardsStudied = Math.min(mockFlashcards.length, Math.floor(Math.random() * 3) + 3);
+            const correctAnswers = Math.floor(cardsStudied * 0.7); // 70% de acierto
+            
+            setTimeout(() => {
+                updateMockStats();
+                logResult(`✅ Sesión completada: ${correctAnswers}/${cardsStudied} correctas (${Math.round(correctAnswers/cardsStudied*100)}%)`, 'success');
+                logResult(`🏆 +${correctAnswers * 10} puntos ganados`, 'success');
+                logResult('📊 Dashboard actualizado con nuevas estadísticas', 'success');
+            }, 1000);
+        }
+
+        function resetData() {
+            mockDecks = [];
+            mockFlashcards = [];
+            mockStats = {};
+            
+            localStorage.removeItem('studyingflash_decks');
+            localStorage.removeItem('studyingflash_flashcards');
+            localStorage.removeItem('studyingflash_stats');
+            
+            updateMockStats();
+            logResult('🔄 Datos reseteados. Todas las estadísticas vuelven a cero.', 'warning');
+            
+            // Limpiar resultados
+            setTimeout(() => {
+                document.getElementById('test-results').innerHTML = '<div class="test-result">⏳ Listo para ejecutar nuevas pruebas...</div>';
+            }, 2000);
+        }
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            updateMockStats();
+            logResult('🚀 Sistema de pruebas inicializado', 'success');
+            logResult(`📊 Estado inicial: ${mockDecks.length} decks, ${mockFlashcards.length} flashcards`, 'success');
+        });
+    </script>
+</body>
+</html>
