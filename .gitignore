@@ -152,6 +152,7 @@ index-*.js
 index-*.css
 *-[A-Za-z0-9]*.js
 *-[A-Za-z0-9]*.css
+!build-script.js
 
 # Vite build outputs
 assets/
