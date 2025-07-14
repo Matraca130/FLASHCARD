@@ -1169,6 +1169,7 @@ function showUserMenu() {
 
 function checkUserLogin() {
     const user = JSON.parse(localStorage.getItem('studyingflash_user') || '{}');
+    if (user && user.loggedIn) {
         updateUIForLoggedUser(user.email);
     }
 }
