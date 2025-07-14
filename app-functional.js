@@ -9,6 +9,7 @@ const CONFIG = {
 const Utils = {
     log: (message, data = null) => {
         if (CONFIG.DEBUG) {
+            console.log(`ℹ️ [StudyingFlash] ${message}`, data ?? '');
         }
     },
     
