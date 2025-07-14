@@ -239,14 +239,15 @@ class StudyingFlashApp {
     showSection(sectionName) {
         Utils.log(`Navegando a sección: ${sectionName}`);
         
-        // Ocultar todas las secciones con cssText completo
+        // Ocultar todas las secciones quitando la clase activa
         document.querySelectorAll('.section').forEach(section => {
-            section.style.cssText = 'display: none !important;';
+            section.classList.remove('active');
         });
-        // Mostrar la sección solicitada con cssText completo
+
+        // Mostrar la sección solicitada agregando la clase activa
         const targetSection = document.getElementById(sectionName);
         if (targetSection) {
-            targetSection.style.cssText = 'display: block !important; visibility: visible !important; opacity: 1 !important;';
+            targetSection.classList.add('active');
             this.currentSection = sectionName;
             // Cargar contenido específico de la sección
             this.loadSectionContent(sectionName);
