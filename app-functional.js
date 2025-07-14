@@ -294,16 +294,23 @@ class StudyingFlashApp {
         }
     }
 
-    loadDashboard() {     const mobileMenu = document.querySelector('.mobile-menu');
-        if (mobileMenu) {
-            mobileMenu.classList.toggle('active');
-        }
-    }
-
+    /**
+     * Cierra el menú móvil si está abierto
+     */
     closeMobileMenu() {
         const mobileMenu = document.querySelector('.mobile-menu');
         if (mobileMenu) {
             mobileMenu.classList.remove('active');
+        }
+    }
+
+    /**
+     * Alterna la visibilidad del menú móvil
+     */
+    toggleMobileMenu() {
+        const mobileMenu = document.querySelector('.mobile-menu');
+        if (mobileMenu) {
+            mobileMenu.classList.toggle('active');
         }
     }
 
