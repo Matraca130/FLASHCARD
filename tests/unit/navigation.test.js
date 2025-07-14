@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from '';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Mock DOM elements
 const mockElement = {
