@@ -8,7 +8,12 @@ const CONFIG = {
 // ===== UTILIDADES GLOBALES =====
 const Utils = {
     log: (message, data = null) => {
-        if (CONFIG.DEBUG) {
+        if (!CONFIG.DEBUG) return;
+
+        if (data !== null) {
+            console.log(`📝 [StudyingFlash] ${message}`, data);
+        } else {
+            console.log(`📝 [StudyingFlash] ${message}`);
         }
     },
     
